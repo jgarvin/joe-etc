@@ -1,6 +1,3 @@
-# Run my script for adding paths for software installed in ~/opt
-export PATH=`~/etc/build_path.py`
-
 # Push the current folder onto the stack everytime I switch folders
 setopt autopushd
 
