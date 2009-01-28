@@ -1,3 +1,6 @@
+# Run my script for adding paths for software installed in ~/opt
+export PATH=`~/etc/build_path.py`
+
 # number of lines kept in history
 export HISTSIZE=100000
 
