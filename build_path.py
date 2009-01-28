@@ -8,12 +8,24 @@ import glob
 import sys
 import subprocess
 
-def has_duplicates(x):
-    return len(x) != len(set(x))
+def find_duplicates(x):
+    unique_list = set(x)
+    dup_list = [i for i in unique_list if x.count(i) > 1]
 
-def any_redundant_folders(proposed_path):
-    paths = proposed_path.split(":")
-    return has_duplicates(paths)
+    return dup_list
+
+def any_redundant_folders(proposed_paths):
+    return find_duplicates(proposed_paths)
+
+def any_redundant_executables(proposed_paths):
+    files = []
+    for path in proposed_paths:
+        files += glob.glob(path + "/*")
+
+    # Strip off leading part of path
+    files = [bin.split("/")[-1] for bin in files]
+
+    return find_duplicates(files)
 
 def x_server_running():
     return os.getenv("DISPLAY") != None
@@ -29,15 +41,24 @@ def main():
 
     bin_folders = glob.glob(opt_folder + "/*/bin")
 
-    new_path = old_path = os.getenv("PATH")
-    for folder in bin_folders:
-        new_path = folder + ":" + new_path
+    old_path_string = os.getenv("PATH")
 
-    if any_redundant_folders(new_path):
-        print(old_path)
-        fail_with_error("Error, trying to add redundant bin folders from /opt!")
+    # Only check for redundancy within ~/opt, because the default install
+    # of ubuntu already has some redundant bin entries
+    duplicates = any_redundant_executables(bin_folders)
+    if duplicates:
+        print(old_path_string)
+        fail_with_error("Error: redundant bins: " + str(duplicates))
 
-    print(new_path)
+    new_paths = bin_folders + old_path_string.split(":")
+
+    duplicates = any_redundant_folders(new_paths)
+    if duplicates:
+        print(old_path_string)
+        fail_with_error("Error: redundant bin folders: " + str(duplicates))
+
+    final_path_string = ":".join(new_paths)
+    print(final_path_string)
 
 if __name__ == "__main__":
     main()
