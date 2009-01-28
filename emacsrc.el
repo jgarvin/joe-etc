@@ -1,3 +1,4 @@
+;; Don't litter everywhere with file~ backups
 (setq
  backup-by-copying t      ; don't clobber symlinks
  backup-directory-alist
@@ -10,12 +11,9 @@
 ;; Prefer to code in Python 3.0, the future :D
 (setq-default py-python-command "python3")
 
+;; Emacs won't load shell-script-mode for zsh automatically
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
-       '(("/\\.[^/]*\\'" . fundamental-mode)
-	 ;; File name has no dot.
-	 ("/[^\\./]*\\'" . fundamental-mode)
-	 ;; File name ends in `.C'.
-	 ("\\.C\\'" . c++-mode))
+       '(("zshrc" . shell-script-mode))
        auto-mode-alist))
