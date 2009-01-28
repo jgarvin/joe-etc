@@ -1,3 +1,8 @@
+# Add stuff to path from /opt if .xsession hasn't already
+if [[ $DISPLAY = '' ]]; then
+    export PATH=`~/etc/build_path.py`
+fi
+
 # Push the current folder onto the stack everytime I switch folders
 setopt autopushd
 
