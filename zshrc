@@ -5,8 +5,8 @@ export PATH=`~/etc/build_path.py`
 setopt autopushd
 
 # Give some convenient shortcuts for pushing and popping folder stack
-alias b='pushd +1'
-alias f='pushd -0'
+alias -r b='pushd +1'
+alias -r f='pushd -0'
 
 # number of lines kept in history
 export HISTSIZE=100000
