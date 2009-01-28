@@ -8,6 +8,9 @@ setopt autopushd
 alias -r b='pushd +1'
 alias -r f='pushd -0'
 
+# Ack is a nice replacement for grep, just does the right thing
+alias -r ack='ack-grep'
+
 # number of lines kept in history
 export HISTSIZE=100000
 
