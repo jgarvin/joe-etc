@@ -1,1 +1,1 @@
-(load "~/etc/emacsrc")
+(load "~/etc/emacsrc.el")
