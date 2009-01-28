@@ -11,6 +11,9 @@ alias -r f='pushd -0'
 # Ack is a nice replacement for grep, just does the right thing
 alias -r ack='ack-grep'
 
+# 'ls' output is easier to read when colored
+alias -r ls='ls --color=auto'
+
 # number of lines kept in history
 export HISTSIZE=100000
 
