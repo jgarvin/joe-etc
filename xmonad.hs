@@ -85,10 +85,11 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_f), runOrRaise "firefox" (className =? "Firefox"))
 
     -- launch pidgin
-    , ((modMask,  xK_f), runOrRaise "pidgin" (className =? "pidgin" && stringProperty "WM_ICON_NAME" =? "console"))
+    -- Need a bit more knowledge for this one, not sure how to give priorities for windows
+    -- , ((modMask,  xK_f), runOrRaise "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
 
     -- launch xchat
-    , ((modMask,  xK_h), runOrRaise "xchat" (className =? "Firefox"))
+    , ((modMask,  xK_x), runOrRaise "xchat" (className =? "xchat"))
 
     -- close focused window 
     , ((modMask , xK_c     ), kill)
