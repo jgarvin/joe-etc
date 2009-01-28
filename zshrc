@@ -1,6 +1,13 @@
 # Run my script for adding paths for software installed in ~/opt
 export PATH=`~/etc/build_path.py`
 
+# Push the current folder onto the stack everytime I switch folders
+setopt autopushd
+
+# Give some convenient shortcuts for pushing and popping folder stack
+alias b='pushd +1'
+alias f='pushd -0'
+
 # number of lines kept in history
 export HISTSIZE=100000
 
