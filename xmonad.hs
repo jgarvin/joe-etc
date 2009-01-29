@@ -89,7 +89,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- , ((modMask,  xK_f), runOrRaise "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
 
     -- launch xchat
-    , ((modMask,  xK_x), runOrRaise "xchat" (className =? "xchat"))
+    , ((modMask,  xK_x), runOrRaise "xchat" (className =? "Xchat"))
 
     -- close focused window 
     , ((modMask , xK_c     ), kill)
