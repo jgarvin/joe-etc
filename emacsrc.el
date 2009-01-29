@@ -1,3 +1,5 @@
+(set-frame-font "Consolas-9")
+
 ;; Don't litter everywhere with file~ backups
 (setq
  backup-by-copying t      ; don't clobber symlinks
@@ -17,3 +19,7 @@
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
+
+;; Make emacs use the normal clipboard
+(setq x-select-enable-clipboard t)
+(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
