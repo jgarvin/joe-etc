@@ -51,3 +51,13 @@
     (require 'gtags)
     (gtags-mode t)
     (djcb-gtags-create-or-update)))
+
+;; Append a new line to files so GCC shuts up
+(add-hook 'c-mode-common-hook
+  (lambda ()
+    (setq require-final-newline t)))
+
+;; Turn off GUI parts
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
