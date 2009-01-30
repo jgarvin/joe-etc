@@ -61,3 +61,49 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+(setq inhibit-startup-message t)
+(setq visible-bell t)
+
+;; Show column number in the mode line
+(column-number-mode 1)
+
+;; Prefer 4-space tabs
+(setq c-default-style "bsd")
+(setq-default c-basic-offset 4)
+(setq-default indent-tabs-mode t)
+(setq default-tab-width 4)
+(setq tab-width 4)
+(c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
+
+;; Show matching parentheses
+(show-paren-mode 1)
+
+;; Show current buffer name in titlebar (instead of emacs@whatever)
+(setq frame-title-format "%b")
+
+;;-------------
+;; Switch between source and header
+;;------------
+;; Association list of extension -> inverse extension
+(setq exts '(("c"   . ("h"))
+			 ("cpp" . ("hpp" "h"))
+             ("hpp" . ("cpp" "c"))
+             ("h"   . ("cpp" "c"))))
+
+;; Process the association list of extensions and find the last file
+;; that exists
+(defun find-other-file (fname fext)
+  (dolist (value (cdr (assoc fext exts)) result)
+    (if (file-exists-p (concat fname "." value))
+        (setq result (concat fname "." value)))))
+
+;; Toggle function that uses the current buffer name to open/find the 
+;; other file
+(defun toggle-header-buffer()
+  (interactive)
+  (let ((ext (file-name-extension buffer-file-name))
+        (fname (file-name-sans-extension buffer-file-name)))
+    (find-file (find-other-file fname ext))))
+
+;; Bind the toggle function to a global key
+;;(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key

@@ -79,7 +79,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch emacs
-    , ((modMask,  xK_e), runOrRaise "emacs-snapshot-gtk" (title =? "emacs-snapshot-gtk@spikeshell"))
+    , ((modMask,  xK_e), runOrRaise "emacs-snapshot-gtk" (className =? "Emacs"))
  
     -- launch firefox
     , ((modMask,  xK_f), runOrRaise "firefox" (className =? "Firefox"))
