@@ -14,6 +14,7 @@ import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
 import XMonad.Actions.CopyWindow
+import XMonad.Layout.NoBorders
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
 import qualified XMonad.StackSet as W
@@ -217,6 +218,7 @@ myLayout = tiled ||| Mirror tiled ||| Full
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
+    , title     =? "Brood War"      --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
  
@@ -253,7 +255,7 @@ defaults = defaultConfig {
         mouseBindings      = myMouseBindings,
  
       -- hooks, layouts
-        layoutHook         = ewmhDesktopsLayout $ avoidStruts $ layoutHook defaultConfig,
-        manageHook         = manageDocks <+> manageHook defaultConfig,
+        layoutHook         = smartBorders $ ewmhDesktopsLayout $ avoidStruts $ layoutHook defaultConfig,
+        manageHook         = myManageHook <+> manageDocks <+> manageHook defaultConfig,
         logHook            = ewmhDesktopsLogHook
     }
