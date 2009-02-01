@@ -78,6 +78,9 @@
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 
+;; Don't use alt-x, use C-x C-m, alt is a pain
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+
 ;; Prefer to code in Python 3.0, the future :D
 (setq-default py-python-command "python3")
 
