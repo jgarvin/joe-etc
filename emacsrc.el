@@ -165,6 +165,11 @@
 ;; So I can delete it
 (setq show-trailing-whitespace t)
 
+;; Delete trailing whitespace automagically
+(add-hook 'write-file-hook
+  (lambda ()
+    (nuke-trailing-whitespace)))
+
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
 
