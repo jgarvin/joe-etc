@@ -3,6 +3,9 @@ if [[ $DISPLAY = '' ]]; then
     export PATH=`~/etc/build_path.py`
 fi
 
+# system beep is irritating for tab completion
+unsetopt beep
+
 # Push the current folder onto the stack everytime I switch folders
 setopt autopushd
 
