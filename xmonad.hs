@@ -17,12 +17,19 @@ import XMonad.Actions.CopyWindow
 import XMonad.Layout.NoBorders
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
-import qualified XMonad.StackSet as W
 import XMonad.Util.EZConfig
 
 -- For sawfish'esq jump-or-exec functionality
 import XMonad.ManageHook
 import XMonad.Actions.WindowGo
+
+-- For moving pidgin windows that want attention to my current desktop
+import XMonad.Hooks.UrgencyHook
+import XMonad.Actions.WindowBringer
+
+data MoveUrgency = MoveUrgency deriving (Read, Show)
+instance UrgencyHook MoveUrgency where
+    urgencyHook MoveUrgency w = windows (bringWindow w)
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -239,7 +246,7 @@ main = xmonad defaults
 --
 -- No need to modify this.
 --
-defaults = defaultConfig {
+defaults = withUrgencyHook MoveUrgency $ defaultConfig {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
