@@ -32,6 +32,7 @@ export HISTFILE=~/.zhistory
 setopt inc_append_history
 
 # Enable completions
+zmodload zsh/complist
 autoload -U compinit
 compinit
 
