@@ -255,7 +255,8 @@ defaults = defaultConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = smartBorders $ ewmhDesktopsLayout $ avoidStruts $ layoutHook defaultConfig,
+        layoutHook         = smartBorders $ {- ewmhDesktopsLayout $ -} avoidStruts $ layoutHook defaultConfig,
         manageHook         = myManageHook <+> manageDocks <+> manageHook defaultConfig,
-        logHook            = ewmhDesktopsLogHook
+        logHook            = ewmhDesktopsLogHook,
+        handleEventHook    = ewmhDesktopsEventHook
     }
