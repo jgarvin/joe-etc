@@ -19,6 +19,11 @@ alias -r ack='ack-grep'
 # 'ls' output is easier to read when colored
 alias -r ls='ls --color=auto'
 
+# Intuitively, searches current folder and subfolders
+search () {
+	find \( -type f -o -type d \) -name \*$1\*
+}
+
 # number of lines kept in history
 export HISTSIZE=100000
 
