@@ -31,6 +31,10 @@ export HISTFILE=~/.zhistory
 # append command to history file once executed
 setopt inc_append_history
 
+# Add mime support for opening files
+autoload -U zsh-mime-setup
+zsh-mime-setup
+
 # Enable completions
 zmodload zsh/complist
 autoload -U compinit
