@@ -35,8 +35,22 @@ setopt inc_append_history
 autoload -U compinit
 compinit
 
-# Cache the completions for speed
-zstyle ':completion::complete:*' use-cache 1
+# Pick up new stuff in $path
+_force_rehash() {
+  (( CURRENT == 1 )) && rehash
+  return 1	# Because we didn't really complete anything
+}
+zstyle ':completion:::::' completer _force_rehash _complete _approximate
+# VERY fancy completion
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX + $#SUFFIX) / 3 )) )'
+zstyle ':completion:*:descriptions' format "- %d -"
+zstyle ':completion:*:corrections' format "- %d - (errors %e})"
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:manuals' separate-sections true
+zstyle ':completion:*:manuals.(^1*)' insert-sections true
+zstyle ':completion:*' menu select
+zstyle ':completion:*' verbose yes
 
 # bash function to decompress archives - http://www.shell-fu.org/lister.php?id=375  
 extract () {  
