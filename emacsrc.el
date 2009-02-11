@@ -44,6 +44,19 @@
 ;; God, the emacs people do think of everything
 (mouse-avoidance-mode 'jump)
 
+;; Add code to let me move lines up or down
+(defun move-line (&optional n)
+  "Move current line N (1) lines up/down leaving point in place."
+  (interactive "p")
+  (when (null n)
+    (setq n 1))
+  (let ((col (current-column)))
+    (beginning-of-line)
+    (next-line 1)
+    (transpose-lines n)
+    (previous-line 1)
+    (forward-char col)))
+
 (defun move-line-up (n)
   "Moves current line N (1) lines up leaving point in place."
   (interactive "p")
@@ -119,6 +132,23 @@
     (gtags-mode t)
     (djcb-gtags-create-or-update)))
 
+(defun djcb-hasktags-create-or-update ()
+  "create or update the TAGS file with hasktags"
+  (interactive)
+  (if (not (file-exists-p (concat default-directory "TAGS")))
+    (let ((olddir default-directory)
+          (topdir (read-directory-name
+                    "hasktags: top of source tree:" default-directory)))
+      (cd topdir)
+      (shell-command "hasktags -e `find -name \\*.hs` && echo 'created tagfile'")
+      (cd olddir)) ; restore
+    ;;  tagfile already exists; update it
+    (shell-command "hasktags -a `find -name \\*.hs` && echo 'updated tagfile'")))
+
+(add-hook 'haskell-mode-hook
+  (lambda ()
+    (djcb-hasktags-create-or-update)))
+
 ;; Append a new line to files so GCC shuts up
 (add-hook 'c-mode-common-hook
   (lambda ()
@@ -176,15 +206,27 @@
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
 
-;; Add code to let me move lines up or down
-(defun move-line (&optional n)
-  "Move current line N (1) lines up/down leaving point in place."
-  (interactive "p")
-  (when (null n)
-    (setq n 1))
-  (let ((col (current-column)))
-    (beginning-of-line)
-    (next-line 1)
-    (transpose-lines n)
-    (previous-line 1)
-    (forward-char col)))
+;; Set F9 = compile hotkey
+(global-set-key [(f9)] 'compile)
+
+;; By default compilation frame is half the window. Yuck.
+(setq compilation-window-height 8)
+
+;; When compiling, make the compile window go away when finished if there are no errors
+(setq compilation-finish-function
+      (lambda (buf str)
+
+        (if (string-match "exited abnormally" str)
+
+            ;;there were errors
+            (message "compilation errors, press C-x ` to visit")
+
+          ;;no errors, make the compilation window go away in 0.5 seconds
+          (run-at-time 0.5 nil 'delete-windows-on buf)
+          (message "NO COMPILATION ERRORS!"))))
+
+;; Don't indent whole files because they're in a namespace block
+(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
+
+(global-set-key "\M-j" 'previous-buffer)
+(global-set-key "\M-k" 'next-buffer)
