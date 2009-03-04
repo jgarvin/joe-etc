@@ -27,9 +27,13 @@ import XMonad.Actions.WindowGo
 import XMonad.Hooks.UrgencyHook
 import XMonad.Actions.WindowBringer
 
+-- data MoveUrgency = MoveUrgency deriving (Read, Show)
+-- instance UrgencyHook MoveUrgency where
+--     urgencyHook MoveUrgency w = windows (bringWindow w)
+
 data MoveUrgency = MoveUrgency deriving (Read, Show)
 instance UrgencyHook MoveUrgency where
-    urgencyHook MoveUrgency w = windows (bringWindow w)
+    urgencyHook MoveUrgency w = windows (\ws -> ws)
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.

@@ -199,6 +199,7 @@
 (setq show-trailing-whitespace t)
 
 ;; Delete trailing whitespace automagically
+;; TODO: Debug, doesn't seem to be working
 (add-hook 'write-file-hook
   (lambda ()
     (nuke-trailing-whitespace)))
@@ -230,3 +231,5 @@
 
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
+
+(global-set-key (kbd "RET") 'newline-and-indent)
