@@ -16,7 +16,21 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
 (setq visible-bell t)
+(fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
+
+ ;; Show me the region until I do something on it
+(setq transient-mark-mode t)
+
+;; Make killing the line also delete it
+(setq kill-whole-line t)
+
+;; Stop this crazy blinking cursor
+(blink-cursor-mode 0)
+
+;; when on a TAB, the cursor has the TAB length
+(setq-default x-stretch-cursor t)
 
 ;; Don't litter everywhere with file~ backups
 (setq
@@ -207,11 +221,14 @@
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
 
-;; Set F9 = compile hotkey
-(global-set-key [(f9)] 'compile)
-
 ;; By default compilation frame is half the window. Yuck.
 (setq compilation-window-height 8)
+
+ ;; keep the window focused on the messages during compilation
+(setq compilation-scroll-output t)
+
+ ;; Keep the highlight on the compilation error
+(setq next-error-highlight t)
 
 ;; When compiling, make the compile window go away when finished if there are no errors
 (setq compilation-finish-function
@@ -233,3 +250,35 @@
 (global-set-key "\M-k" 'next-buffer)
 
 (global-set-key (kbd "RET") 'newline-and-indent)
+
+;; TODO: Make this automatic for new .h files
+(defun ff/headerize ()
+  "Adds the #define HEADER_H, etc."
+  (interactive)
+  (let ((flag-name (replace-regexp-in-string
+                    "[\. \(\)]" "_"
+                    (upcase (file-name-nondirectory (buffer-name))))))
+    (goto-char (point-max))
+    (insert "\n#endif\n")
+    (goto-char (point-min))
+    (insert (concat "#ifndef " flag-name "\n"))
+    (insert (concat "#define " flag-name "\n"))
+    )
+  )
+
+;; Run makefile, or if there isn't one 
+(defun smart-compile()
+  (if (not (or (file-exists-p "makefile") (file-exists-p "Makefile")))
+	  (compile (concat
+				"make -k -j2 "
+				(file-name-sans-extension
+				 (file-name-nondirectory buffer-file-name))))
+	(compile "make -k -j2")))
+
+(defun ff/fast-compile ()
+  "Compiles without asking anything."
+  (interactive)
+  (let ((compilation-read-command nil))
+    (smart-compile)))
+
+(define-key global-map [f9] 'ff/fast-compile)
