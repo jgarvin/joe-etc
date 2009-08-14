@@ -1,7 +1,36 @@
-# Add stuff to path from /opt if .xsession hasn't already
-if [[ $DISPLAY = '' ]]; then
-    export PATH=`~/etc/build_path.py`
+# TODO: Split into a Tradelink specific subfile
+
+if [[ -a ~/.profile ]]; then
+	# Need to run as ksh to work correctly
+	SHELL=/bin/ksh source ~/.profile
 fi
+
+# Add stuff to path from /opt if .xsession hasn't already
+#if [[ $DISPLAY = '' ]]; then
+#    export PATH=`~/etc/build_path.py`
+#fi
+
+# Timestamps for when commands occurred make diagnosing problems easier
+setopt EXTENDED_HISTORY
+
+# Try to use .zhistory on local box before resorting to using the network
+if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
+	export HISTFILE=/home/udesktop178/joeg/.zhistory
+else
+	if [[ -a /home/titan/joeg/.zhistory ]]; then
+		export HISTFILE=/home/titan/joeg/.zhistory
+	fi
+fi
+
+# number of lines kept in history
+export HISTSIZE=100000
+
+# number of lines saved in the history after logout
+export SAVEHIST=100000
+
+# append command to history file once executed
+setopt inc_append_history
+
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -10,31 +39,33 @@ unsetopt beep
 setopt autopushd
 
 # Give some convenient shortcuts for pushing and popping folder stack
-alias -r b='pushd +1'
-alias -r f='pushd -0'
+alias -r b='pushd +1 > /dev/null'
+alias -r f='pushd -0 > /dev/null'
 
 # Ack is a nice replacement for grep, just does the right thing
-alias -r ack='ack-grep'
+alias -r ack='~/etc/ack'
+
+alias -r up='cd ..'
+
+alias -r cdl='cd /home/udesktop178/joeg'
+
+#allow tab completion in the middle of a word
+setopt COMPLETE_IN_WORD
 
 # 'ls' output is easier to read when colored
-alias -r ls='ls --color=auto'
+# Doesn't work on solaris
+#alias -r ls='ls --color=auto'
+if which gls &> /dev/null # Use GNU ls if available
+then
+	alias -r ls='gls --color=auto'
+else
+	alias -r ls='ls --color=auto'
+fi
 
 # Intuitively, searches current folder and subfolders
 search () {
 	find \( -type f -o -type d \) -name \*$1\*
 }
-
-# number of lines kept in history
-export HISTSIZE=100000
-
-# number of lines saved in the history after logout
-export SAVEHIST=100000
-
-# location of history
-export HISTFILE=~/.zhistory
-
-# append command to history file once executed
-setopt inc_append_history
 
 # Add mime support for opening files
 autoload -U zsh-mime-setup
@@ -83,6 +114,19 @@ extract () {
         echo "'$1' is not a valid file"  
     fi  
 }
+
+alarm() {
+    echo 'xmessage $1' | at $2
+}
+
+# Need in order to get color on solaris
+if [[ $COLORTERM = "gnome-terminal" ]]; then
+	export TERM=dtterm
+fi
+
+if [[ $TERM = "xterm" ]]; then
+    export TERM=dtterm
+fi
 
 ################################
 #BEGIN SUPER FANCY PROMPT
@@ -146,7 +190,10 @@ setprompt () {
     fi
     for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
 	eval PR_$color='%{$terminfo[bold]$fg[${(L)color}]%}'
+	#eval PR_$color='%{$terminfo[bold]%}%F{(L)color}'
+	#eval PR_$color='%{$terminfo[bold]%F{${(L)color}}%}'
 	eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
+	#eval PR_LIGHT_$color='%{$f[${(L)color}]%}'
 	(( count = $count + 1 ))
     done
     PR_NO_COLOUR="%{$terminfo[sgr0]%}"
@@ -230,4 +277,22 @@ $PR_LIGHT_GREEN%_$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
 }
 
-setprompt
+# To help emacs tramp mode, all the fancy terminal stuff confuses it
+if [ "$TERM" = "dumb" ]
+then
+  unsetopt zle
+  unsetopt prompt_cr
+  #unsetopt prompt_subst
+  setopt prompt_subst
+  unfunction precmd
+  unfunction preexec
+  unfunction setprompt
+  PS1='$ '
+  PS2='$ '
+  PROMPT='$ '
+  RPROMPT='$ '
+else
+# 	clear
+ 	cat /etc/motd
+	setprompt
+fi
