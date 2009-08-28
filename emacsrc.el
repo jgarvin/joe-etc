@@ -22,7 +22,10 @@
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
-(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
+
+(if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
+	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
+
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
