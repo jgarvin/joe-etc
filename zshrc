@@ -17,9 +17,7 @@ setopt EXTENDED_HISTORY
 if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
 	export HISTFILE=/home/udesktop178/joeg/.zhistory
 else
-	if [[ -a /home/titan/joeg/.zhistory ]]; then
-		export HISTFILE=/home/titan/joeg/.zhistory
-	fi
+	export HISTFILE=$HOME/.zhistory
 fi
 
 if [[ -d ~/opt/android-sdk-linux_x86-1.5_r2/tools ]]; then
