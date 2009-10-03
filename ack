@@ -12,7 +12,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '1.89_02';
+our $VERSION = '1.90';
 # Check http://betterthangrep.com/ for updates
 
 # These are all our globals.
@@ -92,7 +92,7 @@ sub main {
 
     App::Ack::set_up_pager( $opt->{pager} ) if defined $opt->{pager};
     if ( $opt->{f} ) {
-        App::Ack::print_files( $iter, $opt );
+        $nmatches = App::Ack::print_files( $iter, $opt );
     }
     elsif ( $opt->{l} || $opt->{count} ) {
         $nmatches = App::Ack::print_files_with_matches( $iter, $opt );
@@ -660,8 +660,8 @@ no match is found.
 
 The I<grep> code 2 for errors is not used.
 
-0 is returned if C<-f> or C<-g> are specified, irrespective of
-number of files found.
+If C<-f> or C<-g> are specified, then 0 is returned if at least one
+file is found.  If no files are found, then 1 is returned.
 
 =cut
 
@@ -729,6 +729,31 @@ them here.
 
 =head1 FAQ
 
+=head2 Why isn't ack finding a match in (some file)?
+
+Probably because it's of a type that ack doesn't recognize.
+
+ack's searching behavior is driven by filetype.  If ack doesn't
+know what kind of file it is, ack ignores it.
+
+If you want ack to search files that it doesn't recognize, use the
+C<-a> switch.
+
+If you want ack to search every file, even ones that it always
+ignores like coredumps and backup files, use the C<-u> switch.
+
+=head2 Why does ack ignore unknown files by default?
+
+ack is designed by a programmer, for programmers, for searching
+large trees of code.  Most codebases have a lot files in them which
+aren't source files (like compiled object files, source control
+metadata, etc), and grep wastes a lot of time searching through all
+of those as well and returning matches from those files.
+
+That's why ack's behavior of not searching things it doesn't recognize
+is one of its greatest strengths: the speed you get from only
+searching the things that you want to be looking at.
+
 =head2 Wouldn't it be great if F<ack> did search & replace?
 
 No, ack will always be read-only.  Perl has a perfectly good way
@@ -789,9 +814,9 @@ L<http://cpanratings.perl.org/d/ack>
 
 L<http://search.cpan.org/dist/ack>
 
-=item * Subversion repository
+=item * Git source repository
 
-L<http://ack.googlecode.com/svn/>
+L<http://github.com/petdance/ack>
 
 =back
 
@@ -800,6 +825,12 @@ L<http://ack.googlecode.com/svn/>
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Packy Anderson,
+JR Boyens,
+Dan Sully,
+Ryan Niebur,
+Kent Fredric,
+Mike Morearty,
 Ingmar Vanhassel,
 Eric Van Dewoestine,
 Sitaram Chamarty,
@@ -822,10 +853,10 @@ Kevin Riggle,
 Ori Avtalion,
 Torsten Blix,
 Nigel Metheringham,
-Gábor Szabó,
+GE<aacute>bor SzabE<oacute>,
 Tod Hagan,
 Michael Hendricks,
-Ævar Arnfjörð Bjarmason,
+E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason,
 Piers Cawley,
 Stephen Steneker,
 Elias Lutfallah,
@@ -840,11 +871,11 @@ Elliot Shank,
 Merijn Broeren,
 Uwe Voelker,
 Rick Scott,
-Ask Bjørn Hansen,
+Ask BjE<oslash>rn Hansen,
 Jerry Gay,
 Will Coleda,
 Mike O'Regan,
-Slaven Rezić,
+Slaven ReziE<0x107>,
 Mark Stosberg,
 David Alan Pisoni,
 Adriano Ferreira,
@@ -855,7 +886,7 @@ and Pete Krawczyk.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2009 Andy Lester, all rights reserved.
+Copyright 2005-2009 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:
@@ -877,7 +908,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '1.02';
+our $VERSION = '1.06';
 
 
 
@@ -903,6 +934,8 @@ BEGIN {
 
 
 sub files {
+    ($_[0] eq __PACKAGE__) && die 'File::Next::files must not be invoked as File::Next->files';
+
     my ($parms,@queue) = _setup( \%files_defaults, @_ );
     my $filter = $parms->{file_filter};
 
@@ -933,8 +966,8 @@ sub files {
 
 
 
-sub sort_standard($$)   { return $_[0]->[1] cmp $_[1]->[1] };
-sub sort_reverse($$)    { return $_[1]->[1] cmp $_[0]->[1] };
+sub sort_standard($$)   { return $_[0]->[1] cmp $_[1]->[1] }
+sub sort_reverse($$)    { return $_[1]->[1] cmp $_[0]->[1] }
 
 sub reslash {
     my $path = shift;
@@ -1003,8 +1036,7 @@ sub _candidate_files {
     my $follow_symlinks = $parms->{follow_symlinks};
     my $sort_sub = $parms->{sort_files};
 
-    while ( defined ( my $file = readdir $dh ) ) {
-        next if $skip_dirs{$file};
+    for my $file ( grep { !exists $skip_dirs{$_} } readdir $dh ) {
         my $has_stat;
 
         # Only do directory checking if we have a descend_filter
@@ -1050,8 +1082,8 @@ use strict;
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = '1.89_02';
-    $COPYRIGHT = 'Copyright 2005-2009 Andy Lester, all rights reserved.';
+    $VERSION = '1.90';
+    $COPYRIGHT = 'Copyright 2005-2009 Andy Lester.';
 }
 
 our $fh;
@@ -1102,6 +1134,7 @@ BEGIN {
 
     %mappings = (
         actionscript => [qw( as mxml )],
+        ada         => [qw( ada adb ads )],
         asm         => [qw( asm s )],
         batch       => [qw( bat cmd )],
         binary      => q{Binary files, as defined by Perl's -B op (default: off)},
@@ -1133,6 +1166,7 @@ BEGIN {
         python      => [qw( py )],
         rake        => q{Rakefiles},
         ruby        => [qw( rb rhtml rjs rxml erb rake )],
+        scala       => [qw( scala )],
         scheme      => [qw( scm ss )],
         shell       => [qw( sh bash csh tcsh ksh zsh )],
         skipped     => q{Files, but not directories, normally skipped by ack (default: off)},
@@ -1226,7 +1260,7 @@ sub get_command_line_options {
         'L|files-without-matches' => sub { $opt{l} = $opt{v} = 1 },
         'm|max-count=i'         => \$opt{m},
         'match=s'               => \$opt{regex},
-        n                       => \$opt{n},
+        'n|no-recurse'          => \$opt{n},
         o                       => sub { $opt{output} = '$&' },
         'output=s'              => \$opt{output},
         'pager=s'               => \$opt{pager},
@@ -1234,6 +1268,7 @@ sub get_command_line_options {
         'passthru'              => \$opt{passthru},
         'print0'                => \$opt{print0},
         'Q|literal'             => \$opt{Q},
+        'r|R|recurse'           => sub {},
         'smart-case!'           => \$opt{smart_case},
         'sort-files'            => \$opt{sort_files},
         'u|unrestricted'        => \$opt{u},
@@ -1648,8 +1683,8 @@ Search output:
                         only works with -f, -g, -l, -L or -c.
 
 File presentation:
-  --pager=COMMAND       Pipes all ack output through COMMAND.
-                        Ignored if output is redirected.
+  --pager=COMMAND       Pipes all ack output through COMMAND.  For example,
+                        --pager="less -R".  Ignored if output is redirected.
   --nopager             Do not send output through a pager.  Cancels any
                         setting in ~/.ackrc, ACK_PAGER or ACK_PAGER_COLOR.
   --[no]heading         Print a filename heading above each file's results.
@@ -1678,7 +1713,8 @@ File inclusion/exclusion:
                         Ignores CVS, .svn and other ignored directories
   -u, --unrestricted    All files and directories searched
   --[no]ignore-dir=name Add/Remove directory from the list of ignored dirs
-  -n                    No descending into subdirectories
+  -r, -R, --recurse     Recurse into subdirectories (ack's default behavior)
+  -n, --no-recurse      No descending into subdirectories
   -G REGEX              Only search files that match REGEX
 
   --perl                Include only Perl files.
@@ -1778,10 +1814,11 @@ sub get_version_statement {
         my $ext = $Config::Config{_exe};
         $this_perl .= $ext unless $this_perl =~ m/$ext$/i;
     }
+    my $ver = sprintf( '%vd', $^V );
 
     return <<"END_OF_VERSION";
 ack $VERSION
-Running under Perl $] at $this_perl
+Running under Perl $ver at $this_perl
 
 $copyright
 
@@ -1926,7 +1963,7 @@ sub search_resource {
 
             if ( $keep_context ) {
                 if ( $after ) {
-                    print_match_or_context( $opt, 0, $., $_ );
+                    print_match_or_context( $opt, 0, $., $-[0], $+[0], $_ );
                     $after--;
                 }
                 elsif ( $before_context ) {
@@ -1961,7 +1998,7 @@ sub search_resource {
         }
         if ( $keep_context ) {
             if ( @before ) {
-                print_match_or_context( $opt, 0, $before_starts_at_line, @before );
+                print_match_or_context( $opt, 0, $before_starts_at_line, $-[0], $+[0], @before );
                 @before = ();
                 $before_starts_at_line = 0;
             }
@@ -1972,7 +2009,7 @@ sub search_resource {
                 $after = $after_context;
             }
         }
-        print_match_or_context( $opt, 1, $., $_ );
+        print_match_or_context( $opt, 1, $., $-[0], $+[0], $_ );
 
         last if $max && ( $nmatches >= $max ) && !$after;
     } # while
@@ -1983,9 +2020,11 @@ sub search_resource {
 
 
 sub print_match_or_context {
-    my $opt      = shift; # opts array
-    my $is_match = shift; # is there a match on the line?
-    my $line_no  = shift;
+    my $opt         = shift; # opts array
+    my $is_match    = shift; # is there a match on the line?
+    my $line_no     = shift;
+    my $match_start = shift;
+    my $match_end   = shift;
 
     my $color         = $opt->{color};
     my $heading       = $opt->{heading};
@@ -2028,8 +2067,6 @@ sub print_match_or_context {
             }
         }
         else {
-            my $col = $-[0] + 1;
-
             if ( $color && $is_match && $regex &&
                  s/$regex/Term::ANSIColor::colored( substr($_, $-[0], $+[0] - $-[0]), $ENV{ACK_COLOR_MATCH} )/eg ) {
                 # At the end of the line reset the color and remove newline
@@ -2040,7 +2077,7 @@ sub print_match_or_context {
                 s/[\r\n]*\z//;
             }
             if ( $show_column ) {
-                App::Ack::print_column_no( $col, $sep );
+                App::Ack::print_column_no( $match_start+1, $sep );
             }
             App::Ack::print($_ . "\n");
         }
@@ -2109,12 +2146,14 @@ sub print_files {
 
     my $ors = $opt->{print0} ? "\0" : "\n";
 
+    my $nmatches = 0;
     while ( defined ( my $file = $iter->() ) ) {
         App::Ack::print $file, $ors;
+        $nmatches++;
         last if $opt->{1};
     }
 
-    return;
+    return $nmatches;
 }
 
 
@@ -2306,7 +2345,7 @@ sub get_iterator {
 sub set_up_pager {
     my $command = shift;
 
-    return unless App::Ack::output_to_pipe();
+    return if App::Ack::output_to_pipe();
 
     my $pager;
     if ( not open( $pager, '|-', $command ) ) {

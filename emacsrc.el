@@ -43,6 +43,9 @@
 (require 'ido)
 (ido-mode t)
 (setq ido-enable-flex-matching t)
+;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
+(setq ido-default-file-method 'selected-window)
+(setq ido-default-buffer-method 'selected-window)
 
 (setq make-backup-files nil) ;; do not make backup files
 
@@ -417,3 +420,32 @@
                       (kill-buffer ob)))))
       (default (message "This buffer has no file name."))))
 
+(defun unindent-region-with-tab ()
+  (interactive)
+  (save-excursion
+	(if (< (point) (mark)) (exchange-point-and-mark))
+	(let ((save-mark (mark)))
+	  (if (= (point) (line-beginning-position)) (previous-line 1))
+	  (goto-char (line-beginning-position))
+	  (while (>= (point) save-mark)
+		(goto-char (line-beginning-position))
+		(if (= (string-to-char "\t") (char-after (point))) (delete-char 1))
+		(previous-line 1)))))
+
+(defun unindent-block()
+  (interactive)
+  (shift-region (- tab-width))
+  (setq deactivate-mark nil))
+
+(defun shift-region(numcols)
+" my trick to expand the region to the beginning and end of the area selected
+ much in the handy way I liked in the Dreamweaver editor."
+  (if (< (point)(mark))
+    (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
+    (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
+  (setq region-start (region-beginning))
+  (setq region-finish (region-end))
+  (save-excursion
+    (if (< (point) (mark)) (exchange-point-and-mark))
+    (let ((save-mark (mark)))
+      (indent-rigidly region-start region-finish numcols))))
