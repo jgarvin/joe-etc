@@ -22,6 +22,10 @@ else
 	fi
 fi
 
+if [[ -d ~/opt/android-sdk-linux_x86-1.5_r2/tools ]]; then
+ 	export PATH=~/opt/android-sdk-linux_x86-1.5_r2/tools:$PATH
+fi
+
 # number of lines kept in history
 export HISTSIZE=100000
 
@@ -120,12 +124,14 @@ alarm() {
 }
 
 # Need in order to get color on solaris
-if [[ $COLORTERM = "gnome-terminal" ]]; then
-	export TERM=dtterm
-fi
+if [[ -d "/home/udesktop178" ]]; then
+	if [[ $COLORTERM = "gnome-terminal" ]]; then
+		export TERM=dtterm
+	fi
 
-if [[ $TERM = "xterm" ]]; then
-    export TERM=dtterm
+	if [[ $TERM = "xterm" ]]; then
+		export TERM=dtterm
+	fi
 fi
 
 ################################

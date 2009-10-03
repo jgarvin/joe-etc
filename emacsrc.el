@@ -29,6 +29,13 @@
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
+;; android-mode
+(if (file-exists-p "~/opt/android-mode")
+	(progn
+	  (add-to-list 'load-path "~/opt/android-mode")
+	  (require 'android-mode)
+	  (setq android-mode-sdk-dir "~/opt/android-sdk-linux_x86-1.5_r3")))
+
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
 (require 'tramp)
@@ -51,7 +58,7 @@
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-9"))
+(add-to-list 'default-frame-alist '(font . "Consolas-11"))
 
 ;; Color theme
 (require 'color-theme)
@@ -329,7 +336,9 @@
 
 ;; Run makefile, or if there isn't one 
 (defun smart-compile()
-  (if (not (or (file-exists-p "makefile") (file-exists-p "Makefile")))
+  (if (not (or (file-exists-p "makefile")
+			   (file-exists-p "Makefile")
+			   (file-exists-p "../Makefile")))
 	  (compile (concat
 				"make -k -j2 "
 				(file-name-sans-extension
@@ -407,3 +416,4 @@
                                  (string-match (concat name "\\.~.*~$") ob-file-name))) )
                       (kill-buffer ob)))))
       (default (message "This buffer has no file name."))))
+
