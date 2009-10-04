@@ -98,7 +98,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
 
     -- launch scratch terminal
-    , ((modMask,  xK_p), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
+    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
     , ((modMask,  xK_f), runOrRaiseNext "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
@@ -107,7 +107,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch pidgin
     -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    -- , ((modMask,  xK_f), runOrRaiseNext "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
+    , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
 
     -- launch xchat
     , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
