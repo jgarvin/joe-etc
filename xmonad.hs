@@ -95,22 +95,22 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaise "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
 
     -- launch scratch terminal
-    --, ((modMask,  xK_e), runOrRaise "gnome-terminal --role=scratchTerm" ((stringProperty "WM_WINDOW_ROLE") =? "scratchTerm"))
+    , ((modMask,  xK_p), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaise "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
+    , ((modMask,  xK_f), runOrRaiseNext "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
 
-    , ((modMask,  xK_g), runOrRaise "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
+    , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
     -- launch pidgin
     -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    -- , ((modMask,  xK_f), runOrRaise "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
+    -- , ((modMask,  xK_f), runOrRaiseNext "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
 
     -- launch xchat
-    , ((modMask,  xK_x), runOrRaise "xchat" (className =? "Xchat"))
+    , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
 
     -- close focused window
     , ((modMask , xK_c     ), kill)
