@@ -94,6 +94,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- launch a terminal
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
+    -- toggle gnome panel visibility
+    , ((modMask,  xK_b), sendMessage ToggleStruts)
+
     -- launch emacs
     , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
 
