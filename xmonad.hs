@@ -28,6 +28,8 @@ import XMonad.Actions.WindowGo
 import XMonad.Hooks.UrgencyHook
 import XMonad.Actions.WindowBringer
 
+import XMonad.Config.Gnome
+
 -- data MoveUrgency = MoveUrgency deriving (Read, Show)
 -- instance UrgencyHook MoveUrgency where
 --     urgencyHook MoveUrgency w = windows (bringWindow w)
@@ -93,13 +95,13 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaise "emacsclient -c" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaise "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
 
     -- launch scratch terminal
     --, ((modMask,  xK_e), runOrRaise "gnome-terminal --role=scratchTerm" ((stringProperty "WM_WINDOW_ROLE") =? "scratchTerm"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaise "firefox3" (className =? "Firefox"))
+    , ((modMask,  xK_f), runOrRaise "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
 
     , ((modMask,  xK_g), runOrRaise "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
@@ -275,7 +277,7 @@ main = xmonad defaults
 --
 -- No need to modify this.
 --
-defaults = withUrgencyHook MoveUrgency $ defaultConfig {
+defaults = withUrgencyHook MoveUrgency $ gnomeConfig {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -291,8 +293,8 @@ defaults = withUrgencyHook MoveUrgency $ defaultConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = smartBorders $ {- ewmhDesktopsLayout $ -} avoidStruts $ layoutHook defaultConfig,
-        manageHook         = myManageHook <+> manageDocks <+> manageHook defaultConfig,
+        layoutHook         = smartBorders $ {- ewmhDesktopsLayout $ -} avoidStruts $ layoutHook gnomeConfig,
+        manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
         logHook            = ewmhDesktopsLogHook
         --handleEventHook    = ewmhDesktopsEventHook
     }
