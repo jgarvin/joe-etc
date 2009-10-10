@@ -1,15 +1,72 @@
 ;; TODO: It'd be cool to hit a key combo to cycle through yanking things
 ;; in the kill ring.. think there's already a customization for this.
 
+;; TODO: Want the alt+arrow key thing to seemlessly work for current highlight :D
+
+;; TODO: Tab should OBEY. If the line is already indented, assume I want to insert a tab.
+
+;; TODO: Make canceling telling global path just disable it
+
+;; TODO: vc-annotate on CVS should use current working version when on a branch
+
+;; TODO: If you undo, the mark should be reset.
+
+;; Ideal tab behavior:
+;; Indent line if not indented
+;; If indented already, and are at beginning of line, insert a tab
+;; If not indented already, and not at beginning of line, do code completion
+
+;; Module: use indentation already used in file!
+;; Nice to have: emacs/tlmake integration
+;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
+;; of letting me browse project files. Nice for having dual emacs groups for different projects...
+
+(setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
+
+(if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
+	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
+
+(load-file "~/etc/color-theme-6.6.0/color-theme.el")
+(load-file "~/etc/breadcrumb.el")
+
+;; android-mode
+(if (file-exists-p "~/opt/android-mode")
+	(progn
+	  (add-to-list 'load-path "~/opt/android-mode")
+	  (require 'android-mode)
+	  (setq android-mode-sdk-dir "~/opt/android-sdk-linux_x86-1.5_r3")))
+
+(setq tramp-default-method "ssh")
+(setq tramp-default-user "joeg")
+(require 'tramp)
+
+(require 'ido)
+(ido-mode t)
+(setq ido-enable-flex-matching t)
+;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
+(setq ido-default-file-method 'selected-window)
+(setq ido-default-buffer-method 'selected-window)
+
+(setq make-backup-files nil) ;; do not make backup files
+
+(require 'breadcrumb)
+(setq bc-bookmark-limit 10000)
+;;(global-set-key [(control shift space)]         'bc-set) ;; Shift-SPACE for set bookmark
+(global-set-key (kbd "C-S-SPC")         'bc-set) ;; Shift-SPACE for set bookmark
+(global-set-key [(control meta j)]      'bc-previous) ;; M-j for jump to previous
+(global-set-key [(control meta k)]      'bc-next) ;; Shift-M-j for jump to next
+(global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
+(global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
+
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-
-(set-frame-font "Consolas-9")
+(add-to-list 'default-frame-alist '(font . "Consolas-11"))
 
 ;; Color theme
 (require 'color-theme)
 (setq color-theme-is-global t)
+(color-theme-initialize)
 (color-theme-euphoria)
 
 ;; Turn off GUI parts
@@ -33,15 +90,15 @@
 ;; when on a TAB, the cursor has the TAB length
 (setq-default x-stretch-cursor t)
 
-;; Don't litter everywhere with file~ backups
-(setq
- backup-by-copying t      ; don't clobber symlinks
- backup-directory-alist
- '(("." . "~/backup/emacs-backups"))    ; don't litter my fs tree
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t)       ; use versioned backups
+;; ;; Don't litter everywhere with file~ backups
+;; (setq
+;;  backup-by-copying t      ; don't clobber symlinks
+;;  backup-directory-alist
+;;  '(("/home/udesktop178/joeg/backup/emacs-backups"))    ; don't litter my fs tree
+;;  delete-old-versions t
+;;  kept-new-versions 6
+;;  kept-old-versions 2
+;;  version-control t)       ; use versioned backups
 
 ;; Make emacs use the normal clipboard
 (setq x-select-enable-clipboard t)
@@ -137,11 +194,13 @@
     (let ((olddir default-directory)
           (topdir (read-directory-name
                     "gtags: top of source tree:" default-directory)))
-      (cd topdir)
-      (shell-command "gtags && echo 'created tagfile'")
-      (cd olddir)) ; restore
+	  (when (not (string= topdir ""))
+		  (progn
+			(cd topdir)
+			(shell-command "gtags -q && echo 'created tagfile'")
+			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
-    (shell-command "global -u && echo 'updated tagfile'")))
+    (shell-command "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
@@ -196,10 +255,12 @@
 ;; Switch between source and header
 ;;------------
 ;; Association list of extension -> inverse extension
-(setq exts '(("c"   . ("h"))
-			 ("cpp" . ("hpp" "h"))
-             ("hpp" . ("cpp" "c"))
-             ("h"   . ("cpp" "c"))))
+(setq exts '(("c"   . ("h" "H"))
+			 ("cpp" . ("hpp" "h" "H"))
+             ("hpp" . ("cpp" "c" "C"))
+             ("h"   . ("cpp" "c" "C"))
+			 ("H"   . ("cpp" "c" "C"))
+			 ("C"   . ("hpp" "h" "H"))))
 
 ;; Process the association list of extensions and find the last file
 ;; that exists
@@ -217,7 +278,7 @@
     (find-file (find-other-file fname ext))))
 
 ;; Bind the toggle function to a global key
-;;(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
+(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
 
 ;; So I can delete it
 (setq show-trailing-whitespace t)
@@ -261,6 +322,15 @@
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 
+(defun close-frame-or-exit ()
+  "Tries to close the current frame, if it's the only one left just exits."
+  (interactive)
+  (if (= (length (frame-list)) 1)
+	  (save-buffers-kill-emacs)
+	(delete-frame)))
+
+(global-set-key "\C-x\C-c" 'close-frame-or-exit)
+
 ;; TODO: Make this automatic for new .h files
 (defun ff/headerize ()
   "Adds the #define HEADER_H, etc."
@@ -278,7 +348,9 @@
 
 ;; Run makefile, or if there isn't one 
 (defun smart-compile()
-  (if (not (or (file-exists-p "makefile") (file-exists-p "Makefile")))
+  (if (not (or (file-exists-p "makefile")
+			   (file-exists-p "Makefile")
+			   (file-exists-p "../Makefile")))
 	  (compile (concat
 				"make -k -j2 "
 				(file-name-sans-extension
@@ -326,3 +398,63 @@
 ;; (require 'semanticdb-global)
 ;; (semanticdb-enable-gnu-global-databases 'c-mode)
 ;; (semanticdb-enable-gnu-global-databases 'c++-mode)
+
+;; Use full file names for buffers, otherwise can get lost
+(setq-default mode-line-buffer-identification
+			  '("%S:"(buffer-file-name "%f")))
+
+
+;;(vc-annotate (buffer-file-name) (vc-workfile-version (buffer-file-name)))
+
+
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t) ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+(global-set-key (kbd "C-x K") 'kill-other-buffers-of-this-file-name)
+(defun kill-other-buffers-of-this-file-name (&optional buffer)
+"Kill all other buffers visiting files of the same base name."
+(interactive "bBuffer to make unique: ")
+(setq buffer (get-buffer buffer))
+(cond ((buffer-file-name buffer)
+       (let ((name (file-name-nondirectory (buffer-file-name buffer))))
+         (loop for ob in (buffer-list)
+               do (if (and (not (eq ob buffer))
+                           (buffer-file-name ob)
+                           (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
+                             (or (equal ob-file-name name)
+                                 (string-match (concat name "\\.~.*~$") ob-file-name))) )
+                      (kill-buffer ob)))))
+      (default (message "This buffer has no file name."))))
+
+(defun unindent-region-with-tab ()
+  (interactive)
+  (save-excursion
+	(if (< (point) (mark)) (exchange-point-and-mark))
+	(let ((save-mark (mark)))
+	  (if (= (point) (line-beginning-position)) (previous-line 1))
+	  (goto-char (line-beginning-position))
+	  (while (>= (point) save-mark)
+		(goto-char (line-beginning-position))
+		(if (= (string-to-char "\t") (char-after (point))) (delete-char 1))
+		(previous-line 1)))))
+
+(defun unindent-block()
+  (interactive)
+  (shift-region (- tab-width))
+  (setq deactivate-mark nil))
+
+(defun shift-region(numcols)
+" my trick to expand the region to the beginning and end of the area selected
+ much in the handy way I liked in the Dreamweaver editor."
+  (if (< (point)(mark))
+    (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
+    (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
+  (setq region-start (region-beginning))
+  (setq region-finish (region-end))
+  (save-excursion
+    (if (< (point) (mark)) (exchange-point-and-mark))
+    (let ((save-mark (mark)))
+      (indent-rigidly region-start region-finish numcols))))

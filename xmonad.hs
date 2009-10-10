@@ -28,6 +28,8 @@ import XMonad.Actions.WindowGo
 import XMonad.Hooks.UrgencyHook
 import XMonad.Actions.WindowBringer
 
+import XMonad.Config.Gnome
+
 -- data MoveUrgency = MoveUrgency deriving (Read, Show)
 -- instance UrgencyHook MoveUrgency where
 --     urgencyHook MoveUrgency w = windows (bringWindow w)
@@ -65,7 +67,7 @@ myModMask       = mod4Mask
 -- Set numlockMask = 0 if you don't have a numlock key, or want to treat
 -- numlock status separately.
 --
-myNumlockMask   = mod2Mask
+myNumlockMask   = mod3Mask
 
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
@@ -92,23 +94,26 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- launch a terminal
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
+    -- toggle gnome panel visibility
+    , ((modMask,  xK_b), sendMessage ToggleStruts)
+
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaise "emacs-snapshot-gtk" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
 
     -- launch scratch terminal
-    , ((modMask,  xK_e), runOrRaise "gnome-terminal --role=scratchTerm" ((stringProperty "WM_WINDOW_ROLE") =? "scratchTerm"))
+    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaise "firefox-3.5" (className =? "Firefox"))
+    , ((modMask,  xK_f), runOrRaiseNext "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
 
-    , ((modMask,  xK_g), runOrRaise "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
+    , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
     -- launch pidgin
     -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    -- , ((modMask,  xK_f), runOrRaise "pidgin" (className =? "pidgin" && not stringProperty "WM_ICON_NAME" =? "Buddy List"))
+    , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
 
     -- launch xchat
-    , ((modMask,  xK_x), runOrRaise "xchat" (className =? "Xchat"))
+    , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
 
     -- close focused window
     , ((modMask , xK_c     ), kill)
@@ -174,6 +179,17 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [((m .|. modMask, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+	++
+	
+    --
+    -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
+    -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+    --
+    [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip [xK_e, xK_r] [0..]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+ 
+
 
 
 ------------------------------------------------------------------------
@@ -264,7 +280,7 @@ main = xmonad defaults
 --
 -- No need to modify this.
 --
-defaults = withUrgencyHook MoveUrgency $ defaultConfig {
+defaults = withUrgencyHook MoveUrgency $ gnomeConfig {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -280,8 +296,8 @@ defaults = withUrgencyHook MoveUrgency $ defaultConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = smartBorders $ {- ewmhDesktopsLayout $ -} avoidStruts $ layoutHook defaultConfig,
-        manageHook         = myManageHook <+> manageDocks <+> manageHook defaultConfig,
-        logHook            = ewmhDesktopsLogHook,
-        handleEventHook    = ewmhDesktopsEventHook
+        layoutHook         = smartBorders $ {- ewmhDesktopsLayout $ -} avoidStruts $ layoutHook gnomeConfig,
+        manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
+        logHook            = ewmhDesktopsLogHook
+        --handleEventHook    = ewmhDesktopsEventHook
     }
