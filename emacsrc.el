@@ -2,6 +2,7 @@
 ;; in the kill ring.. think there's already a customization for this.
 
 ;; Let us connect with emacs-client
+(toggle-debug-on-error)
 (server-start)
 
 (set-frame-font "Consolas-9")
@@ -20,7 +21,7 @@
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
 
- ;; Show me the region until I do something on it
+;; Show me the region until I do something on it
 (setq transient-mark-mode t)
 
 ;; Make killing the line also delete it
@@ -117,6 +118,15 @@
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
+
+;; (defun is-home-folder (path)
+;;   (let ((folder-names (split-string folder "/"))
+;; 		(if (= "home" 
+
+;; (defun determine-source-tree-root ()
+;;   (if (not (= 0 (call-process "global" nil nil nil " -p")))
+;; 	  (let ((olddir default-directory))))
+		
 
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
@@ -282,3 +292,37 @@
     (smart-compile)))
 
 (define-key global-map [f9] 'ff/fast-compile)
+
+(defun list-all-subfolders (folder)
+  (let ((folder-list (list folder)))
+	(dolist (subfolder (directory-files folder))
+	  (let ((name (concat folder "/" subfolder)))
+		(when (and (file-directory-p name)
+				   (not (equal subfolder ".."))
+				   (not (equal subfolder ".")))
+		  (set 'folder-list (append folder-list (list name))))))
+  folder-list))
+
+;;(load-file "~/opt/cedet-1.0pre6/common/cedet.el")
+;; (load-file "~/opt/cedet-cvs/common/cedet.el")
+;; (require 'cedet)
+;; (require 'semantic-ia)
+;; (semantic-load-enable-gaudy-code-helpers)
+;; (setq qt4-base-dir "/usr/include/qt4")
+;; (dolist (folder (list-all-subfolders qt4-base-dir))
+;;   (semantic-add-system-include folder 'c++-mode)
+;;   (add-to-list 'auto-mode-alist (cons folder 'c++-mode)))
+
+;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig.h"))
+;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig-dist.h"))
+;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qglobal.h"))
+;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qobjectdefs.h"))
+;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qwebkitglobal.h"))
+
+;; (semantic-add-system-include qt4-base-dir 'c++-mode)
+;; (semantic-add-system-include "/usr/include/qt4/QtGui" 'c++-mode)
+;; (add-to-list 'auto-mode-alist (cons qt4-base-dir 'c++-mode))
+;; (add-to-list 'auto-mode-alist (cons "/usr/include/qt4/QtGui" 'c++-mode))
+;; (require 'semanticdb-global)
+;; (semanticdb-enable-gnu-global-databases 'c-mode)
+;; (semanticdb-enable-gnu-global-databases 'c++-mode)

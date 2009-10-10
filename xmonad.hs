@@ -18,6 +18,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Util.EZConfig
+import XMonad.Hooks.ManageHelpers
 
 -- For sawfish'esq jump-or-exec functionality
 import XMonad.ManageHook
@@ -42,7 +43,7 @@ myTerminal      = "gnome-terminal"
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 1
+myBorderWidth   = 5
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -80,7 +81,8 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor  = "#dddddd"
-myFocusedBorderColor = "#ff0000"
+--myFocusedBorderColor = "#ff0000"
+myFocusedBorderColor = "#0000ff"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -91,10 +93,15 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch emacs
-    , ((modMask,  xK_e), runOrRaise "emacs-snapshot-gtk" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaise "emacs-snapshot-gtk" (className =? "Emacs"))
+
+    -- launch scratch terminal
+    , ((modMask,  xK_e), runOrRaise "gnome-terminal --role=scratchTerm" ((stringProperty "WM_WINDOW_ROLE") =? "scratchTerm"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaise "firefox" (className =? "Firefox"))
+    , ((modMask,  xK_f), runOrRaise "firefox-3.5" (className =? "Firefox"))
+
+    , ((modMask,  xK_g), runOrRaise "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
     -- launch pidgin
     -- Need a bit more knowledge for this one, not sure how to give priorities for windows
@@ -107,16 +114,16 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask , xK_c     ), kill)
 
      -- Rotate through the available layout algorithms
-    , ((modMask,               xK_space ), sendMessage NextLayout)
+    , ((modMask,               xK_Tab ), sendMessage NextLayout)
 
     --  Reset the layouts on the current workspace to default
-    , ((modMask .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
+--    , ((modMask .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
 
     -- Resize viewed windows to the correct size
     , ((modMask,               xK_n     ), refresh)
 
     -- Move focus to the next window
-    , ((modMask,               xK_Tab   ), windows W.focusDown)
+    --, ((modMask,               xK_Tab   ), windows W.focusDown)
 
     -- Move focus to the next window
     , ((modMask,               xK_j     ), windows W.focusDown)
@@ -231,7 +238,14 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , title     =? "Brood War"      --> doFloat
     , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
+    , resource  =? "kdesktop"       --> doIgnore
+    , className =? "stalonetray"    --> doIgnore
+    , className =? "Do"             --> doIgnore
+    , className =? "gnome-panel"          --> doFloat
+    --, className =? "Docker"         --> doIgnore
+    , (stringProperty "WM_NAME")   =? "VLC"            --> doFullFloat
+    , appName   =? "VLC (XVideo output)" --> doFloat
+    , isFullscreen                  --> doFullFloat]
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
