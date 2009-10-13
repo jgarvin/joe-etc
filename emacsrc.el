@@ -21,6 +21,8 @@
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
+(setq make-backup-files nil) ;; do not make backup files
+
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
 
 (if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
@@ -47,7 +49,6 @@
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
 
-(setq make-backup-files nil) ;; do not make backup files
 
 (require 'breadcrumb)
 (setq bc-bookmark-limit 10000)
@@ -89,16 +90,6 @@
 
 ;; when on a TAB, the cursor has the TAB length
 (setq-default x-stretch-cursor t)
-
-;; ;; Don't litter everywhere with file~ backups
-;; (setq
-;;  backup-by-copying t      ; don't clobber symlinks
-;;  backup-directory-alist
-;;  '(("/home/udesktop178/joeg/backup/emacs-backups"))    ; don't litter my fs tree
-;;  delete-old-versions t
-;;  kept-new-versions 6
-;;  kept-old-versions 2
-;;  version-control t)       ; use versioned backups
 
 ;; Make emacs use the normal clipboard
 (setq x-select-enable-clipboard t)

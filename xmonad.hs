@@ -98,7 +98,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_b), sendMessage ToggleStruts)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon --no-init-file; emacsclient -c" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaiseNext "emacs --daemon; emacsclient -c" (className =? "Emacs"))
 
     -- launch scratch terminal
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
