@@ -36,7 +36,7 @@
 	(progn
 	  (add-to-list 'load-path "~/opt/android-mode")
 	  (require 'android-mode)
-	  (setq android-mode-sdk-dir "~/opt/android-sdk-linux_x86-1.5_r3")))
+	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))))
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")

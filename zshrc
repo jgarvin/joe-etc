@@ -20,8 +20,9 @@ else
 	export HISTFILE=$HOME/.zhistory
 fi
 
-if [[ -d ~/opt/android-sdk-linux_x86-1.5_r2/tools ]]; then
- 	export PATH=~/opt/android-sdk-linux_x86-1.5_r2/tools:$PATH
+export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
+if [[ -d $ANDROID_PATH ]]; then
+	export PATH=$ANDROID_PATH/tools:$PATH
 fi
 
 # number of lines kept in history
@@ -52,6 +53,8 @@ alias -r up='cd ..'
 alias -r cdl='cd /home/udesktop178/joeg'
 
 alias -r recent='ls -l -r --sort=time'
+
+alias -r emacs="emacsclient -n "
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
