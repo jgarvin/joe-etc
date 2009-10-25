@@ -132,9 +132,11 @@ if [[ -d "/home/udesktop178" ]]; then
 		export TERM=dtterm
 	fi
 
-	if [[ $TERM = "xterm" ]]; then
-		export TERM=dtterm
-	fi
+# Don't think I actually want this, not sure why it got added.
+# Comment for now, see what happens.
+	# if [[ $TERM = "xterm" ]]; then
+	# 	export TERM=dtterm
+	# fi
 fi
 
 ################################
