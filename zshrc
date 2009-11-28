@@ -1,7 +1,7 @@
 # TODO: Split into a Tradelink specific subfile
 
+# Need to run as ksh to work correctly
 if [[ -a ~/.profile ]]; then
-	# Need to run as ksh to work correctly
 	SHELL=/bin/ksh source ~/.profile
 fi
 
@@ -46,7 +46,9 @@ alias -r b='pushd +1 > /dev/null'
 alias -r f='pushd -0 > /dev/null'
 
 # Ack is a nice replacement for grep, just does the right thing
-alias -r ack='~/etc/ack'
+# Really should be able to add to the existing make type, but will make mk a separate
+# type for now.
+alias -r ack='~/etc/ack --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
 
 alias -r up='cd ..'
 
@@ -129,11 +131,11 @@ alarm() {
 # Need in order to get color on solaris
 if [[ -d "/home/udesktop178" ]]; then
 	if [[ $COLORTERM = "gnome-terminal" ]]; then
-		export TERM=dtterm
+		export TERM=xtermc
 	fi
 
 	if [[ $TERM = "xterm" ]]; then
-		export TERM=dtterm
+		export TERM=xtermc
 	fi
 fi
 

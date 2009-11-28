@@ -62,7 +62,7 @@
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-11"))
+(add-to-list 'default-frame-alist '(font . "Consolas-9"))
 
 ;; Color theme
 (require 'color-theme)
