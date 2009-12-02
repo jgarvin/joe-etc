@@ -31,6 +31,10 @@
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
+(load-file "~/etc/undo-tree.el")
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 ;; android-mode
 (if (file-exists-p "~/opt/android-mode")
 	(progn
