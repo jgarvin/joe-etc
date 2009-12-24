@@ -1,9 +1,9 @@
 # TODO: Split into a Tradelink specific subfile
 
-if [[ -a ~/.profile ]]; then
-	# Need to run as ksh to work correctly
-	SHELL=/bin/ksh source ~/.profile
-fi
+# if [[ -a ~/.profile ]]; then
+# 	# Need to run as ksh to work correctly
+# 	SHELL=/bin/ksh source ~/.profile
+# fi
 
 # Add stuff to path from /opt if .xsession hasn't already
 #if [[ $DISPLAY = '' ]]; then

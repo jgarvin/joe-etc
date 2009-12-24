@@ -1,3 +1,7 @@
 \#*
 *.pyc
 TAGS
+GPATH
+GRTAGS
+GSYSMS
+GTAGS
