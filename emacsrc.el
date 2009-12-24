@@ -31,6 +31,10 @@
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
+(load-file "~/etc/undo-tree.el")
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 ;; android-mode
 (if (file-exists-p "~/opt/android-mode")
 	(progn
@@ -76,7 +80,7 @@
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-11"))
+(add-to-list 'default-frame-alist '(font . "Consolas-9"))
 
 ;; Color theme
 (require 'color-theme)
