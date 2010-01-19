@@ -22,6 +22,7 @@
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
 (setq make-backup-files nil) ;; do not make backup files
+(setq backup-inhibited t)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
 
@@ -343,14 +344,17 @@
 
 ;; Run makefile, or if there isn't one 
 (defun smart-compile()
-  (if (not (or (file-exists-p "makefile")
-			   (file-exists-p "Makefile")
-			   (file-exists-p "../Makefile")))
+  (if (or (file-exists-p "makefile")
+		  (file-exists-p "Makefile")
+		  (file-exists-p "../Makefile"))
+	  (compile "make -k -j2")
+	(if (file-expand-wildcards "*.tc")
+		(compile "tlmake")
 	  (compile (concat
 				"make -k -j2 "
 				(file-name-sans-extension
-				 (file-name-nondirectory buffer-file-name))))
-	(compile "make -k -j2")))
+				 (file-name-nondirectory buffer-file-name)))))))
+  
 
 (defun ff/fast-compile ()
   "Compiles without asking anything."
@@ -358,7 +362,12 @@
   (let ((compilation-read-command nil))
     (smart-compile)))
 
+(defun tlmake-install ()
+  (interactive)
+  (compile "tlmake install"))
+
 (define-key global-map [f9] 'ff/fast-compile)
+(define-key global-map [f10] 'tlmake-install)
 
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))

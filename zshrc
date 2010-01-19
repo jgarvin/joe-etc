@@ -25,11 +25,18 @@ if [[ -d $ANDROID_PATH ]]; then
 	export PATH=$ANDROID_PATH/tools:$PATH
 fi
 
+if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
+	export PATH=/home/udesktop178/joeg/opt/bin:$PATH
+	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
+fi
+
 # number of lines kept in history
 export HISTSIZE=100000
 
 # number of lines saved in the history after logout
 export SAVEHIST=100000
+
+export MAKEFLAGS="-j4"
 
 # append command to history file once executed
 setopt inc_append_history
