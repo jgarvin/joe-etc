@@ -43,6 +43,20 @@
 	  (require 'android-mode)
 	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))))
 
+(defun android-debug ()
+  (progn
+	(setq gud-jdb-use-classpath t)
+	(setq gud-jdb-classpath (format "%s/src:%s/bin/classes" (android-root) (android-root)))
+	(setq gud-jdb-sourcepath (format "%s/src" (android-root)))
+	)
+  (jdb "jdb -attach localhost:8700")
+  )
+
+(defun android-log ()
+  (terminal-emulator "android_log" "adb" '("logcat")))
+
+(android-log)
+
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
 (require 'tramp)
