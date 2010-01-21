@@ -262,7 +262,7 @@
 ;; Show matching parentheses
 (show-paren-mode 1)
 
-(setq auto-mode-alist (cons '("\\.incl$" . c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.incl$" . c++-mode) auto-mode-alist))
 
 ;;-------------
 ;; Switch between source and header
