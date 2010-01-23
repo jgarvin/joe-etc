@@ -34,6 +34,7 @@
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
 (global-undo-tree-mode)
+(define-key undo-tree-map (kbd "C-/") nil)
 
 ;; android-mode
 (if (file-exists-p "~/opt/android-mode")
@@ -80,7 +81,7 @@
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-9"))
+(add-to-list 'default-frame-alist '(font . "Consolas-11"))
 
 ;; Color theme
 (require 'color-theme)
