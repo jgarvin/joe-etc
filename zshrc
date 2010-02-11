@@ -57,8 +57,6 @@ alias -r f='pushd -0 > /dev/null'
 # type for now.
 alias -r ack='~/etc/ack --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
 
-alias -r up='cd ..'
-
 alias -r cdl='cd /home/udesktop178/joeg'
 
 alias -r recent='ls -l -r --sort=time'
@@ -77,6 +75,18 @@ then
 else
 	alias -r ls='ls --color=auto'
 fi
+
+if which gfind &> /dev/null # Use GNU ls if available
+then
+	alias -r find='gfind'
+fi
+
+alias l.='ls -d .*'     #list hidden files
+alias -r ..="cd .."
+alias -r ....="cd ../.."
+alias -r .....="cd ../../.."
+alias -r ......="cd ../../../.."
+alias cl="clear;ls"
 
 # Intuitively, searches current folder and subfolders
 search () {
