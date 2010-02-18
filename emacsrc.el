@@ -21,8 +21,12 @@
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
-(setq make-backup-files nil) ;; do not make backup files
-(setq backup-inhibited t)
+;; Put backups in /tmp on unix and C:/temp on windows
+(setq backup-directory-alist
+	  `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+	  `((".*" ,temporary-file-directory t)))
+(setq tramp-backup-directory-alist backup-directory-alist)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
 

@@ -55,7 +55,7 @@ alias -r f='pushd -0 > /dev/null'
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-alias -r ack='~/etc/ack --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
+alias -r ack='~/etc/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
 
 alias -r cdl='cd /home/udesktop178/joeg'
 
@@ -79,6 +79,11 @@ fi
 if which gfind &> /dev/null # Use GNU ls if available
 then
 	alias -r find='gfind'
+fi
+
+if which gmake &> /dev/null # Use GNU make if available
+then
+	alias -r make='gmake'
 fi
 
 alias l.='ls -d .*'     #list hidden files
@@ -146,7 +151,7 @@ alarm() {
 }
 
 # Need in order to get color on solaris
-if [[ -d "/home/udesktop178" ]]; then
+if [[ -d "/net/udesktop178" ]]; then
 	if [[ $COLORTERM = "gnome-terminal" ]]; then
 		export TERM=xtermc
 	fi
@@ -154,12 +159,24 @@ if [[ -d "/home/udesktop178" ]]; then
 	if [[ $TERM = "xterm" ]]; then
 		export TERM=xtermc
 	fi
+
+	if [[ `uname -s` = "Linux" ]]; then
+		export TERM=xterm
+	fi
 fi
 
 ################################
 #BEGIN SUPER FANCY PROMPT
 #Source: http://aperiodic.net/phil/prompt/
 ################################
+
+apm 2&> /dev/null
+if [[ "$?" -eq 0 ]]; then
+	APM_SUPPORTED=0
+else
+	APM_SUPPORTED=1
+fi
+
 function precmd {
 
     local TERMWIDTH
@@ -185,7 +202,7 @@ function precmd {
     ###
     # Get APM info.
 
-    if which apm &> /dev/null; then
+    if which apm &> /dev/null && return $APM_SUPPORTED; then
 	PR_APM_RESULT=`apm`
     fi
 }
