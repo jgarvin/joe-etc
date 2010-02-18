@@ -41,7 +41,6 @@ export MAKEFLAGS="-j4"
 # append command to history file once executed
 setopt inc_append_history
 
-
 # system beep is irritating for tab completion
 unsetopt beep
 
@@ -61,7 +60,7 @@ alias -r cdl='cd /home/udesktop178/joeg'
 
 alias -r recent='ls -l -r --sort=time'
 
-alias -r emacs="emacsclient -n "
+alias -r e='~/etc/launch-emacs -n'
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD

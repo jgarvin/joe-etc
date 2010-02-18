@@ -21,6 +21,8 @@
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
+(toggle-debug-on-error)
+
 ;; Put backups in /tmp on unix and C:/temp on windows
 (setq backup-directory-alist
 	  `((".*" . ,temporary-file-directory)))
@@ -29,7 +31,6 @@
 (setq tramp-backup-directory-alist backup-directory-alist)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
-
 (if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
 	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
 
@@ -84,7 +85,10 @@
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
 ;; Let us connect with emacs-client
-(toggle-debug-on-error)
+(if (file-exists-p "/net/udesktop178")
+	  (setq server-host "udesktop178"))
+(setq server-socket-dir "~/.emacs.d")
+(setq server-use-tcp t)
 (server-start)
 (add-to-list 'default-frame-alist '(font . "Consolas-9"))
 
