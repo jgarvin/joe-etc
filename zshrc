@@ -156,12 +156,12 @@ if [[ -d "/net/udesktop178" ]]; then
 		export TERM=xtermc
 	fi
 
-	if [[ $TERM = "xterm" ]]; then
-		export TERM=xtermc
-	fi
-
 	if [[ `uname -s` = "Linux" ]]; then
 		export TERM=xterm
+	else
+		if [[ $TERM = "xterm" ]]; then
+			export TERM=xtermc
+		fi
 	fi
 fi
 
@@ -169,13 +169,6 @@ fi
 #BEGIN SUPER FANCY PROMPT
 #Source: http://aperiodic.net/phil/prompt/
 ################################
-
-apm 2&> /dev/null
-if [[ "$?" -eq 0 ]]; then
-	APM_SUPPORTED=0
-else
-	APM_SUPPORTED=1
-fi
 
 function precmd {
 
@@ -202,7 +195,7 @@ function precmd {
     ###
     # Get APM info.
 
-    if which apm &> /dev/null && return $APM_SUPPORTED; then
+    if apm &> /dev/null; then
 	PR_APM_RESULT=`apm`
     fi
 }
