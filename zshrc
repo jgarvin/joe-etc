@@ -86,10 +86,10 @@ then
 fi
 
 alias l.='ls -d .*'     #list hidden files
-alias -r ..="cd .."
-alias -r ....="cd ../.."
-alias -r .....="cd ../../.."
-alias -r ......="cd ../../../.."
+alias -r up="cd .."
+alias -r upup="cd ../.."
+alias -r upupup="cd ../../.."
+alias -r upupupup="cd ../../../.."
 alias cl="clear;ls"
 
 # Intuitively, searches current folder and subfolders
