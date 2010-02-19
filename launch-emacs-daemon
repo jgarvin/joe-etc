@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+source ~/etc/detect-emacs
+
+$PREFERRED_EMACS --daemon
+sleep 2
+$PREFERRED_EMACSCLIENT -c $@

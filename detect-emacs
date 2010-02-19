@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+export PREFERRED_EMACS=emacs
+export PREFERRED_EMACSCLIENT=emacsclient
+if which emacs-snapshot-gtk &> /dev/null
+then
+	export PREFERRED_EMACS=emacs-snapshot-gtk
+	export PREFERRED_EMACSCLIENT=emacsclient.emacs-snapshot
+fi
+
+# Weird hack needed to make things work on goat
+if [[ "$DISPLAY" != ":0.0" ]]; then
+	export EMACS_DISPLAY=""
+else
+	export EMACS_DISPLAY=$DISPLAY
+fi
