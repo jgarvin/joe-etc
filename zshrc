@@ -85,6 +85,26 @@ then
 	alias -r make='gmake'
 fi
 
+if which ggrep &> /dev/null # Use GNU grep if available
+then
+	alias -r grep='ggrep --color=auto'
+fi
+
+if which gawk &> /dev/null # Use GNU awk if available
+then
+	alias -r awk='gawk'
+fi
+
+if which gsed &> /dev/null # Use GNU sed if available
+then
+	alias -r sed='gsed'
+fi
+
+if which python &> /dev/null # Script requires python, and cat is rather essential
+then
+	alias -r cat='~/etc/safecat.py'
+fi
+
 alias l.='ls -d .*'     #list hidden files
 alias -r up="cd .."
 alias -r upup="cd ../.."
