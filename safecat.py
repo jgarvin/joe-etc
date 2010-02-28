@@ -67,4 +67,8 @@ if __name__ == "__main__":
                 print >> sys.stderr, "Don't cat binaries!"
                 sys.exit(1)
 
-    os.execvp("cat", ["cat"] + sys.argv[1:])
+    cat_prog = which("gcat")
+    if not cat_prog:
+        cat_prog = which("cat")
+
+    os.execv(cat_prog, [os.path.basename(cat_prog)] + sys.argv[1:])
