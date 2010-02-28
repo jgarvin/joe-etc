@@ -5,6 +5,7 @@
 import string, sys
 import os
 import os.path
+import resource
 
 # Taken from: http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
 # All SO question and answers are under a CC license requiring attribution.
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     for arg in sys.argv:
         if os.path.exists(arg):
             f = open(arg)
-            contents = f.read()
+            contents = f.read(resource.getpagesize()) # Examine first page only
             f.close()
             if not istext(contents):
                 print >> sys.stderr, "Don't cat binaries!"
