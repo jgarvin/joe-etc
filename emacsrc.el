@@ -37,6 +37,10 @@
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
+(add-to-list 'load-path "~/etc/drag-stuff")
+(require 'drag-stuff)
+(drag-stuff-global-mode t)
+
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
 (global-undo-tree-mode)
@@ -134,32 +138,6 @@
 
 ;; God, the emacs people do think of everything
 (mouse-avoidance-mode 'jump)
-
-;; Add code to let me move lines up or down
-(defun move-line (&optional n)
-  "Move current line N (1) lines up/down leaving point in place."
-  (interactive "p")
-  (when (null n)
-    (setq n 1))
-  (let ((col (current-column)))
-    (beginning-of-line)
-    (next-line 1)
-    (transpose-lines n)
-    (previous-line 1)
-    (forward-char col)))
-
-(defun move-line-up (n)
-  "Moves current line N (1) lines up leaving point in place."
-  (interactive "p")
-  (move-line (if (null n) -1 (- n))))
-
-(defun move-line-down (n)
-  "Moves current line N (1) lines down leaving point in place."
-  (interactive "p")
-  (move-line (if (null n) 1 n)))
-
-(global-set-key [(meta up)] 'move-line-up)
-(global-set-key [(meta down)] 'move-line-down)
 
 ;; A more useful C-a
 (defun beginning-or-indentation (&optional n)
@@ -476,8 +454,6 @@
   (setq deactivate-mark nil))
 
 (defun shift-region(numcols)
-" my trick to expand the region to the beginning and end of the area selected
- much in the handy way I liked in the Dreamweaver editor."
   (if (< (point)(mark))
     (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
     (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
