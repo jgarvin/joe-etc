@@ -105,6 +105,11 @@ then
 	alias -r cat='~/etc/safecat.py'
 fi
 
+# if which perl &> /dev/null # Script requires perl, and rm is rather essential
+# then
+# 	alias -r rm='~/etc/safe-rm-0.8/safe-rm'
+# fi
+
 alias l.='ls -d .*'     #list hidden files
 alias -r up="cd .."
 alias -r upup="cd ../.."

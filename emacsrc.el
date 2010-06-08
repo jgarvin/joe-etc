@@ -1,8 +1,3 @@
-;; TODO: It'd be cool to hit a key combo to cycle through yanking things
-;; in the kill ring.. think there's already a customization for this.
-
-;; TODO: Want the alt+arrow key thing to seemlessly work for current highlight :D
-
 ;; TODO: Tab should OBEY. If the line is already indented, assume I want to insert a tab.
 
 ;; TODO: Make canceling telling global path just disable it
@@ -23,11 +18,15 @@
 
 (toggle-debug-on-error)
 
-;; Put backups in /tmp on unix and C:/temp on windows
+;; When remotely logging in, need to remap alt for emacs keybindings to work
+(when (getenv "DISPLAY")
+  (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
+	(setq x-alt-keysym 'meta)))
+
 (setq backup-directory-alist
-	  `((".*" . ,temporary-file-directory)))
+	  `((".*" . ,"~/backup")))
 (setq auto-save-file-name-transforms
-	  `((".*" ,temporary-file-directory t)))
+	  `((".*" ,"~/backup" t)))
 (setq tramp-backup-directory-alist backup-directory-alist)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
@@ -40,6 +39,20 @@
 (add-to-list 'load-path "~/etc/drag-stuff")
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
+
+(add-to-list 'load-path "~/etc/wrap-region")
+(require 'wrap-region)
+(wrap-region-global-mode t)
+(add-hook 'wrap-region-after-insert-twice-hook
+          (lambda ()
+            (let ((modes '(c-mode c++-mode java-mode javascript-mode css-mode)))
+              (if (and (string= (char-to-string (char-before)) "{") (member major-mode modes))
+                  (let ((origin (line-beginning-position)))
+                    (newline 2)
+                    (indent-region origin (line-end-position))
+                    (forward-line -1)
+                    (indent-according-to-mode))))))
+(setq wrap-region-except-modes '(calc-mode))
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
@@ -78,23 +91,15 @@
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
 
-
 (require 'breadcrumb)
 (setq bc-bookmark-limit 10000)
-;;(global-set-key [(control shift space)]         'bc-set) ;; Shift-SPACE for set bookmark
 (global-set-key (kbd "C-S-SPC")         'bc-set) ;; Shift-SPACE for set bookmark
 (global-set-key [(control meta j)]      'bc-previous) ;; M-j for jump to previous
 (global-set-key [(control meta k)]      'bc-next) ;; Shift-M-j for jump to next
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
-;; Let us connect with emacs-client
-(if (file-exists-p "/net/udesktop178")
-	  (setq server-host "udesktop178"))
-(setq server-socket-dir "~/.emacs.d")
-(setq server-use-tcp t)
-(server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-9"))
+(add-to-list 'default-frame-alist '(font . "Consolas-12"))
 
 ;; Color theme
 (require 'color-theme)
@@ -137,7 +142,7 @@
 (setq scroll-step 1)
 
 ;; God, the emacs people do think of everything
-(mouse-avoidance-mode 'jump)
+;;(mouse-avoidance-mode 'jump)
 
 ;; A more useful C-a
 (defun beginning-or-indentation (&optional n)
@@ -172,15 +177,6 @@
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
-
-;; (defun is-home-folder (path)
-;;   (let ((folder-names (split-string folder "/"))
-;; 		(if (= "home" 
-
-;; (defun determine-source-tree-root ()
-;;   (if (not (= 0 (call-process "global" nil nil nil " -p")))
-;; 	  (let ((olddir default-directory))))
-		
 
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
@@ -321,6 +317,18 @@
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 
+;; AWESOMENESS
+(require 'cc-mode)
+(global-set-key (kbd "C-d") 'c-hungry-delete-forward)
+(global-set-key (kbd "DEL") 'c-hungry-delete-forward)
+(global-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
+
+(add-hook 'c-mode-common-hook
+		  (lambda () (setq c-hungry-delete-key t)))
+
+(add-hook 'c-mode-common-hook
+		  (lambda () (c-subword-mode 1)))
+
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
   (interactive)
@@ -382,36 +390,9 @@
 		  (set 'folder-list (append folder-list (list name))))))
   folder-list))
 
-;;(load-file "~/opt/cedet-1.0pre6/common/cedet.el")
-;; (load-file "~/opt/cedet-cvs/common/cedet.el")
-;; (require 'cedet)
-;; (require 'semantic-ia)
-;; (semantic-load-enable-gaudy-code-helpers)
-;; (setq qt4-base-dir "/usr/include/qt4")
-;; (dolist (folder (list-all-subfolders qt4-base-dir))
-;;   (semantic-add-system-include folder 'c++-mode)
-;;   (add-to-list 'auto-mode-alist (cons folder 'c++-mode)))
-
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig-dist.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qglobal.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qobjectdefs.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qwebkitglobal.h"))
-
-;; (semantic-add-system-include qt4-base-dir 'c++-mode)
-;; (semantic-add-system-include "/usr/include/qt4/QtGui" 'c++-mode)
-;; (add-to-list 'auto-mode-alist (cons qt4-base-dir 'c++-mode))
-;; (add-to-list 'auto-mode-alist (cons "/usr/include/qt4/QtGui" 'c++-mode))
-;; (require 'semanticdb-global)
-;; (semanticdb-enable-gnu-global-databases 'c-mode)
-;; (semanticdb-enable-gnu-global-databases 'c++-mode)
-
 ;; Use full file names for buffers, otherwise can get lost
 (setq-default mode-line-buffer-identification
 			  '("%S:"(buffer-file-name "%f")))
-
-
-;;(vc-annotate (buffer-file-name) (vc-workfile-version (buffer-file-name)))
 
 
 (require 'uniquify)
@@ -421,20 +402,21 @@
 (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
 
 (global-set-key (kbd "C-x K") 'kill-other-buffers-of-this-file-name)
+
 (defun kill-other-buffers-of-this-file-name (&optional buffer)
-"Kill all other buffers visiting files of the same base name."
-(interactive "bBuffer to make unique: ")
-(setq buffer (get-buffer buffer))
-(cond ((buffer-file-name buffer)
-       (let ((name (file-name-nondirectory (buffer-file-name buffer))))
-         (loop for ob in (buffer-list)
-               do (if (and (not (eq ob buffer))
-                           (buffer-file-name ob)
-                           (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
-                             (or (equal ob-file-name name)
-                                 (string-match (concat name "\\.~.*~$") ob-file-name))) )
-                      (kill-buffer ob)))))
-      (default (message "This buffer has no file name."))))
+  "Kill all other buffers visiting files of the same base name."
+  (interactive "bBuffer to make unique: ")
+  (setq buffer (get-buffer buffer))
+  (cond ((buffer-file-name buffer)
+		 (let ((name (file-name-nondirectory (buffer-file-name buffer))))
+		   (loop for ob in (buffer-list)
+				 do (if (and (not (eq ob buffer))
+							 (buffer-file-name ob)
+							 (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
+							   (or (equal ob-file-name name)
+								   (string-match (concat name "\\.~.*~$") ob-file-name))) )
+						(kill-buffer ob)))))
+		(default (message "This buffer has no file name."))))
 
 (defun unindent-region-with-tab ()
   (interactive)
