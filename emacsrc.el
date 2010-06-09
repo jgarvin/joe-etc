@@ -12,7 +12,6 @@
 ;; If not indented already, and not at beginning of line, do code completion
 
 ;; Module: use indentation already used in file!
-;; Nice to have: emacs/tlmake integration
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
@@ -45,7 +44,7 @@
 (wrap-region-global-mode t)
 (add-hook 'wrap-region-after-insert-twice-hook
           (lambda ()
-            (let ((modes '(c-mode c++-mode java-mode javascript-mode css-mode)))
+            (let ((modes '(c-mode c-mode-common-hook c++-mode java-mode javascript-mode css-mode)))
               (if (and (string= (char-to-string (char-before)) "{") (member major-mode modes))
                   (let ((origin (line-beginning-position)))
                     (newline 2)
@@ -316,6 +315,7 @@
 (global-set-key "\M-k" 'next-buffer)
 
 (global-set-key (kbd "RET") 'newline-and-indent)
+(global-set-key (kbd "C-m") 'newline-and-indent)
 
 ;; AWESOMENESS
 (require 'cc-mode)
