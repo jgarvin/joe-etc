@@ -89,6 +89,7 @@
 ;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
+(setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii")))
 
 (require 'breadcrumb)
 (setq bc-bookmark-limit 10000)
@@ -260,9 +261,15 @@
 ;; that exists
 (defun find-other-file (fname fext)
   (dolist (value (cdr (assoc fext exts)) result)
-    (if (file-exists-p (concat fname "." value))
-        (setq result (concat fname "." value)))))
-
+	(let ((path (file-name-directory fname))
+		  (name (file-name-nondirectory fname)))
+	  (if (file-exists-p (concat path name "." value))
+		  (setq result (concat path name "." value))
+		(if (file-exists-p (concat path "private/" name "." value))
+			(setq result (concat path "private/" name "." value))
+		  (if (file-exists-p (concat path "../" name "." value))
+			  (setq result (concat path "../" name "." value))))))))
+  
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
 (defun toggle-header-buffer()
