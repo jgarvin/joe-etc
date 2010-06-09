@@ -317,6 +317,9 @@
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
+;; If I'm searching and I hit backspace, I mean backspace dammit.
+(define-key isearch-mode-map '[backspace] 'isearch-delete-char)
+
 ;; AWESOMENESS
 (require 'cc-mode)
 (global-set-key (kbd "C-d") 'c-hungry-delete-forward)
