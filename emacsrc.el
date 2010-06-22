@@ -42,6 +42,7 @@
 (add-to-list 'load-path "~/etc/wrap-region")
 (require 'wrap-region)
 (wrap-region-global-mode t)
+(setq wrap-region-insert-twice t)
 (add-hook 'wrap-region-after-insert-twice-hook
           (lambda ()
             (let ((modes '(c-mode c-mode-common-hook c++-mode java-mode javascript-mode css-mode)))
@@ -52,6 +53,28 @@
                     (forward-line -1)
                     (indent-according-to-mode))))))
 (setq wrap-region-except-modes '(calc-mode))
+
+(defadvice wrap-region (around wrap-region-around (left right beg end) activate)
+  "..."
+  (let ((modes '(c-mode c++-mode java-mode)))
+    (cond ((member major-mode modes)
+           (let ((region (buffer-substring-no-properties beg end))
+                 (origin (line-beginning-position)))
+             (delete-region beg end)
+             (insert left)
+             (newline 2)
+             (insert "}")
+             (indent-region origin (line-end-position))
+             (forward-line -1)
+             (insert region)
+             (indent-region beg end)))
+          (t ad-do-it))))
+
+;; So annoying this is not default
+(defadvice yank (after c-yank-indent)
+  "Indents after yanking"
+  (when (member major-mode '(c-mode c++-mode javascript-mode java-mode css-mode))
+	(indent-region)))
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
@@ -190,10 +213,14 @@
 	  (when (not (string= topdir ""))
 		  (progn
 			(cd topdir)
-			(shell-command "gtags -q && echo 'created tagfile'")
+			(start-process-shell-command "gtags create"
+										 "gtags_buffer"
+										 "gtags -q && echo 'created tagfile'")
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
-    (shell-command "global -u 2> /dev/null && echo 'updated tagfile'")))
+    (start-process-shell-command "gtags update"
+								 "gtags_buffer"
+								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
@@ -207,6 +234,10 @@
     (require 'gtags)
     (gtags-mode t)
     (djcb-gtags-create-or-update)))
+
+;; (add-hook 'c-mode-common-hook
+;;   (lambda ()
+;; 	(local-set-key (kbd "{") )))
 
 (defun djcb-hasktags-create-or-update ()
   "create or update the TAGS file with hasktags"
