@@ -81,12 +81,16 @@
 (global-undo-tree-mode)
 (define-key undo-tree-map (kbd "C-/") nil)
 
+(defun android-log ()
+  (terminal-emulator "android_log" "adb" '("logcat")))
+
 ;; android-mode
 (if (file-exists-p "~/opt/android-mode")
 	(progn
 	  (add-to-list 'load-path "~/opt/android-mode")
 	  (require 'android-mode)
-	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))))
+	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))
+	  (android-log)))
 
 (defun android-debug ()
   (progn
@@ -96,11 +100,6 @@
 	)
   (jdb "jdb -attach localhost:8700")
   )
-
-(defun android-log ()
-  (terminal-emulator "android_log" "adb" '("logcat")))
-
-(android-log)
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
