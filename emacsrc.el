@@ -385,7 +385,6 @@
 
 (define-key global-map [f9] 'ff/fast-compile)
 (define-key global-map [f10] 'tlmake-install)
-
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))
 	(dolist (subfolder (directory-files folder))
