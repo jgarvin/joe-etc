@@ -125,7 +125,10 @@
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
 (server-start)
-(add-to-list 'default-frame-alist '(font . "Consolas-11"))
+
+(if (> (display-pixel-width) 1280)
+	(add-to-list 'default-frame-alist '(font . "Consolas-12"))
+  (add-to-list 'default-frame-alist '(font . "Consolas-11")))
 
 ;; Color theme
 (require 'color-theme)
