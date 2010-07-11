@@ -306,7 +306,7 @@
 			(setq result (concat path "private/" name "." value))
 		  (if (file-exists-p (concat path "../" name "." value))
 			  (setq result (concat path "../" name "." value))))))))
-  
+
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
 (defun toggle-header-buffer()
@@ -323,7 +323,7 @@
 
 ;; Delete trailing whitespace automagically
 ;; TODO: Debug, doesn't seem to be working
-(add-hook 'write-file-hook
+(add-hook 'write-file-hooks
   (lambda ()
     (nuke-trailing-whitespace)))
 
@@ -400,7 +400,7 @@
     )
   )
 
-;; Run makefile, or if there isn't one 
+;; Run makefile, or if there isn't one
 (defun smart-compile()
   (if (or (file-exists-p "makefile")
 		  (file-exists-p "Makefile")
@@ -412,7 +412,7 @@
 				"make -k -j2 "
 				(file-name-sans-extension
 				 (file-name-nondirectory buffer-file-name)))))))
-  
+
 
 (defun ff/fast-compile ()
   "Compiles without asking anything."
