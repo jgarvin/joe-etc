@@ -41,7 +41,6 @@ export MAKEFLAGS="-j4"
 # append command to history file once executed
 setopt inc_append_history
 
-
 # system beep is irritating for tab completion
 unsetopt beep
 
@@ -55,15 +54,13 @@ alias -r f='pushd -0 > /dev/null'
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-alias -r ack='~/etc/ack --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
-
-alias -r up='cd ..'
+alias -r ack='~/etc/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
 
 alias -r cdl='cd /home/udesktop178/joeg'
 
 alias -r recent='ls -l -r --sort=time'
 
-alias -r emacs="emacsclient -n "
+alias -r e='~/etc/launch-emacs -n'
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
@@ -77,6 +74,48 @@ then
 else
 	alias -r ls='ls --color=auto'
 fi
+
+if which gfind &> /dev/null # Use GNU ls if available
+then
+	alias -r find='gfind'
+fi
+
+if which gmake &> /dev/null # Use GNU make if available
+then
+	alias -r make='gmake'
+fi
+
+if which ggrep &> /dev/null # Use GNU grep if available
+then
+	alias -r grep='ggrep --color=auto'
+fi
+
+if which gawk &> /dev/null # Use GNU awk if available
+then
+	alias -r awk='gawk'
+fi
+
+if which gsed &> /dev/null # Use GNU sed if available
+then
+	alias -r sed='gsed'
+fi
+
+if which python &> /dev/null # Script requires python, and cat is rather essential
+then
+	alias -r cat='~/etc/safecat.py'
+fi
+
+# if which perl &> /dev/null # Script requires perl, and rm is rather essential
+# then
+# 	alias -r rm='~/etc/safe-rm-0.8/safe-rm'
+# fi
+
+alias l.='ls -d .*'     #list hidden files
+alias -r up="cd .."
+alias -r upup="cd ../.."
+alias -r upupup="cd ../../.."
+alias -r upupupup="cd ../../../.."
+alias cl="clear;ls"
 
 # Intuitively, searches current folder and subfolders
 search () {
@@ -136,13 +175,17 @@ alarm() {
 }
 
 # Need in order to get color on solaris
-if [[ -d "/home/udesktop178" ]]; then
+if [[ -d "/net/udesktop178" ]]; then
 	if [[ $COLORTERM = "gnome-terminal" ]]; then
 		export TERM=xtermc
 	fi
 
-	if [[ $TERM = "xterm" ]]; then
-		export TERM=xtermc
+	if [[ `uname -s` = "Linux" ]]; then
+		export TERM=xterm
+	else
+		if [[ $TERM = "xterm" ]]; then
+			export TERM=xtermc
+		fi
 	fi
 fi
 
@@ -150,6 +193,7 @@ fi
 #BEGIN SUPER FANCY PROMPT
 #Source: http://aperiodic.net/phil/prompt/
 ################################
+
 function precmd {
 
     local TERMWIDTH
@@ -175,7 +219,7 @@ function precmd {
     ###
     # Get APM info.
 
-    if which apm &> /dev/null; then
+    if apm &> /dev/null; then
 	PR_APM_RESULT=`apm`
     fi
 }
@@ -306,7 +350,9 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
-# 	clear
- 	cat /etc/motd
+# 	clear   
+ 	if [[ -a /etc/motd ]]; then
+ 	    cat /etc/motd
+ 	fi
 	setprompt
 fi

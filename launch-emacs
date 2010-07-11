@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+source ~/etc/detect-emacs
+
+DISPLAY=$EMACS_DISPLAY $PREFERRED_EMACSCLIENT -c --alternate-editor "$HOME/etc/launch-emacs-daemon $@" $@

@@ -1,8 +1,3 @@
-;; TODO: It'd be cool to hit a key combo to cycle through yanking things
-;; in the kill ring.. think there's already a customization for this.
-
-;; TODO: Want the alt+arrow key thing to seemlessly work for current highlight :D
-
 ;; TODO: Tab should OBEY. If the line is already indented, assume I want to insert a tab.
 
 ;; TODO: Make canceling telling global path just disable it
@@ -17,20 +12,69 @@
 ;; If not indented already, and not at beginning of line, do code completion
 
 ;; Module: use indentation already used in file!
-;; Nice to have: emacs/tlmake integration
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
-(setq make-backup-files nil) ;; do not make backup files
-(setq backup-inhibited t)
+(toggle-debug-on-error)
+
+;; When remotely logging in, need to remap alt for emacs keybindings to work
+(when (getenv "DISPLAY")
+  (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
+	(setq x-alt-keysym 'meta)))
+
+(setq backup-directory-alist
+	  `((".*" . ,"~/backup")))
+(setq auto-save-file-name-transforms
+	  `((".*" ,"~/backup" t)))
+(setq tramp-backup-directory-alist backup-directory-alist)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
-
 (if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
 	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
 
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
+
+(add-to-list 'load-path "~/etc/drag-stuff")
+(require 'drag-stuff)
+(drag-stuff-global-mode t)
+
+(add-to-list 'load-path "~/etc/wrap-region")
+(require 'wrap-region)
+(wrap-region-global-mode t)
+(setq wrap-region-insert-twice t)
+(add-hook 'wrap-region-after-insert-twice-hook
+          (lambda ()
+            (let ((modes '(c-mode c-mode-common-hook c++-mode java-mode javascript-mode css-mode)))
+              (if (and (string= (char-to-string (char-before)) "{") (member major-mode modes))
+                  (let ((origin (line-beginning-position)))
+                    (newline 2)
+                    (indent-region origin (line-end-position))
+                    (forward-line -1)
+                    (indent-according-to-mode))))))
+(setq wrap-region-except-modes '(calc-mode))
+
+(defadvice wrap-region (around wrap-region-around (left right beg end) activate)
+  "..."
+  (let ((modes '(c-mode c++-mode java-mode)))
+    (cond ((member major-mode modes)
+           (let ((region (buffer-substring-no-properties beg end))
+                 (origin (line-beginning-position)))
+             (delete-region beg end)
+             (insert left)
+             (newline 2)
+             (insert "}")
+             (indent-region origin (line-end-position))
+             (forward-line -1)
+             (insert region)
+             (indent-region beg end)))
+          (t ad-do-it))))
+
+;; So annoying this is not default
+(defadvice yank (after c-yank-indent)
+  "Indents after yanking"
+  (when (member major-mode '(c-mode c++-mode javascript-mode java-mode css-mode))
+	(indent-region)))
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
@@ -68,11 +112,10 @@
 ;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
-
+(setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii")))
 
 (require 'breadcrumb)
 (setq bc-bookmark-limit 10000)
-;;(global-set-key [(control shift space)]         'bc-set) ;; Shift-SPACE for set bookmark
 (global-set-key (kbd "C-S-SPC")         'bc-set) ;; Shift-SPACE for set bookmark
 (global-set-key [(control meta j)]      'bc-previous) ;; M-j for jump to previous
 (global-set-key [(control meta k)]      'bc-next) ;; Shift-M-j for jump to next
@@ -125,33 +168,7 @@
 (setq scroll-step 1)
 
 ;; God, the emacs people do think of everything
-(mouse-avoidance-mode 'jump)
-
-;; Add code to let me move lines up or down
-(defun move-line (&optional n)
-  "Move current line N (1) lines up/down leaving point in place."
-  (interactive "p")
-  (when (null n)
-    (setq n 1))
-  (let ((col (current-column)))
-    (beginning-of-line)
-    (next-line 1)
-    (transpose-lines n)
-    (previous-line 1)
-    (forward-char col)))
-
-(defun move-line-up (n)
-  "Moves current line N (1) lines up leaving point in place."
-  (interactive "p")
-  (move-line (if (null n) -1 (- n))))
-
-(defun move-line-down (n)
-  "Moves current line N (1) lines down leaving point in place."
-  (interactive "p")
-  (move-line (if (null n) 1 n)))
-
-(global-set-key [(meta up)] 'move-line-up)
-(global-set-key [(meta down)] 'move-line-down)
+;;(mouse-avoidance-mode 'jump)
 
 ;; A more useful C-a
 (defun beginning-or-indentation (&optional n)
@@ -187,15 +204,6 @@
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
 
-;; (defun is-home-folder (path)
-;;   (let ((folder-names (split-string folder "/"))
-;; 		(if (= "home" 
-
-;; (defun determine-source-tree-root ()
-;;   (if (not (= 0 (call-process "global" nil nil nil " -p")))
-;; 	  (let ((olddir default-directory))))
-		
-
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
 (defun djcb-gtags-create-or-update ()
@@ -208,10 +216,14 @@
 	  (when (not (string= topdir ""))
 		  (progn
 			(cd topdir)
-			(shell-command "gtags -q && echo 'created tagfile'")
+			(start-process-shell-command "gtags create"
+										 "gtags_buffer"
+										 "gtags -q && echo 'created tagfile'")
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
-    (shell-command "global -u 2> /dev/null && echo 'updated tagfile'")))
+    (start-process-shell-command "gtags update"
+								 "gtags_buffer"
+								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
@@ -225,6 +237,10 @@
     (require 'gtags)
     (gtags-mode t)
     (djcb-gtags-create-or-update)))
+
+;; (add-hook 'c-mode-common-hook
+;;   (lambda ()
+;; 	(local-set-key (kbd "{") )))
 
 (defun djcb-hasktags-create-or-update ()
   "create or update the TAGS file with hasktags"
@@ -279,9 +295,15 @@
 ;; that exists
 (defun find-other-file (fname fext)
   (dolist (value (cdr (assoc fext exts)) result)
-    (if (file-exists-p (concat fname "." value))
-        (setq result (concat fname "." value)))))
-
+	(let ((path (file-name-directory fname))
+		  (name (file-name-nondirectory fname)))
+	  (if (file-exists-p (concat path name "." value))
+		  (setq result (concat path name "." value))
+		(if (file-exists-p (concat path "private/" name "." value))
+			(setq result (concat path "private/" name "." value))
+		  (if (file-exists-p (concat path "../" name "." value))
+			  (setq result (concat path "../" name "." value))))))))
+  
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
 (defun toggle-header-buffer()
@@ -334,6 +356,22 @@
 (global-set-key "\M-k" 'next-buffer)
 
 (global-set-key (kbd "RET") 'newline-and-indent)
+(global-set-key (kbd "C-m") 'newline-and-indent)
+
+;; If I'm searching and I hit backspace, I mean backspace dammit.
+(define-key isearch-mode-map '[backspace] 'isearch-delete-char)
+
+;; AWESOMENESS
+(require 'cc-mode)
+(global-set-key (kbd "C-d") 'c-hungry-delete-forward)
+(global-set-key (kbd "DEL") 'c-hungry-delete-forward)
+(global-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
+
+(add-hook 'c-mode-common-hook
+		  (lambda () (setq c-hungry-delete-key t)))
+
+(add-hook 'c-mode-common-hook
+		  (lambda () (c-subword-mode 1)))
 
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
@@ -395,36 +433,9 @@
 		  (set 'folder-list (append folder-list (list name))))))
   folder-list))
 
-;;(load-file "~/opt/cedet-1.0pre6/common/cedet.el")
-;; (load-file "~/opt/cedet-cvs/common/cedet.el")
-;; (require 'cedet)
-;; (require 'semantic-ia)
-;; (semantic-load-enable-gaudy-code-helpers)
-;; (setq qt4-base-dir "/usr/include/qt4")
-;; (dolist (folder (list-all-subfolders qt4-base-dir))
-;;   (semantic-add-system-include folder 'c++-mode)
-;;   (add-to-list 'auto-mode-alist (cons folder 'c++-mode)))
-
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qconfig-dist.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qglobal.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qobjectdefs.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt4-base-dir "/Qt/qwebkitglobal.h"))
-
-;; (semantic-add-system-include qt4-base-dir 'c++-mode)
-;; (semantic-add-system-include "/usr/include/qt4/QtGui" 'c++-mode)
-;; (add-to-list 'auto-mode-alist (cons qt4-base-dir 'c++-mode))
-;; (add-to-list 'auto-mode-alist (cons "/usr/include/qt4/QtGui" 'c++-mode))
-;; (require 'semanticdb-global)
-;; (semanticdb-enable-gnu-global-databases 'c-mode)
-;; (semanticdb-enable-gnu-global-databases 'c++-mode)
-
 ;; Use full file names for buffers, otherwise can get lost
 (setq-default mode-line-buffer-identification
 			  '("%S:"(buffer-file-name "%f")))
-
-
-;;(vc-annotate (buffer-file-name) (vc-workfile-version (buffer-file-name)))
 
 
 (require 'uniquify)
@@ -434,20 +445,21 @@
 (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
 
 (global-set-key (kbd "C-x K") 'kill-other-buffers-of-this-file-name)
+
 (defun kill-other-buffers-of-this-file-name (&optional buffer)
-"Kill all other buffers visiting files of the same base name."
-(interactive "bBuffer to make unique: ")
-(setq buffer (get-buffer buffer))
-(cond ((buffer-file-name buffer)
-       (let ((name (file-name-nondirectory (buffer-file-name buffer))))
-         (loop for ob in (buffer-list)
-               do (if (and (not (eq ob buffer))
-                           (buffer-file-name ob)
-                           (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
-                             (or (equal ob-file-name name)
-                                 (string-match (concat name "\\.~.*~$") ob-file-name))) )
-                      (kill-buffer ob)))))
-      (default (message "This buffer has no file name."))))
+  "Kill all other buffers visiting files of the same base name."
+  (interactive "bBuffer to make unique: ")
+  (setq buffer (get-buffer buffer))
+  (cond ((buffer-file-name buffer)
+		 (let ((name (file-name-nondirectory (buffer-file-name buffer))))
+		   (loop for ob in (buffer-list)
+				 do (if (and (not (eq ob buffer))
+							 (buffer-file-name ob)
+							 (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
+							   (or (equal ob-file-name name)
+								   (string-match (concat name "\\.~.*~$") ob-file-name))) )
+						(kill-buffer ob)))))
+		(default (message "This buffer has no file name."))))
 
 (defun unindent-region-with-tab ()
   (interactive)
@@ -467,8 +479,6 @@
   (setq deactivate-mark nil))
 
 (defun shift-region(numcols)
-" my trick to expand the region to the beginning and end of the area selected
- much in the handy way I liked in the Dreamweaver editor."
   (if (< (point)(mark))
     (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
     (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
