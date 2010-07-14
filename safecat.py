@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 """Checks if files are binaries before catting them. Because I'm error prone."""
 

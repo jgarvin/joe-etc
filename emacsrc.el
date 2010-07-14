@@ -126,7 +126,13 @@
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
-(add-to-list 'default-frame-alist '(font . "Consolas-12"))
+;; Let us connect with emacs-client
+(toggle-debug-on-error)
+(server-start)
+
+(if (> (display-pixel-width) 1280)
+	(add-to-list 'default-frame-alist '(font . "Consolas-12"))
+  (add-to-list 'default-frame-alist '(font . "Consolas-11")))
 
 ;; Color theme
 (require 'color-theme)
@@ -304,7 +310,7 @@
 			(setq result (concat path "private/" name "." value))
 		  (if (file-exists-p (concat path "../" name "." value))
 			  (setq result (concat path "../" name "." value))))))))
-  
+
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
 (defun toggle-header-buffer()
@@ -321,7 +327,7 @@
 
 ;; Delete trailing whitespace automagically
 ;; TODO: Debug, doesn't seem to be working
-(add-hook 'write-file-hook
+(add-hook 'write-file-hooks
   (lambda ()
     (nuke-trailing-whitespace)))
 
@@ -398,7 +404,7 @@
     )
   )
 
-;; Run makefile, or if there isn't one 
+;; Run makefile, or if there isn't one
 (defun smart-compile()
   (if (or (file-exists-p "makefile")
 		  (file-exists-p "Makefile")
@@ -410,7 +416,7 @@
 				"make -k -j2 "
 				(file-name-sans-extension
 				 (file-name-nondirectory buffer-file-name)))))))
-  
+
 
 (defun ff/fast-compile ()
   "Compiles without asking anything."
@@ -424,7 +430,6 @@
 
 (define-key global-map [f9] 'ff/fast-compile)
 (define-key global-map [f10] 'tlmake-install)
-
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))
 	(dolist (subfolder (directory-files folder))

@@ -355,7 +355,9 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
-# 	clear
- 	cat /etc/motd
+# 	clear   
+ 	if [[ -a /etc/motd ]]; then
+ 	    cat /etc/motd
+ 	fi
 	setprompt
 fi
