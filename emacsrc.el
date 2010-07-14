@@ -42,37 +42,6 @@
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
 
-(add-to-list 'load-path "~/etc/wrap-region")
-(require 'wrap-region)
-(wrap-region-global-mode t)
-(setq wrap-region-insert-twice t)
-(add-hook 'wrap-region-after-insert-twice-hook
-          (lambda ()
-            (let ((modes '(c-mode c-mode-common-hook c++-mode java-mode javascript-mode css-mode)))
-              (if (and (string= (char-to-string (char-before)) "{") (member major-mode modes))
-                  (let ((origin (line-beginning-position)))
-                    (newline 2)
-                    (indent-region origin (line-end-position))
-                    (forward-line -1)
-                    (indent-according-to-mode))))))
-(setq wrap-region-except-modes '(calc-mode))
-
-(defadvice wrap-region (around wrap-region-around (left right beg end) activate)
-  "..."
-  (let ((modes '(c-mode c++-mode java-mode)))
-    (cond ((member major-mode modes)
-           (let ((region (buffer-substring-no-properties beg end))
-                 (origin (line-beginning-position)))
-             (delete-region beg end)
-             (insert left)
-             (newline 2)
-             (insert "}")
-             (indent-region origin (line-end-position))
-             (forward-line -1)
-             (insert region)
-             (indent-region beg end)))
-          (t ad-do-it))))
-
 (defun yank-and-indent ()
   "Yank and then indent the newly formed region according to mode."
   (interactive)
