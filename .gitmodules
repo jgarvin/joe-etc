@@ -1,0 +1,9 @@
+[submodule "wrap-region/"]
+	path = wrap-region/
+	url = git://github.com/rejeep/wrap-region.git
+[submodule "drag-stuff"]
+	path = drag-stuff
+	url = git://github.com/rejeep/drag-stuff.git
+[submodule "wrap-region"]
+	path = wrap-region
+	url = http://github.com/rejeep/wrap-region.git
