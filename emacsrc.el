@@ -15,6 +15,9 @@
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
+;; TODO: "automatic vertical indenting", know how much I like to space out my functions and classes
+;; and automatically make sure that many lines are preserved when I copy/paste
+
 (toggle-debug-on-error)
 
 ;; When remotely logging in, need to remap alt for emacs keybindings to work
@@ -70,11 +73,12 @@
              (indent-region beg end)))
           (t ad-do-it))))
 
-;; So annoying this is not default
-(defadvice yank (after c-yank-indent)
-  "Indents after yanking"
-  (when (member major-mode '(c-mode c++-mode javascript-mode java-mode css-mode))
-	(indent-region)))
+(defun yank-and-indent ()
+  "Yank and then indent the newly formed region according to mode."
+  (interactive)
+  (yank)
+  (call-interactively 'indent-region))
+(global-set-key (kbd "C-y")         'yank-and-indent)
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)

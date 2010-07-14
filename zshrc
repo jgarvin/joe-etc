@@ -100,6 +100,11 @@ then
 	alias -r sed='gsed'
 fi
 
+if which gsleep &> /dev/null # Use GNU sed if available
+then
+	alias -r sleep='gsleep'
+fi
+
 if which python &> /dev/null # Script requires python, and cat is rather essential
 then
 	alias -r cat='~/etc/safecat.py'
