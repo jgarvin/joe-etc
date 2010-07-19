@@ -35,6 +35,11 @@
 (if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
 	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
 
+(add-to-list 'load-path "~/etc/autopair-read-only") ;; comment if autopair.el is in standard load path
+(require 'autopair)
+(autopair-global-mode) ;; enable autopair in all buffers
+;;(set-variable autopair-autowrap t)
+
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
@@ -73,7 +78,8 @@
 (defun android-log ()
   (terminal-emulator "android_log" "adb" '("logcat")))
 
-(android-log)
+(if (file-exists-p "~/opt/android-mode")
+	(android-log))
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
@@ -298,7 +304,7 @@
 ;; TODO: Debug, doesn't seem to be working
 (add-hook 'write-file-hooks
   (lambda ()
-    (nuke-trailing-whitespace)))
+    (delete-trailing-whitespace)))
 
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
@@ -464,3 +470,4 @@
     (if (< (point) (mark)) (exchange-point-and-mark))
     (let ((save-mark (mark)))
       (indent-rigidly region-start region-finish numcols))))
+
