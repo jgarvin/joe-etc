@@ -85,6 +85,11 @@
 (setq tramp-default-user "joeg")
 (require 'tramp)
 
+;; Make more notepad like out of the box
+(setq default-major-mode 'text-mode)
+(setq text-mode-hook				; Enable auto-fill-mode
+	  '(lambda () (longlines-mode 1)))
+
 (require 'ido)
 (ido-mode t)
 (setq ido-enable-flex-matching t)
@@ -415,13 +420,8 @@
 		  (set 'folder-list (append folder-list (list name))))))
   folder-list))
 
-;; Use full file names for buffers, otherwise can get lost
-(setq-default mode-line-buffer-identification
-			  '("%S:"(buffer-file-name "%f")))
-
-
 (require 'uniquify)
-(setq uniquify-buffer-name-style 'reverse)
+(setq uniquify-buffer-name-style 'forward)
 (setq uniquify-separator "/")
 (setq uniquify-after-kill-buffer-p t) ; rename after killing uniquified
 (setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
