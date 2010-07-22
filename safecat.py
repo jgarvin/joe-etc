@@ -3,7 +3,7 @@
 """Checks if files are binaries before catting them. Because I'm error prone."""
 
 import string, sys
-import os
+import os, stat
 import os.path
 import resource
 
@@ -60,6 +60,9 @@ def istext(s):
 if __name__ == "__main__":
     try:
         for arg in sys.argv:
+            if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
+                continue
+
             if os.path.exists(arg):
                 f = open(arg)
                 contents = f.read(resource.getpagesize()) # Examine first page only
