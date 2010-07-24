@@ -98,7 +98,7 @@
   )
 
 (defun android-log ()
-  (terminal-emulator "android_log" "adb" '("logcat")))
+  (terminal-emulator "android_log" "zsh" '("-c" "adb" "logcat")))
 
 (android-log)
 

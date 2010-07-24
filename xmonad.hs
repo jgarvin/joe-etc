@@ -104,7 +104,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaiseNext "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
+    , ((modMask,  xK_f), runOrRaiseNext "firefox" (className =? "Firefox" <||> className =? "Shiretoko"))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
@@ -180,7 +180,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 	++
-	
+
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
@@ -188,7 +188,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_e, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
- 
+
 
 
 
