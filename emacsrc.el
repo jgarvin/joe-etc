@@ -15,6 +15,9 @@
 ;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
 ;; of letting me browse project files. Nice for having dual emacs groups for different projects...
 
+;; TODO: "automatic vertical indenting", know how much I like to space out my functions and classes
+;; and automatically make sure that many lines are preserved when I copy/paste
+
 (toggle-debug-on-error)
 
 ;; When remotely logging in, need to remap alt for emacs keybindings to work
@@ -32,6 +35,11 @@
 (if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
 	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
 
+(add-to-list 'load-path "~/etc/autopair-read-only") ;; comment if autopair.el is in standard load path
+(require 'autopair)
+(autopair-global-mode) ;; enable autopair in all buffers
+;;(set-variable autopair-autowrap t)
+
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
 
@@ -39,42 +47,12 @@
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
 
-(add-to-list 'load-path "~/etc/wrap-region")
-(require 'wrap-region)
-(wrap-region-global-mode t)
-(setq wrap-region-insert-twice t)
-(add-hook 'wrap-region-after-insert-twice-hook
-          (lambda ()
-            (let ((modes '(c-mode c-mode-common-hook c++-mode java-mode javascript-mode css-mode)))
-              (if (and (string= (char-to-string (char-before)) "{") (member major-mode modes))
-                  (let ((origin (line-beginning-position)))
-                    (newline 2)
-                    (indent-region origin (line-end-position))
-                    (forward-line -1)
-                    (indent-according-to-mode))))))
-(setq wrap-region-except-modes '(calc-mode))
-
-(defadvice wrap-region (around wrap-region-around (left right beg end) activate)
-  "..."
-  (let ((modes '(c-mode c++-mode java-mode)))
-    (cond ((member major-mode modes)
-           (let ((region (buffer-substring-no-properties beg end))
-                 (origin (line-beginning-position)))
-             (delete-region beg end)
-             (insert left)
-             (newline 2)
-             (insert "}")
-             (indent-region origin (line-end-position))
-             (forward-line -1)
-             (insert region)
-             (indent-region beg end)))
-          (t ad-do-it))))
-
-;; So annoying this is not default
-(defadvice yank (after c-yank-indent)
-  "Indents after yanking"
-  (when (member major-mode '(c-mode c++-mode javascript-mode java-mode css-mode))
-	(indent-region)))
+(defun yank-and-indent ()
+  "Yank and then indent the newly formed region according to mode."
+  (interactive)
+  (yank)
+  (call-interactively 'indent-region))
+(global-set-key (kbd "C-y")         'yank-and-indent)
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
@@ -100,7 +78,8 @@
 (defun android-log ()
   (terminal-emulator "android_log" "zsh" '("-c" "adb" "logcat")))
 
-(android-log)
+(if (file-exists-p "~/opt/android-mode")
+	(android-log))
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
@@ -325,7 +304,7 @@
 ;; TODO: Debug, doesn't seem to be working
 (add-hook 'write-file-hooks
   (lambda ()
-    (nuke-trailing-whitespace)))
+    (delete-trailing-whitespace)))
 
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
@@ -491,3 +470,4 @@
     (if (< (point) (mark)) (exchange-point-and-mark))
     (let ((save-mark (mark)))
       (indent-rigidly region-start region-finish numcols))))
+

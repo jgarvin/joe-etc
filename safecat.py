@@ -3,7 +3,7 @@
 """Checks if files are binaries before catting them. Because I'm error prone."""
 
 import string, sys
-import os
+import os, stat
 import os.path
 import resource
 
@@ -41,7 +41,7 @@ def istextfile(filename, blocksize = 512):
 def istext(s):
     if "\0" in s:
         return 0
-    
+
     if not s:  # Empty files are considered text
         return 1
 
@@ -58,14 +58,20 @@ def istext(s):
 
 
 if __name__ == "__main__":
-    for arg in sys.argv:
-        if os.path.exists(arg):
-            f = open(arg)
-            contents = f.read(resource.getpagesize()) # Examine first page only
-            f.close()
-            if not istext(contents):
-                print >> sys.stderr, "Don't cat binaries!"
-                sys.exit(1)
+    try:
+        for arg in sys.argv:
+            if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
+                continue
+
+            if os.path.exists(arg):
+                f = open(arg)
+                contents = f.read(resource.getpagesize()) # Examine first page only
+                f.close()
+                if not istext(contents):
+                    print >> sys.stderr, "Don't cat binaries!"
+                    sys.exit(1)
+    except IOError: # If missing file just give us the error from normal cat
+        pass
 
     cat_prog = which("gcat")
     if not cat_prog:

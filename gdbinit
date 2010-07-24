@@ -1,6 +1,4 @@
 echo \nReading ~/.gdbinit...\n\n
-set print object on
-set print vtbl on
-set print demangle on
 set print asm-demangle on
-set print pretty on
+
+source ~/etc/stl-views-1.0.3.gdb
