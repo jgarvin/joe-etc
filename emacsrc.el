@@ -359,15 +359,13 @@
 
 ;; AWESOMENESS
 (require 'cc-mode)
-(global-set-key (kbd "C-d") 'c-hungry-delete-forward)
-(global-set-key (kbd "DEL") 'c-hungry-delete-forward)
-(global-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-
 (add-hook 'c-mode-common-hook
-		  (lambda () (setq c-hungry-delete-key t)))
-
-(add-hook 'c-mode-common-hook
-		  (lambda () (c-subword-mode 1)))
+		  (lambda ()
+			(setq c-hungry-delete-key t)
+			(c-subword-mode 1)
+			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
+			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
+			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
 
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
