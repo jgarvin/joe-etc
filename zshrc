@@ -107,7 +107,7 @@ fi
 
 if which python &> /dev/null # Script requires python, and cat is rather essential
 then
-	alias -r cat='~/etc/safecat.py'
+	alias -r cat='python ~/etc/safecat.py'
 fi
 
 # if which perl &> /dev/null # Script requires perl, and rm is rather essential

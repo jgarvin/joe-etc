@@ -59,12 +59,16 @@
 (global-undo-tree-mode)
 (define-key undo-tree-map (kbd "C-/") nil)
 
+(defun android-log ()
+  (terminal-emulator "android_log" "zsh" '("-c" "adb" "logcat")))
+
 ;; android-mode
 (if (file-exists-p "~/opt/android-mode")
 	(progn
 	  (add-to-list 'load-path "~/opt/android-mode")
 	  (require 'android-mode)
-	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))))
+	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))
+	  (android-log)))
 
 (defun android-debug ()
   (progn
@@ -74,12 +78,6 @@
 	)
   (jdb "jdb -attach localhost:8700")
   )
-
-(defun android-log ()
-  (terminal-emulator "android_log" "zsh" '("-c" "adb" "logcat")))
-
-(if (file-exists-p "~/opt/android-mode")
-	(android-log))
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
@@ -349,15 +347,13 @@
 
 ;; AWESOMENESS
 (require 'cc-mode)
-(global-set-key (kbd "C-d") 'c-hungry-delete-forward)
-(global-set-key (kbd "DEL") 'c-hungry-delete-forward)
-(global-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-
 (add-hook 'c-mode-common-hook
-		  (lambda () (setq c-hungry-delete-key t)))
-
-(add-hook 'c-mode-common-hook
-		  (lambda () (c-subword-mode 1)))
+		  (lambda ()
+			(setq c-hungry-delete-key t)
+			(c-subword-mode 1)
+			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
+			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
+			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
 
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
