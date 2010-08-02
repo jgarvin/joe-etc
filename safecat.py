@@ -60,6 +60,8 @@ def istext(s):
 if __name__ == "__main__":
     try:
         for arg in sys.argv:
+            if arg == "-":
+                continue
             if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
                 continue
 

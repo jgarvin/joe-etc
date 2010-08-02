@@ -306,7 +306,6 @@
 (setq show-trailing-whitespace t)
 
 ;; Delete trailing whitespace automagically
-;; TODO: Debug, doesn't seem to be working
 (add-hook 'write-file-hooks
   (lambda ()
     (delete-trailing-whitespace)))
