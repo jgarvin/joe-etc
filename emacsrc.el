@@ -18,6 +18,9 @@
 ;; TODO: "automatic vertical indenting", know how much I like to space out my functions and classes
 ;; and automatically make sure that many lines are preserved when I copy/paste
 
+;; TODO: When doing a find/replace, take the region from the last all whitespace line to the next all
+;; whitespace line, and indent it.
+
 (toggle-debug-on-error)
 
 ;; When remotely logging in, need to remap alt for emacs keybindings to work
