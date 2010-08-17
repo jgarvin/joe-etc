@@ -1,1 +1,23 @@
+# Make backtick the command character. If I change this I'll need to find-replace ^`
 escape ^``
+
+# Put the window title in the status line
+hardstatus alwayslastline "%t"
+
+defscrollback 640000
+startup_message off
+
+# Refit the terminal window when we switch windows
+register f ^`:next^J^`F
+register b ^`:prev^J^`F
+bind n process f
+bind p process b
+
+# Make it easy to reload config
+bind q source $HOME/.screenrc
+
+# Make it easy to create new tmp windows, depends on zsh letting you type
+# directories to cd to them.
+register t ^`c/tmp^J^`A^H^H^Htmp^J
+bind t process t
+
