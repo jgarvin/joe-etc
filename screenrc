@@ -4,7 +4,7 @@ escape ^``
 # Put the window title in the status line
 hardstatus alwayslastline "%t"
 
-defscrollback 640000
+defscrollback 64000
 startup_message off
 
 # Refit the terminal window when we switch windows

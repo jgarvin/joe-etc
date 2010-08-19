@@ -169,10 +169,10 @@ alias -r recent='ls -l -r --sort=time'
 alias -r e='~/etc/launch-emacs -n'
 
 if [[ `uname -s` = "Linux" ]]; then
-	alias -r tsk='ps aux | grep $@'
+	alias -r tsk='ps aux | grep -i $@'
 fi
 if [[ `uname -s` = "SunOS" ]]; then
-	alias -r tsk='ps -ef | grep $@'
+	alias -r tsk='ps -ef | grep -i $@'
 fi
 
 #allow tab completion in the middle of a word
@@ -216,6 +216,11 @@ fi
 if which gsleep &> /dev/null # Use GNU sed if available
 then
 	alias -r sleep='gsleep'
+fi
+
+if which gtar &> /dev/null # Use GNU tar if available
+then
+	alias -r tar='gtar'
 fi
 
 if which python &> /dev/null # Script requires python, and cat is rather essential
@@ -515,7 +520,12 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
-# 	clear
+	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
+	if which stty &> /dev/null # Use GNU awk if available
+	then
+		stty sane
+	fi
+
  	if [[ -s /etc/motd ]]; then
  	    cat /etc/motd
  	fi
