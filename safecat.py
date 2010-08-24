@@ -62,10 +62,11 @@ if __name__ == "__main__":
         for arg in sys.argv:
             if arg == "-":
                 continue
-            if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
-                continue
 
             if os.path.exists(arg):
+                if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
+                    continue
+
                 f = open(arg)
                 contents = f.read(resource.getpagesize()) # Examine first page only
                 f.close()
