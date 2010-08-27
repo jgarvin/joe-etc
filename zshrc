@@ -129,7 +129,7 @@ setopt globdots              # Assume leading . for hidden files
 # Need in order to get color on solaris
 if [[ -d "/net/udesktop178" ]]; then
 	if [[ $COLORTERM = "gnome-terminal" ]]; then
-		export TERM=xtermc
+		export TERM=xterm-color
 	fi
 
 	if [[ `uname -s` = "Linux" ]]; then
@@ -184,8 +184,6 @@ setopt COMPLETE_IN_WORD
 if which gls &> /dev/null # Use GNU ls if available
 then
 	alias -r ls='gls --color=auto'
-else
-	alias -r ls='ls --color=auto'
 fi
 
 if which gfind &> /dev/null # Use GNU ls if available

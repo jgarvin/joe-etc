@@ -29,7 +29,6 @@ def which(program):
     return None
 
 
-
 # Code to determine whether file is binary or not
 # taken from: http://code.activestate.com/recipes/173220/
 text_characters = "".join(map(chr, range(32, 127)) + list("\n\r\t\b"))
