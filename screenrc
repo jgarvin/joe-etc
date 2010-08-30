@@ -21,6 +21,8 @@ bind q source $HOME/.screenrc
 register t ^`c/tmp^J^`A^H^H^Htmp^J
 bind t process t
 
+bind o select top
+
 
 #### EMACSIFICATION
 #### Taken from: http://snarfed.org/emacs_keybindings_in_gnu_screens_copy-scrollback_mode

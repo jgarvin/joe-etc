@@ -126,17 +126,19 @@ setopt completealiases       # Treat aliases as commands
 setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
 
+# Use terminfo from the last century
+if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
+	export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+fi
+
 # Need in order to get color on solaris
 if [[ -d "/net/udesktop178" ]]; then
 	if [[ $COLORTERM = "gnome-terminal" ]]; then
-		export TERM=xterm-color
-	fi
-
-	if [[ `uname -s` = "Linux" ]]; then
-		export TERM=xterm
-	else
-		if [[ $TERM = "xterm" ]]; then
-			export TERM=xtermc
+		if ! TERM=gnome-256color infocmp &> /dev/null # Use GNU ls if available
+		then
+			export TERM=xterm
+		else
+			export TERM=gnome-256color
 		fi
 	fi
 fi
