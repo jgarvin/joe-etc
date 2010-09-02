@@ -58,6 +58,7 @@
 (global-set-key "\C-ch" 'hide-lines)
 (global-set-key "\C-cu" 'show-all-invisible)
 
+
 (defun yank-and-indent ()
   "Yank and then indent the newly formed region according to mode."
   (interactive)
@@ -482,3 +483,5 @@
     (let ((save-mark (mark)))
       (indent-rigidly region-start region-finish numcols))))
 
+(global-set-key "\C-s" 'isearch-forward-regexp)
+(global-set-key "\M-%" 'query-replace-regexp)

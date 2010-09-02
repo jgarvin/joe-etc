@@ -3,6 +3,9 @@ escape ^``
 
 # Put the window title in the status line
 hardstatus alwayslastline "%t"
+#hardstatus alwayslastline "%{+b dw}:%{-b dw}:%{+b dk}[%{-b dg} %0C:%s%a %{=b dk}]-[   %{-b dw}Load%{+b dk}:%{-b dg}%l %{+b dk}] [%{-b dg}%2`%{+b dk}] %=[ %{-b dg}%1`%{=b dk} ]%{-b dw}:%{+b dw}:%<"
+#hardstatus alwayslastline "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %m/%d %C%a "
+
 
 defscrollback 64000
 startup_message off

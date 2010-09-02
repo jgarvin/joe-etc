@@ -110,6 +110,7 @@ zstyle ':vcs_info:svn:*' formats \
 ###############################################################################
 export MAKEFLAGS="-j4"
 export DS_DOMAIN="joegtest"
+export DS_SERVICES="~/.services"
 
 
 ###############################################################################
@@ -127,19 +128,25 @@ setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
 
 # Use terminfo from the last century
-if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
-	export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+if [[ -d "/opt/tradelink/share/terminfo" ]]; then
+	export TERMINFO=/opt/tradelink/share/terminfo
+else
+	if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
+		export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+	else
+		if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
+			export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
+		fi
+	fi
 fi
 
 # Need in order to get color on solaris
 if [[ -d "/net/udesktop178" ]]; then
-	if [[ $COLORTERM = "gnome-terminal" ]]; then
-		if ! TERM=gnome-256color infocmp &> /dev/null # Use GNU ls if available
-		then
-			export TERM=xterm
-		else
-			export TERM=gnome-256color
-		fi
+	if TERM=xtermc infocmp &> /dev/null # Use GNU ls if available
+	then
+		export TERM=xtermc
+	else
+		export TERM=xterm
 	fi
 fi
 
@@ -434,7 +441,7 @@ setprompt () {
 
     typeset -A altchar
     set -A altchar ${(s..)terminfo[acsc]}
-    PR_SET_CHARSET="%{$terminfo[enacs]%}"
+	PR_SET_CHARSET="%{$terminfo[enacs]%}"
     PR_SHIFT_IN="%{$terminfo[smacs]%}"
     PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
     PR_HBAR=${altchar[q]:--}
