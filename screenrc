@@ -1,1 +1,60 @@
-escape ^Xx
+# Make backtick the command character. If I change this I'll need to find-replace ^`
+escape ^``
+
+# Put the window title in the status line
+hardstatus alwayslastline "%t"
+#hardstatus alwayslastline "%{+b dw}:%{-b dw}:%{+b dk}[%{-b dg} %0C:%s%a %{=b dk}]-[   %{-b dw}Load%{+b dk}:%{-b dg}%l %{+b dk}] [%{-b dg}%2`%{+b dk}] %=[ %{-b dg}%1`%{=b dk} ]%{-b dw}:%{+b dw}:%<"
+#hardstatus alwayslastline "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %m/%d %C%a "
+
+
+defscrollback 64000
+startup_message off
+
+# Refit the terminal window when we switch windows
+register f ^`:next^J^`F
+register b ^`:prev^J^`F
+bind n process f
+bind p process b
+
+# Make it easy to reload config
+bind q source $HOME/.screenrc
+
+# Make it easy to create new tmp windows, depends on zsh letting you type
+# directories to cd to them.
+register t ^`c/tmp^J^`A^H^H^Htmp^J
+bind t process t
+
+bind o select top
+
+
+#### EMACSIFICATION
+#### Taken from: http://snarfed.org/emacs_keybindings_in_gnu_screens_copy-scrollback_mode
+
+# emacs keybindings for navigation in copy mode
+markkeys ^B=Y:^F=V:h=^B:l=^F:0=^A:$=^E
+
+# C-space sets mark. markkeys does it in screen 4.0 and higher, but 3.9x
+# needs the bindkey command. (note the ^@ escape sequence for C-space.)
+markkeys ' '=^@
+# bindkey -m ^@ stuff ' '
+
+# page up and page down
+bindkey -m -k kP stuff Y
+bindkey -m -k kN stuff V
+
+# failed attempt to make C-space work in i-search too
+# bindkey -m ^@ eval "stuff \033" "stuff ^@"
+
+# special hack for C-e, since it should go *past*
+# the last char. -m means this is for copy mode only.
+bindkey -m ^e stuff "$^f"
+
+# C-g and other keys just quit copy mode. Esc does nothing.
+markkeys \033=\015=^G=^D=h=j=k=l=H=M=L=G=g=y=c=v=a=x=b=e=B=E=w
+markkeys @=\033
+
+# control arrows move by words. (set B, e, and w to F keys so that i can
+# use them to move by words, but they themselves still quit copy mode.)
+markkeys B=[:E=]:b={:e=}:w=>
+bindkey -m ^[Od stuff {  #"[[}"
+bindkey -m ^[Oc stuff ]  #"}]^f"

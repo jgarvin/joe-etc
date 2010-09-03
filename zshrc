@@ -5,11 +5,10 @@ if [[ -a ~/.profile ]]; then
 	SHELL=/bin/ksh source ~/.profile
 fi
 
-# Add stuff to path from /opt if .xsession hasn't already
-#if [[ $DISPLAY = '' ]]; then
-#    export PATH=`~/etc/build_path.py`
-#fi
 
+################################################################################
+# History settings
+################################################################################
 # Timestamps for when commands occurred make diagnosing problems easier
 setopt EXTENDED_HISTORY
 
@@ -36,16 +35,132 @@ export HISTSIZE=100000
 # number of lines saved in the history after logout
 export SAVEHIST=100000
 
-export MAKEFLAGS="-j4"
-
 # append command to history file once executed
 setopt inc_append_history
+
+
+
+###############################################################################
+# vcs_info settings
+###############################################################################
+# comment out until I find where to get this
+#autoload -Uz vcs_info && vcs_info
+
+# Enable git cvs and svn magic
+zstyle ':vcs_info:*' enable git cvs svn darcs hg
+
+_vcs_fmt_action="${BLD}${MAG}[${CYA}%b${NOR}-${BLD}${WHT}%a${MAG}]${NOR}"
+_vcs_fmt_branch="${BLD}${MAG}[${CYA}%b${MAG}]${NOR}"
+_vcs_fmt_branch_svn="${CYA}%b${RED}:${YLW}%r${NOR}"
+_vcs_fmt_type="${BLD}${MAG}(${GRN}%s${MAG})${NOR}"
+
+# CVS formats
+zstyle ':vcs_info:cvs:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:cvs:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+# Git formats
+zstyle ':vcs_info:git:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:git:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+# Hg formats
+zstyle ':vcs_info:hg:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:hg:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+# Git-svn formats
+zstyle ':vcs_info:git-svn:*' branchformat ${_vcs_fmt_branch_svn}
+zstyle ':vcs_info:git-svn:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:git-svn:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+# Darcs formats
+zstyle ':vcs_info:darcs:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:darcs:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+# SVN-alike formats
+zstyle ':vcs_info:svn:*' branchformat ${_vcs_fmt_branch_svn}
+zstyle ':vcs_info:svn:*' actionformats \
+        ${_vcs_fmt_action} \
+        ${_vcs_fmt_type}
+zstyle ':vcs_info:svn:*' formats \
+        ${_vcs_fmt_branch} \
+        ${_vcs_fmt_type}
+
+
+###############################################################################
+# preferred app settings
+###############################################################################
+export MAKEFLAGS="-j4"
+export DS_DOMAIN="joegtest"
+export DS_SERVICES="~/.services"
+
+
+###############################################################################
+# misc zsh settings
+###############################################################################
+
+setopt autopushd             # Push things onto the directory stack
+setopt autocd                # cd to a dir when just its name is given
+setopt chasedots             # Resolve symlinks before resolving parent dirs
+setopt autolist              # Do a list on ambiguous completion
+setopt automenu              # Do a menu after <Tab><Tab>
+setopt autoparamslash        # Append a slash for directory completion
+setopt completealiases       # Treat aliases as commands
+setopt listpacked            # Use variable column widths
+setopt globdots              # Assume leading . for hidden files
+
+# Use terminfo from the last century
+if [[ -d "/opt/tradelink/share/terminfo" ]]; then
+	export TERMINFO=/opt/tradelink/share/terminfo
+else
+	if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
+		export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+	else
+		if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
+			export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
+		fi
+	fi
+fi
+
+# Need in order to get color on solaris
+if [[ -d "/net/udesktop178" ]]; then
+	if TERM=xtermc infocmp &> /dev/null # Use GNU ls if available
+	then
+		export TERM=xtermc
+	else
+		export TERM=xterm
+	fi
+fi
 
 # system beep is irritating for tab completion
 unsetopt beep
 
-# Push the current folder onto the stack everytime I switch folders
-setopt autopushd
+# Add mime support for opening files
+autoload -U zsh-mime-setup
+zsh-mime-setup
+
+
+###############################################################################
+# utilities
+###############################################################################
 
 # Give some convenient shortcuts for pushing and popping folder stack
 alias -r b='pushd +1 > /dev/null'
@@ -62,6 +177,13 @@ alias -r recent='ls -l -r --sort=time'
 
 alias -r e='~/etc/launch-emacs -n'
 
+if [[ `uname -s` = "Linux" ]]; then
+	alias -r tsk='ps aux | grep -i $@'
+fi
+if [[ `uname -s` = "SunOS" ]]; then
+	alias -r tsk='ps -ef | grep -i $@'
+fi
+
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
 
@@ -71,8 +193,6 @@ setopt COMPLETE_IN_WORD
 if which gls &> /dev/null # Use GNU ls if available
 then
 	alias -r ls='gls --color=auto'
-else
-	alias -r ls='ls --color=auto'
 fi
 
 if which gfind &> /dev/null # Use GNU ls if available
@@ -105,9 +225,14 @@ then
 	alias -r sleep='gsleep'
 fi
 
+if which gtar &> /dev/null # Use GNU tar if available
+then
+	alias -r tar='gtar'
+fi
+
 if which python &> /dev/null # Script requires python, and cat is rather essential
 then
-	alias -r cat='~/etc/safecat.py'
+	alias -r cat='python ~/etc/safecat.py'
 fi
 
 # if which perl &> /dev/null # Script requires perl, and rm is rather essential
@@ -127,77 +252,124 @@ search () {
 	find \( -type f -o -type d \) -name \*$1\*
 }
 
-# Add mime support for opening files
-autoload -U zsh-mime-setup
-zsh-mime-setup
-
-# Enable completions
-zmodload zsh/complist
-autoload -U compinit
-compinit
-
-# Pick up new stuff in $path
-_force_rehash() {
-  (( CURRENT == 1 )) && rehash
-  return 1	# Because we didn't really complete anything
-}
-zstyle ':completion:::::' completer _force_rehash _complete _approximate
-# VERY fancy completion
-zstyle -e ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX + $#SUFFIX) / 3 )) )'
-zstyle ':completion:*:descriptions' format "- %d -"
-zstyle ':completion:*:corrections' format "- %d - (errors %e})"
-zstyle ':completion:*:default' list-prompt '%S%M matches%s'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:manuals' separate-sections true
-zstyle ':completion:*:manuals.(^1*)' insert-sections true
-zstyle ':completion:*' menu select
-zstyle ':completion:*' verbose yes
-
-# bash function to decompress archives - http://www.shell-fu.org/lister.php?id=375  
-extract () {  
-    if [ -f $1 ] ; then  
-        case $1 in  
-            *.tar.bz2)   tar xvjf $1        ;;  
-            *.tar.gz)    tar xvzf $1     ;;  
-            *.bz2)       bunzip2 $1       ;;  
-            *.rar)       unrar x $1     ;;  
-            *.gz)        gunzip $1     ;;  
-            *.tar)       tar xvf $1        ;;  
-            *.tbz2)      tar xvjf $1      ;;  
-            *.tgz)       tar xvzf $1       ;;  
-            *.zip)       unzip $1     ;;  
-            *.Z)         uncompress $1  ;;  
-            *.7z)        7z x $1    ;;  
-            *)           echo "'$1' cannot be extracted via >extract<" ;;  
-        esac  
-    else  
-        echo "'$1' is not a valid file"  
-    fi  
+# bash function to decompress archives - http://www.shell-fu.org/lister.php?id=375
+extract () {
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xvjf $1        ;;
+            *.tar.gz)    tar xvzf $1     ;;
+            *.bz2)       bunzip2 $1       ;;
+            *.rar)       unrar x $1     ;;
+            *.gz)        gunzip $1     ;;
+            *.tar)       tar xvf $1        ;;
+            *.tbz2)      tar xvjf $1      ;;
+            *.tgz)       tar xvzf $1       ;;
+            *.zip)       unzip $1     ;;
+            *.Z)         uncompress $1  ;;
+            *.7z)        7z x $1    ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
 }
 
 alarm() {
     echo 'xmessage $1' | at $2
 }
 
-# Need in order to get color on solaris
-if [[ -d "/net/udesktop178" ]]; then
-	if [[ $COLORTERM = "gnome-terminal" ]]; then
-		export TERM=xtermc
-	fi
+alias linecount="find -regextype posix-extended -regex \".*\.(h|cpp|c|cc|py)\" | xargs wc -l"
 
-	if [[ `uname -s` = "Linux" ]]; then
-		export TERM=xterm
-	else
-		if [[ $TERM = "xterm" ]]; then
-			export TERM=xtermc
-		fi
-	fi
+
+
+
+################################################################################
+# Completion settings
+################################################################################
+
+autoload -Uz compinit && compinit
+
+#zstyle ':completion:*' completions 1
+#zstyle ':completion:*' prompt '%e errors found:'
+
+zstyle ':completion:*' completer \
+    _expand \
+    _complete \
+    _match \
+    _approximate \
+    _prefix
+
+# Cache completion results
+zstyle ':completion:*' use-cache on
+
+# Try to use .zhistory on local box before resorting to using the network
+if [[ -a /home/udesktop178/joeg/.zshcache ]]; then
+	zstyle ':completion:*' cache-path /home/udesktop178/joeg/.zshcache
+else
+	zstyle ':completion:*' cache-path $HOME/.zshcache
 fi
 
-################################
-#BEGIN SUPER FANCY PROMPT
-#Source: http://aperiodic.net/phil/prompt/
-################################
+# Make lower-case input case insensitive
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# Better process completion
+zstyle ':completion:*:processes' command 'ps -U $USERNAME -u $USERNAME -o pid,s,nice,stime,args'
+zstyle ':completion:*:processes-names' command 'ps -U $USERNAME -u $USERNAME -o args'
+
+# Ignore VCS directories when completing
+zstyle ':completion:*:(all-|)files' ignored-patterns \
+    '(|*/)CVS' \
+    '(|*/).git' \
+    '(|*/).svn'
+zstyle ':completion:*:cd:*' ignored-patterns \
+    '(|*/)#CVS' \
+    '(|*/)#.git' \
+    '(|*/)#.svn'
+
+# Fix errors
+zstyle ':completion:*:approximate:*' max-errors 2 numeric
+
+# Ignore internal functions
+zstyle ':completion:*:functions' ignored-patterns \
+    '_*'
+
+# Remove trailing slashes from directories
+zstyle ':completion:*' squeeze-slashes true
+
+# Attempt to complete many parts at once
+zstyle ':completion:*' matcher-list '' 'r:|[._-]=** r:|=**' 'l:|=* r:|=*'
+
+# Substitute things when tab completing
+zstyle ':completion:*:expand:*' substitute true
+
+# Insert as much as possible
+zstyle ':completion:*:match:*' glob true
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:match:*' insert-unambiguous true
+
+# Ignore where we are when completing directory names
+zstyle ':completion:*' ignore-parents parent pwd directory
+
+# Completion list settings
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' list-suffixes true
+zstyle ':completion:*' menu select=long
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+
+# Separate groups
+zstyle ':completion:*' group-name ''
+
+# Highlight current choice
+zstyle ':completion:*' menu select
+
+
+
+################################################################################
+# Prompt settings
+# Source: http://aperiodic.net/phil/prompt/
+################################################################################
 
 function precmd {
 
@@ -207,13 +379,13 @@ function precmd {
 
     ###
     # Truncate the path if it's too long.
-    
+
     PR_FILLBAR=""
     PR_PWDLEN=""
-    
+
     local promptsize=${#${(%):---(%n@%m:%l)---()--}}
     local pwdsize=${#${(%):-%~}}
-    
+
     if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
 	    ((PR_PWDLEN=$TERMWIDTH - $promptsize))
     else
@@ -266,10 +438,10 @@ setprompt () {
 
     ###
     # See if we can use extended characters to look nicer.
-    
+
     typeset -A altchar
     set -A altchar ${(s..)terminfo[acsc]}
-    PR_SET_CHARSET="%{$terminfo[enacs]%}"
+	PR_SET_CHARSET="%{$terminfo[enacs]%}"
     PR_SHIFT_IN="%{$terminfo[smacs]%}"
     PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
     PR_HBAR=${altchar[q]:--}
@@ -278,10 +450,10 @@ setprompt () {
     PR_LRCORNER=${altchar[j]:--}
     PR_URCORNER=${altchar[k]:--}
 
-    
+
     ###
     # Decide if we need to set titlebar text.
-    
+
     case $TERM in
 	xterm*)
 	    PR_TITLEBAR=$'%{\e]0;%(!.-=*[ROOT]*=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\a%}'
@@ -293,8 +465,8 @@ setprompt () {
 	    PR_TITLEBAR=''
 	    ;;
     esac
-    
-    
+
+
     ###
     # Decide whether to set a screen title
     if [[ "$TERM" == "screen" ]]; then
@@ -302,18 +474,18 @@ setprompt () {
     else
 	PR_STITLE=''
     fi
-    
-    
+
+
     ###
     # APM detection
-    
+
     if which apm &> /dev/null; then
 	PR_APM='$PR_RED${PR_APM_RESULT[(w)5,(w)6]/\% /%%}$PR_LIGHT_BLUE:'
     else
 	PR_APM=''
     fi
-    
-    
+
+
     ###
     # Finally, the prompt.
 
@@ -355,7 +527,18 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
-# 	clear   
+	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
+	if which stty &> /dev/null
+	then
+		stty sane
+	fi
+
+	# And this
+	if which resize &> /dev/null
+	then
+		resize >& /dev/null
+	fi
+
  	if [[ -s /etc/motd ]]; then
  	    cat /etc/motd
  	fi
