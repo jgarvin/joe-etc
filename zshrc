@@ -111,6 +111,7 @@ zstyle ':vcs_info:svn:*' formats \
 export MAKEFLAGS="-j4"
 export DS_DOMAIN="joegtest"
 export DS_SERVICES="~/.services"
+export EDITOR="~/etc/launchemacs -n"
 
 
 ###############################################################################

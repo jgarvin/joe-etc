@@ -30,44 +30,7 @@ import XMonad.Actions.WindowBringer
 
 import XMonad.Config.Gnome
 
--- data MoveUrgency = MoveUrgency deriving (Read, Show)
--- instance UrgencyHook MoveUrgency where
---     urgencyHook MoveUrgency w = windows (bringWindow w)
-
-data MoveUrgency = MoveUrgency deriving (Read, Show)
-instance UrgencyHook MoveUrgency where
-    urgencyHook MoveUrgency w = windows (\ws -> ws)
-
--- The preferred terminal program, which is used in a binding below and by
--- certain contrib modules.
---
-myTerminal      = "gnome-terminal"
-
--- Width of the window border in pixels.
---
-myBorderWidth   = 5
-
--- modMask lets you specify which modkey you want to use. The default
--- is mod1Mask ("left alt").  You may also consider using mod3Mask
--- ("right alt"), which does not conflict with emacs keybindings. The
--- "windows key" is usually mod4Mask.
---
-myModMask       = mod4Mask
-
--- The mask for the numlock key. Numlock status is "masked" from the
--- current modifier status, so the keybindings will work with numlock on or
--- off. You may need to change this on some systems.
---
--- You can find the numlock modifier by running "xmodmap" and looking for a
--- modifier with Num_Lock bound to it:
---
--- > $ xmodmap | grep Num
--- > mod2        Num_Lock (0x4d)
---
--- Set numlockMask = 0 if you don't have a numlock key, or want to treat
--- numlock status separately.
---
-myNumlockMask   = mod3Mask
+import XMonad.Prompt.Shell
 
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
@@ -80,16 +43,10 @@ myNumlockMask   = mod3Mask
 --
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
--- Border colors for unfocused and focused windows, respectively.
---
-myNormalBorderColor  = "#dddddd"
---myFocusedBorderColor = "#ff0000"
-myFocusedBorderColor = "#0000ff"
-
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
-myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
+myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
@@ -98,13 +55,13 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_b), sendMessage ToggleStruts)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaiseNext "e" (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
 
     -- launch scratch terminal
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaiseNext "firefox-3.5 || firefox3" (className =? "Firefox" <||> className =? "Shiretoko"))
+    , ((modMask,  xK_f), runOrRaiseNext browser (className =? "Firefox" <||> className =? "Shiretoko"))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
@@ -180,7 +137,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 	++
-	
+
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
@@ -188,7 +145,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_e, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
- 
+
 
 
 
@@ -263,16 +220,15 @@ myManageHook = composeAll
     , appName   =? "VLC (XVideo output)" --> doFloat
     , isFullscreen                  --> doFullFloat]
 
--- Whether focus follows the mouse pointer.
-myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = True
-
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = xmonad defaults
+main = do
+  browser <- getBrowser
+  editor  <- getEditor
+  xmonad $ defaults browser editor
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -280,19 +236,19 @@ main = xmonad defaults
 --
 -- No need to modify this.
 --
-defaults = withUrgencyHook MoveUrgency $ gnomeConfig {
+defaults browser editor = gnomeConfig {
       -- simple stuff
-        terminal           = myTerminal,
-        focusFollowsMouse  = myFocusFollowsMouse,
-        borderWidth        = myBorderWidth,
-        modMask            = myModMask,
-        numlockMask        = myNumlockMask,
+        terminal           = "gnome-terminal",
+        focusFollowsMouse  = True,
+        borderWidth        = 5,
+        modMask            = mod4Mask,
+        numlockMask        = mod3Mask,
         workspaces         = myWorkspaces,
-        normalBorderColor  = myNormalBorderColor,
-        focusedBorderColor = myFocusedBorderColor,
+        normalBorderColor  = "#dddddd",
+        focusedBorderColor = "#0000ff",
 
       -- key bindings
-        keys               = myKeys,
+        keys               = myKeys browser editor,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
