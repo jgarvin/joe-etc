@@ -13,10 +13,14 @@ fi
 setopt EXTENDED_HISTORY
 
 # Try to use .zhistory on local box before resorting to using the network
-if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
-	export HISTFILE=/home/udesktop178/joeg/.zhistory
+if [[ "$HOST" == "udesktop178" ]]; then
+	export HISTFILE=/export/home/joeg/.zhistory
 else
-	export HISTFILE=$HOME/.zhistory
+	if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
+		export HISTFILE=/home/udesktop178/joeg/.zhistory
+	else
+		export HISTFILE=$HOME/.zhistory
+	fi
 fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
