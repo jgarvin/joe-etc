@@ -18,6 +18,12 @@
 ;; TODO: "automatic vertical indenting", know how much I like to space out my functions and classes
 ;; and automatically make sure that many lines are preserved when I copy/paste
 
+;; TODO: When doing a find/replace, take the region from the last all whitespace line to the next all
+;; whitespace line, and indent it.
+
+;; TODO: hide-lines should put something in the status bar to indicate things are hidden
+;; TODO: executing show-all-invisible should only reveal lines in the current buffer, not all
+
 (toggle-debug-on-error)
 
 ;; When remotely logging in, need to remap alt for emacs keybindings to work
@@ -46,6 +52,12 @@
 (add-to-list 'load-path "~/etc/drag-stuff")
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
+
+(load-file "~/etc/hide-lines.el")
+(require 'hide-lines)
+(global-set-key "\C-ch" 'hide-lines)
+(global-set-key "\C-cu" 'show-all-invisible)
+
 
 (defun yank-and-indent ()
   "Yank and then indent the newly formed region according to mode."
@@ -86,7 +98,12 @@
 ;; Make more notepad like out of the box
 (setq default-major-mode 'text-mode)
 (setq text-mode-hook				; Enable auto-fill-mode
-	  '(lambda () (longlines-mode 1)))
+	  '(lambda ()
+		 (let ((ext (file-name-extension (buffer-file-name))))
+		   (when (not (or (string-equal ext "tc")
+						  (string-equal ext "in")
+						  (string-equal ext "tmp")))
+			 (longlines-mode 1)))))
 
 (require 'ido)
 (ido-mode t)
@@ -304,7 +321,6 @@
 (setq show-trailing-whitespace t)
 
 ;; Delete trailing whitespace automagically
-;; TODO: Debug, doesn't seem to be working
 (add-hook 'write-file-hooks
   (lambda ()
     (delete-trailing-whitespace)))
@@ -475,3 +491,5 @@
     (let ((save-mark (mark)))
       (indent-rigidly region-start region-finish numcols))))
 
+(global-set-key "\C-s" 'isearch-forward-regexp)
+(global-set-key "\M-%" 'query-replace-regexp)

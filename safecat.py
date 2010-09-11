@@ -29,7 +29,6 @@ def which(program):
     return None
 
 
-
 # Code to determine whether file is binary or not
 # taken from: http://code.activestate.com/recipes/173220/
 text_characters = "".join(map(chr, range(32, 127)) + list("\n\r\t\b"))
@@ -60,10 +59,13 @@ def istext(s):
 if __name__ == "__main__":
     try:
         for arg in sys.argv:
-            if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
+            if arg == "-":
                 continue
 
             if os.path.exists(arg):
+                if not stat.S_ISREG(os.stat(arg)[stat.ST_MODE]):
+                    continue
+
                 f = open(arg)
                 contents = f.read(resource.getpagesize()) # Examine first page only
                 f.close()
