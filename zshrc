@@ -113,7 +113,6 @@ zstyle ':vcs_info:svn:*' formats \
 # preferred app settings
 ###############################################################################
 export MAKEFLAGS="-j4"
-export DS_DOMAIN="joegtest"
 export DS_SERVICES="~/.services"
 export EDITOR="~/etc/launchemacs -n"
 
@@ -145,15 +144,15 @@ else
 	fi
 fi
 
-# Need in order to get color on solaris
-if [[ -d "/net/udesktop178" ]]; then
-	if TERM=xtermc infocmp &> /dev/null # Use GNU ls if available
-	then
-		export TERM=xtermc
-	else
-		export TERM=xterm
-	fi
-fi
+# # Need in order to get color on solaris
+# if [[ -d "/net/udesktop178" ]]; then
+# 	if TERM=xterm infocmp &> /dev/null # Use GNU ls if available
+# 	then
+# 		export TERM=xterm
+# 	else
+# 		export TERM=xterm
+# 	fi
+# fi
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -536,6 +535,11 @@ else
 	if which stty &> /dev/null
 	then
 		stty sane
+
+		# This disable Ctrl+s sending the STOP signal. This allows forward search in
+		# zsh to work, and it prevents me from accidentally freezing all of my screen
+		# instances (sending STOP to one sends it to all of them).
+		stty -ixon
 	fi
 
 	# And this

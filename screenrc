@@ -1,3 +1,6 @@
+# Remove the 'freeze' key binding, since it's easy to hit by accident.
+bind s
+
 # Make backtick the command character. If I change this I'll need to find-replace ^`
 escape ^``
 
