@@ -189,8 +189,6 @@ fi
 setopt COMPLETE_IN_WORD
 
 # 'ls' output is easier to read when colored
-# Doesn't work on solaris
-#alias -r ls='ls --color=auto'
 if which gls &> /dev/null # Use GNU ls if available
 then
 	alias -r ls='gls --color=auto'
