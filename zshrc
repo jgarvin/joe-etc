@@ -108,7 +108,13 @@ zstyle ':vcs_info:svn:*' formats \
 ###############################################################################
 # preferred app settings
 ###############################################################################
-export MAKEFLAGS="-j4"
+
+if [[ -a /proc/cpuinfo ]]; then
+	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+else
+	export MAKEFLAGS="-j4"
+fi
+
 export DS_DOMAIN="joegtest"
 export DS_SERVICES="~/.services"
 export EDITOR="~/etc/launchemacs -n"
