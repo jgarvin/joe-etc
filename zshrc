@@ -38,7 +38,10 @@ export SAVEHIST=100000
 # append command to history file once executed
 setopt inc_append_history
 
-
+if [[ `uname -s` = "SunOS" ]]; then
+	# Without this I don't get psrinfo
+	export PATH=$PATH:/usr/sbin
+fi
 
 ###############################################################################
 # vcs_info settings
@@ -112,7 +115,7 @@ zstyle ':vcs_info:svn:*' formats \
 if [[ -a /proc/cpuinfo ]]; then
 	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
 else
-	export MAKEFLAGS="-j4"
+	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l`
 fi
 
 export DS_DOMAIN="joegtest"
