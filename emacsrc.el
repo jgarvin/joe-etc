@@ -206,6 +206,13 @@
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
 
+;; Generate tags whenever we open a C/C++ source file
+(add-hook 'c-mode-common-hook
+		  (lambda ()
+			(require 'gtags)
+			(gtags-mode t)
+			(djcb-gtags-create-or-update)))
+
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
 (defun djcb-gtags-create-or-update ()
@@ -232,13 +239,6 @@
   (lambda()
     (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
     (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
-
-;; Generate tags whenever we open a C/C++ source file
-(add-hook 'c-mode-common-hook
-  (lambda ()
-    (require 'gtags)
-    (gtags-mode t)
-    (djcb-gtags-create-or-update)))
 
 ;; (add-hook 'c-mode-common-hook
 ;;   (lambda ()
@@ -356,6 +356,14 @@
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
+(defun indent-newline-indent ()
+  (interactive)
+  (progn
+	(indent-according-to-mode)
+	(newline-and-indent)))
+
+;; (global-set-key (kbd "RET") 'indent-newline-indent)
+;; (global-set-key (kbd "C-m") 'indent-newline-indent)
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
@@ -364,10 +372,10 @@
 
 ;; AWESOMENESS
 (require 'cc-mode)
+(c-subword-mode 1) ;; lets you delete camelcase words one at a time
 (add-hook 'c-mode-common-hook
 		  (lambda ()
 			(setq c-hungry-delete-key t)
-			(c-subword-mode 1)
 			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
 			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))

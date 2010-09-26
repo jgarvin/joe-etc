@@ -42,7 +42,10 @@ export SAVEHIST=100000
 # append command to history file once executed
 setopt inc_append_history
 
-
+if [[ `uname -s` = "SunOS" ]]; then
+	# Without this I don't get psrinfo
+	export PATH=$PATH:/usr/sbin
+fi
 
 ###############################################################################
 # vcs_info settings
@@ -112,7 +115,15 @@ zstyle ':vcs_info:svn:*' formats \
 ###############################################################################
 # preferred app settings
 ###############################################################################
-export MAKEFLAGS="-j4"
+if [[ -a /proc/cpuinfo ]]; then
+	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+else
+	# We have to pipe to tr at the end to get rid of spaces and tabs
+	# that solaris wc introduces that prevents shell string concatenation
+	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
+fi
+
+export DS_DOMAIN="joegtest"
 #export DS_SERVICES="~/.services"
 export EDITOR="~/etc/launchemacs -n"
 
@@ -192,11 +203,11 @@ fi
 setopt COMPLETE_IN_WORD
 
 # 'ls' output is easier to read when colored
-# Doesn't work on solaris
-#alias -r ls='ls --color=auto'
 if which gls &> /dev/null # Use GNU ls if available
 then
 	alias -r ls='gls --color=auto'
+else
+	alias -r ls='ls --color=auto'
 fi
 
 if which gfind &> /dev/null # Use GNU ls if available
