@@ -113,7 +113,7 @@ zstyle ':vcs_info:svn:*' formats \
 # preferred app settings
 ###############################################################################
 export MAKEFLAGS="-j4"
-export DS_SERVICES="~/.services"
+#export DS_SERVICES="~/.services"
 export EDITOR="~/etc/launchemacs -n"
 
 
@@ -173,7 +173,7 @@ alias -r f='pushd -0 > /dev/null'
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-alias -r ack='~/etc/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk'
+alias -r ack='~/etc/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp'
 
 alias -r cdl='cd /home/udesktop178/joeg'
 
@@ -407,12 +407,12 @@ function precmd {
 
 
 setopt extended_glob
-preexec () {
-    if [[ "$TERM" == "screen" ]]; then
-	local CMD=${1[(wr)^(*=*|sudo|-*)]}
-	echo -n "\ek$CMD\e\\"
-    fi
-}
+# preexec () {
+#     if [[ "$TERM" == "screen" ]]; then
+# 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
+# 	echo -n "\ek$CMD\e\\"
+#     fi
+# }
 
 
 setprompt () {
@@ -462,9 +462,9 @@ setprompt () {
 	xterm*)
 	    PR_TITLEBAR=$'%{\e]0;%(!.-=*[ROOT]*=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\a%}'
 	    ;;
-	screen)
-	    PR_TITLEBAR=$'%{\e_screen \005 (\005t) | %(!.-=[ROOT]=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\e\\%}'
-	    ;;
+	# screen)
+	#     PR_TITLEBAR=$'%{\e_screen \005 (\005t) | %(!.-=[ROOT]=- | .)%n@%m:%~ | ${COLUMNS}x${LINES} | %y\e\\%}'
+	#     ;;
 	*)
 	    PR_TITLEBAR=''
 	    ;;
@@ -472,12 +472,12 @@ setprompt () {
 
 
     ###
-    # Decide whether to set a screen title
-    if [[ "$TERM" == "screen" ]]; then
-	PR_STITLE=$'%{\ekzsh\e\\%}'
-    else
-	PR_STITLE=''
-    fi
+    # # Decide whether to set a screen title
+    # if [[ "$TERM" == "screen" ]]; then
+	# PR_STITLE=$'%{\ekzsh\e\\%}'
+    # else
+	# PR_STITLE=''
+    # fi
 
 
     ###
@@ -531,6 +531,10 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
+	if [[ 1 -ne $GNU_SCREEN_IS_RUNNING && $TERM == "screen" ]]; then
+		export TERM=xterm
+	fi
+
 	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
 	if which stty &> /dev/null
 	then

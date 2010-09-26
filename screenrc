@@ -61,3 +61,7 @@ markkeys @=\033
 markkeys B=[:E=]:b={:e=}:w=>
 bindkey -m ^[Od stuff {  #"[[}"
 bindkey -m ^[Oc stuff ]  #"}]^f"
+
+# zshrc uses this to decide whether to unset the TERM=screen setting when ssh'ing
+# prompt gets messed up on solaris
+setenv GNU_SCREEN_IS_RUNNING 1
