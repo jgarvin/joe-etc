@@ -194,6 +194,8 @@ setopt COMPLETE_IN_WORD
 if which gls &> /dev/null # Use GNU ls if available
 then
 	alias -r ls='gls --color=auto'
+else
+	alias -r ls='ls --color=auto'
 fi
 
 if which gfind &> /dev/null # Use GNU ls if available
