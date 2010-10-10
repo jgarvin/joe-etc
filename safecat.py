@@ -28,7 +28,6 @@ def which(program):
 
     return None
 
-
 # Code to determine whether file is binary or not
 # taken from: http://code.activestate.com/recipes/173220/
 text_characters = "".join(map(chr, range(32, 127)) + list("\n\r\t\b"))
@@ -38,9 +37,6 @@ def istextfile(filename, blocksize = 512):
     return istext(open(filename).read(blocksize))
 
 def istext(s):
-    if "\0" in s:
-        return 0
-
     if not s:  # Empty files are considered text
         return 1
 
@@ -48,13 +44,21 @@ def istext(s):
     # use the 'remove' option to get rid of the text characters.)
     t = s.translate(_null_trans, text_characters)
 
+    # If the only nontext character is NULL, it is still safe to
+    # cat. The /proc/$PID/environ file on Linux is NULL separated,
+    # so this lets us cat it.
+    allNull = True
+    for c in t:
+        if c != '\0':
+            allNull = False
+    if allNull:
+        return 1
+
     # If more than 30% non-text characters, then
     # this is considered a binary file
     if float(len(t))/len(s) > 0.30:
         return 0
     return 1
-
-
 
 if __name__ == "__main__":
     try:
