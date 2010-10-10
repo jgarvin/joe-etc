@@ -1,21 +1,11 @@
 # Apply TL specific settings
-source ~/etc/shell/tlsh
+source ~/etc/shell/prefs
 
 ################################################################################
 # History settings
 ################################################################################
 # Timestamps for when commands occurred make diagnosing problems easier
 setopt EXTENDED_HISTORY
-
-export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
-if [[ -d $ANDROID_PATH ]]; then
-	export PATH=$ANDROID_PATH/tools:$PATH
-fi
-
-if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
-	export PATH=/home/udesktop178/joeg/opt/bin:$PATH
-	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
-fi
 
 # number of lines kept in history
 export HISTSIZE=100000
@@ -92,19 +82,6 @@ zstyle ':vcs_info:svn:*' formats \
 
 
 ###############################################################################
-# preferred app settings
-###############################################################################
-if [[ -a /proc/cpuinfo ]]; then
-	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
-else
-	# We have to pipe to tr at the end to get rid of spaces and tabs
-	# that solaris wc introduces that prevents shell string concatenation
-	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
-fi
-
-export EDITOR="~/etc/launch-emacs -n"
-
-###############################################################################
 # misc zsh settings
 ###############################################################################
 
@@ -117,6 +94,7 @@ setopt autoparamslash        # Append a slash for directory completion
 setopt completealiases       # Treat aliases as commands
 setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
+setopt COMPLETE_IN_WORD      # allow completion in the middle of a word
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -134,30 +112,12 @@ zsh-mime-setup
 alias -r b='pushd +1 > /dev/null'
 alias -r f='pushd -0 > /dev/null'
 
-# Ack is a nice replacement for grep, just does the right thing
-# Really should be able to add to the existing make type, but will make mk a separate
-# type for now.
-ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@ }
-
 alias -r recent='ls -l -r --sort=time'
-
 alias -r e='~/etc/launch-emacs -n'
 
-if [[ `uname -s` = "Linux" ]]; then
-	tsk() { ps aux | grep -i $@ }
-fi
-if [[ `uname -s` = "SunOS" ]]; then
-	tsk() { ps -ef | grep -i $@ }
-fi
+# allow tab completion in the middle of a word
 
-#allow tab completion in the middle of a word
-setopt COMPLETE_IN_WORD
-
-
-if which python &> /dev/null # Script requires python, and cat is rather essential
-then
-	alias -r cat='python ~/etc/safecat.py'
-fi
+alias cat='cat -vet'
 
 alias l.='ls -d .*'
 alias -r up="cd .."
@@ -205,9 +165,6 @@ alias linecount="find -regextype posix-extended -regex \".*\.(h|cpp|c|cc|py|H|C)
 
 autoload -Uz compinit && compinit
 
-#zstyle ':completion:*' completions 1
-#zstyle ':completion:*' prompt '%e errors found:'
-
 zstyle ':completion:*' completer \
     _expand \
     _complete \
@@ -217,13 +174,6 @@ zstyle ':completion:*' completer \
 
 # Cache completion results
 zstyle ':completion:*' use-cache on
-
-# Try to use .zhistory on local box before resorting to using the network
-if [[ -a /home/udesktop178/joeg/.zshcache ]]; then
-	zstyle ':completion:*' cache-path /home/udesktop178/joeg/.zshcache
-else
-	zstyle ':completion:*' cache-path $HOME/.zshcache
-fi
 
 # Make lower-case input case insensitive
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'

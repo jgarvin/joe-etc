@@ -78,3 +78,12 @@ if which gtar &> /dev/null # Use GNU tar if available
 then
 	alias tar='gtar'
 fi
+
+# Try to use .zhistory on local box before resorting to using the network
+if [[ `basename $SHELL` = "zsh" ]]; then
+	if [[ -a /home/udesktop178/joeg/.zshcache ]]; then
+		zstyle ':completion:*' cache-path /home/udesktop178/joeg/.zshcache
+	else
+		zstyle ':completion:*' cache-path $HOME/.zshcache
+	fi
+fi

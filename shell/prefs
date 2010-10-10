@@ -1,0 +1,34 @@
+export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
+if [[ -d $ANDROID_PATH ]]; then
+	export PATH=$ANDROID_PATH/tools:$PATH
+fi
+
+if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
+	export PATH=/home/udesktop178/joeg/opt/bin:$PATH
+	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
+fi
+
+# Ack is a nice replacement for grep, just does the right thing
+# Really should be able to add to the existing make type, but will make mk a separate
+# type for now.
+ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@; }
+
+export EDITOR="~/etc/launch-emacs"
+
+if [[ -a /proc/cpuinfo ]]; then
+	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+else
+	# We have to pipe to tr at the end to get rid of spaces and tabs
+	# that solaris wc introduces that prevents shell string concatenation
+	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
+fi
+
+if [[ `uname -s` = "Linux" ]]; then
+	tsk() { ps aux | grep -i $@; }
+fi
+if [[ `uname -s` = "SunOS" ]]; then
+	tsk() { ps -ef | grep -i $@; }
+fi
+
+# Load tradelink preferences
+source $HOME/etc/shell/tlsh

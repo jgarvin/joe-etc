@@ -12,4 +12,4 @@ then
 fi
 
 # If we must load bash, still load tradelink settings
-source $HOME/etc/shell/tlsh
+source $HOME/etc/shell/prefs
