@@ -1,27 +1,11 @@
-# TODO: Split into a Tradelink specific subfile
-
-# Need to run as ksh to work correctly
-if [[ -a ~/.profile ]]; then
-	SHELL=/bin/ksh source ~/.profile
-fi
-
+# Apply TL specific settings
+source ~/etc/tlzsh
 
 ################################################################################
 # History settings
 ################################################################################
 # Timestamps for when commands occurred make diagnosing problems easier
 setopt EXTENDED_HISTORY
-
-# Try to use .zhistory on local box before resorting to using the network
-if [[ "$HOST" == "udesktop178" ]]; then
-	export HISTFILE=/export/home/joeg/.zhistory
-else
-	if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
-		export HISTFILE=/home/udesktop178/joeg/.zhistory
-	else
-		export HISTFILE=$HOME/.zhistory
-	fi
-fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
@@ -41,11 +25,6 @@ export SAVEHIST=100000
 
 # append command to history file once executed
 setopt inc_append_history
-
-if [[ `uname -s` = "SunOS" ]]; then
-	# Without this I don't get psrinfo
-	export PATH=$PATH:/usr/sbin
-fi
 
 ###############################################################################
 # vcs_info settings
@@ -123,9 +102,7 @@ else
 	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
 fi
 
-export DS_DOMAIN="test"
 export EDITOR="~/etc/launch-emacs -n"
-
 
 ###############################################################################
 # misc zsh settings
@@ -140,29 +117,6 @@ setopt autoparamslash        # Append a slash for directory completion
 setopt completealiases       # Treat aliases as commands
 setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
-
-# Use terminfo from the last century
-if [[ -d "/opt/tradelink/share/terminfo" ]]; then
-	export TERMINFO=/opt/tradelink/share/terminfo
-else
-	if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
-		export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
-	else
-		if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
-			export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
-		fi
-	fi
-fi
-
-# # Need in order to get color on solaris
-# if [[ -d "/net/udesktop178" ]]; then
-# 	if TERM=xterm infocmp &> /dev/null # Use GNU ls if available
-# 	then
-# 		export TERM=xterm
-# 	else
-# 		export TERM=xterm
-# 	fi
-# fi
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -183,78 +137,29 @@ alias -r f='pushd -0 > /dev/null'
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-alias -r ack='~/etc/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp'
-
-alias -r cdl='cd /home/udesktop178/joeg'
+ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@ }
 
 alias -r recent='ls -l -r --sort=time'
 
 alias -r e='~/etc/launch-emacs -n'
 
 if [[ `uname -s` = "Linux" ]]; then
-	alias -r tsk='ps aux | grep -i $@'
+	tsk() { ps aux | grep -i $@ }
 fi
 if [[ `uname -s` = "SunOS" ]]; then
-	alias -r tsk='ps -ef | grep -i $@'
+	tsk() { ps -ef | grep -i $@ }
 fi
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
 
-# 'ls' output is easier to read when colored
-if which gls &> /dev/null # Use GNU ls if available
-then
-	alias -r ls='gls --color=auto'
-else
-	alias -r ls='ls --color=auto'
-fi
-
-if which gfind &> /dev/null # Use GNU ls if available
-then
-	alias -r find='gfind'
-fi
-
-if which gmake &> /dev/null # Use GNU make if available
-then
-	alias -r make='gmake'
-fi
-
-if which ggrep &> /dev/null # Use GNU grep if available
-then
-	alias -r grep='ggrep --color=auto'
-fi
-
-if which gawk &> /dev/null # Use GNU awk if available
-then
-	alias -r awk='gawk'
-fi
-
-if which gsed &> /dev/null # Use GNU sed if available
-then
-	alias -r sed='gsed'
-fi
-
-if which gsleep &> /dev/null # Use GNU sed if available
-then
-	alias -r sleep='gsleep'
-fi
-
-if which gtar &> /dev/null # Use GNU tar if available
-then
-	alias -r tar='gtar'
-fi
 
 if which python &> /dev/null # Script requires python, and cat is rather essential
 then
 	alias -r cat='python ~/etc/safecat.py'
 fi
 
-# if which perl &> /dev/null # Script requires perl, and rm is rather essential
-# then
-# 	alias -r rm='~/etc/safe-rm-0.8/safe-rm'
-# fi
-
-alias l.='ls -d .*'     #list hidden files
+alias l.='ls -d .*'
 alias -r up="cd .."
 alias -r upup="cd ../.."
 alias -r upupup="cd ../../.."
@@ -292,10 +197,7 @@ alarm() {
     echo 'xmessage $1' | at $2
 }
 
-alias linecount="find -regextype posix-extended -regex \".*\.(h|cpp|c|cc|py)\" | xargs wc -l"
-
-
-
+alias linecount="find -regextype posix-extended -regex \".*\.(h|cpp|c|cc|py|H|C)\" | xargs wc -l"
 
 ################################################################################
 # Completion settings
@@ -378,8 +280,6 @@ zstyle ':completion:*' group-name ''
 # Highlight current choice
 zstyle ':completion:*' menu select
 
-
-
 ################################################################################
 # Prompt settings
 # Source: http://aperiodic.net/phil/prompt/
@@ -389,7 +289,6 @@ function precmd {
 
     local TERMWIDTH
     (( TERMWIDTH = ${COLUMNS} - 1 ))
-
 
     ###
     # Truncate the path if it's too long.
@@ -405,7 +304,6 @@ function precmd {
     else
 	PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${PR_HBAR}.)}"
     fi
-
 
     ###
     # Get APM info.
@@ -441,10 +339,7 @@ setprompt () {
     fi
     for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
 	eval PR_$color='%{$terminfo[bold]$fg[${(L)color}]%}'
-	#eval PR_$color='%{$terminfo[bold]%}%F{(L)color}'
-	#eval PR_$color='%{$terminfo[bold]%F{${(L)color}}%}'
 	eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
-	#eval PR_LIGHT_$color='%{$f[${(L)color}]%}'
 	(( count = $count + 1 ))
     done
     PR_NO_COLOUR="%{$terminfo[sgr0]%}"
@@ -541,10 +436,6 @@ then
   PROMPT='$ '
   RPROMPT='$ '
 else
-	if [[ 1 -ne $GNU_SCREEN_IS_RUNNING && $TERM == "screen" ]]; then
-		export TERM=xterm
-	fi
-
 	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
 	if which stty &> /dev/null
 	then

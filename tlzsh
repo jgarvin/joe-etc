@@ -1,0 +1,80 @@
+# Need to run as ksh to work correctly
+if [[ -a ~/.profile ]]; then
+	SHELL=/bin/ksh source ~/.profile
+fi
+
+# Try to use .zhistory on local box before resorting to using the network
+if [[ "$HOST" == "udesktop178" ]]; then
+	export HISTFILE=/export/home/joeg/.zhistory
+else
+	if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
+		export HISTFILE=/home/udesktop178/joeg/.zhistory
+	else
+		export HISTFILE=$HOME/.zhistory
+	fi
+fi
+
+if [[ `uname -s` = "SunOS" ]]; then
+	# Without this I don't get psrinfo
+	export PATH=$PATH:/usr/sbin
+fi
+
+export DS_DOMAIN="test"
+
+# Use terminfo from the last century
+if [[ -d "/opt/tradelink/share/terminfo" ]]; then
+	export TERMINFO=/opt/tradelink/share/terminfo
+else
+	if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
+		export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+	else
+		if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
+			export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
+		fi
+	fi
+fi
+
+alias -r cdl='cd /home/udesktop178/joeg'
+
+# 'ls' output is easier to read when colored
+if which gls &> /dev/null # Use GNU ls if available
+then
+	alias -r ls='gls --color=auto'
+else
+	alias -r ls='ls --color=auto'
+fi
+
+if which gfind &> /dev/null # Use GNU ls if available
+then
+	alias -r find='gfind'
+fi
+
+if which gmake &> /dev/null # Use GNU make if available
+then
+	alias -r make='gmake'
+fi
+
+if which ggrep &> /dev/null # Use GNU grep if available
+then
+	alias -r grep='ggrep --color=auto'
+fi
+
+if which gawk &> /dev/null # Use GNU awk if available
+then
+	alias -r awk='gawk'
+fi
+
+if which gsed &> /dev/null # Use GNU sed if available
+then
+	alias -r sed='gsed'
+fi
+
+if which gsleep &> /dev/null # Use GNU sed if available
+then
+	alias -r sleep='gsleep'
+fi
+
+if which gtar &> /dev/null # Use GNU tar if available
+then
+	alias -r tar='gtar'
+fi
