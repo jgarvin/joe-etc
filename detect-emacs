@@ -9,7 +9,8 @@ then
 fi
 
 # Weird hack needed to make things work on goat
-if [[ "$DISPLAY" != ":0.0" ]]; then
+if test "$DISPLAY" != ":0.0"
+then
 	export EMACS_DISPLAY=""
 else
 	export EMACS_DISPLAY=$DISPLAY

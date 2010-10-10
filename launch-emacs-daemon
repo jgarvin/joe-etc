@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-source ~/etc/detect-emacs
+. $HOME/etc/detect-emacs
 
-$PREFERRED_EMACS --daemon
+$PREFERRED_EMACS --daemon --no-init-file --load $HOME/etc/emacsrc.el
 sleep 2
 $PREFERRED_EMACSCLIENT -c $@

@@ -123,9 +123,8 @@ else
 	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
 fi
 
-export DS_DOMAIN="joegtest"
-#export DS_SERVICES="~/.services"
-export EDITOR="~/etc/launchemacs -n"
+export DS_DOMAIN="test"
+export EDITOR="~/etc/launch-emacs -n"
 
 
 ###############################################################################
