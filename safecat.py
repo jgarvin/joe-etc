@@ -47,11 +47,7 @@ def istext(s):
     # If the only nontext character is NULL, it is still safe to
     # cat. The /proc/$PID/environ file on Linux is NULL separated,
     # so this lets us cat it.
-    allNull = True
-    for c in t:
-        if c != '\0':
-            allNull = False
-    if allNull:
+    if not t.strip('\0'):
         return 1
 
     # If more than 30% non-text characters, then
