@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 export PREFERRED_EMACS=emacs
 export PREFERRED_EMACSCLIENT=emacsclient
