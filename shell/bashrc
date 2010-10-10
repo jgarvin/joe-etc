@@ -1,0 +1,15 @@
+# This makes sure we don't end up in an endless loop
+# if somehow the zshrc is configured to exec bash
+export BASH_LAUNCHED_ZSH="Yes"
+
+# I prefer to use zsh when available
+if which zsh &> /dev/null
+then
+	if test $BASH_LAUNCHED_ZSH != "Yes"
+	then
+		exec zsh
+	fi
+fi
+
+# If we must load bash, still load tradelink settings
+source $HOME/etc/shell/tlsh

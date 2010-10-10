@@ -1,5 +1,5 @@
 # Apply TL specific settings
-source ~/etc/tlzsh
+source ~/etc/shell/tlsh
 
 ################################################################################
 # History settings
