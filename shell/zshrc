@@ -1,3 +1,7 @@
+########################################
+##### sh specific preferences #####
+########################################
+
 # Apply TL specific settings
 source ~/etc/shell/prefs
 
@@ -116,8 +120,6 @@ alias -r recent='ls -l -r --sort=time'
 alias -r e='~/etc/launch-emacs -n'
 
 # allow tab completion in the middle of a word
-
-alias cat='cat -vet'
 
 alias l.='ls -d .*'
 alias -r up="cd .."

@@ -1,4 +1,4 @@
- # Need to run as ksh to work correctly
+# Need to run as ksh to work correctly
 if [[ -a ~/.profile ]]; then
 	SHELL=/bin/ksh source ~/.profile
 fi

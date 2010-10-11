@@ -1,0 +1,48 @@
+#!/bin/sh
+
+set -u;
+set -e;
+
+. $HOME/etc/shell/util
+
+uninstall_xmonad()
+{
+	if is_symlink $HOME/.xmonad/xmonad.hs
+	then
+		rm -r $HOME/.xmonad
+	fi
+}
+
+install_xmonad()
+{
+	if test -e $HOME/.xmonad
+	then
+		error "xmonad was not torn down cleanly!"
+		uninstall_xmonad
+	fi
+
+	mkdir $HOME/.xmonad
+	ln -s $HOME/etc/xmonad/xmonad.hs $HOME/.xmonad/xmonad.hs
+}
+
+kill_wms()
+{
+	for wm in $@
+	do
+		wm_no_opts=$(echo "$wm" | cut -d ' ' -f 1)
+		nice_kill $wm_no_opts launch; true;
+	done
+}
+
+install_xmonad
+
+# Try to keep a functioning window manager even if xmonad fails
+
+IFS=$'@' WM_LIST="xmonad@metacity --replace@kwin --replace@sawfish@openbox@twm";
+IFS=$'@' kill_wms $WM_LIST;
+
+trap "uninstall_xmonad; exit" EXIT
+set +e;
+IFS=$'@' try_apps $WM_LIST;
+set -e;
+

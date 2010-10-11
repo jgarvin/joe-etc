@@ -1,3 +1,7 @@
+########################################
+##### Non-zsh specific preferences #####
+########################################
+
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
 	export PATH=$ANDROID_PATH/tools:$PATH
@@ -23,12 +27,6 @@ else
 	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
 fi
 
-if [[ `uname -s` = "Linux" ]]; then
-	tsk() { ps aux | grep -i $@; }
-fi
-if [[ `uname -s` = "SunOS" ]]; then
-	tsk() { ps -ef | grep -i $@; }
-fi
-
 # Load tradelink preferences
+source $HOME/etc/shell/util
 source $HOME/etc/shell/tlsh
