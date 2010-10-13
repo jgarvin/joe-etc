@@ -23,11 +23,11 @@ tsk()
  	# We filter out grep from the list of processes so
 	# long as grep isn't the process we're actually trying
 	# to see running
-	if test $1 != "grep"
+	if expr match $1 "grep"
 	then
-		ps_crossplatform | grep -i $@ | grep -v grep;
-	else
 		ps_crossplatform | grep -i $@;
+	else
+		ps_crossplatform | grep -i $@ | grep -v grep;
 	fi
 }
 
