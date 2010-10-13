@@ -1,0 +1,116 @@
+########################################
+##### script utility functions     #####
+########################################
+
+if test `uname -s` = "Linux"
+then
+	ps_crossplatform()
+	{
+		ps aux;
+	}
+fi
+
+if test `uname -s` = "SunOS"
+then
+	ps_crossplatform()
+	{
+		ps -ef;
+	}
+fi
+
+tsk()
+{
+ 	# We filter out grep from the list of processes so
+	# long as grep isn't the process we're actually trying
+	# to see running
+	if test $1 != "grep"
+	then
+		ps_crossplatform | grep -i $@ | grep -v grep;
+	else
+		ps_crossplatform | grep -i $@;
+	fi
+}
+
+error()
+{
+	if test -n "$DISPLAY"
+	then
+		if which xmessage > /dev/null;
+		then
+			xmessage "Error: " $@ > /dev/null;
+			return 0;
+		fi
+	else
+		echo "Error: " $@ >&2;
+	fi
+}
+
+is_symlink()
+{
+	if test -e $1
+	then
+		if test -L $1
+		then
+			echo -n '' > /dev/null;
+		else
+			error "$1 isn't a symlink.";
+			return 1;
+		fi
+	fi
+
+	return 0;
+}
+
+try_apps()
+{
+	for app in "$@"
+	do
+		app_no_opts="$(echo $app | cut -d ' ' -f 1)";
+		if which $app_no_opts > /dev/null;
+		then
+			eval "$app";
+			if test "$?" = "130" -o "$?" = "0" # SIGINT is OK
+			then
+				break;
+			else
+				if test "$app" = "$1";
+				then
+					error "Nonzero exit code from:" $app;
+				fi
+			fi
+		else
+			if test "$app" = "$1";
+			then
+				error "Could not find:" $1;
+			fi
+		fi
+	done
+}
+
+# Supports a second parameter to filter out things
+# to NOT kill. useful for killing 'x' before running
+# 'launch-x'
+nice_kill()
+{
+	if test "$2" = "";
+	then
+		filter() { cat; }
+	else
+		filter() { grep -v $1; }
+	fi
+
+	if test "$(tsk $1 | filter $2)" != "";
+	then
+		pkill -SIGINT $1;
+		sleep 1;
+		if test "$(tsk $1 | filter $2)" != "";
+		then
+			pkill -SIGTERM $1;
+			sleep 1;
+			if test "$(tsk $1 | filter $2)" != "";
+			then
+				pkill -9 $1;
+			fi
+		fi
+	fi
+}
