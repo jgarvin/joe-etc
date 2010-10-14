@@ -7,14 +7,17 @@ set -e;
 
 uninstall_xmonad()
 {
+	echo "Uninstalling xmonad preferences..."
 	if is_symlink $HOME/.xmonad/xmonad.hs
 	then
 		rm -r $HOME/.xmonad
 	fi
+	echo "Uninstalled xmonad preferences successfully"
 }
 
 install_xmonad()
 {
+	echo "Installing xmonad preferences..."
 	if test -e $HOME/.xmonad
 	then
 		error "xmonad was not torn down cleanly!"
@@ -23,15 +26,19 @@ install_xmonad()
 
 	mkdir $HOME/.xmonad
 	ln -s $HOME/etc/xmonad/xmonad.hs $HOME/.xmonad/xmonad.hs
+
+	echo "Installed xmonad preferences successfully."
 }
 
 kill_wms()
 {
+	echo "Killing existing window managers..."
 	for wm in $@
 	do
 		wm_no_opts=$(echo "$wm" | cut -d ' ' -f 1)
-		nice_kill $wm_no_opts launch; true;
+		nice_pkill $wm_no_opts launch; true;
 	done
+	echo "Killed existing window managers successfully..."
 }
 
 install_xmonad

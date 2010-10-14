@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ########################################
 ##### script utility functions     #####
 ########################################
@@ -87,30 +89,52 @@ try_apps()
 	done
 }
 
+# Tries harder and harder to kill a process,
+# but starts the nice way.
+nice_kill()
+{
+	to_kill=$1
+
+	for sig in INT TERM KILL
+	do
+		echo "Trying SIG$sig on $to_kill"
+		kill -$sig $to_kill
+		if (! ps $to_kill );
+		then
+			echo "Killed successfully."
+			return 0;
+		fi
+		sleep 1;
+	done
+
+	echo "Could not kill!"
+	return 1;
+}
+
 # Supports a second parameter to filter out things
 # to NOT kill. useful for killing 'x' before running
 # 'launch-x'
-nice_kill()
+nice_pkill()
 {
-	if test "$2" = "";
+	echo "Killing" \'$1\' "processes that don't contain" \'$2\';
+
+	if test $# -eq 1
 	then
 		filter() { cat; }
-	else
+	elif test $# -eq 2
+	then
 		filter() { grep -v $1; }
+	else
+		echo "Error, too many parameters.";
+		return 1;
 	fi
 
-	if test "$(tsk $1 | filter $2)" != "";
+	seek() { pgrep -l $1 | filter $2 | awk '{ print $1 }'; }
+
+	to_kill=$(seek $1 $2);
+
+	if test "$to_kill" != ""
 	then
-		pkill -SIGINT $1;
-		sleep 1;
-		if test "$(tsk $1 | filter $2)" != "";
-		then
-			pkill -SIGTERM $1;
-			sleep 1;
-			if test "$(tsk $1 | filter $2)" != "";
-			then
-				pkill -9 $1;
-			fi
-		fi
+		nice_kill $to_kill;
 	fi
 }

@@ -17,7 +17,7 @@ fi
 # type for now.
 ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@; }
 
-export EDITOR="~/etc/launch-emacs"
+export EDITOR="$HOME/etc/launch-emacs"
 
 if [[ -a /proc/cpuinfo ]]; then
 	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
