@@ -1,6 +1,12 @@
+#!/bin/sh
+
 ########################################
 ##### Non-zsh specific preferences #####
 ########################################
+
+# Load tradelink preference
+. $HOME/etc/shell/util
+. $HOME/etc/shell/tlsh
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
@@ -27,6 +33,3 @@ else
 	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
 fi
 
-# Load tradelink preferences
-source $HOME/etc/shell/util
-source $HOME/etc/shell/tlsh
