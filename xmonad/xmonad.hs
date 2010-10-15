@@ -58,7 +58,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
-    , ((modMask,  xK_b), sendMessage ToggleStruts)
+    , ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
@@ -67,7 +67,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
+    , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
