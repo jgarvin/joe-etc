@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -u;
+set -e;
+
+for browser in chromium-browser firefox3 firefox epiphany mozilla
+do
+	if which $browser > /dev/null
+	then
+		echo $browser;
+		break;
+	fi
+done
