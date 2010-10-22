@@ -87,3 +87,11 @@ if [[ `basename $SHELL` = "zsh" ]]; then
 		zstyle ':completion:*' cache-path $HOME/.zshcache
 	fi
 fi
+
+# By default SQL is pants on head stupid about keyboard shortcuts
+# and arrow keys. rlwrap fixes that.
+if which rlwrap &> /dev/null
+then
+    alias sql='rlwrap sql'
+	alias isql='rlwrap isql'
+fi
