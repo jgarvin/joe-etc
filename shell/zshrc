@@ -2,6 +2,12 @@
 ##### sh specific preferences #####
 ########################################
 
+# if [[ -a /etc/zprofile ]]; then
+# 	echo "foo"
+# else
+# 	SHELL=/usr/bin/ksh source /etc/profile
+# fi
+
 # Apply TL specific settings
 source ~/etc/shell/prefs
 
