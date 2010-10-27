@@ -2,11 +2,10 @@
 ##### sh specific preferences #####
 ########################################
 
-# if [[ -a /etc/zprofile ]]; then
-# 	echo "foo"
-# else
-# 	SHELL=/usr/bin/ksh source /etc/profile
-# fi
+# Prefer emacs bindings! I've found boxes where they default to vi bindings.
+# Apparently the default changes based on your $EDITOR, but even if my EDITOR
+# is set to emacs the london boxes default me to vi bindings without this.
+bindkey -e
 
 # Apply TL specific settings
 source ~/etc/shell/prefs
@@ -412,7 +411,7 @@ else
 	fi
 
  	if [[ -s /etc/motd ]]; then
- 	    cat /etc/motd
+ 		cat /etc/motd
  	fi
 	setprompt
 fi
