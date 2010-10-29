@@ -21,7 +21,16 @@ fi
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@; }
+ack()
+{
+	~/etc/bin/ack \
+		--type-set incl=.incl \
+		--type-set tc=.tc --sort-files \
+		--type-set mk=.mk \
+		--type-set bejunk=.ii,.utii,.P --type=nobejunk \
+		--type-set pagedisplay=.page \
+		--type-add hh=.ipp $@;
+}
 
 export EDITOR="~/etc/launch-emacs"
 
