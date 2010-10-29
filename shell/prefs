@@ -26,8 +26,13 @@ ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --typ
 export EDITOR="~/etc/launch-emacs"
 
 if [[ -a /proc/cpuinfo ]]; then
+	# Linux
 	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
-else
+elif which psrinfo > /dev/null; then
+	# Solaris
 	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | awk '{ print $1 }'`
+else
+	echo "Couldn't determine number of CPUs for makeflags!"
 fi
 
+alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
