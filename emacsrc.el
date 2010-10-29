@@ -147,6 +147,13 @@
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
 
+;; Get rid of the visual bell for some common 'errors'
+(setq ring-bell-function
+      (lambda ()
+		(unless (memq this-command
+					  '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
+		  (ding))))
+
 ;; Show me the region until I do something on it
 (setq transient-mark-mode t)
 

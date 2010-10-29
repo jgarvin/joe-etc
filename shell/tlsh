@@ -36,7 +36,18 @@ else
 	fi
 fi
 
-cdl() { cd /home/udesktop178/joeg; }
+cdl()
+{
+	hostname=$(hostname)
+	if [[ -a /home/$hostname/joeg ]]; then
+		cd /home/$hostname/joeg;
+	else
+		echo "Creating /home/$hostname/joeg"
+		sudo mkdir /home/$hostname/joeg
+		sudo chgrp develop /home/$hostname/joeg
+		sudo chown joeg /home/$hostname/joeg
+	fi
+}
 
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
@@ -89,6 +100,9 @@ if [[ `basename $SHELL` = "zsh" ]]; then
 		zstyle ':completion:*' cache-path $HOME/.zshcache
 	fi
 fi
+
+# Harmless over LAN on modern CPUs, and very useful when logged into london.
+alias ssh="ssh -C"
 
 # By default SQL is pants on head stupid about keyboard shortcuts
 # and arrow keys. rlwrap fixes that.
