@@ -380,9 +380,6 @@
 ;; If I'm searching and I hit backspace, I mean backspace dammit.
 (define-key isearch-mode-map '[backspace] 'isearch-delete-char)
 
-;; AWESOMENESS
-(require 'cc-mode)
-(c-subword-mode 1) ;; lets you delete camelcase words one at a time
 (add-hook 'c-mode-common-hook
 		  (lambda ()
 			(setq c-hungry-delete-key t)
@@ -522,3 +519,7 @@
     (call-interactively 'grep)
     (setq ack-history             grep-history
           ack-host-defaults-alist grep-host-defaults-alist)))
+
+;; AWESOMENESS
+(require 'cc-mode)
+(c-subword-mode 1) ;; lets you delete camelcase words one at a time

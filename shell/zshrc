@@ -1,6 +1,10 @@
-########################################
-##### sh specific preferences #####
-########################################
+##########################################
+#####    zsh specific preferences    #####
+##########################################
+
+# Now deleting a word won't erase a whole path.
+autoload -U select-word-style
+select-word-style bash
 
 # Prefer emacs bindings! I've found boxes where they default to vi bindings.
 # Apparently the default changes based on your $EDITOR, but even if my EDITOR
