@@ -157,6 +157,11 @@ alias -r upupup="cd ../../.."
 alias -r upupupup="cd ../../../.."
 alias cl="clear;ls"
 
+prepend-timestamp()
+{
+	awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }'
+}
+
 # Intuitively, searches current folder and subfolders
 search () {
 	find \( -type f -o -type d \) -name \*$1\*

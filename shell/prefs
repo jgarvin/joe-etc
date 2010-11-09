@@ -18,6 +18,10 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
 fi
 
+if [[ -d $HOME/etc/bin ]]; then
+	export PATH=$HOME/etc/bin:$PATH
+fi
+
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.

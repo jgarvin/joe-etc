@@ -279,7 +279,7 @@
 ;; Prefer 4-space tabs
 (setq c-default-style "bsd")
 (setq-default c-basic-offset 4)
-(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
 (setq default-tab-width 4)
 (setq tab-width 4)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
@@ -501,24 +501,23 @@
 (global-set-key "\C-s" 'isearch-forward-regexp)
 (global-set-key "\M-%" 'query-replace-regexp)
 
-(defvar ack-command "ack --nogroup --nocolor ")
-(defvar ack-history nil)
-(defvar ack-host-defaults-alist nil)
-(defun ack ()
-  "Like grep, but using ack-command as the default"
-  (interactive)
-										; Make sure grep has been initialized
-  (if (>= emacs-major-version 22)
-      (require 'grep)
-    (require 'compile))
-										; Close STDIN to keep ack from going into filter mode
-  (let ((null-device (format "< %s" null-device))
-        (grep-command ack-command)
-        (grep-history ack-history)
-        (grep-host-defaults-alist ack-host-defaults-alist))
-    (call-interactively 'grep)
-    (setq ack-history             grep-history
-          ack-host-defaults-alist grep-host-defaults-alist)))
+(add-to-list 'load-path "~joeg/etc/")
+(autoload 'ack-same "full-ack" nil t)
+(autoload 'ack "full-ack" nil t)
+(autoload 'ack-find-same-file "full-ack" nil t)
+(autoload 'ack-find-file "full-ack" nil t)
+(global-set-key "\M-k" 'ack)
+
+;; Taken from Trey Jackson's answer on superuser.com
+;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
+(defun my-find-file-check-make-large-file-read-only-hook ()
+  "If a file is over a given size, make the buffer read only."
+  (when (> (buffer-size) (* 100 1024 1024))
+    (setq buffer-read-only t)
+    (buffer-disable-undo)
+    (fundamental-mode)
+	(message "Buffer is set to read-only because it is large.  Undo also disabled.")))
+(add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
 ;; AWESOMENESS
 (require 'cc-mode)
