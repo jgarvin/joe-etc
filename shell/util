@@ -25,7 +25,7 @@ tsk()
  	# We filter out grep from the list of processes so
 	# long as grep isn't the process we're actually trying
 	# to see running
-	if expr match $1 "grep"
+	if expr match $1 "grep" > /dev/null
 	then
 		ps_crossplatform | grep -i $@;
 	else
