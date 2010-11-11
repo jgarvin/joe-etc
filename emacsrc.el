@@ -151,7 +151,7 @@
 (setq ring-bell-function
       (lambda ()
 		(unless (memq this-command
-					  '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
+                          '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
 		  (ding))))
 
 ;; Show me the region until I do something on it
@@ -347,18 +347,24 @@
  ;; Keep the highlight on the compilation error
 (setq next-error-highlight t)
 
+(defun buffer-mode (buffer-or-string)
+  "Returns the major mode associated with a buffer."
+  (save-excursion
+    (set-buffer buffer-or-string)
+    major-mode))
+
 ;; When compiling, make the compile window go away when finished if there are no errors
 (setq compilation-finish-function
       (lambda (buf str)
+        (when (not-equal 'ack-mode (buffer-mode buf))
+          (if (string-match "exited abnormally" str)
 
-        (if (string-match "exited abnormally" str)
+              ;;there were errors
+              (message "compilation errors, press C-x ` to visit")
 
-            ;;there were errors
-            (message "compilation errors, press C-x ` to visit")
-
-          ;;no errors, make the compilation window go away in 0.5 seconds
-          (run-at-time 0.5 nil 'delete-windows-on buf)
-          (message "NO COMPILATION ERRORS!"))))
+            ;;no errors, make the compilation window go away in 0.5 seconds
+            (run-at-time 0.5 nil 'delete-windows-on buf)
+            (message "NO COMPILATION ERRORS!")))))
 
 ;; Don't indent whole files because they're in a namespace block
 (add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
@@ -386,6 +392,7 @@
 			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
 			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
+
 
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
@@ -522,3 +529,4 @@
 ;; AWESOMENESS
 (require 'cc-mode)
 (c-subword-mode 1) ;; lets you delete camelcase words one at a time
+(require 'ack)
