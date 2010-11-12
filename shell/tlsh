@@ -130,11 +130,12 @@ export PATH=/opt/app/sybase15/OCS-15_0/bin:$PATH
 tlsh_file_name=$0
 tlmake()
 {
+    disable -f tlmake
     if [[ `basename $PWD` = "icache_wombat" ]]; then;
         echo "Running with 1 CPU. See $tlsh_file_name"
-
-        disable -f tlmake
-        MAKEFLAGS=-j1 tlmake
-        enable -f tlmake
+        MAKEFLAGS=-j1 tlmake $@
+    else
+        tlmake $@
     fi
+    enable -f tlmake
 }
