@@ -125,3 +125,13 @@ testinstr()
 
 # Use newer sybase
 export PATH=/opt/app/sybase15/OCS-15_0/bin:$PATH
+
+# icache_wombat eats all my memory when compiled with multiple CPUs
+real_tlmake_path=$(which tlmake)
+tlmake()
+{
+    if [[ `basename $PWD` = "icache_wombat" ]]; then;
+        echo "Running with 1 CPU. See "
+        MAKEFLAGS=-j1 $real_tlmake_path
+    fi
+}
