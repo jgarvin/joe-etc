@@ -36,7 +36,6 @@ else
 	fi
 fi
 
-
 hostname=$(hostname)
 
 if [[ ! -a /home/$hostname/joeg ]]; then
@@ -111,9 +110,6 @@ if [[ `basename $SHELL` = "zsh" ]]; then
 		zstyle ':completion:*' cache-path $HOME/.zshcache
 	fi
 fi
-
-# Harmless over LAN on modern CPUs, and very useful when logged into london.
-alias ssh="ssh -C"
 
 # By default SQL is pants on head stupid about keyboard shortcuts
 # and arrow keys. rlwrap fixes that.

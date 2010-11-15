@@ -49,3 +49,6 @@ else
 fi
 
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
+
+# Harmless over LAN on modern CPUs, and very useful when logged into london.
+alias ssh="ssh -C"
