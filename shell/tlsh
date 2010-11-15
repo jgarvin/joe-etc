@@ -62,7 +62,7 @@ else
 	alias ls='ls --color=auto'
 fi
 
-if which gfind &> /dev/null # Use GNU ls if available
+if which gfind &> /dev/null # Use GNU find if available
 then
 	alias find='gfind'
 fi
@@ -87,7 +87,7 @@ then
 	alias sed='gsed'
 fi
 
-if which gsleep &> /dev/null # Use GNU sed if available
+if which gsleep &> /dev/null # Use GNU sleep if available
 then
 	alias sleep='gsleep'
 fi
@@ -97,9 +97,14 @@ then
 	alias tar='gtar'
 fi
 
-if which gcp &> /dev/null # Use GNU tar if available
+if which gcp &> /dev/null # Use GNU cp if available
 then
 	alias cp='gcp'
+fi
+
+if which gstrings &> /dev/null # Use GNU strings if available
+then
+	alias strings='gstrings'
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
