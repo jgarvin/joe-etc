@@ -58,7 +58,7 @@ if "-h" in sys.argv or "--help" in sys.argv:
     print "acore by Joe G."
     print
     print "Automatically finds the most recent core and opens it in gdb."
-    print "Usage: acore [appname]"
+    print "Usage: acore [-r] [appname]"
     print
     print "-h, --help\t Print this help"
     print "-r, --recent\t Choose most recent core without asking."
@@ -216,8 +216,17 @@ try:
         if not op.exists(local_core_folder):
             os.mkdir(local_core_folder)
 
-        os.system("cp -p " + chosenCore[0] + " " + local_core_folder)
-        chosenCore[0] = op.join(local_core_folder, op.basename(chosenCore[0]))
+        # Append the epoch timestamp on to the end to make the file unique
+        target_core_name = op.basename(chosenCore[0]) + "." + str(chosenCore[1])
+        target_core_path = op.join(local_core_folder, target_core_name)
+
+        copy_command = "cp -p " + chosenCore[0] + " " + target_core_path
+        if os.system(copy_command):
+            print >> sys.stderr, "Error, copy failed."
+            print >> sys.stderr, "Copy command was: " + copy_command
+            sys.exit(1)
+
+        chosenCore[0] = target_core_path
 except OSError:
     # We probably don't have permissions.
     pass
