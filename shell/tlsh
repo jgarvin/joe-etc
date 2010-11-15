@@ -142,7 +142,7 @@ tlsh_file_name=$0
 tlmake()
 {
     disable -f tlmake
-    if [[ `basename $PWD` = "icache_wombat" ]]; then;
+    if [[ `basename $PWD` = "icache_wombat" ]]; then
         echo "Running with 1 CPU. See $tlsh_file_name"
         MAKEFLAGS=-j1 tlmake $@
     else
