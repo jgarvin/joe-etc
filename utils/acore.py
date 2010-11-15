@@ -5,6 +5,7 @@ import os
 import os.path as op
 import glob
 import datetime
+import popen2
 
 def extract_name(core_path):
     "Extracts the name of an app from the name of its core file."
@@ -38,6 +39,11 @@ def name_contains_version(app_name):
         return False
 
     return True
+
+def run(command):
+    the_run = popen2.Popen3(command)
+    the_run.wait()
+    return the_run.fromchild.read()
 
 if "-h" in sys.argv or "--help" in sys.argv:
     print "acore by Joe G."
@@ -119,7 +125,70 @@ else:
 
     chosenCore = possibleCores[choice]
 
+chosenBinary = None
+if name_contains_version(chosenCoreName):
+    # First try looking on scratchhost for the official unstripped binary.
+    scratchhost_binary = find_scratchhost_binary(chosenCoreName)
+    if scratchhost_binary:
+        chosenBinary = scratchhost_binary
 
+if not chosenBinary:
+    # Inspect the core to see if we can find the binary.
+    pargs_command = "pargs " + chosenCore[0]
+    pargs_output = run(pargs_command)
+    pargs_output = pargs_output.split("\n")
+
+    pargs_error = ("Error, don't know where to look for binary on "
+                   "scratchhost and couldn't extract the path to the "
+                   "binary using pargs. "
+                   "Failed pargs command: %s" % pargs_command)
+
+    if len(pargs_output) < 2:
+        print "error 1 %s " % pargs_output
+        print >> sys.stderr, pargs_error
+        sys.exit(1)
+
+    binary_path = pargs_output[1].split(':', 1)
+    if len(binary_path) == 1:
+        print
+        print binary_path
+        print
+        print pargs_output
+        print
+        print pargs_output[1]
+        print
+        print >> sys.stderr, pargs_error
+        sys.exit(1)
+
+    binary_path = binary_path[1].strip()
+    if op.isabs(binary_path):
+        chosenBinary = binary_path
+    else:
+        # Use strings to get the PWD from the core, which we can join with
+        # the relative path in argv[0] to locate the binary.
+        strings_command = "strings " + chosenCore[0] + " | grep PWD"
+        strings_output = run(strings_command)
+        strings_output = strings_output.split("\n")
+
+        candidate = None
+        for line in strings_output:
+            if line.strip().startswith("PWD="):
+                directory = line.strip().split("=", 1)[1]
+                candidate = op.normpath(op.join(directory, binary_path))
+                if op.exists(candidate) and not op.isdir(candidate):
+                    chosenBinary = candidate
+                    break
+
+        if not chosenBinary:
+            print >> sys.stderr, "Unable to locate binary for core."
+            print >> sys.stderr, "No binary found on scratchhost."
+            print >> sys.stderr, "Extracted argv[0] from core: %s" % binary_path
+            if candidate:
+                print >> sys.stderr, "Found unsuitable candidate: %s" % candidate
+                print >> sys.stderr, "Candidate either didn't exist or was a directory."
+
+print chosenCore
+print chosenBinary
 
 # Output the date and time of the core
 # Output the path to the core
