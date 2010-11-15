@@ -36,19 +36,24 @@ else
 	fi
 fi
 
-cdl()
-{
-	hostname=$(hostname)
-	if [[ -a /home/$hostname/joeg ]]; then
-		cd /home/$hostname/joeg
-	else
-		echo "Creating /home/$hostname/joeg"
-		sudo mkdir /home/$hostname/joeg
-		sudo chgrp develop /home/$hostname/joeg
-		sudo chown joeg /home/$hostname/joeg
-		cd /home/$hostname/joeg
-	fi
-}
+
+hostname=$(hostname)
+
+if [[ ! -a /home/$hostname/joeg ]]; then
+	echo "Creating /home/$hostname/joeg"
+	sudo mkdir /home/$hostname/joeg
+	sudo chgrp develop /home/$hostname/joeg
+	sudo chown joeg /home/$hostname/joeg
+	cd /home/$hostname/joeg
+fi
+
+if [[ "$PWD" = "/home/titan/joeg" ]]; then
+    if [[ -a /home/$hostname/joeg ]]; then
+	    cd /home/$hostname/joeg
+    fi
+fi
+
+alias cdl=/home/$hostname/joeg
 
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
@@ -91,6 +96,11 @@ fi
 if which gtar &> /dev/null # Use GNU tar if available
 then
 	alias tar='gtar'
+fi
+
+if which gcp &> /dev/null # Use GNU tar if available
+then
+	alias cp='gcp'
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
