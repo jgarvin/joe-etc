@@ -2,7 +2,10 @@
 
 import sys
 import os
+import grp
+import pwd
 import os.path as op
+import getpass
 import glob
 import datetime
 import popen2
@@ -10,14 +13,16 @@ import popen2
 def extract_name(core_path):
     "Extracts the name of an app from the name of its core file."
     fname = op.basename(core_path)
-    core_name_parts = fname.split('.')
 
-    if len(core_name_parts) < 3:
+    tmp = fname.strip("core.")
+    core_name_parts = tmp.rsplit('.', 1)
+
+    if len(core_name_parts) < 2:
         print >> sys.stderr, ("Couldn't figure out name of app based on filename "
                               "of core %s" % core_path)
         sys.exit(1)
 
-    return core_name_parts[1]
+    return core_name_parts[0]
 
 def find_scratchhost_binary(app_name):
     "Returns the path to the binary on scratchhost if present, otherwise None"
@@ -34,7 +39,7 @@ def name_contains_version(app_name):
     if len(hyphen_split) == 1:
         return False
 
-    period_split = hyphen_split('.')
+    period_split = hyphen_split[1].split('.')
     if len(period_split) == 1:
         return False
 
@@ -44,6 +49,10 @@ def run(command):
     the_run = popen2.Popen3(command)
     the_run.wait()
     return the_run.fromchild.read()
+
+def time_str(timestamp):
+    core_time = datetime.datetime.fromtimestamp(timestamp)
+    return core_time.strftime("%c")
 
 if "-h" in sys.argv or "--help" in sys.argv:
     print "acore by Joe G."
@@ -86,9 +95,9 @@ if len(possibleCores) == 0:
     print >> sys.stderr, "No core for %s was found." % sys.argv[1]
     sys.exit(1)
 elif len(possibleCores) == 1:
-    chosenCore = (possibleCores[0], op.getmtime(possibleCores[0]))
+    chosenCore = [possibleCores[0], op.getmtime(possibleCores[0])]
 else:
-    possibleCores = [(core, op.getmtime(core)) for core in possibleCores]
+    possibleCores = [[core, op.getmtime(core)] for core in possibleCores]
     possibleCores.sort(key=lambda x: x[1], reverse=True)
 
     if "-r" in sys.argv or "--recent" in sys.argv:
@@ -99,9 +108,7 @@ else:
 
         while 1:
             for i, (core, timestamp) in enumerate(possibleCores):
-                core_time = datetime.datetime.fromtimestamp(timestamp)
-                time_str = core_time.strftime("%c")
-                print "%d. %s (%s)" % (i, core, time_str)
+                print "%d. %s (%s)" % (i, core, time_str(timestamp))
             print "> ",
 
             choice = raw_input()
@@ -186,16 +193,40 @@ if not chosenBinary:
             if candidate:
                 print >> sys.stderr, "Found unsuitable candidate: %s" % candidate
                 print >> sys.stderr, "Candidate either didn't exist or was a directory."
+            sys.exit(1)
 
-print chosenCore
-print chosenBinary
+# A script runs periodically that changes the group for cores in /var/core
+# to be corefans instead of root, but we can't trust it's configured correctly
+# for all hosts. If the binary is less than 500MB, copy it to /export/home/$USER
+# and open it there, otherwise warn and ask if we should copy it anyway.
+try:
+    local_home = op.join("/export/home", getpass.getuser())
+    local_core_folder = op.join(local_home, "cores")
+    core_megs = op.getsize(chosenCore[0]) / 1024. / 1024.
+    agree = True
+    if core_megs > 500:
+        print >> sys.stderr, ("Warning core file is large (%dMB). Still copy to "
+                              "%s? [yn]" % (core_megs, local_core_folder))
+        agree = raw_input()
+        agree = 'y' == agree or 'Y' == agree
 
-# Output the date and time of the core
-# Output the path to the core
-# Output the date and time of the app
-# Output the path to the app
+    if agree:
+        if not op.exists(local_home):
+            os.mkdir(local_home)
+        if not op.exists(local_core_folder):
+            os.mkdir(local_core_folder)
 
-# Copy the core to /export/home/joeg
+        os.system("cp -p " + chosenCore[0] + " " + local_core_folder)
+        chosenCore[0] = op.join(local_core_folder, op.basename(chosenCore[0]))
+except OSError:
+    # We probably don't have permissions.
+    pass
 
-# Start GDB
+print "Core timestamp: " + time_str(chosenCore[1])
+print "Binary timestamp: " + time_str(op.getmtime(chosenBinary))
+
+gdb_command = "gdb " + chosenBinary + " " + chosenCore[0]
+print "Running: " + gdb_command
+
+sys.exit(os.system(gdb_command))
 
