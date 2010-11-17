@@ -208,7 +208,7 @@ main = do
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
 instance Transformer DECORATIONS Window where
-		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999 } ) x)
+		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } ) x)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

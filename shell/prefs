@@ -52,3 +52,6 @@ alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C"
+
+# Without this OO looks terrible under xmonad
+OOO_FORCE_DESKTOP=gnome
