@@ -158,3 +158,13 @@ tlmake()
     fi
     enable -f tlmake
 }
+
+poor_man_dtrace()
+{
+    while true
+    do
+        pstack $1 | gc++filt | head -n ${2:-10}
+        sleep 2
+        clear
+    done
+}
