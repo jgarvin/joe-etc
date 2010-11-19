@@ -519,11 +519,12 @@
 ;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
 (defun my-find-file-check-make-large-file-read-only-hook ()
   "If a file is over a given size, make the buffer read only."
-  (when (> (buffer-size) (* 100 1024 1024))
+  (when (> (buffer-size) (* 10 1024 1024))
     (setq buffer-read-only t)
+    (auto-save-default nil)
     (buffer-disable-undo)
     (fundamental-mode)
-	(message "Buffer is set to read-only because it is large.  Undo also disabled.")))
+	(message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
 ;; AWESOMENESS
