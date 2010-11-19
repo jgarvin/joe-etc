@@ -53,5 +53,13 @@ alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C"
 
+# 99% of the time I want truss to include child processes
+file_name=$0
+truss()
+{
+    echo "Running truss including children. See $file_name."
+    truss -f $@
+}
+
 # Without this OO looks terrible under xmonad
 OOO_FORCE_DESKTOP=gnome
