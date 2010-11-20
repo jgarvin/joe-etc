@@ -356,15 +356,14 @@
 ;; When compiling, make the compile window go away when finished if there are no errors
 (setq compilation-finish-function
       (lambda (buf str)
-        (when (not-equal 'ack-mode (buffer-mode buf))
-          (if (string-match "exited abnormally" str)
+        (if (string-match "exited abnormally" str)
 
-              ;;there were errors
-              (message "compilation errors, press C-x ` to visit")
+            ;;there were errors
+            (message "compilation errors, press C-x ` to visit")
 
-            ;;no errors, make the compilation window go away in 0.5 seconds
-            (run-at-time 0.5 nil 'delete-windows-on buf)
-            (message "NO COMPILATION ERRORS!")))))
+          ;;no errors, make the compilation window go away in 0.5 seconds
+          (run-at-time 0.5 nil 'delete-windows-on buf)
+          (message "NO COMPILATION ERRORS!"))))
 
 ;; Don't indent whole files because they're in a namespace block
 (add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
