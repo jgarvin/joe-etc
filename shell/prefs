@@ -1,6 +1,12 @@
+#!/bin/sh
+
 ########################################
 ##### Non-zsh specific preferences #####
 ########################################
+
+# Load tradelink preference
+. $HOME/etc/shell/util
+. $HOME/etc/shell/tlsh
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
@@ -12,22 +18,49 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
 fi
 
+if [[ -d $HOME/etc/bin ]]; then
+	export PATH=$HOME/etc/bin:$PATH
+fi
+
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
-ack() { ~/etc/bin/ack --type-set incl=.incl --type-set tc=.tc --sort-files --type-set mk=.mk --type-set bejunk=.ii,.utii,.P --type=nobejunk --type-set pagedisplay=.page --type-add hh=.ipp $@; }
+ack()
+{
+	~/etc/bin/ack \
+		--type-set incl=.incl \
+		--type-set tc=.tc --sort-files \
+		--type-set mk=.mk \
+		--type-set bejunk=.ii,.utii,.P --type=nobejunk \
+		--type-set pagedisplay=.page \
+		--type-add hh=.ipp $@;
+}
 
 export BROWSER=`$HOME/etc/pick-browser`
 export EDITOR="$HOME/etc/launch-emacs"
 
 if [[ -a /proc/cpuinfo ]]; then
+	# Linux
 	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+elif which psrinfo > /dev/null; then
+	# Solaris
+	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | awk '{ print $1 }'`
 else
-	# We have to pipe to tr at the end to get rid of spaces and tabs
-	# that solaris wc introduces that prevents shell string concatenation
-	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | tr -d ' \\t'`
+	echo "Couldn't determine number of CPUs for makeflags!"
 fi
 
-# Load tradelink preferences
-source $HOME/etc/shell/util
-source $HOME/etc/shell/tlsh
+alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
+
+# Harmless over LAN on modern CPUs, and very useful when logged into london.
+alias ssh="ssh -C"
+
+# 99% of the time I want truss to include child processes
+file_name=$0
+truss()
+{
+    echo "Running truss including children. See $file_name."
+    truss -f $@
+}
+
+# Without this OO looks terrible under xmonad
+OOO_FORCE_DESKTOP=gnome

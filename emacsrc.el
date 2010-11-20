@@ -147,6 +147,13 @@
 (setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
 
+;; Get rid of the visual bell for some common 'errors'
+(setq ring-bell-function
+      (lambda ()
+		(unless (memq this-command
+                          '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
+		  (ding))))
+
 ;; Show me the region until I do something on it
 (setq transient-mark-mode t)
 
@@ -272,7 +279,7 @@
 ;; Prefer 4-space tabs
 (setq c-default-style "bsd")
 (setq-default c-basic-offset 4)
-(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
 (setq default-tab-width 4)
 (setq tab-width 4)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
@@ -340,18 +347,24 @@
  ;; Keep the highlight on the compilation error
 (setq next-error-highlight t)
 
+(defun buffer-mode (buffer-or-string)
+  "Returns the major mode associated with a buffer."
+  (save-excursion
+    (set-buffer buffer-or-string)
+    major-mode))
+
 ;; When compiling, make the compile window go away when finished if there are no errors
 (setq compilation-finish-function
       (lambda (buf str)
+        (when (not-equal 'ack-mode (buffer-mode buf))
+          (if (string-match "exited abnormally" str)
 
-        (if (string-match "exited abnormally" str)
+              ;;there were errors
+              (message "compilation errors, press C-x ` to visit")
 
-            ;;there were errors
-            (message "compilation errors, press C-x ` to visit")
-
-          ;;no errors, make the compilation window go away in 0.5 seconds
-          (run-at-time 0.5 nil 'delete-windows-on buf)
-          (message "NO COMPILATION ERRORS!"))))
+            ;;no errors, make the compilation window go away in 0.5 seconds
+            (run-at-time 0.5 nil 'delete-windows-on buf)
+            (message "NO COMPILATION ERRORS!")))))
 
 ;; Don't indent whole files because they're in a namespace block
 (add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
@@ -373,15 +386,13 @@
 ;; If I'm searching and I hit backspace, I mean backspace dammit.
 (define-key isearch-mode-map '[backspace] 'isearch-delete-char)
 
-;; AWESOMENESS
-(require 'cc-mode)
-(c-subword-mode 1) ;; lets you delete camelcase words one at a time
 (add-hook 'c-mode-common-hook
 		  (lambda ()
 			(setq c-hungry-delete-key t)
 			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
 			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
+
 
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
@@ -497,21 +508,26 @@
 (global-set-key "\C-s" 'isearch-forward-regexp)
 (global-set-key "\M-%" 'query-replace-regexp)
 
-(defvar ack-command "ack --nogroup --nocolor ")
-(defvar ack-history nil)
-(defvar ack-host-defaults-alist nil)
-(defun ack ()
-  "Like grep, but using ack-command as the default"
-  (interactive)
-										; Make sure grep has been initialized
-  (if (>= emacs-major-version 22)
-      (require 'grep)
-    (require 'compile))
-										; Close STDIN to keep ack from going into filter mode
-  (let ((null-device (format "< %s" null-device))
-        (grep-command ack-command)
-        (grep-history ack-history)
-        (grep-host-defaults-alist ack-host-defaults-alist))
-    (call-interactively 'grep)
-    (setq ack-history             grep-history
-          ack-host-defaults-alist grep-host-defaults-alist)))
+(add-to-list 'load-path "~joeg/etc/")
+(autoload 'ack-same "full-ack" nil t)
+(autoload 'ack "full-ack" nil t)
+(autoload 'ack-find-same-file "full-ack" nil t)
+(autoload 'ack-find-file "full-ack" nil t)
+(global-set-key "\M-k" 'ack)
+
+;; Taken from Trey Jackson's answer on superuser.com
+;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
+(defun my-find-file-check-make-large-file-read-only-hook ()
+  "If a file is over a given size, make the buffer read only."
+  (when (> (buffer-size) (* 10 1024 1024))
+    (setq buffer-read-only t)
+    (auto-save-default nil)
+    (buffer-disable-undo)
+    (fundamental-mode)
+	(message "Large buffer: Undo disabled, made read only, autosave disabled.")))
+(add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
+
+;; AWESOMENESS
+(require 'cc-mode)
+(c-subword-mode 1) ;; lets you delete camelcase words one at a time
+(require 'ack)

@@ -1,3 +1,5 @@
+#!/bin/env zsh
+
 # Need to run as ksh to work correctly
 if [[ -a ~/.profile ]]; then
 	SHELL=/bin/ksh source ~/.profile
@@ -34,7 +36,25 @@ else
 	fi
 fi
 
-cdl() { cd /home/udesktop178/joeg; }
+hostname=$(hostname)
+
+if [[ -d /home/$hostname ]]; then
+    if [[ ! -a /home/$hostname/joeg ]]; then
+	    echo "Creating /home/$hostname/joeg"
+	    sudo mkdir /home/$hostname/joeg
+	    sudo chgrp develop /home/$hostname/joeg
+	    sudo chown joeg /home/$hostname/joeg
+	    cd /home/$hostname/joeg
+    fi
+fi
+
+if [[ "$PWD" = "/home/titan/joeg" ]]; then
+    if [[ -a /home/$hostname/joeg ]]; then
+	    cd /home/$hostname/joeg
+    fi
+fi
+
+alias cdl=/home/$hostname/joeg
 
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
@@ -44,7 +64,7 @@ else
 	alias ls='ls --color=auto'
 fi
 
-if which gfind &> /dev/null # Use GNU ls if available
+if which gfind &> /dev/null # Use GNU find if available
 then
 	alias find='gfind'
 fi
@@ -69,7 +89,7 @@ then
 	alias sed='gsed'
 fi
 
-if which gsleep &> /dev/null # Use GNU sed if available
+if which gsleep &> /dev/null # Use GNU sleep if available
 then
 	alias sleep='gsleep'
 fi
@@ -77,6 +97,21 @@ fi
 if which gtar &> /dev/null # Use GNU tar if available
 then
 	alias tar='gtar'
+fi
+
+if which gcp &> /dev/null # Use GNU cp if available
+then
+	alias cp='gcp'
+fi
+
+if which gstrings &> /dev/null # Use GNU strings if available
+then
+	alias strings='gstrings'
+fi
+
+if which ghead &> /dev/null # Use GNU head if available
+then
+	alias head='ghead'
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
@@ -87,3 +122,51 @@ if [[ `basename $SHELL` = "zsh" ]]; then
 		zstyle ':completion:*' cache-path $HOME/.zshcache
 	fi
 fi
+
+# By default SQL is pants on head stupid about keyboard shortcuts
+# and arrow keys. rlwrap fixes that.
+if which rlwrap &> /dev/null
+then
+    alias sql='rlwrap sql'
+	alias isql='rlwrap isql'
+else
+	echo "rlwrap not available, so you're stuck with bare sql." >&2
+fi
+
+testinstr()
+{
+	echo "ICACHE:"
+	DS_DOMAIN=wslave2a ./mfquery $1 $2 $3 $4 $5 $6 ASK_PRICE BID_PRICE CLOSE_DATE CLOSE_PRICE LAST_PRICE LAST_TIME PREV_DAY_CLOSE_PRICE PREV_DAY_CLOSE_DATE --marketFeedMethod=ICACHE --quit_on_snapshot
+	echo "WOMBAT:"
+	DS_DOMAIN=wslave2a ./mfquery $1 $2 $3 $4 $5 $6 ASK_PRICE BID_PRICE CLOSE_DATE CLOSE_PRICE LAST_PRICE LAST_TIME PREV_DAY_CLOSE_PRICE PREV_DAY_CLOSE_DATE --marketFeedMethod=WOMBAT --quit_on_snapshot 2> /dev/null
+}
+
+# Use newer sybase
+export PATH=/opt/app/sybase15/OCS-15_0/bin:$PATH
+
+# Use newer emacs
+export PATH=/opt/app/emacs-23.1/bin:$PATH
+
+# icache_wombat eats all my memory when compiled with multiple CPUs
+tlsh_file_name=$0
+tlmake()
+{
+    disable -f tlmake
+    if [[ `basename $PWD` = "icache_wombat" ]]; then
+        echo "Running with 1 CPU. See $tlsh_file_name"
+        MAKEFLAGS=-j1 tlmake $@
+    else
+        tlmake $@
+    fi
+    enable -f tlmake
+}
+
+poor_man_dtrace()
+{
+    while true
+    do
+        pstack $1 | gc++filt | head -n ${2:-10}
+        sleep 2
+        clear
+    done
+}

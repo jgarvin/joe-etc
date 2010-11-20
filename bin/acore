@@ -1,0 +1,5 @@
+#!/bin/env sh
+
+sudo chgrp corefans /var/core/*
+sudo chmod g+rw /var/core/*
+PYTHONPATH=$HOME/etc/python python $HOME/etc/utils/acore.py $@

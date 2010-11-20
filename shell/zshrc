@@ -1,9 +1,38 @@
-########################################
-##### sh specific preferences #####
-########################################
+##########################################
+#####    zsh specific preferences    #####
+##########################################
+
+# Now deleting a word won't erase a whole path.
+autoload -U select-word-style
+select-word-style bash
+
+# Prefer emacs bindings! I've found boxes where they default to vi bindings.
+# Apparently the default changes based on your $EDITOR, but even if my EDITOR
+# is set to emacs the london boxes default me to vi bindings without this.
+bindkey -e
 
 # Apply TL specific settings
 source ~/etc/shell/prefs
+
+# Sync configuration with git once a day.
+if which git > /dev/null; then
+	if [[ ! -a ~/.gitsyncdate ]]; then
+		touch ~/.gitsyncdate
+	fi
+
+	if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
+		oldpwd=$PWD
+		cd ~/etc
+		if git pull --ff-only origin master > ~/.gitsynclog 2>&1; then
+			date | awk '{ print $2$3 }' > ~/.gitsyncdate
+		else
+			echo "Error syncing config with git. Check $HOME/.gitsynclog."
+		fi
+		cd $oldpwd
+	fi
+else
+	echo "Couldn't update config, git isn't in \$PATH."
+fi
 
 ################################################################################
 # History settings
@@ -127,6 +156,11 @@ alias -r upup="cd ../.."
 alias -r upupup="cd ../../.."
 alias -r upupupup="cd ../../../.."
 alias cl="clear;ls"
+
+prepend-timestamp()
+{
+	awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }'
+}
 
 # Intuitively, searches current folder and subfolders
 search () {
@@ -406,7 +440,7 @@ else
 	fi
 
  	if [[ -s /etc/motd ]]; then
- 	    cat /etc/motd
+ 		cat /etc/motd
  	fi
 	setprompt
 fi
