@@ -41,10 +41,15 @@ kill_wms()
 	echo "Killed existing window managers successfully..."
 }
 
+echo "Starting with pid $$"
+export MAIN_SCRIPT_PID=$$
+
 install_xmonad
 
-# Try to keep a functioning window manager even if xmonad fails
+# kill other instances of the script
+nice_pkill launch-xmonad
 
+# Try to keep a functioning window manager even if xmonad fails
 IFS=$'@' WM_LIST="xmonad@metacity --replace@kwin --replace@sawfish@openbox@twm";
 IFS=$'@' kill_wms $WM_LIST;
 

@@ -25,7 +25,7 @@ tsk()
  	# We filter out grep from the list of processes so
 	# long as grep isn't the process we're actually trying
 	# to see running
-	if expr match $1 "grep"
+	if expr match $1 "grep" > /dev/null;
 	then
 		ps_crossplatform | grep -i $@;
 	else
@@ -98,7 +98,7 @@ nice_kill()
 	for sig in INT TERM KILL
 	do
 		echo "Trying SIG$sig on $to_kill"
-		kill -$sig $to_kill
+		kill -$sig $to_kill;
 		if (! ps $to_kill );
 		then
 			echo "Killed successfully."
@@ -111,27 +111,48 @@ nice_kill()
 	return 1;
 }
 
-# Supports a second parameter to filter out things
-# to NOT kill. useful for killing 'x' before running
-# 'launch-x'
+# ALL of the children of a pid
+if which pstree > /dev/null
+then
+	pid_children()
+	{
+		pstree -p $1 | egrep -o '\([0-9]+\)' | tr -d '()'
+	}
+elif which ptree > /dev/null
+then
+	# Need to actually test this on Solaris
+	pid_children()
+	{
+		ptree $1 | awk '{ print $1 }'
+	}
+fi
+
+# Tries killing a process the nice way, by name.
+# Will NOT commit suicide.
 nice_pkill()
 {
-	echo "Killing" \'$1\' "processes that don't contain" \'$2\';
+	echo "Killing processes with name $1 avoiding children of "$MAIN_SCRIPT_PID
 
-	if test $# -eq 1
-	then
-		filter() { cat; }
-	elif test $# -eq 2
-	then
-		filter() { grep -v $1; }
-	else
-		echo "Error, too many parameters.";
-		return 1;
-	fi
+	suicide_regex="("
+	first="true"
+	for child in $(pid_children $MAIN_SCRIPT_PID)
+	do
+		if test $first = "true"
+		then
+			first="false"
+		else
+			suicide_regex=$suicide_regex"|"
+		fi
+		suicide_regex=$suicide_regex$child
+	done
+	suicide_regex=$suicide_regex")"
 
-	seek() { pgrep -l $1 | filter $2 | awk '{ print $1 }'; }
+	echo "Pid finding command: pgrep $1 | egrep -v $suicide_regex"
+	to_kill=$(pgrep $1 | egrep -v "$suicide_regex" | grep -v $$ );
 
-	to_kill=$(seek $1 $2);
+	echo "Going to kill: "$to_kill
+
+	pgrep $1 | egrep -v $suicide_regex
 
 	if test "$to_kill" != ""
 	then
