@@ -58,7 +58,9 @@ file_name=$0
 truss()
 {
     echo "Running truss including children. See $file_name."
+    disable -f truss
     truss -f $@
+    enable -f truss
 }
 
 # Without this OO looks terrible under xmonad
