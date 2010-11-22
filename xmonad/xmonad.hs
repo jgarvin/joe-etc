@@ -34,6 +34,7 @@ import XMonad.Config.Gnome
 
 import XMonad.Prompt.Shell
 
+import Data.Char
 import XMonad.Layout.SimpleDecoration
 import XMonad.Layout.MultiToggle
 
@@ -48,6 +49,10 @@ import XMonad.Layout.MultiToggle
 --
 myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
+capitalizeWord :: String -> String
+capitalizeWord [] = []
+capitalizeWord (x:xs) = toUpper x : xs
+
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
@@ -57,7 +62,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
-    , ((modMask,  xK_b), sendMessage ToggleStruts)
+    , ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
@@ -66,7 +71,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_f), runOrRaiseNext browser (className =? "Firefox" <||> className =? "Shiretoko"))
+    , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 

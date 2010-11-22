@@ -14,6 +14,9 @@ bindkey -e
 # Apply TL specific settings
 source ~/etc/shell/prefs
 
+# Apply zsh specific utils
+source ~/etc/shell/zsh_util
+
 # Sync configuration with git once a day.
 if which git > /dev/null; then
 	if [[ ! -a ~/.gitsyncdate ]]; then
@@ -192,8 +195,6 @@ extract () {
 alarm() {
     echo 'xmessage $1' | at $2
 }
-
-alias linecount="find -regextype posix-extended -regex \".*\.(h|cpp|c|cc|py|H|C)\" | xargs wc -l"
 
 ################################################################################
 # Completion settings

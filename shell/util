@@ -89,31 +89,74 @@ try_apps()
 	done
 }
 
-# Supports a second parameter to filter out things
-# to NOT kill. useful for killing 'x' before running
-# 'launch-x'
+# Tries harder and harder to kill a process,
+# but starts the nice way.
 nice_kill()
 {
-	if test "$2" = "";
-	then
-		filter() { cat; }
-	else
-		filter() { grep -v $1; }
-	fi
+	to_kill=$1
 
-	if test "$(tsk $1 | filter $2)" != "";
-	then
-		pkill -SIGINT $1;
-		sleep 1;
-		if test "$(tsk $1 | filter $2)" != "";
+	for sig in INT TERM KILL
+	do
+		echo "Trying SIG$sig on $to_kill"
+		kill -$sig $to_kill;
+		if (! ps $to_kill );
 		then
-			pkill -SIGTERM $1;
-			sleep 1;
-			if test "$(tsk $1 | filter $2)" != "";
-			then
-				pkill -9 $1;
-			fi
+			echo "Killed successfully."
+			return 0;
 		fi
+		sleep 1;
+	done
+
+	echo "Could not kill!"
+	return 1;
+}
+
+# ALL of the children of a pid
+if which pstree > /dev/null
+then
+	pid_children()
+	{
+		pstree -p $1 | egrep -o '\([0-9]+\)' | tr -d '()'
+	}
+elif which ptree > /dev/null
+then
+	# Need to actually test this on Solaris
+	pid_children()
+	{
+		ptree $1 | awk '{ print $1 }'
+	}
+fi
+
+# Tries killing a process the nice way, by name.
+# Will NOT commit suicide.
+nice_pkill()
+{
+	echo "Killing processes with name $1 avoiding children of "$MAIN_SCRIPT_PID
+
+	suicide_regex="("
+	first="true"
+	for child in $(pid_children $MAIN_SCRIPT_PID)
+	do
+		if test $first = "true"
+		then
+			first="false"
+		else
+			suicide_regex=$suicide_regex"|"
+		fi
+		suicide_regex=$suicide_regex$child
+	done
+	suicide_regex=$suicide_regex")"
+
+	echo "Pid finding command: pgrep $1 | egrep -v $suicide_regex"
+	to_kill=$(pgrep $1 | egrep -v "$suicide_regex" | grep -v $$ );
+
+	echo "Going to kill: "$to_kill
+
+	pgrep $1 | egrep -v $suicide_regex
+
+	if test "$to_kill" != ""
+	then
+		nice_kill $to_kill;
 	fi
 }
 

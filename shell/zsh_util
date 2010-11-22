@@ -1,0 +1,6 @@
+#!/bin/env zsh
+
+linecount()
+{
+    wc -l **/*.((C)|(H)|(cpp)|(hpp)|(py)|(hh)|(cc))
+}

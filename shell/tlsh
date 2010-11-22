@@ -38,12 +38,14 @@ fi
 
 hostname=$(hostname)
 
-if [[ ! -a /home/$hostname/joeg ]]; then
-	echo "Creating /home/$hostname/joeg"
-	sudo mkdir /home/$hostname/joeg
-	sudo chgrp develop /home/$hostname/joeg
-	sudo chown joeg /home/$hostname/joeg
-	cd /home/$hostname/joeg
+if [[ -d /home/$hostname ]]; then
+    if [[ ! -a /home/$hostname/joeg ]]; then
+	    echo "Creating /home/$hostname/joeg"
+	    sudo mkdir /home/$hostname/joeg
+	    sudo chgrp develop /home/$hostname/joeg
+	    sudo chown joeg /home/$hostname/joeg
+	    cd /home/$hostname/joeg
+    fi
 fi
 
 if [[ "$PWD" = "/home/titan/joeg" ]]; then
