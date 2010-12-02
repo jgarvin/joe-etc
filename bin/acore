@@ -1,5 +1,14 @@
 #!/bin/env sh
 
-sudo chgrp corefans /var/core/*
-sudo chmod g+rw /var/core/*
+# Only change the permissions on the cores if we need to. This way on sites
+# where corefans isn't setup properly when I manually change the core to belong
+# to the develop group acore won't reverse my work.
+cores=`ls /var/core*`
+for core in $cores; do
+    if test '!' -r $core; then
+        sudo chgrp corefans $core
+        sudo chmod g+r $core
+    fi
+done
+
 PYTHONPATH=$HOME/etc/python python $HOME/etc/utils/acore.py $@
