@@ -5,9 +5,9 @@
 # to the develop group acore won't reverse my work.
 cores=`ls /var/core*`
 for core in $cores; do
-    if test '!' -r $core; then
-        sudo chgrp corefans $core
-        sudo chmod g+r $core
+    if test '!' -r /var/core/$core; then
+        sudo chgrp corefans /var/core/$core
+        sudo chmod g+r /var/core/$core
     fi
 done
 
