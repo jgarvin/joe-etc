@@ -3,7 +3,7 @@
 # Only change the permissions on the cores if we need to. This way on sites
 # where corefans isn't setup properly when I manually change the core to belong
 # to the develop group acore won't reverse my work.
-cores=`ls /var/core*`
+cores=`ls /var/core/core.*`
 for core in $cores; do
     if test '!' -r /var/core/$core; then
         sudo chgrp corefans /var/core/$core
