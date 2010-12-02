@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/env zsh
 
 set -u;
 set -e;
 
 for browser in chromium-browser firefox3 firefox epiphany mozilla
 do
-	if which $browser > /dev/null
+	if which $browser 2>&1 > /dev/null
 	then
 		echo $browser;
 		break;
