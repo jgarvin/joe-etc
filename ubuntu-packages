@@ -1,0 +1,41 @@
+# The basics
+zsh
+emacs-snapshot-gtk
+emacs-goodies-el
+chromium-browser
+htop
+iotop
+
+# Revision control
+cvs
+subversion
+git
+gitk
+bzr
+darcs
+mercurial
+
+# Xmonad
+cabal-install
+xmonad
+libghc6-xmonad-dev
+libghc6-xmonad-doc
+libghc6-xmonad-contrib-dev
+libghc6-xmonad-contrib-doc
+
+# Coding
+build-essential
+libboost-all-dev
+cmake
+scons
+libqt4-dev
+qt4-doc-html
+
+# Multimedia and ease of use
+wine
+vlc
+ubuntu-restricted-extras
+
+# Misc.
+pidgin
+xchat
