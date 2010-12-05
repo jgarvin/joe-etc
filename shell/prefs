@@ -49,6 +49,10 @@ else
 	echo "Couldn't determine number of CPUs for makeflags!"
 fi
 
+if which htop > /dev/null; then
+    alias top='htop'
+fi
+
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
