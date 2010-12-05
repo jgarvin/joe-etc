@@ -68,7 +68,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
 
     -- launch scratch terminal
-    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
+    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal --disable-factory" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
@@ -223,7 +223,7 @@ instance Transformer DECORATIONS Window where
 --
 defaults browser editor = gnomeConfig {
       -- simple stuff
-        terminal           = "gnome-terminal",
+        terminal           = "gnome-terminal --disable-factory",
         focusFollowsMouse  = True,
         borderWidth        = 5,
         modMask            = mod4Mask,
