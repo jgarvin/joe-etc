@@ -18,6 +18,7 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
 fi
 
+export REAL_GDB_LOCATION=`which gdb`
 if [[ -d $HOME/etc/bin ]]; then
 	export PATH=$HOME/etc/bin:$PATH
 fi
@@ -66,14 +67,6 @@ truss()
     disable -f truss
     truss -f $@
     enable -f truss
-}
-
-gdb()
-{
-    echo "Running interruptable GDB. See $file_name."
-    disable -f gdb
-    $HOME/etc/utils/trapper.py '(gdb)' `which gdb` $@
-    enable -f gdb
 }
 
 # Without this OO looks terrible under xmonad
