@@ -1,4 +1,4 @@
 #!/bin/sh
 
 echo "Running uninterruptible gdb. See file $0."
-python $HOME/etc/utils/trapper.py '(gdb)' $REAL_GDB_LOCATION $@
+$HOME/etc/utils/trapper.py '(gdb)' $REAL_GDB_LOCATION $@
