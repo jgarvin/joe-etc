@@ -205,7 +205,7 @@ try:
     core_megs = op.getsize(chosenCore[0]) / 1024. / 1024.
     agree = True
     if core_megs > 500:
-        print >> sys.stderr, ("Warning core file is large (%dMB). Still copy to "
+        print >> sys.stderr, ("Warning: Core file is large (%dMB).\n\tStill copy to "
                               "%s? [yn]" % (core_megs, local_core_folder))
         agree = raw_input()
         agree = 'y' == agree or 'Y' == agree
