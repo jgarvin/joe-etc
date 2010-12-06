@@ -18,7 +18,15 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	export SCONS_LIB_DIR=/home/udesktop178/joeg/opt/lib
 fi
 
+# Although we haven't added $HOME/etc/bin to our path yet,
+# if we're a subshell we may inherit it. We want to remove
+# it temporarily because we're going to find the 'real'
+# locations of different utilities.
+export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
+
 export REAL_GDB_LOCATION=`which gdb`
+
+# OK, now put it back in.
 if [[ -d $HOME/etc/bin ]]; then
 	export PATH=$HOME/etc/bin:$PATH
 fi
