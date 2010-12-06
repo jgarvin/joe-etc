@@ -68,5 +68,13 @@ truss()
     enable -f truss
 }
 
+gdb()
+{
+    echo "Running interruptable GDB. See $file_name."
+    disable -f gdb
+    $HOME/etc/utils/trapper.py '(gdb)' `which gdb` $@
+    enable -f gdb
+}
+
 # Without this OO looks terrible under xmonad
 OOO_FORCE_DESKTOP=gnome

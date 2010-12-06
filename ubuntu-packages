@@ -35,6 +35,7 @@ cmake
 scons
 libqt4-dev
 qt4-doc-html
+python-profiler
 
 # Multimedia and ease of use
 wine
