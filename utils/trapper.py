@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 
 # Runs its second argument, then waits for the first argument
 # to appear on stdout. Until the first argument appears on stdout,
@@ -25,7 +25,8 @@ def main():
 
     def siginthandler_kill(signum, frame):
         if to_launch and enabled:
-            to_launch.send_signal(signal.SIGKILL)
+            # Would use send_signal but this works in python2.4
+            os.kill(to_launch.pid, signal.SIGKILL)
 
     listen_for = sys.argv[1]
     to_run = sys.argv[2:]
