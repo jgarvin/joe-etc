@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.6
 
 import sys
 import os
@@ -237,5 +237,5 @@ print "Binary timestamp: " + time_str(op.getmtime(chosenBinary))
 gdb_command = "gdb " + chosenBinary + " " + chosenCore[0]
 print "Running: " + gdb_command
 
-sys.exit(os.system(gdb_command))
-
+import subprocess
+sys.exit(subprocess.call(gdb_command, shell=True))

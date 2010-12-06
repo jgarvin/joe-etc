@@ -25,7 +25,7 @@ def main():
 
     def siginthandler_kill(signum, frame):
         if to_launch and enabled:
-                to_launch.send_signal(signal.SIGKILL)
+            to_launch.send_signal(signal.SIGKILL)
 
     listen_for = sys.argv[1]
     to_run = sys.argv[2:]
