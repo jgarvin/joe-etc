@@ -32,6 +32,10 @@ def main():
 
     signal.signal(signal.SIGINT, siginthandler_kill)
 
+    # Just launch if given no arguments
+    if len(sys.argv) == 2:
+        sys.exit(os.system("".join(to_run)))
+
     to_launch = subprocess.Popen(to_run,
                                  bufsize=1,
                                  stdout=subprocess.PIPE)
