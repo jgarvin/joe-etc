@@ -5,12 +5,17 @@ emacs-goodies-el
 chromium-browser
 htop
 iotop
+lsof
 
 # Revision control
 cvs
 subversion
 git
 gitk
+git-svn
+git-cvs
+git-arch
+magit
 bzr
 darcs
 mercurial
@@ -30,6 +35,7 @@ cmake
 scons
 libqt4-dev
 qt4-doc-html
+python-profiler
 
 # Multimedia and ease of use
 wine

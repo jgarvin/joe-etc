@@ -1,9 +1,9 @@
-#!/bin/env sh
+#!/usr/bin/env sh
 
 # Only change the permissions on the cores if we need to. This way on sites
 # where corefans isn't setup properly when I manually change the core to belong
 # to the develop group acore won't reverse my work.
-cores=`ls /var/core/core.*`
+cores=`ls /var/core/core.* 2> /dev/null`
 for core in $cores; do
     if test '!' -r $core; then
         sudo chgrp corefans $core
@@ -11,4 +11,6 @@ for core in $cores; do
     fi
 done
 
-PYTHONPATH=$HOME/etc/python python $HOME/etc/utils/acore.py $@
+PYTHONPATH=$HOME/etc/python python \
+    $HOME/etc/utils/ctrl-c-handler.py \
+    acore $@
