@@ -507,7 +507,7 @@
 (global-set-key "\C-s" 'isearch-forward-regexp)
 (global-set-key "\M-%" 'query-replace-regexp)
 
-(add-to-list 'load-path "~joeg/etc/")
+(add-to-list 'load-path "~/etc/")
 (autoload 'ack-same "full-ack" nil t)
 (autoload 'ack "full-ack" nil t)
 (autoload 'ack-find-same-file "full-ack" nil t)
