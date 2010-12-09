@@ -530,3 +530,11 @@
 (require 'cc-mode)
 (c-subword-mode 1) ;; lets you delete camelcase words one at a time
 (require 'ack)
+
+(defun my-delete-leading-whitespace (start end)
+  "Delete whitespace at the beginning of each line in region."
+  (interactive "*r")
+  (save-excursion
+    (if (not (bolp)) (forward-line 1))
+    (delete-whitespace-rectangle (point) end nil)))
+(global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
