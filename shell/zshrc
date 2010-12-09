@@ -2,6 +2,8 @@
 #####    zsh specific preferences    #####
 ##########################################
 
+export REPORTTIME=10
+
 # Now deleting a word won't erase a whole path.
 autoload -U select-word-style
 select-word-style bash

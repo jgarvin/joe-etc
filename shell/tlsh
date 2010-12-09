@@ -1,8 +1,10 @@
 #!/bin/env zsh
 
 # Need to run as ksh to work correctly
-if [[ -a ~/.profile ]]; then
+if [[ `uname -s` = "SunOS" ]]; then
+    if [[ -a ~/.profile ]]; then
 	SHELL=/bin/ksh source ~/.profile
+    fi
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
