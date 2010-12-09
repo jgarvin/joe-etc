@@ -4,6 +4,30 @@
 ##### script utility functions     #####
 ########################################
 
+path_append() {
+    # Only append a path if it's not already present
+    if [ -d "$1" ]; then
+        if [[ ":$PATH:" != *":$1:"* ]]; then
+            export PATH="$PATH:$1"
+        fi
+    else
+        echo "Error, tried to prepend path $1 but it doesn't exist." >&2
+        return 1
+    fi
+}
+
+path_prepend() {
+    # Only prepend a path if it's not already present
+    if [ -d "$1" ]; then
+        if [[ ":$PATH:" != *":$1:"* ]]; then
+            export PATH="$1:$PATH"
+        fi
+    else
+        echo "Error, tried to prepend path $1 but it doesn't exist." >&2
+        return 1
+    fi
+}
+
 if test `uname -s` = "Linux"
 then
 	ps_crossplatform()
