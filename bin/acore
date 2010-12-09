@@ -14,3 +14,4 @@ done
 PYTHONPATH=$HOME/etc/python python \
     $HOME/etc/utils/ctrl-c-handler.py \
     acore $@
+

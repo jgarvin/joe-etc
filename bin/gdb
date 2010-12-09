@@ -1,4 +1,12 @@
 #!/bin/sh
 
-echo "Running uninterruptible gdb. See file $0."
-$HOME/etc/utils/trapper.py '(gdb)' $REAL_GDB_LOCATION $@
+if test "$REAL_GDB_LOCATION" = ''; then
+    echo '$REAL_GDB_LOCATION' "not set! Can't run gdb." >&2
+    exit 1
+fi
+
+cmd="$HOME/etc/utils/trapper.py '(gdb)' $REAL_GDB_LOCATION $@"
+
+echo "Starting uninterruptible gdb. See file $0."
+echo "Running: $cmd"
+eval $cmd

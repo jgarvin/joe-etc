@@ -221,7 +221,7 @@ try:
         target_core_path = op.join(local_core_folder, target_core_name)
 
         copy_command = "cp -p " + chosenCore[0] + " " + target_core_path
-        if os.system(copy_command):
+        if os.WEXITSTATUS(os.system(copy_command)):
             print >> sys.stderr, "Error, copy failed."
             print >> sys.stderr, "Copy command was: " + copy_command
             sys.exit(1)
@@ -237,4 +237,4 @@ print "Binary timestamp: " + time_str(op.getmtime(chosenBinary))
 gdb_command = "gdb " + chosenBinary + " " + chosenCore[0]
 print "Running: " + gdb_command
 
-sys.exit(os.system(gdb_command))
+sys.exit(os.WEXITSTATUS(os.system(gdb_command)))
