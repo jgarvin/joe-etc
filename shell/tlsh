@@ -9,10 +9,10 @@ fi
 
 # Try to use .zhistory on local box before resorting to using the network
 if [[ "$HOST" == "udesktop178" ]]; then
-	export HISTFILE=/export/home/joeg/.zhistory
+	export HISTFILE=/export/home/$USER/.zhistory
 else
-	if [[ -a /home/udesktop178/joeg/.zhistory ]]; then
-		export HISTFILE=/home/udesktop178/joeg/.zhistory
+	if [[ -a /home/udesktop178/$USER/.zhistory ]]; then
+		export HISTFILE=/home/udesktop178/$USER/.zhistory
 	else
 		export HISTFILE=$HOME/.zhistory
 	fi

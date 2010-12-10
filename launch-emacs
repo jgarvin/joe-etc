@@ -1,9 +1,0 @@
-#!/bin/sh
-
-. $HOME/etc/detect-emacs
-
-# -c means create a new frame
-# --alternate-editor says what to do when the daemon can't be found
-# (which is launch the daemon)
-# -n says don't wait for the server to return (fire up the emacs and forget about it)
-DISPLAY=$EMACS_DISPLAY $PREFERRED_EMACSCLIENT -c --alternate-editor "$HOME/etc/launch-emacs-daemon" $@

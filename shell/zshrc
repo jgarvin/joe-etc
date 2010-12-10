@@ -151,7 +151,7 @@ alias -r b='pushd +1 > /dev/null'
 alias -r f='pushd -0 > /dev/null'
 
 alias -r recent='ls -l -r --sort=time'
-alias -r e='~/etc/launch-emacs -n'
+alias -r e='emacsclient -n -c'
 
 # allow tab completion in the middle of a word
 
