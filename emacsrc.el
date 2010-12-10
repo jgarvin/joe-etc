@@ -126,7 +126,6 @@
 
 ;; Let us connect with emacs-client
 (toggle-debug-on-error)
-;(server-start)
 
 (if (> (display-pixel-width) 1280)
 	(add-to-list 'default-frame-alist '(font . "Consolas-12"))
