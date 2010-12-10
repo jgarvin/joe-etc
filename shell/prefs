@@ -46,8 +46,7 @@ ack()
 export BROWSER=`$HOME/etc/pick-browser`
 
 # Newer versions of emacs will autoload emacs if ALTERNATE_EDITOR is empty.
-export ALTERNATE_EDITOR=''
-export EDITOR="emacsclient"
+export EDITOR="$HOME/etc/bin/launch-emacs"
 
 if [[ -a /proc/cpuinfo ]]; then
 	# Linux
