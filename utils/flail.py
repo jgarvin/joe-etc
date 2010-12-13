@@ -7,6 +7,7 @@ import stat
 import os.path as op
 import signal
 import subprocess
+import pwd
 
 import argparse
 
@@ -32,6 +33,10 @@ if args.lock and args.interval != None:
     print >> sys.stderr, "flail: error: Interval is meaningless when locked."
     sys.exit(1)
 
+if args.interval != None and args.interval <= 0:
+    print >> sys.stderr, "flail: error: Interval must be 1 or greater."
+    sys.exit(1)
+
 if not args.interval:
     args.interval = 5
 
@@ -46,15 +51,27 @@ def get_log_files():
 
     logfilepaths = [l for l in logfilepaths if not op.isdir(l)]
 
-    logpairs = [(os.stat(f)[stat.ST_MTIME], f) for f in logfilepaths]
-    logpairs.sort(key=lambda x: x[0], reverse=True)
+    logpairs = [(os.stat(f), f) for f in logfilepaths]
+
+    if args.user:
+        filtered = []
+        for f in logpairs:
+            if pwd.getpwuid(f[0][stat.ST_UID])[0] == args.user:
+                filtered.append(f)
+        logpairs = filtered
+
+    logpairs.sort(key=lambda x: x[0][stat.ST_MTIME], reverse=True)
     return logpairs
 
 def monitor_cmd(f):
     return "less +F " + f
 
 def latest_file():
-    return get_log_files()[0][1]
+    logfiles = get_log_files()
+    if not logfiles:
+        print >>sys.stderr, "flail: error: No matching log file found!"
+        sys.exit(1)
+    return logfiles[0][1]
 
 def monitor_file(f):
     print "Running: " + monitor_cmd()
