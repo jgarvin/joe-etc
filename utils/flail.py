@@ -6,6 +6,7 @@ import os
 import stat
 import os.path as op
 import signal
+import subprocess
 
 import argparse
 
@@ -23,13 +24,16 @@ parser.add_argument('-i', '--interval', metavar='T', type=int,
                     dest="interval", help='Poll for new logs every T seconds.')
 parser.add_argument(metavar='APPLICATION', type=str,
                     dest="application",
-                    help='Open logs for this application.')
+                    help='Open logs for this application. Treated as substring.')
 
 args = parser.parse_args()
 
 if args.lock and args.interval != None:
     print >> sys.stderr, "flail: error: Interval is meaningless when locked."
     sys.exit(1)
+
+if not args.interval:
+    args.interval = 5
 
 def get_log_files():
     glob_prefix = "/var/tmp/tlapp.*"
@@ -46,12 +50,46 @@ def get_log_files():
     logpairs.sort(key=lambda x: x[0], reverse=True)
     return logpairs
 
+def monitor_cmd(f):
+    return "less +F " + f
+
+def latest_file():
+    return get_log_files()[0][1]
+
 def monitor_file(f):
-    cmd = "less +F " + f
-    print "Running: " + cmd
-    return os.system(cmd)
+    print "Running: " + monitor_cmd()
+    return os.system(monitor_cmd())
 
-if args.lock:
-    sys.exit(os.WEXITSTATUS(monitor_file(get_log_files()[0][1])))
+current_file = None
+less_instance = None
 
-sys.exit(0)
+def check_for_newer(signum, frame):
+    global current_file, less_instance
+    candidate = latest_file()
+    if candidate != current_file:
+        current_file = candidate
+
+        if less_instance:
+            less_instance.terminate()
+        less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
+
+def forward_signals(signum, frame):
+    os.kill(less_instance.pid, signum)
+
+check_for_newer(None, None)
+
+if not args.lock:
+    signal.signal(signal.SIGALRM, check_for_newer)
+    signal.alarm(args.interval)
+
+# Without this less doesn't exit correctly.
+signal.signal(signal.SIGINT, forward_signals)
+
+while 1:
+    try:
+        less_instance.wait()
+        sys.exit(less_instance.returncode)
+    except OSError:
+        pass
+
+sys.exit(1)
