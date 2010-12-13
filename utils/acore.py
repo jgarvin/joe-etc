@@ -11,7 +11,7 @@ import datetime
 import popen2
 
 def extract_name(core_path):
-    "Extracts the name of an app from the name of its core file."
+    "Extracts the name of an app from the name of its core filename."
     fname = op.basename(core_path)
 
     tmp = fname.strip("core.")
@@ -33,7 +33,7 @@ def find_scratchhost_binary(app_name):
     return None
 
 def name_contains_version(app_name):
-    """Returns True if the given name contains a tradlink version number,
+    """Returns True if the given name contains a tradelink version number,
     e.g. 'foo-1.2' will return True but 'foo' will not."""
     hyphen_split = app_name.rsplit('-', 1)
     if len(hyphen_split) == 1:
@@ -157,13 +157,6 @@ if not chosenBinary:
 
     binary_path = pargs_output[1].split(':', 1)
     if len(binary_path) == 1:
-        print
-        print binary_path
-        print
-        print pargs_output
-        print
-        print pargs_output[1]
-        print
         print >> sys.stderr, pargs_error
         sys.exit(1)
 
