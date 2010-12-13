@@ -157,13 +157,6 @@ if not chosenBinary:
 
     binary_path = pargs_output[1].split(':', 1)
     if len(binary_path) == 1:
-        print
-        print binary_path
-        print
-        print pargs_output
-        print
-        print pargs_output[1]
-        print
         print >> sys.stderr, pargs_error
         sys.exit(1)
 
