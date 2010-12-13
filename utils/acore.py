@@ -166,16 +166,28 @@ if not chosenBinary:
     else:
         # Use strings to get the PWD from the core, which we can join with
         # the relative path in argv[0] to locate the binary.
-        strings_command = "strings " + chosenCore[0] + " | grep PWD"
+        # At the same, time, see if the '_' env variable is defined, which is
+        # set by shells just before they execute external commands. WM's
+        # launching apps won't always set it, but manual runs in the shell will.
+        # It's the most reliable.
+        strings_command = "strings " + chosenCore[0] + " | egrep '^(_=|PWD=)'"
         strings_output = run(strings_command)
         strings_output = strings_output.split("\n")
 
+        def good_candidate(candidate):
+            return op.exists(candidate) and not op.isdir(candidate)
+
         candidate = None
         for line in strings_output:
+            if line.strip().startswith("_="):
+                candidate = line.strip().split("=", 1)[1]
+                if good_candidate(candidate):
+                    chosenBinary = candidate
+                    break
             if line.strip().startswith("PWD="):
                 directory = line.strip().split("=", 1)[1]
                 candidate = op.normpath(op.join(directory, binary_path))
-                if op.exists(candidate) and not op.isdir(candidate):
+                if good_candidate(candidate):
                     chosenBinary = candidate
                     break
 

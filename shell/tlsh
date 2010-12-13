@@ -9,10 +9,10 @@ fi
 
 # Try to use .zhistory on local box before resorting to using the network
 if [[ "$HOST" == "udesktop178" ]]; then
-	export HISTFILE=/export/home/$USER/.zhistory
+	export HISTFILE=/export/home/`whoami`/.zhistory
 else
-	if [[ -a /home/udesktop178/$USER/.zhistory ]]; then
-		export HISTFILE=/home/udesktop178/$USER/.zhistory
+	if [[ -a /home/udesktop178/`whoami`/.zhistory ]]; then
+		export HISTFILE=/home/udesktop178/`whoami`/.zhistory
 	else
 		export HISTFILE=$HOME/.zhistory
 	fi
@@ -41,22 +41,22 @@ fi
 hostname=$(hostname)
 
 if [[ -d /home/$hostname ]]; then
-    if [[ ! -a /home/$hostname/joeg ]]; then
-	    echo "Creating /home/$hostname/joeg"
-	    sudo mkdir /home/$hostname/joeg
-	    sudo chgrp develop /home/$hostname/joeg
-	    sudo chown joeg /home/$hostname/joeg
-	    cd /home/$hostname/joeg
+    if [[ ! -a /home/$hostname/$LOGNAME ]]; then
+	    echo "Creating /home/$hostname/$LOGNAME"
+	    sudo mkdir /home/$hostname/$LOGNAME
+	    sudo chgrp develop /home/$hostname/$LOGNAME
+	    sudo chown $LOGNAME /home/$hostname/$LOGNAME
+	    cd /home/$hostname/$LOGNAME
     fi
 fi
 
-if [[ "$PWD" = "/home/titan/joeg" ]]; then
-    if [[ -a /home/$hostname/joeg ]]; then
-	    cd /home/$hostname/joeg
+if [[ "$PWD" = "/home/titan/$LOGNAME" ]]; then
+    if [[ -a /home/$hostname/$LOGNAME ]]; then
+	    cd /home/$hostname/$LOGNAME
     fi
 fi
 
-alias cdl=/home/$hostname/joeg
+alias cdl=/home/$hostname/$LOGNAME
 
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
@@ -118,8 +118,8 @@ fi
 
 # Try to use .zhistory on local box before resorting to using the network
 if [[ `basename $SHELL` = "zsh" ]]; then
-	if [[ -a /home/udesktop178/joeg/.zshcache ]]; then
-		zstyle ':completion:*' cache-path /home/udesktop178/joeg/.zshcache
+	if [[ -a /home/udesktop178/$LOGNAME/.zshcache ]]; then
+		zstyle ':completion:*' cache-path /home/udesktop178/$LOGNAME/.zshcache
 	else
 		zstyle ':completion:*' cache-path $HOME/.zshcache
 	fi
@@ -174,4 +174,12 @@ poor_man_dtrace()
     done
 }
 
-export CVSROOT=:pserver:joeg@cvs:/cvs
+export CVSROOT=:pserver:$LOGNAME@cvs:/cvs
+
+launch_builder() {
+    if [[ ! $hostname = "userver43" ]]; then
+        ssh -t builder@userver43 ZDOTDIR=~joeg zsh
+    else
+        ZDOTDIR=~joeg zsh
+    fi
+}

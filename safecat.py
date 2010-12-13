@@ -6,27 +6,7 @@ import string, sys
 import os, stat
 import os.path
 import resource
-
-# Taken from: http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-# All SO question and answers are under a CC license requiring attribution.
-# Author: user 'Jay'
-# User profile: http://stackoverflow.com/users/20840/jay
-def which(program):
-    import os
-    def is_exe(fpath):
-        return os.path.exists(fpath) and os.access(fpath, os.X_OK)
-
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-
-    return None
+from utils.which import which
 
 # Code to determine whether file is binary or not
 # taken from: http://code.activestate.com/recipes/173220/
