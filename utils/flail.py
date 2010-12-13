@@ -92,9 +92,7 @@ def check_for_newer():
         current_file = candidate
 
         if less_instance:
-            print "try to terminate"
-            os.kill(less_instance.pid, signal.SIGKILL)
-            #less_instance.terminate()
+            less_instance.terminate()
         less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
 
 def forward_signals(signum, frame):
