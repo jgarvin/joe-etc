@@ -14,6 +14,8 @@ import argparse
 app_description = ("Automatically finds the most recent log and "
                    "monitors it with less.")
 
+DEFAULT_INTERVAL = 5
+
 parser = argparse.ArgumentParser(description=app_description)
 parser.add_argument('-u', '--user', metavar='USER', type=str,
                     dest="user", help='Only open logs from USER.')
@@ -22,7 +24,8 @@ parser.add_argument('-l', '--lock', dest='lock', action='store_true',
                     help="Don't automatically move to most recent log over time.")
 parser.add_argument('-i', '--interval', metavar='T', type=int,
                     default=None,
-                    dest="interval", help='Poll for new logs every T seconds.')
+                    dest="interval", help=("Poll for new logs every T seconds. "
+                                           "Defaults to %d." % DEFAULT_INTERVAL))
 parser.add_argument(metavar='APPLICATION', type=str,
                     dest="application",
                     help='Open logs for this application. Treated as substring.')
@@ -38,7 +41,7 @@ if args.interval != None and args.interval <= 0:
     sys.exit(1)
 
 if not args.interval:
-    args.interval = 5
+    args.interval = DEFAULT_INTERVAL
 
 def get_log_files():
     glob_prefix = "/var/tmp/tlapp.*"
