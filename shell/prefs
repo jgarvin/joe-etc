@@ -5,8 +5,8 @@
 ########################################
 
 # Load tradelink preference
-. $HOME/etc/shell/util
-. $HOME/etc/shell/tlsh
+. `dirname $0`/util
+. `dirname $0`/tlsh
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
@@ -25,8 +25,8 @@ export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
 export REAL_GDB_LOCATION=`which gdb`
 
 # OK, now put it back in.
-if [[ -d $HOME/etc/bin ]]; then
-	path_prepend $HOME/etc/bin
+if [[ -d $ZDOTDIR/etc/bin ]]; then
+	path_prepend $ZDOTDIR/etc/bin
 fi
 
 # Ack is a nice replacement for grep, just does the right thing
@@ -43,10 +43,10 @@ ack()
 		--type-add hh=.ipp $@;
 }
 
-export BROWSER=`$HOME/etc/pick-browser`
+export BROWSER=`$ZDOTDIR/etc/pick-browser`
 
 # Newer versions of emacs will autoload emacs if ALTERNATE_EDITOR is empty.
-export EDITOR="$HOME/etc/bin/launch-emacs"
+export EDITOR="$ZDOTDIR/etc/bin/launch-emacs"
 
 if [[ -a /proc/cpuinfo ]]; then
 	# Linux
