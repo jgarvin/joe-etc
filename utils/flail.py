@@ -8,6 +8,7 @@ import os.path as op
 import signal
 import subprocess
 import pwd
+import time
 
 import argparse
 
@@ -82,34 +83,38 @@ def monitor_file(f):
 
 current_file = None
 less_instance = None
+killing_child = False
 
-def check_for_newer(signum, frame):
+def check_for_newer():
     global current_file, less_instance
     candidate = latest_file()
     if candidate != current_file:
         current_file = candidate
 
         if less_instance:
-            less_instance.terminate()
+            print "try to terminate"
+            os.kill(less_instance.pid, signal.SIGKILL)
+            #less_instance.terminate()
         less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
 
 def forward_signals(signum, frame):
     os.kill(less_instance.pid, signum)
 
-check_for_newer(None, None)
+check_for_newer()
 
-if not args.lock:
-    signal.signal(signal.SIGALRM, check_for_newer)
-    signal.alarm(args.interval)
+def on_child_death(signum, frame):
+    sys.exit(less_instance.returncode)
 
 # Without this less doesn't exit correctly.
 signal.signal(signal.SIGINT, forward_signals)
+signal.signal(signal.SIGCHLD, on_child_death)
 
 while 1:
-    try:
-        less_instance.wait()
+    time.sleep(args.interval)
+    less_instance.poll()
+    if less_instance.returncode != None:
         sys.exit(less_instance.returncode)
-    except OSError:
-        pass
+    if not args.lock:
+        check_for_newer()
 
 sys.exit(1)

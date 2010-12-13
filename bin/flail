@@ -1,5 +1,4 @@
 #!/usr/bin/env sh
 
 PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/ctrl-c-handler.py \
-    flail $@
+    $HOME/etc/utils/flail.py $@
