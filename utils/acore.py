@@ -89,7 +89,7 @@ if len(sys.argv) == 1:
 else:
     chosenCoreName = sys.argv[1]
 
-possibleCores = glob.glob("/var/core/core." + chosenCoreName + ".*")
+possibleCores = glob.glob("/var/core/core.*" + chosenCoreName + "*.*")
 
 if len(possibleCores) == 0:
     print >> sys.stderr, "No core for %s was found." % sys.argv[1]

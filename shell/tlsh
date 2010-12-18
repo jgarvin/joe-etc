@@ -23,6 +23,12 @@ if [[ `uname -s` = "SunOS" ]]; then
 	export PATH=$PATH:/usr/sbin
 fi
 
+if [[ -a $HOME/etc/tradelink/bin/make_services ]]; then
+    if [[ -a $HOME/.services ]]; then
+        $ZDOTDIR/etc/tradelink/bin/make_services
+        export DS_SERVICES=$HOME/.services
+    fi
+fi
 export DS_DOMAIN="test"
 
 # Use terminfo from the last century
