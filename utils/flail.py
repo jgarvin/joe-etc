@@ -27,6 +27,9 @@ parser.add_argument('-i', '--interval', metavar='T', type=int,
                     default=None,
                     dest="interval", help=("Poll for new logs every T seconds. "
                                            "Defaults to %d." % DEFAULT_INTERVAL))
+parser.add_argument('-n', '--nth', metavar='N', type=int,
+                    default=1,
+                    dest="nth", help=("Open nth most recent log. Default 1."))
 parser.add_argument(metavar='APPLICATION', type=str,
                     dest="application",
                     help='Open logs for this application. Treated as substring.')
@@ -39,6 +42,10 @@ if args.lock and args.interval != None:
 
 if args.interval != None and args.interval <= 0:
     print >> sys.stderr, "flail: error: Interval must be 1 or greater."
+    sys.exit(1)
+
+if args.nth <= 0:
+    print >> sys.stderr, "flail: error: Nth must be 1 or greater."
     sys.exit(1)
 
 if not args.interval:
@@ -75,7 +82,10 @@ def latest_file():
     if not logfiles:
         print >>sys.stderr, "flail: error: No matching log file found!"
         sys.exit(1)
-    return logfiles[0][1]
+    if args.nth > len(logfiles):
+        print >>sys.stderr, "flail: error: No %dth most recent log file." % args.nth
+        sys.exit(1)
+    return logfiles[args.nth - 1][1]
 
 def monitor_file(f):
     print "Running: " + monitor_cmd()
@@ -91,8 +101,10 @@ def check_for_newer():
     if candidate != current_file:
         current_file = candidate
 
-        if less_instance:
-            os.kill(less_instance.pid, signal.SIGKILL)
+        old_less_instance = less_instance
+        less_instance = None
+        if old_less_instance:
+            os.kill(old_less_instance.pid, signal.SIGKILL)
         less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
 
 def forward_signals(signum, frame):
@@ -101,7 +113,8 @@ def forward_signals(signum, frame):
 check_for_newer()
 
 def on_child_death(signum, frame):
-    sys.exit(less_instance.returncode)
+    if less_instance:
+        sys.exit(less_instance.returncode)
 
 # Without this less doesn't exit correctly.
 signal.signal(signal.SIGINT, forward_signals)
