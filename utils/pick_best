@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+set -u;
+set -e;
+
+for program in $(echo $@ | tr ' ' '\n')
+do
+	if which $program > /dev/null 2>&1
+	then
+		desired_program=$(which $program);
+		break;
+	fi
+done
+
+echo $desired_program

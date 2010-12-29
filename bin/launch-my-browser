@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+browser_list="chromium-browser firefox3 firefox epiphany mozilla"
+$HOME/etc/utils/remote_launch $($HOME/etc/utils/pick_best $browser_list)
