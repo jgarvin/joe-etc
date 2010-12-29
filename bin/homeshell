@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if test "`hostname`" = "udesktop178"; then
+    echo "remote launch `hostname` `date`" > $HOME/.homeshell-log
+    ssh userver43 "gnome-terminal --disable-factory --command \"ssh udesktop178\""
+else
+    echo "local launch `hostname` `date`" > $HOME/.homeshell-log
+    gnome-terminal --disable-factory
+fi
