@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# TODO: Add test for existence of a file to toggle remote/local mode.
+
+preferred_server="us257"
+log_info="launch '$@' `hostname` `date`"
+
+if test "`hostname`" = "udesktop178"; then
+    echo "remote" $log_ifno > $HOME/.homeshell-log
+    ssh $preferred_server $@
+else
+    echo "local" $log_info > $HOME/.homeshell-log
+    $@
+fi
