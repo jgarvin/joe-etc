@@ -43,7 +43,7 @@ ack()
 		--type-add hh=.ipp $@;
 }
 
-export BROWSER=`$ZDOTDIR/etc/pick-browser`
+export BROWSER=`$ZDOTDIR/etc/bin/launch-my-browser`
 
 # Newer versions of emacs will autoload emacs if ALTERNATE_EDITOR is empty.
 export EDITOR="$ZDOTDIR/etc/bin/launch-emacs"

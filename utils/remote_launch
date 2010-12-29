@@ -5,8 +5,13 @@
 preferred_server="us257"
 log_info="launch '$@' `hostname` `date`"
 
+if test ! -n "$1"; then
+    echo "failed" $log_info > $HOME/.homeshell-log
+    exit 1
+fi
+
 if test "`hostname`" = "udesktop178"; then
-    echo "remote" $log_ifno > $HOME/.homeshell-log
+    echo "remote" $log_info > $HOME/.homeshell-log
     ssh $preferred_server $@
 else
     echo "local" $log_info > $HOME/.homeshell-log

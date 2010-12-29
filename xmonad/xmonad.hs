@@ -12,6 +12,9 @@
 import XMonad
 import System.Exit
 
+import System.Environment
+import System.FilePath
+
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 
@@ -68,7 +71,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
 
     -- launch scratch terminal
-    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal --disable-factory" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
+    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
@@ -207,9 +210,9 @@ myManageHook = composeAll
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
-  browser <- getBrowser
+  home_folder <- getEnv "HOME"
   editor  <- getEditor
-  xmonad $ defaults browser editor
+  xmonad $ defaults editor home_folder
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
 instance Transformer DECORATIONS Window where
@@ -221,9 +224,9 @@ instance Transformer DECORATIONS Window where
 --
 -- No need to modify this.
 --
-defaults browser editor = gnomeConfig {
+defaults editor home_folder = gnomeConfig {
       -- simple stuff
-        terminal           = "gnome-terminal --disable-factory",
+        terminal           = joinPath [home_folder, "etc/bin/homeshell"],
         focusFollowsMouse  = True,
         borderWidth        = 5,
         modMask            = mod4Mask,
@@ -233,7 +236,7 @@ defaults browser editor = gnomeConfig {
         focusedBorderColor = "#0000ff",
 
       -- key bindings
-        keys               = myKeys browser editor,
+        keys               = myKeys (joinPath [home_folder, "etc/bin/launch-my-browser"]) editor,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
