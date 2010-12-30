@@ -14,6 +14,7 @@ import System.Exit
 
 import System.Environment
 import System.FilePath
+import System.Process
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -204,11 +205,7 @@ myManageHook = composeAll
     , appName   =? "VLC (XVideo output)" --> doFloat
     , isFullscreen                  --> doFullFloat]
 
-------------------------------------------------------------------------
--- Now run xmonad with all the defaults we set up.
-
--- Run xmonad with the settings you specify. No need to modify this.
---
+--browser <- readProcess (joinPath [home_folder, "etc/bin/utils/pick_best_browser"]) [] [])
 main = do
   home_folder <- getEnv "HOME"
   editor  <- getEditor
