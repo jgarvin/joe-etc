@@ -12,6 +12,9 @@
 import XMonad
 import System.Exit
 
+import Debug.Trace
+
+import System.IO
 import System.Environment
 import System.FilePath
 import System.Process
@@ -60,7 +63,7 @@ capitalizeWord (x:xs) = toUpper x : xs
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
-myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
+myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
     [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
@@ -75,7 +78,7 @@ myKeys browser editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
 
     -- launch firefox
-    , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser <||> className =? (capitalizeWord browser)))
+    , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
@@ -205,11 +208,11 @@ myManageHook = composeAll
     , appName   =? "VLC (XVideo output)" --> doFloat
     , isFullscreen                  --> doFullFloat]
 
---browser <- readProcess (joinPath [home_folder, "etc/bin/utils/pick_best_browser"]) [] [])
 main = do
   home_folder <- getEnv "HOME"
   editor  <- getEditor
-  xmonad $ defaults editor home_folder
+  browser_name <- (readProcess (joinPath [home_folder, "etc/utils/pick_best_browser"]) ["-n"] [])
+  xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
 instance Transformer DECORATIONS Window where
@@ -221,7 +224,7 @@ instance Transformer DECORATIONS Window where
 --
 -- No need to modify this.
 --
-defaults editor home_folder = gnomeConfig {
+defaults editor home_folder browser_name = gnomeConfig {
       -- simple stuff
         terminal           = joinPath [home_folder, "etc/bin/homeshell"],
         focusFollowsMouse  = True,
@@ -233,7 +236,7 @@ defaults editor home_folder = gnomeConfig {
         focusedBorderColor = "#0000ff",
 
       -- key bindings
-        keys               = myKeys (joinPath [home_folder, "etc/bin/launch-my-browser"]) editor,
+        keys               = myKeys (joinPath [home_folder, "etc/bin/launch-my-browser"]) browser_name editor,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts

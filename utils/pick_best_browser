@@ -1,4 +1,13 @@
 #!/bin/sh
 
 browser_list="chromium-browser firefox3 firefox epiphany mozilla"
-$HOME/etc/utils/pick_best $browser_list
+
+# -n means "name only", we remove the path and any digits
+if test "$1" = "-n"; then
+    temp=`$HOME/etc/utils/pick_best $browser_list`
+    echo `basename $temp | tr -d 1234567890`
+    echo `basename $temp | tr -d 1234567890` > $HOME/templog
+else
+    $HOME/etc/utils/pick_best $browser_list
+fi
+
