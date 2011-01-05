@@ -15,7 +15,7 @@ import argparse
 app_description = ("Automatically finds the most recent log and "
                    "monitors it with less.")
 
-DEFAULT_INTERVAL = 5
+DEFAULT_INTERVAL = 1
 
 parser = argparse.ArgumentParser(description=app_description)
 parser.add_argument('-u', '--user', metavar='USER', type=str,
@@ -122,7 +122,7 @@ def on_child_death(signum, frame):
     if less_instance:
         try:
             while 1:
-                old_less_instance.wait()
+                less_instance.wait()
                 break
         except OSError:
             pass
