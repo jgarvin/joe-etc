@@ -105,6 +105,12 @@ def check_for_newer():
         less_instance = None
         if old_less_instance:
             os.kill(old_less_instance.pid, signal.SIGKILL)
+            try:
+                while 1:
+                    old_less_instance.wait()
+                    break
+            except OSError:
+                pass
         less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
 
 def forward_signals(signum, frame):
@@ -114,6 +120,12 @@ check_for_newer()
 
 def on_child_death(signum, frame):
     if less_instance:
+        try:
+            while 1:
+                old_less_instance.wait()
+                break
+        except OSError:
+            pass
         sys.exit(less_instance.returncode)
 
 # Without this less doesn't exit correctly.
