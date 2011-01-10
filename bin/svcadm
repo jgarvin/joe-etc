@@ -1,5 +1,13 @@
-#!/usr/bin/env sh
+#!/usr/bin/env zsh
 
-PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/ctrl-c-handler.py \
-    safeguard svcadm $@
+real_loc=`cat $HOME/etc/real_locations/svcadm`
+
+cmd=("PYTHONPATH=$HOME/etc/python python " \
+    "$HOME/etc/utils/ctrl-c-handler.py " \
+    "safeguard $real_loc $@")
+
+if [[ "$SCRIPTING_DEBUG" = "1" ]]; then
+    echo "Running: $cmd"
+fi
+
+eval $cmd
