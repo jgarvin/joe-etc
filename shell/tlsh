@@ -190,3 +190,11 @@ launch_builder() {
     fi
 }
 
+launch_builder_sparc() {
+    if [[ ! $hostname = "solsparc" ]]; then
+        ssh -t builder@solsparc ZDOTDIR=~joeg zsh
+    else
+        ZDOTDIR=~joeg zsh
+    fi
+}
+
