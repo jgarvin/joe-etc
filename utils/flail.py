@@ -12,6 +12,10 @@ import time
 
 import argparse
 
+# TODO: Snake logs
+# TODO: nic logs
+# TODO: top logs
+
 app_description = ("Automatically finds the most recent log and "
                    "monitors it with less.")
 
@@ -75,7 +79,7 @@ def get_log_files():
     return logpairs
 
 def monitor_cmd(f):
-    return "less +F " + f
+    return "less -n +F " + f
 
 def latest_file():
     logfiles = get_log_files()
@@ -104,7 +108,7 @@ def check_for_newer():
         old_less_instance = less_instance
         less_instance = None
         if old_less_instance:
-            os.kill(old_less_instance.pid, signal.SIGKILL)
+            os.kill(old_less_instance.pid, signal.SIGCHLD)
             try:
                 while 1:
                     old_less_instance.wait()
@@ -114,6 +118,7 @@ def check_for_newer():
         less_instance = subprocess.Popen(monitor_cmd(current_file), shell=True)
 
 def forward_signals(signum, frame):
+    global less_instance
     os.kill(less_instance.pid, signum)
 
 check_for_newer()
