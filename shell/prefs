@@ -85,3 +85,4 @@ truss()
 
 # Without this OO looks terrible under xmonad
 OOO_FORCE_DESKTOP=gnome
+
