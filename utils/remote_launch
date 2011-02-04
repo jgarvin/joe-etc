@@ -14,7 +14,6 @@ if test ! "`hostname`" = "$preferred_server"; then
     echo "remote" $log_info > $HOME/.homeshell-log
     ssh $preferred_server $@
 else
-    echo "Going to run: $@"
     echo "local" $log_info > $HOME/.homeshell-log
     eval $@
 fi
