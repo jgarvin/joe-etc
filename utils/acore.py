@@ -10,6 +10,10 @@ import glob
 import datetime
 import popen2
 
+# TODO: -s to just list cores
+# TODO: Map /opt/tradelink/bin whichVersion scripts to their
+# symlinks in /opt/tradelink/bin/newInst
+
 def extract_name(core_path):
     "Extracts the name of an app from the name of its core filename."
     fname = op.basename(core_path)
@@ -162,7 +166,7 @@ if not chosenBinary:
 
     binary_path = binary_path[1].strip()
     if op.isabs(binary_path):
-        chosenBinary = binary_path
+        chosenBinary = os.path.realpath(binary_path)
     else:
         # Use strings to get the PWD from the core, which we can join with
         # the relative path in argv[0] to locate the binary.
