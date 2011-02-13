@@ -169,6 +169,18 @@ tlmake()
     enable -f tlmake
 }
 
+tlversion()
+{
+    disable -f tlversion
+    if [[ `basename $PWD` = "icache_wombat" ]]; then
+        echo "Running with 1 CPU. See $tlsh_file_name"
+        MAKEFLAGS=-j1 tlversion $@
+    else
+        tlversion $@
+    fi
+    enable -f tlversion
+}
+
 poor_man_dtrace()
 {
     while true
@@ -189,3 +201,12 @@ launch_builder() {
         ZDOTDIR=~joeg zsh
     fi
 }
+
+launch_builder_sparc() {
+    if [[ ! $hostname = "solsparc" ]]; then
+        ssh -t builder@solsparc ZDOTDIR=~joeg zsh
+    else
+        ZDOTDIR=~joeg zsh
+    fi
+}
+

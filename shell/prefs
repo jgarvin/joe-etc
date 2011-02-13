@@ -22,7 +22,13 @@ fi
 # it temporarily because we're going to find the 'real'
 # locations of different utilities.
 export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
-export REAL_GDB_LOCATION=`which gdb`
+
+if [[ ! -a $HOME/etc/real_locations ]]; then
+    mkdir $HOME/etc/real_locations
+fi
+
+which gdb > $HOME/etc/real_locations/gdb
+which svcadm > $HOME/etc/real_locations/svcadm
 
 # OK, now put it back in.
 if [[ -d $ZDOTDIR/etc/bin ]]; then
@@ -79,3 +85,4 @@ truss()
 
 # Without this OO looks terrible under xmonad
 OOO_FORCE_DESKTOP=gnome
+

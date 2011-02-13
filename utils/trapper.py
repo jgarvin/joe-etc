@@ -46,10 +46,6 @@ def main():
     poller = select.poll()
     poller.register(child_stdout, select.POLLIN)
 
-    # Even though I don't read from this, I need to poll on it
-    # in order for newlines to interleave correctly with stdout.
-    poller.register(sys.stdin, select.POLLIN)
-
     deblockify(child_stdout.fileno())
 
     listen_for_index = 0

@@ -58,7 +58,6 @@
 (global-set-key "\C-ch" 'hide-lines)
 (global-set-key "\C-cu" 'show-all-invisible)
 
-
 (defun yank-and-indent ()
   "Yank and then indent the newly formed region according to mode."
   (interactive)
@@ -67,7 +66,7 @@
 
 (add-hook 'c-mode-common-hook
 		  (lambda ()
-			(global-set-key (kbd "C-y") 'yank-and-indent)))
+			(local-set-key (kbd "C-y") 'yank-and-indent)))
 
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
@@ -236,12 +235,12 @@
 			(cd topdir)
 			(start-process-shell-command "gtags create"
 										 "gtags_buffer"
-										 "gtags -q && echo 'created tagfile'")
+										 "~/etc/utils/remote_launch gtags -q && echo 'created tagfile'")
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
     (start-process-shell-command "gtags update"
 								 "gtags_buffer"
-								 "global -u 2> /dev/null && echo 'updated tagfile'")))
+								 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
