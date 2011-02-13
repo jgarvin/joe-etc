@@ -12,7 +12,10 @@ fi
 
 if test "`hostname`" = "udesktop178"; then
     echo "remote" $log_info > $HOME/.homeshell-log
-    ssh $preferred_server $@
+    if ! ssh $preferred_server $@; then
+        echo "remote failed, trying local " $log_info > $HOME/.homeshell-log
+        eval $@
+    fi
 else
     echo "local" $log_info > $HOME/.homeshell-log
     $@
