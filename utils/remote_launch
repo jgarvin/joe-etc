@@ -12,7 +12,8 @@ fi
 
 if test ! "`hostname`" = "$preferred_server"; then
     echo "remote" $log_info > $HOME/.homeshell-log
-    if ! ssh $preferred_server $@; then
+    ssh $preferred_server $@
+    if test ! "$?" = "0"; then
         echo "remote failed, trying local " $log_info > $HOME/.homeshell-log
         eval $@
     fi
