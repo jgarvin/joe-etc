@@ -1,3 +1,7 @@
 #!/usr/bin/env zsh
 
-$HOME/etc/utils/remote_launch $($HOME/etc/utils/pick_best_browser)
+if test "$TL_SITE" = ""; then
+    $($HOME/etc/utils/pick_best_browser)
+else
+    $HOME/etc/utils/remote_launch $($HOME/etc/utils/pick_best_browser)
+fi
