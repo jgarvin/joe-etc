@@ -72,7 +72,7 @@ if not args.interval:
 def get_log_files():
     glob_prefix = "/var/tmp/tlapp.*"
     if args.application:
-        glob_path = glob_prefix + args.application + "." + socket.gethostname() + "*.log"
+        glob_path = glob_prefix + "*" + args.application + "*." + socket.gethostname() + "*.log"
     else:
         glob_path = glob_prefix + "*" + socket.gethostname() + "*.log"
 
