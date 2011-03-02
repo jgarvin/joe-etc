@@ -97,16 +97,6 @@
 (setq tramp-default-user "joeg")
 (require 'tramp)
 
-;; Make more notepad like out of the box
-(setq default-major-mode 'text-mode)
-(setq text-mode-hook				; Enable auto-fill-mode
-	  '(lambda ()
-		 (let ((ext (file-name-extension (buffer-file-name))))
-		   (when (not (or (string-equal ext "tc")
-						  (string-equal ext "in")
-						  (string-equal ext "tmp")))
-			 (longlines-mode 1)))))
-
 (require 'ido)
 (ido-mode t)
 (setq ido-enable-flex-matching t)
@@ -512,11 +502,27 @@
 (autoload 'ack-find-file "full-ack" nil t)
 (global-set-key "\M-k" 'ack)
 
+;; Threshold after which we consider the file to be large
+;; and don't want to do anything too expensive.
+(setq uncomfortable-buffer-size (* 10 1024 1024))
+
+;; Make more notepad like out of the box
+(setq default-major-mode 'text-mode)
+(setq text-mode-hook				; Enable auto-fill-mode
+	  '(lambda ()
+		 (let ((ext (file-name-extension (buffer-file-name))))
+		   (when (and (not (or (string-equal ext "tc")
+                               (string-equal ext "in")
+                               (string-equal ext "tmp")
+                               (string-equal ext "log")))
+                      (< (buffer-size) uncomfortable-buffer-size))
+             (longlines-mode 1)))))
+
 ;; Taken from Trey Jackson's answer on superuser.com
 ;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
 (defun my-find-file-check-make-large-file-read-only-hook ()
   "If a file is over a given size, make the buffer read only."
-  (when (> (buffer-size) (* 10 1024 1024))
+  (when (> (buffer-size) uncomfortable-buffer-size)
     (setq buffer-read-only t)
     (setq auto-save-default nil)
     (buffer-disable-undo)
