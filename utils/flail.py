@@ -9,11 +9,10 @@ import signal
 import subprocess
 import pwd
 import time
+import socket
 
 import argparse
 
-# TODO: -t to just show a list of logs
-# TODO: Make -t work with -n to specify how far to go back
 # TODO: Get logs from /opt/tradelink/share/repository
 # TODO: Get log from repository when new log is empty, switch when it becomes nonempty
 # TODO: Debug why less doesn't get killed correctly
@@ -73,9 +72,9 @@ if not args.interval:
 def get_log_files():
     glob_prefix = "/var/tmp/tlapp.*"
     if args.application:
-        glob_path = glob_prefix + args.application + "*.log"
+        glob_path = glob_prefix + args.application + "." + socket.gethostname() + "*.log"
     else:
-        glob_path = glob_prefix + ".log"
+        glob_path = glob_prefix + "*" + socket.gethostname() + "*.log"
 
     logfilepaths = glob.glob(glob_path)
 
