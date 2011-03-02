@@ -69,14 +69,25 @@ if desired_log_number() <= 0:
 if not args.interval:
     args.interval = DEFAULT_INTERVAL
 
-def get_log_files():
-    glob_prefix = "/var/tmp/tlapp.*"
-    if args.application:
-        glob_path = glob_prefix + "*" + args.application + "*." + socket.gethostname() + "*.log"
-    else:
-        glob_path = glob_prefix + "*" + socket.gethostname() + "*.log"
+def get_glob_dirs(application):
+    glob_prefixes = ["/var/tmp/"]
 
-    logfilepaths = glob.glob(glob_path)
+    if application:
+        glob_app_dirnames = "/opt/tradelink/share/repository/*" + application + "*"
+        glob_prefixes.extend(glob.glob(glob_app_dirnames))
+
+    return glob_prefixes
+
+def get_log_files():
+    logfilepaths = []
+    for d in get_glob_dirs(args.application):
+        glob_prefix = "tlapp.*"
+        if args.application:
+            glob_path = op.join(d, "tlapp.*" + args.application + "*." + socket.gethostname() + "*.log")
+        else:
+            glob_path = op.join(d, "tlapp.*" + socket.gethostname() + "*.log")
+
+        logfilepaths.extend(glob.glob(glob_path))
 
     logfilepaths = [l for l in logfilepaths if not op.isdir(l)]
 
