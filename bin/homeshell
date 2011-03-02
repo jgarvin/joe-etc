@@ -1,3 +1,7 @@
 #!/bin/sh
 
-$HOME/etc/utils/remote_launch gnome-terminal --disable-factory --command \"ssh udesktop178\"
+if test "$TL_SITE" = ""; then
+    gnome-terminal --disable-factory
+else
+    $HOME/etc/utils/remote_launch gnome-terminal --disable-factory --command \"ssh udesktop178\"
+fi
