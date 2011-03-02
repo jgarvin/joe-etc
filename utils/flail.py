@@ -13,7 +13,6 @@ import socket
 
 import argparse
 
-# TODO: Get logs from /opt/tradelink/share/repository
 # TODO: Get log from repository when new log is empty, switch when it becomes nonempty
 # TODO: Debug why less doesn't get killed correctly
 
@@ -144,7 +143,8 @@ def check_for_newer():
 
 def forward_signals(signum, frame):
     global less_instance
-    os.kill(less_instance.pid, signum)
+    if less_instance:
+        os.kill(less_instance.pid, signum)
 
 if args.show_only:
     # We use args.nth directly instead of desired_log_number()
@@ -157,6 +157,7 @@ if args.show_only:
 check_for_newer()
 
 def on_child_death(signum, frame):
+    global less_instance
     if less_instance:
         try:
             while 1:
