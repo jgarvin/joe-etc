@@ -149,7 +149,9 @@ def forward_signals(signum, frame):
 if args.show_only:
     # We use args.nth directly instead of desired_log_number()
     # since a slice of 0:None maps to the whole container.
-    print "\n".join([i[1] for i in get_log_files()][0:args.nth])
+    tmp = [i[1] for i in get_log_files()][0:args.nth]
+    tmp.reverse()
+    print "\n".join(tmp)
     sys.exit(0)
 
 check_for_newer()
