@@ -35,7 +35,7 @@ if [[ "$(whoami)" = "$(basename $ZDOTDIR)" ]]; then
 	    if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
 		    oldpwd=$PWD
 		    cd ~/etc
-		    if git pull --ff-only origin master > ~/.gitsynclog 2>&1; then
+		    if git fetch > ~/.gitsynclog 2>&1; then
 			    date | awk '{ print $2$3 }' > ~/.gitsyncdate
 		    else
 			    echo "Error syncing config with git. Check $HOME/.gitsynclog."
