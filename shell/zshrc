@@ -308,6 +308,7 @@ function precmd {
     if apm &> /dev/null; then
 	PR_APM_RESULT=`apm`
     fi
+
 }
 
 

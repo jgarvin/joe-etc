@@ -194,6 +194,13 @@ poor_man_dtrace()
 
 export CVSROOT=:pserver:$LOGNAME@cvs:/cvs
 
+print_version_tmps() {
+    for i in `search version.tmp`
+    do
+        echo `dirname $i`-`cat $i` | awk -F./ '{ print $2 }'
+    done
+}
+
 launch_builder() {
     if [[ ! $hostname = "userver43" ]]; then
         ssh -t builder@userver43 ZDOTDIR=~joeg zsh
