@@ -201,6 +201,31 @@ print_version_tmps() {
     done
 }
 
+dry_run_cmd() {
+    if [[ -z "$RUN_FOR_REAL" ]]
+    then
+        echo $@
+    else
+        eval $@
+    fi
+}
+
+version_swap() {
+    start_folder=$PWD
+    for i in `search version.tmp`
+    do
+        echo "Processing" `dirname $i`
+        echo "Current folder:" $PWD
+        dir=`dirname $i`
+        version_cmd="cmp_versions $dir/version.in $i"
+        version_change=`eval $version_cmd`
+        dry_run_cmd cp $i $dir/.version.tmp.backup
+        dry_run_cmd rm $i
+        dry_run_cmd "cd $dir; tlversion $version_change; cd $OLDPWD"
+        cd $start_folder
+    done
+}
+
 launch_builder() {
     if [[ ! $hostname = "userver43" ]]; then
         ssh -t builder@userver43 ZDOTDIR=~joeg zsh
