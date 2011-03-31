@@ -2,26 +2,29 @@
 
 # Need to run as ksh to work correctly
 if [[ `uname -s` = "SunOS" ]]; then
-    if [[ -a ~/.profile ]]; then
-	SHELL=/bin/ksh source ~/.profile
+    if [[ -a $HOME/.profile ]]; then
+	SHELL=/bin/ksh source $HOME/.profile
     fi
-fi
 
-# Try to use .zhistory on local box before resorting to using the network
-if [[ "$HOST" == "udesktop178" ]]; then
-	export HISTFILE=/export/home/`whoami`/.zhistory
-else
-	if [[ -a /home/udesktop178/`whoami`/.zhistory ]]; then
-		export HISTFILE=/home/udesktop178/`whoami`/.zhistory
-	else
-		export HISTFILE=$HOME/.zhistory
-	fi
-fi
+    # Use terminfo from the last century
+    if [[ -d "/opt/tradelink/share/terminfo" ]]; then
+	    export TERMINFO=/opt/tradelink/share/terminfo
+    else
+	    if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
+		    export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
+	    else
+		    if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
+			    export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
+		    fi
+	    fi
+    fi
 
-if [[ `uname -s` = "SunOS" ]]; then
 	# Without this I don't get psrinfo
 	export PATH=$PATH:/usr/sbin
 fi
+
+# Try to use .zhistory on local box before resorting to using the network
+export HISTFILE=/export/home/$LOGNAME/.zhistory
 
 if [[ -a $HOME/etc/tradelink/bin/make_services ]]; then
     if [[ -a $HOME/.services ]]; then
@@ -29,40 +32,28 @@ if [[ -a $HOME/etc/tradelink/bin/make_services ]]; then
         export DS_SERVICES=$HOME/.services
     fi
 fi
-export DS_DOMAIN="test"
 
-# Use terminfo from the last century
-if [[ -d "/opt/tradelink/share/terminfo" ]]; then
-	export TERMINFO=/opt/tradelink/share/terminfo
-else
-	if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
-		export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
-	else
-		if [[ -d "/export/home/joeg/ncurses-install/share/terminfo" ]]; then
-			export TERMINFO=/export/home/joeg/ncurses-install/share/terminfo
-		fi
-	fi
-fi
+export DS_DOMAIN="test"
 
 hostname=$(hostname)
 
-if [[ -d /home/$hostname ]]; then
-    if [[ ! -a /home/$hostname/$LOGNAME ]]; then
-	    echo "Creating /home/$hostname/$LOGNAME"
-	    sudo mkdir /home/$hostname/$LOGNAME
-	    sudo chgrp develop /home/$hostname/$LOGNAME
-	    sudo chown $LOGNAME /home/$hostname/$LOGNAME
-	    cd /home/$hostname/$LOGNAME
+if [[ -d /export/home ]]; then
+    if [[ ! -a /export/home/$LOGNAME ]]; then
+	    echo "Creating /export/home/$LOGNAME"
+	    sudo mkdir /export/home/$LOGNAME
+	    sudo chgrp develop /export/home/$LOGNAME
+	    sudo chown $LOGNAME /export/home/$LOGNAME
+	    cd /export/home/$LOGNAME
     fi
 fi
 
 if [[ "$PWD" = "/home/titan/$LOGNAME" ]]; then
-    if [[ -a /home/$hostname/$LOGNAME ]]; then
-	    cd /home/$hostname/$LOGNAME
+    if [[ -a /export/home/$LOGNAME ]]; then
+	    cd /export/home/$LOGNAME
     fi
 fi
 
-alias cdl=/home/$hostname/$LOGNAME
+alias cdl=/export/home/$LOGNAME
 
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
@@ -85,6 +76,11 @@ fi
 if which ggrep &> /dev/null # Use GNU grep if available
 then
 	alias grep='ggrep --color=auto'
+else
+    if grep --version &> /dev/null | grep GNU &> /dev/null
+    then
+        alias grep='grep --color=auto'
+    fi
 fi
 
 if which gawk &> /dev/null # Use GNU awk if available
@@ -124,11 +120,7 @@ fi
 
 # Try to use .zhistory on local box before resorting to using the network
 if [[ `basename $SHELL` = "zsh" ]]; then
-	if [[ -a /home/udesktop178/$LOGNAME/.zshcache ]]; then
-		zstyle ':completion:*' cache-path /home/udesktop178/$LOGNAME/.zshcache
-	else
-		zstyle ':completion:*' cache-path $HOME/.zshcache
-	fi
+	zstyle ':completion:*' cache-path /export/home/joeg/.zshcache
 fi
 
 # By default SQL is pants on head stupid about keyboard shortcuts

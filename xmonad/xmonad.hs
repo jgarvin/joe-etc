@@ -199,6 +199,7 @@ myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , title     =? "Brood War"      --> doFloat
+    , className =? "Rti"            --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
@@ -211,7 +212,8 @@ myManageHook = composeAll
 main = do
   home_folder <- getEnv "HOME"
   editor  <- getEditor
-  browser_name <- (readProcess (joinPath [home_folder, "etc/utils/pick_best_browser"]) ["-n"] [])
+  --browser_name <- (readProcess (joinPath [home_folder, "etc/utils/pick_best_browser"]) ["-n"] [])
+  browser_name <- return "google-chrome"
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)

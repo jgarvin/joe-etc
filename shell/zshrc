@@ -25,8 +25,22 @@ source $ZDOTDIR/etc/shell/prefs
 # Apply zsh specific utils
 source $ZDOTDIR/etc/shell/zsh_util
 
+local opt_location=/export/home/$LOGNAME/opt
+
+if [[ -d $opt_location/bin ]]; then
+    export PATH=$PATH:$opt_location/bin
+fi
+
+if [[ -d $opt_location/lib ]]; then
+    export LD_LIBRARY_PATH=$opt_location/lib
+fi
+
+if [[ -d $opt_location/share/man ]]; then
+    export MANPATH=$MANPATH:$opt_location/share/man
+fi
+
 # Sync configuration with git once a day.
-if [[ "$(whoami)" = "$(basename $ZDOTDIR)" ]]; then
+if [[ "$LOGNAME" = "$(basename $ZDOTDIR)" ]]; then
     if which git > /dev/null; then
 	    if [[ ! -a ~/.gitsyncdate ]]; then
 		    touch ~/.gitsyncdate
