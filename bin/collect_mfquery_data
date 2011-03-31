@@ -1,0 +1,16 @@
+#!/bin/env zsh
+
+local contract="$0"
+local mfquery_line="DS_DOMAIN=wslave2a ./mfquery $CONTRACT ASK_PRICE BID_PRICE ASK_SIZE BID_SIZE TRADE_VOLUME LAST_PRICE LAST_TIME CUMULATIVE_VOLUME"
+
+local methods="ICACHE DS WOMBAT"
+
+local base_filename=$(echo $contract | sed 's/ /_g')
+
+for m in $methods; do;
+    $mfquery_line --marketFeedMethod=$m > $base_filename-$m 2>&1 &
+done
+
+channel=$(grep $(echo $contract | sed 's/ /:/g') /var/opt/icache/channel-assignment-log | awk '{ print $3 }')
+
+icache_buffer_tool read --include-channels $channel > $base_filename-buffer
