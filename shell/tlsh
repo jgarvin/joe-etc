@@ -1,5 +1,8 @@
 #!/bin/env zsh
 
+# Yes, this is terrible
+xhost + > /dev/null 2>&1
+
 # Need to run as ksh to work correctly
 if [[ `uname -s` = "SunOS" ]]; then
     if [[ -a $HOME/.profile ]]; then
@@ -146,6 +149,16 @@ export PATH=/opt/app/sybase15/OCS-15_0/bin:$PATH
 
 # Use newer emacs
 export PATH=/opt/app/emacs-23.1/bin:$PATH
+
+# less_than_4_gigs()
+# {
+#     if [[ $(uname -s) = "Linux" ]]; then
+#         [[ $(free -m | grep Mem | awk '{ print $2 }') < 4032 ]]
+#     fi
+#     if [[ $(uname -s) = "SunOS" ]]; then
+#         [[ "$(prtconf | grep Mem | awk '{ print $3 }')" < 4032 ]]
+#     fi
+# }
 
 # icache_wombat eats all my memory when compiled with multiple CPUs
 tlsh_file_name=$0
