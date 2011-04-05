@@ -17,6 +17,9 @@ for m in ICACHE DS WOMBAT; do;
     eval "$mfquery_line --marketFeedMethod=$m > $base_filename-$m 2>&1" &
 done
 
-channel=$(grep $(echo $contract | sed 's/ /:/g') /var/opt/icache/channel-assignment-log | awk '{ print $3 }')
+local colon_name=$(echo $contract | sed 's/ /:/g')
 
+query_wombat $colon_name > $base_filename-mamalisten 2>&1 &
+
+local channel=$(grep $colon_name /var/opt/icache/channel-assignment-log | awk '{ print $3 }')
 icache_buffer_tool read --include-channels $channel > $base_filename-buffer 2>&1 &
