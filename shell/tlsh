@@ -30,10 +30,8 @@ fi
 export HISTFILE=/export/home/$LOGNAME/.zhistory
 
 if which servicesgen &> /dev/null; then
-    if [[ -a $HOME/.services ]]; then
-        $ZDOTDIR/etc/tradelink/bin/make_services
-        export DS_SERVICES=$HOME/.services
-    fi
+    $ZDOTDIR/etc/tradelink/bin/make_services
+    export DS_SERVICES=$HOME/.services
 fi
 
 export DS_DOMAIN="test"
