@@ -45,6 +45,8 @@ import Data.Char
 import XMonad.Layout.SimpleDecoration
 import XMonad.Layout.MultiToggle
 
+import PickBrowser
+
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
 -- workspace name. The number of workspaces is determined by the length
@@ -92,11 +94,11 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- close focused window
     , ((modMask , xK_c     ), kill)
 
-     -- Rotate through the available layout algorithms
+    -- Rotate through the available layout algorithms
     , ((modMask,               xK_Tab ), sendMessage NextLayout)
 
-	 -- Rotate through the available layout algorithms
-	, ((modMask,               xK_d ), sendMessage (Toggle DECORATIONS))
+    -- Toggle decorations
+    , ((modMask,               xK_d ), sendMessage (Toggle DECORATIONS))
 
     -- Resize viewed windows to the correct size
     , ((modMask,               xK_n     ), refresh)
@@ -212,8 +214,7 @@ myManageHook = composeAll
 main = do
   home_folder <- getEnv "HOME"
   editor  <- getEditor
-  --browser_name <- (readProcess (joinPath [home_folder, "etc/utils/pick_best_browser"]) ["-n"] [])
-  browser_name <- return "google-chrome"
+  browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)

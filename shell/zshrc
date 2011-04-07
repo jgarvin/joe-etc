@@ -25,6 +25,12 @@ source $ZDOTDIR/etc/shell/prefs
 # Apply zsh specific utils
 source $ZDOTDIR/etc/shell/zsh_util
 
+if [[ $(uname -s) = "Linux" ]]; then
+    cd ~/etc
+    redo/redo all
+    cd -
+fi
+
 local opt_location=/export/home/$LOGNAME/opt
 
 if [[ -d $opt_location/bin ]]; then
@@ -49,7 +55,7 @@ if [[ "$LOGNAME" = "$(basename $ZDOTDIR)" ]]; then
 	    if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
 		    oldpwd=$PWD
 		    cd ~/etc
-		    if git pull --ff-only origin master > ~/.gitsynclog 2>&1; then
+		    if git fetch > ~/.gitsynclog 2>&1; then
 			    date | awk '{ print $2$3 }' > ~/.gitsyncdate
 		    else
 			    echo "Error syncing config with git. Check $HOME/.gitsynclog."

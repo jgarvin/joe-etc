@@ -238,27 +238,6 @@
     (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
     (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
 
-;; (add-hook 'c-mode-common-hook
-;;   (lambda ()
-;; 	(local-set-key (kbd "{") )))
-
-(defun djcb-hasktags-create-or-update ()
-  "create or update the TAGS file with hasktags"
-  (interactive)
-  (if (not (file-exists-p (concat default-directory "TAGS")))
-    (let ((olddir default-directory)
-          (topdir (read-directory-name
-                    "hasktags: top of source tree:" default-directory)))
-      (cd topdir)
-      (shell-command "hasktags -e `find -name \\*.hs` && echo 'created tagfile'")
-      (cd olddir)) ; restore
-    ;;  tagfile already exists; update it
-    (shell-command "hasktags -a `find -name \\*.hs` && echo 'updated tagfile'")))
-
-(add-hook 'haskell-mode-hook
-  (lambda ()
-    (djcb-hasktags-create-or-update)))
-
 ;; Append a new line to files so GCC shuts up
 (add-hook 'c-mode-common-hook
   (lambda ()

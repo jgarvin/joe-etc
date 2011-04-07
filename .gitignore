@@ -7,3 +7,9 @@ GRTAGS
 GSYSMS
 GTAGS
 real_locations
+*.hi
+*.o
+*.s
+xmonad-x86_64-*
+xmonad.errors
+.redo
