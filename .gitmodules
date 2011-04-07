@@ -7,3 +7,6 @@
 [submodule "wrap-region"]
 	path = wrap-region
 	url = http://github.com/rejeep/wrap-region.git
+[submodule "redo"]
+	path = redo
+	url = https://github.com/apenwarr/redo.git

@@ -25,6 +25,12 @@ source $ZDOTDIR/etc/shell/prefs
 # Apply zsh specific utils
 source $ZDOTDIR/etc/shell/zsh_util
 
+if [[ $(uname -s) = "Linux" ]]; then
+    cd ~/etc
+    redo/redo all
+    cd -
+fi
+
 # Sync configuration with git once a day.
 if [[ "$(whoami)" = "$(basename $ZDOTDIR)" ]]; then
     if which git > /dev/null; then

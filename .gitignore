@@ -12,3 +12,4 @@ real_locations
 *.s
 xmonad-x86_64-*
 xmonad.errors
+.redo
