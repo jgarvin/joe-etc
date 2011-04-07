@@ -71,7 +71,7 @@ fi
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
-alias ssh="ssh -C"
+alias ssh="ssh -C -X"
 
 # 99% of the time I want truss to include child processes
 file_name=$0

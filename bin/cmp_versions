@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+PYTHONPATH=$HOME/etc/python python \
+    $HOME/etc/utils/cmp_versions.py $@

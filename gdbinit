@@ -15,3 +15,5 @@ end
 
 set script-extension soft
 source ~/etc/rwtime.py
+
+handle SIGUSR1 nostop

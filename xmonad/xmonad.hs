@@ -201,6 +201,7 @@ myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , title     =? "Brood War"      --> doFloat
+    , className =? "Rti"            --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore

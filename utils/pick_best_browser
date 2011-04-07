@@ -1,6 +1,6 @@
 #!/bin/sh
 
-browser_list="chromium-browser firefox3 firefox epiphany mozilla"
+browser_list="chromium-browser google-chrome firefox4 firefox3 firefox epiphany mozilla"
 
 # -n means "name only", we remove the path and any digits
 if test "$1" = "-n"; then

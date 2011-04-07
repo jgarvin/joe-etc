@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+local cur_dur=$PWD
+trap "cd $cur_dur" INT TERM EXIT
+
+local find_util=find
+if which gfind &> /dev/null; then;
+    find_util=gfind
+fi
+
+for i in $($find_util -name version.in | grep -v deprecated)
+do
+    echo $(basename $(dirname $i))"-"$(cat $i | grep -v '#') | grep -v deprecated
+done
+
+for i in $($find_util -name Version.H | grep -v deprecated)
+do
+    local major=$(cat $i | grep major | awk '{ print $7 }' | sed 's/;//g')
+    local minor=$(cat $i | grep minor | awk '{ print $7 }' | sed 's/;//g')
+    local micro=$(cat $i | grep micro | awk '{ print $7 }' | sed 's/;//g')
+    echo $(basename $(dirname $i))"-"$major.$minor.$micro
+done
