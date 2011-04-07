@@ -28,11 +28,16 @@ def extract_name(core_path):
 
     return core_name_parts[0]
 
+def split_versioned_name(app_name):
+    return app_name.rsplit('-', 1)
+
 def find_scratchhost_binary(app_name):
     "Returns the path to the binary on scratchhost if present, otherwise None"
-    bin_path = op.join("/net/scratchhost/export/builds/", app_name)
-    if op.exists(bin_path):
-        return bin_path
+    name, version = split_versioned_name(app_name)
+    bin_path = "/net/scratchhost/export/builds/*" + name + "*-" + version
+    scratchList = glob.glob(bin_path)
+    if len(bin_path) and op.exists(scratchList[0]):
+        return scratchList[0]
 
     return None
 
@@ -203,6 +208,12 @@ if not chosenBinary:
                 print >> sys.stderr, "Found unsuitable candidate: %s" % candidate
                 print >> sys.stderr, "Candidate either didn't exist or was a directory."
             sys.exit(1)
+
+if name_contains_version(op.basename(chosenBinary)):
+    # First try looking on scratchhost for the official unstripped binary.
+    scratchhost_binary = find_scratchhost_binary(op.basename(chosenBinary))
+    if scratchhost_binary:
+        chosenBinary = scratchhost_binary
 
 # A script runs periodically that changes the group for cores in /var/core
 # to be corefans instead of root, but we can't trust it's configured correctly
