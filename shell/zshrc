@@ -27,8 +27,8 @@ source $ZDOTDIR/etc/shell/zsh_util
 
 if [[ $(uname -s) = "Linux" ]]; then
     cd ~/etc
-    redo/redo all
-    cd -
+    redo/redo all > ~/.redolog 2>&1
+    cd - > /dev/null
 fi
 
 local opt_location=/export/home/$LOGNAME/opt

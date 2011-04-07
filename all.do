@@ -1,1 +1,1 @@
-redo xmonad/lib/PickBrowser.hs
+redo xmonad/lib/PickBrowser.hs > ~/.pickbrowserlog 2>&1
