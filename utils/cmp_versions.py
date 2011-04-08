@@ -48,7 +48,7 @@ if len(first) != 3:
     sys.exit(1)
 
 if len(second) != 3:
-    print >>sys.stderr, "Malformatted version string in first file."
+    print >>sys.stderr, "Malformatted version string in second file."
     sys.exit(1)
 
 first = [int(i) for i in first]
