@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-real_loc=`cat $HOME/etc/real_locations/svcadm`
+real_loc=$(cat $HOME/etc/real_locations/$(hostname)/svcadm)
 
 cmd=("PYTHONPATH=$HOME/etc/python python " \
     "$HOME/etc/utils/ctrl-c-handler.py " \

@@ -23,12 +23,12 @@ fi
 # locations of different utilities.
 export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
 
-if [[ ! -a $HOME/etc/real_locations ]]; then
-    mkdir $HOME/etc/real_locations
+if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
+    mkdir $HOME/etc/real_locations/$(hostname)
 fi
 
-which gdb > $HOME/etc/real_locations/gdb
-which svcadm > $HOME/etc/real_locations/svcadm
+which gdb > $HOME/etc/real_locations/$(hostname)/gdb
+which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
 
 # OK, now put it back in.
 if [[ -d $ZDOTDIR/etc/bin ]]; then

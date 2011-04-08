@@ -1,6 +1,6 @@
 #!/bin/sh
 
-real_loc=`cat $HOME/etc/real_locations/gdb`
+real_loc=$(cat $HOME/etc/real_locations/$(hostname)/gdb)
 cmd="$HOME/etc/utils/trapper.py '(gdb)' $real_loc $@"
 
 echo "Starting uninterruptible gdb. See file $0."
