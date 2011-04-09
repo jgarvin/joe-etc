@@ -6,7 +6,10 @@
 
 # Load tradelink preference
 . `dirname $0`/util
-. `dirname $0`/tlsh
+
+if [[ -d /opt/tradelink ]]; then
+    . `dirname $0`/tlsh
+fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
