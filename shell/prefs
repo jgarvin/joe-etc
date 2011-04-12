@@ -71,7 +71,19 @@ if which htop > /dev/null; then
     alias top='htop'
 fi
 
+if grep --version &> /dev/null | grep GNU &> /dev/null
+then
+    alias grep='grep --color=auto'
+fi
+
+if ls --version &> /dev/null | grep GNU &> /dev/null
+then
+    alias ls='ls --color=auto'
+fi
+
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
+
+
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C -X"
