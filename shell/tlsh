@@ -94,12 +94,6 @@ then
 	alias awk='gawk'
 fi
 
-if which gless &> /dev/null # Use GNU awk if available
-then
-    # The -R preserves color when piping to less, awesome.
-	alias less='gless -R'
-fi
-
 if which gsed &> /dev/null # Use GNU sed if available
 then
 	alias sed='gsed'
