@@ -66,6 +66,9 @@
 (require 'tramp)
 
 (require 'ido)
+;; Without this, when running emacs as sudo .ido.last will become
+;; root owned. Super annoying.
+(setq ido-save-directory-list-file (concat "~/.ido." (getenv "LOGNAME") ".last"))
 (ido-mode t)
 (setq ido-enable-flex-matching t)
 ;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
