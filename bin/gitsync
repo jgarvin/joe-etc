@@ -9,10 +9,10 @@ if which git > /dev/null; then
 	if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
 		oldpwd=$PWD
 		cd ~/etc
-		if git fetch > ~/.gitsynclog 2>&1; then
+		if git fetch; then
 			date | awk '{ print $2$3 }' > ~/.gitsyncdate
 		else
-			echo "Error syncing config with git. Check $HOME/.gitsynclog." >2
+			echo "Unable to sync." > 2
 		fi
 		cd $oldpwd
 	fi

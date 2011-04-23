@@ -3,6 +3,20 @@
 # Yes, this is terrible
 xhost + > /dev/null 2>&1
 
+local opt_location=/export/home/$LOGNAME/opt
+
+if [[ -d $opt_location/bin ]]; then
+    export PATH=$PATH:$opt_location/bin
+fi
+
+if [[ -d $opt_location/lib ]]; then
+    export LD_LIBRARY_PATH=$opt_location/lib
+fi
+
+if [[ -d $opt_location/share/man ]]; then
+    export MANPATH=$MANPATH:$opt_location/share/man
+fi
+
 # Need to run as ksh to work correctly
 if [[ `uname -s` = "SunOS" ]]; then
     if [[ -a $HOME/.profile ]]; then

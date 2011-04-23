@@ -25,7 +25,7 @@ export HISTFILE=~/.zhistory
 source $ZDOTDIR/etc/shell/prefs
 
 # Apply zsh specific utils
-hesource $ZDOTDIR/etc/shell/zsh_util
+source $ZDOTDIR/etc/shell/zsh_util
 
 if [[ $(uname -s) = "Linux" ]]; then
     cd ~/etc
@@ -48,7 +48,9 @@ if [[ -d $opt_location/share/man ]]; then
 fi
 
 # Sync configuration with github every login.
-gitsync > ~/.gitsynclog 2>&1 &
+if ! gitsync > ~/.gitsynclog 2>&1; then
+    echo "Error syncing git. See ~/.gitsynclog."
+fi &
 
 # if [[ -a $HOME/etc/cron/$(hostname).cron ]]; then
 #     crontab $HOME/etc/cron/$(hostname).cron
