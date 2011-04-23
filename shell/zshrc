@@ -1,7 +1,3 @@
-##########################################
-#####    zsh specific preferences    #####
-##########################################
-
 export SHELL=`which zsh`
 
 export REPORTTIME=10
@@ -19,6 +15,8 @@ if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
 fi
 
+export HISTFILE=~/.zhistory
+
 # Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
 
@@ -31,19 +29,12 @@ if [[ $(uname -s) = "Linux" ]]; then
     cd - > /dev/null
 fi
 
-local opt_location=/export/home/$LOGNAME/opt
+# Sync configuration with github every login.
+if ! gitsync > ~/.gitsynclog 2>&1; then
+    echo "Error syncing git. See ~/.gitsynclog."
+fi &
 
-if [[ -d $opt_location/bin ]]; then
-    export PATH=$PATH:$opt_location/bin
-fi
-
-if [[ -d $opt_location/lib ]]; then
-    export LD_LIBRARY_PATH=$opt_location/lib
-fi
-
-if [[ -d $opt_location/share/man ]]; then
-    export MANPATH=$MANPATH:$opt_location/share/man
-fi
+echo "$(date) $(hostname) $LOGNAME" >> ~/.shell_log
 
 cdr()
 {
@@ -52,27 +43,9 @@ cdr()
     cd $(unbuffer find . -name "*$1*" -type d | head -1)
 }
 
-# Sync configuration with git once a day.
-if [[ "$LOGNAME" = "$(basename $ZDOTDIR)" ]]; then
-    if which git > /dev/null; then
-	    if [[ ! -a ~/.gitsyncdate ]]; then
-		    touch ~/.gitsyncdate
-	    fi
-
-	    if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
-		    oldpwd=$PWD
-		    cd ~/etc
-		    if git fetch > ~/.gitsynclog 2>&1; then
-			    date | awk '{ print $2$3 }' > ~/.gitsyncdate
-		    else
-			    echo "Error syncing config with git. Check $HOME/.gitsynclog."
-		    fi
-		    cd $oldpwd
-	    fi
-    else
-	    echo "Couldn't update config, git isn't in \$PATH."
-    fi
-fi
+# if [[ -a $HOME/etc/cron/$(hostname).cron ]]; then
+#     crontab $HOME/etc/cron/$(hostname).cron
+# fi
 
 ################################################################################
 # History settings
@@ -90,71 +63,6 @@ export SAVEHIST=100000
 setopt inc_append_history
 
 ###############################################################################
-# vcs_info settings
-###############################################################################
-# comment out until I find where to get this
-#autoload -Uz vcs_info && vcs_info
-
-# Enable git cvs and svn magic
-zstyle ':vcs_info:*' enable git cvs svn darcs hg
-
-_vcs_fmt_action="${BLD}${MAG}[${CYA}%b${NOR}-${BLD}${WHT}%a${MAG}]${NOR}"
-_vcs_fmt_branch="${BLD}${MAG}[${CYA}%b${MAG}]${NOR}"
-_vcs_fmt_branch_svn="${CYA}%b${RED}:${YLW}%r${NOR}"
-_vcs_fmt_type="${BLD}${MAG}(${GRN}%s${MAG})${NOR}"
-
-# CVS formats
-zstyle ':vcs_info:cvs:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:cvs:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Git formats
-zstyle ':vcs_info:git:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:git:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Hg formats
-zstyle ':vcs_info:hg:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:hg:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Git-svn formats
-zstyle ':vcs_info:git-svn:*' branchformat ${_vcs_fmt_branch_svn}
-zstyle ':vcs_info:git-svn:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:git-svn:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Darcs formats
-zstyle ':vcs_info:darcs:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:darcs:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# SVN-alike formats
-zstyle ':vcs_info:svn:*' branchformat ${_vcs_fmt_branch_svn}
-zstyle ':vcs_info:svn:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:svn:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-
-###############################################################################
 # misc zsh settings
 ###############################################################################
 
@@ -168,6 +76,7 @@ setopt completealiases       # Treat aliases as commands
 setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
 setopt COMPLETE_IN_WORD      # allow completion in the middle of a word
+setopt extended_glob         # Lets you negate patterns, e.g. all non .c files: ^*.c
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -184,12 +93,9 @@ zsh-mime-setup
 # Give some convenient shortcuts for pushing and popping folder stack
 alias -r b='pushd +1 > /dev/null'
 alias -r f='pushd -0 > /dev/null'
-
 alias -r recent='ls -l -r --sort=time'
-alias -r e='emacsclient -n -c'
 
 # allow tab completion in the middle of a word
-
 alias l.='ls -d .*'
 alias -r up="cd .."
 alias -r upup="cd ../.."
@@ -227,10 +133,6 @@ extract () {
     else
         echo "'$1' is not a valid file"
     fi
-}
-
-alarm() {
-    echo 'xmessage $1' | at $2
 }
 
 ################################################################################
@@ -338,16 +240,6 @@ function precmd {
 
 }
 
-
-setopt extended_glob
-# preexec () {
-#     if [[ "$TERM" == "screen" ]]; then
-# 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
-# 	echo -n "\ek$CMD\e\\"
-#     fi
-# }
-
-
 setprompt () {
     ###
     # Need this so the prompt will work.
@@ -451,8 +343,7 @@ if [ "$TERM" = "dumb" ]
 then
   unsetopt zle
   unsetopt prompt_cr
-  #unsetopt prompt_subst
-  setopt prompt_subst
+  unsetopt prompt_subst
   unfunction precmd
   unfunction preexec
   unfunction setprompt
