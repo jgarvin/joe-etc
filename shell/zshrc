@@ -36,6 +36,13 @@ fi &
 
 echo "DATE=$(date) HOST=$(hostname) USER=$LOGNAME TERM=$TERM" >> ~/.shell_log
 
+cdr()
+{
+    # Have to run with unbuffer to make sure that it stops as
+    # soon as it gets the first result.
+    cd $(unbuffer find . -name "*$1*" -type d | head -1)
+}
+
 # if [[ -a $HOME/etc/cron/$(hostname).cron ]]; then
 #     crontab $HOME/etc/cron/$(hostname).cron
 # fi
