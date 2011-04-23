@@ -146,6 +146,7 @@ if name_contains_version(chosenCoreName):
     # First try looking on scratchhost for the official unstripped binary.
     scratchhost_binary = find_scratchhost_binary(chosenCoreName)
     if scratchhost_binary:
+        print "Found corresponding binary on scratchhost."
         chosenBinary = scratchhost_binary
 
 if not chosenBinary:
