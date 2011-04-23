@@ -2,7 +2,6 @@
 
 setup_symlink()
 {
-    echo "Creating $0 for $1"
     if [[ -a $1 ]]; then
         ln -sf $1 $2
     fi
