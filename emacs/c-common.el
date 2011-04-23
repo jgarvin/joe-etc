@@ -48,6 +48,14 @@
 (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
 
+;; Prefer 4-space tabs
+(setq c-default-style "bsd")
+(setq-default c-basic-offset 4)
+(setq-default indent-tabs-mode nil)
+(setq default-tab-width 4)
+(setq tab-width 4)
+(c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
+
 ;; TODO: Make this automatic for new .h files
 (defun ff/headerize ()
   "Adds the #define HEADER_H, etc."

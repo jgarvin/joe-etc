@@ -131,9 +131,6 @@
 ;; Scroll 1 line at a time
 (setq scroll-step 1)
 
-;; God, the emacs people do think of everything
-;;(mouse-avoidance-mode 'jump)
-
 ;; A more useful C-a
 (defun beginning-or-indentation (&optional n)
   "Move cursor to beginning of this line or to its indentation.
@@ -164,14 +161,6 @@
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
-
-;; Prefer 4-space tabs
-(setq c-default-style "bsd")
-(setq-default c-basic-offset 4)
-(setq-default indent-tabs-mode nil)
-(setq default-tab-width 4)
-(setq tab-width 4)
-(c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
 
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
