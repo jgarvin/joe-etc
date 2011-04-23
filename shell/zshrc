@@ -339,7 +339,7 @@ $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
 }
 
 # To help emacs tramp mode, all the fancy terminal stuff confuses it
-if [ "$TERM" = "dumb" ]
+if [[ "$TERM" = "dumb" || "$TERM" = "" ]]
 then
   unsetopt zle
   unsetopt prompt_cr
