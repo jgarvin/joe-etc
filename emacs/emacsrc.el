@@ -27,8 +27,11 @@
 ;; Enable debugging
 (toggle-debug-on-error)
 
-;; When remotely logging in, need to remap alt for emacs keybindings to work
 (when (getenv "DISPLAY")
+  ;; Make emacs use the normal clipboard
+  (setq x-select-enable-clipboard t)
+  (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+  ;; When remotely logging in, need to remap alt for emacs keybindings to work
   (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
 	(setq x-alt-keysym 'meta)))
 
@@ -117,10 +120,6 @@
 
 ;; when on a TAB, the cursor has the TAB length
 (setq-default x-stretch-cursor t)
-
-;; Make emacs use the normal clipboard
-(setq x-select-enable-clipboard t)
-(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; Show column number in the mode line
 (column-number-mode 1)
