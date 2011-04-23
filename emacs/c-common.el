@@ -42,3 +42,60 @@
 
 ;; Don't indent whole files because they're in a namespace block
 (c-set-offset 'innamespace 0)
+
+(setq c-hungry-delete-key t)
+(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
+(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
+(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
+
+;; TODO: Make this automatic for new .h files
+(defun ff/headerize ()
+  "Adds the #define HEADER_H, etc."
+  (interactive)
+  (let ((flag-name (replace-regexp-in-string
+                    "[\. \(\)]" "_"
+                    (upcase (file-name-nondirectory (buffer-name))))))
+    (goto-char (point-max))
+    (insert "\n#endif\n")
+    (goto-char (point-min))
+    (insert (concat "#ifndef " flag-name "\n"))
+    (insert (concat "#define " flag-name "\n"))
+    )
+  )
+
+;; Run makefile, or if there isn't one
+(defun smart-compile()
+  (if (or (file-exists-p "makefile")
+		  (file-exists-p "Makefile")
+		  (file-exists-p "../Makefile"))
+	  (compile "make -k -j2")
+	(if (file-expand-wildcards "*.tc")
+		(compile "tlmake")
+	  (compile (concat
+				"make -k -j2 "
+				(file-name-sans-extension
+				 (file-name-nondirectory buffer-file-name)))))))
+
+
+(defun ff/fast-compile ()
+  "Compiles without asking anything."
+  (interactive)
+  (let ((compilation-read-command nil))
+    (smart-compile)))
+
+(defun tlmake-install ()
+  (interactive)
+  (compile "tlmake install"))
+
+(define-key global-map [f9] 'ff/fast-compile)
+(define-key global-map [f10] 'tlmake-install)
+(defun list-all-subfolders (folder)
+  (let ((folder-list (list folder)))
+	(dolist (subfolder (directory-files folder))
+	  (let ((name (concat folder "/" subfolder)))
+		(when (and (file-directory-p name)
+				   (not (equal subfolder ".."))
+				   (not (equal subfolder ".")))
+		  (set 'folder-list (append folder-list (list name))))))
+  folder-list))
+

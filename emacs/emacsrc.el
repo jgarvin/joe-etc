@@ -38,11 +38,6 @@
 	  `((".*" ,"~/backup" t)))
 (setq tramp-backup-directory-alist backup-directory-alist)
 
-(setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
-
-(load-file "~/etc/color-theme-6.6.0/color-theme.el")
-(load-file "~/etc/breadcrumb.el")
-
 (add-to-list 'load-path "~/etc/drag-stuff")
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
@@ -75,6 +70,7 @@
 (setq ido-default-buffer-method 'selected-window)
 (setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii")))
 
+(load-file "~/etc/breadcrumb.el")
 (require 'breadcrumb)
 (setq bc-bookmark-limit 10000)
 (global-set-key (kbd "C-S-SPC")         'bc-set) ;; Shift-SPACE for set bookmark
@@ -88,6 +84,7 @@
   (add-to-list 'default-frame-alist '(font . "Consolas-11")))
 
 ;; Color theme
+(add-to-list 'load-path "~/etc/color-theme-6.6.0")
 (require 'color-theme)
 (setq color-theme-is-global t)
 (color-theme-initialize)
@@ -272,13 +269,6 @@
 ;; If I'm searching and I hit backspace, I mean backspace dammit.
 (define-key isearch-mode-map '[backspace] 'isearch-delete-char)
 
-(add-hook 'c-mode-common-hook
-		  (lambda ()
-			(setq c-hungry-delete-key t)
-			(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
-			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
-			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
-
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
   (interactive)
@@ -288,57 +278,6 @@
 
 ;; Close windows, not emacs.
 (global-set-key "\C-x\C-c" 'close-frame-or-exit)
-
-;; TODO: Make this automatic for new .h files
-(defun ff/headerize ()
-  "Adds the #define HEADER_H, etc."
-  (interactive)
-  (let ((flag-name (replace-regexp-in-string
-                    "[\. \(\)]" "_"
-                    (upcase (file-name-nondirectory (buffer-name))))))
-    (goto-char (point-max))
-    (insert "\n#endif\n")
-    (goto-char (point-min))
-    (insert (concat "#ifndef " flag-name "\n"))
-    (insert (concat "#define " flag-name "\n"))
-    )
-  )
-
-;; Run makefile, or if there isn't one
-(defun smart-compile()
-  (if (or (file-exists-p "makefile")
-		  (file-exists-p "Makefile")
-		  (file-exists-p "../Makefile"))
-	  (compile "make -k -j2")
-	(if (file-expand-wildcards "*.tc")
-		(compile "tlmake")
-	  (compile (concat
-				"make -k -j2 "
-				(file-name-sans-extension
-				 (file-name-nondirectory buffer-file-name)))))))
-
-
-(defun ff/fast-compile ()
-  "Compiles without asking anything."
-  (interactive)
-  (let ((compilation-read-command nil))
-    (smart-compile)))
-
-(defun tlmake-install ()
-  (interactive)
-  (compile "tlmake install"))
-
-(define-key global-map [f9] 'ff/fast-compile)
-(define-key global-map [f10] 'tlmake-install)
-(defun list-all-subfolders (folder)
-  (let ((folder-list (list folder)))
-	(dolist (subfolder (directory-files folder))
-	  (let ((name (concat folder "/" subfolder)))
-		(when (and (file-directory-p name)
-				   (not (equal subfolder ".."))
-				   (not (equal subfolder ".")))
-		  (set 'folder-list (append folder-list (list name))))))
-  folder-list))
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -429,9 +368,9 @@
 	(message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
-;; AWESOMENESS
+;; lets you delete camelcase words one at a time
 (require 'cc-mode)
-(c-subword-mode 1) ;; lets you delete camelcase words one at a time
+(c-subword-mode 1)
 
 (defun my-delete-leading-whitespace (start end)
   "Delete whitespace at the beginning of each line in region."
