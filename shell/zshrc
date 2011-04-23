@@ -67,6 +67,7 @@ setopt completealiases       # Treat aliases as commands
 setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
 setopt COMPLETE_IN_WORD      # allow completion in the middle of a word
+setopt extended_glob         # Lets you negate patterns, e.g. all non .c files: ^*.c
 
 # system beep is irritating for tab completion
 unsetopt beep
@@ -236,16 +237,6 @@ function precmd {
     fi
 
 }
-
-
-setopt extended_glob
-# preexec () {
-#     if [[ "$TERM" == "screen" ]]; then
-# 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
-# 	echo -n "\ek$CMD\e\\"
-#     fi
-# }
-
 
 setprompt () {
     ###
