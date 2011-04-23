@@ -84,12 +84,9 @@ zsh-mime-setup
 # Give some convenient shortcuts for pushing and popping folder stack
 alias -r b='pushd +1 > /dev/null'
 alias -r f='pushd -0 > /dev/null'
-
 alias -r recent='ls -l -r --sort=time'
-alias -r e='emacsclient -n -c'
 
 # allow tab completion in the middle of a word
-
 alias l.='ls -d .*'
 alias -r up="cd .."
 alias -r upup="cd ../.."
@@ -127,10 +124,6 @@ extract () {
     else
         echo "'$1' is not a valid file"
     fi
-}
-
-alarm() {
-    echo 'xmessage $1' | at $2
 }
 
 ################################################################################
