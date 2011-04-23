@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+# Sync configuration with git once a day.
+if which git > /dev/null; then
+	if [[ ! -a ~/.gitsyncdate ]]; then
+		touch ~/.gitsyncdate
+	fi
+
+	if test "$(date | awk '{ print $2$3 }')" != "$(cat ~/.gitsyncdate)"; then
+		oldpwd=$PWD
+		cd ~/etc
+		if git fetch > ~/.gitsynclog 2>&1; then
+			date | awk '{ print $2$3 }' > ~/.gitsyncdate
+		else
+			echo "Error syncing config with git. Check $HOME/.gitsynclog." >2
+		fi
+		cd $oldpwd
+	fi
+else
+	echo "Couldn't update config, git isn't in \$PATH." >2
+fi
