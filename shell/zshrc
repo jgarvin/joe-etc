@@ -34,7 +34,7 @@ if ! gitsync > ~/.gitsynclog 2>&1; then
     echo "Error syncing git. See ~/.gitsynclog."
 fi &
 
-echo "$(date) $(hostname) $LOGNAME" >> ~/.shell_log
+echo "DATE=$(date) HOST=$(hostname) USER=$LOGNAME TERM=$TERM" >> ~/.shell_log
 
 # if [[ -a $HOME/etc/cron/$(hostname).cron ]]; then
 #     crontab $HOME/etc/cron/$(hostname).cron
