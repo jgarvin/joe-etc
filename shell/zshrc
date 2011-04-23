@@ -1,7 +1,3 @@
-##########################################
-#####    zsh specific preferences    #####
-##########################################
-
 export SHELL=`which zsh`
 
 export REPORTTIME=10
