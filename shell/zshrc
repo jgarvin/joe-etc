@@ -45,6 +45,13 @@ if [[ -d $opt_location/share/man ]]; then
     export MANPATH=$MANPATH:$opt_location/share/man
 fi
 
+cdr()
+{
+    # Have to run with unbuffer to make sure that it stops as
+    # soon as it gets the first result.
+    cd $(unbuffer find . -name "*$1*" -type d | head -1)
+}
+
 # Sync configuration with git once a day.
 if [[ "$LOGNAME" = "$(basename $ZDOTDIR)" ]]; then
     if which git > /dev/null; then
