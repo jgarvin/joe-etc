@@ -24,6 +24,7 @@
 ;; TODO: hide-lines should put something in the status bar to indicate things are hidden
 ;; TODO: executing show-all-invisible should only reveal lines in the current buffer, not all
 
+;; Enable debugging
 (toggle-debug-on-error)
 
 ;; When remotely logging in, need to remap alt for emacs keybindings to work
@@ -38,13 +39,6 @@
 (setq tramp-backup-directory-alist backup-directory-alist)
 
 (setq load-path (cons "~/etc/color-theme-6.6.0" load-path))
-(if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
-	(load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
-
-(add-to-list 'load-path "~/etc/autopair-read-only") ;; comment if autopair.el is in standard load path
-(require 'autopair)
-(autopair-global-mode) ;; enable autopair in all buffers
-;;(set-variable autopair-autowrap t)
 
 (load-file "~/etc/color-theme-6.6.0/color-theme.el")
 (load-file "~/etc/breadcrumb.el")
@@ -64,34 +58,10 @@
   (yank)
   (call-interactively 'indent-region))
 
-(add-hook 'c-mode-common-hook
-		  (lambda ()
-			(local-set-key (kbd "C-y") 'yank-and-indent)))
-
 (load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
 (global-undo-tree-mode)
 (define-key undo-tree-map (kbd "C-/") nil)
-
-(defun android-log ()
-  (terminal-emulator "android_log" "zsh" '("-c" "adb" "logcat")))
-
-;; android-mode
-(if (file-exists-p "~/opt/android-mode")
-	(progn
-	  (add-to-list 'load-path "~/opt/android-mode")
-	  (require 'android-mode)
-	  (setq android-mode-sdk-dir (getenv "ANDROID_PATH"))
-	  (android-log)))
-
-(defun android-debug ()
-  (progn
-	(setq gud-jdb-use-classpath t)
-	(setq gud-jdb-classpath (format "%s/src:%s/bin/classes" (android-root) (android-root)))
-	(setq gud-jdb-sourcepath (format "%s/src" (android-root)))
-	)
-  (jdb "jdb -attach localhost:8700")
-  )
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
@@ -112,9 +82,6 @@
 (global-set-key [(control meta k)]      'bc-next) ;; Shift-M-j for jump to next
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
-
-;; Let us connect with emacs-client
-(toggle-debug-on-error)
 
 (if (> (display-pixel-width) 1280)
 	(add-to-list 'default-frame-alist '(font . "Consolas-12"))
@@ -194,54 +161,12 @@
 ;; Don't use alt-x, use C-x C-m, alt is a pain
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 
-;; Prefer to code in Python 3.0, the future :D
-(setq-default py-python-command "python3")
-
 ;; Emacs won't load shell-script-mode for zsh automatically
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
-
-;; Generate tags whenever we open a C/C++ source file
-(add-hook 'c-mode-common-hook
-		  (lambda ()
-			(require 'gtags)
-			(gtags-mode t)
-			(djcb-gtags-create-or-update)))
-
-;; Function to generate tags with GNU Global
-;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
-(defun djcb-gtags-create-or-update ()
-  "create or update the gnu global tag file"
-  (interactive)
-  (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
-    (let ((olddir default-directory)
-          (topdir (read-directory-name
-                    "gtags: top of source tree:" default-directory)))
-	  (when (not (string= topdir ""))
-		  (progn
-			(cd topdir)
-			(start-process-shell-command "gtags create"
-										 "gtags_buffer"
-										 "~/etc/utils/remote_launch gtags -q && echo 'created tagfile'")
-			(cd olddir)))) ; restore
-    ;;  tagfile already exists; update it
-    (start-process-shell-command "gtags update"
-								 "gtags_buffer"
-								 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
-
-;; Rebind the normal find tag functions to use the GNU global versions
-(add-hook 'gtags-mode-hook
-  (lambda()
-    (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-    (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
-
-;; Append a new line to files so GCC shuts up
-(add-hook 'c-mode-common-hook
-  (lambda ()
-    (setq require-final-newline t)))
 
 ;; Prefer 4-space tabs
 (setq c-default-style "bsd")
@@ -332,9 +257,6 @@
           (run-at-time 0.5 nil 'delete-windows-on buf)
           (message "NO COMPILATION ERRORS!"))))
 
-;; Don't indent whole files because they're in a namespace block
-(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
-
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
@@ -344,8 +266,6 @@
 	(indent-according-to-mode)
 	(newline-and-indent)))
 
-;; (global-set-key (kbd "RET") 'indent-newline-indent)
-;; (global-set-key (kbd "C-m") 'indent-newline-indent)
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
@@ -359,7 +279,6 @@
 			(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 			(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)))
 
-
 (defun close-frame-or-exit ()
   "Tries to close the current frame, if it's the only one left just exits."
   (interactive)
@@ -367,6 +286,7 @@
 	  (save-buffers-kill-emacs)
 	(delete-frame)))
 
+;; Close windows, not emacs.
 (global-set-key "\C-x\C-c" 'close-frame-or-exit)
 
 ;; TODO: Make this automatic for new .h files
@@ -512,7 +432,6 @@
 ;; AWESOMENESS
 (require 'cc-mode)
 (c-subword-mode 1) ;; lets you delete camelcase words one at a time
-(require 'ack)
 
 (defun my-delete-leading-whitespace (start end)
   "Delete whitespace at the beginning of each line in region."
@@ -521,3 +440,11 @@
     (if (not (bolp)) (forward-line 1))
     (delete-whitespace-rectangle (point) end nil)))
 (global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
+
+(add-hook 'c-mode-common-hook
+		  (lambda ()
+            (load-file "~/etc/emacs/c-common.el")))
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            (load-file "~/etc/emacs/java.el")))
