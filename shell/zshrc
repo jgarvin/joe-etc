@@ -33,20 +33,6 @@ if [[ $(uname -s) = "Linux" ]]; then
     cd - > /dev/null
 fi
 
-local opt_location=/export/home/$LOGNAME/opt
-
-if [[ -d $opt_location/bin ]]; then
-    export PATH=$PATH:$opt_location/bin
-fi
-
-if [[ -d $opt_location/lib ]]; then
-    export LD_LIBRARY_PATH=$opt_location/lib
-fi
-
-if [[ -d $opt_location/share/man ]]; then
-    export MANPATH=$MANPATH:$opt_location/share/man
-fi
-
 # Sync configuration with github every login.
 if ! gitsync > ~/.gitsynclog 2>&1; then
     echo "Error syncing git. See ~/.gitsynclog."
@@ -70,71 +56,6 @@ export SAVEHIST=100000
 
 # append command to history file once executed
 setopt inc_append_history
-
-###############################################################################
-# vcs_info settings
-###############################################################################
-# comment out until I find where to get this
-#autoload -Uz vcs_info && vcs_info
-
-# Enable git cvs and svn magic
-zstyle ':vcs_info:*' enable git cvs svn darcs hg
-
-_vcs_fmt_action="${BLD}${MAG}[${CYA}%b${NOR}-${BLD}${WHT}%a${MAG}]${NOR}"
-_vcs_fmt_branch="${BLD}${MAG}[${CYA}%b${MAG}]${NOR}"
-_vcs_fmt_branch_svn="${CYA}%b${RED}:${YLW}%r${NOR}"
-_vcs_fmt_type="${BLD}${MAG}(${GRN}%s${MAG})${NOR}"
-
-# CVS formats
-zstyle ':vcs_info:cvs:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:cvs:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Git formats
-zstyle ':vcs_info:git:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:git:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Hg formats
-zstyle ':vcs_info:hg:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:hg:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Git-svn formats
-zstyle ':vcs_info:git-svn:*' branchformat ${_vcs_fmt_branch_svn}
-zstyle ':vcs_info:git-svn:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:git-svn:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# Darcs formats
-zstyle ':vcs_info:darcs:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:darcs:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
-# SVN-alike formats
-zstyle ':vcs_info:svn:*' branchformat ${_vcs_fmt_branch_svn}
-zstyle ':vcs_info:svn:*' actionformats \
-        ${_vcs_fmt_action} \
-        ${_vcs_fmt_type}
-zstyle ':vcs_info:svn:*' formats \
-        ${_vcs_fmt_branch} \
-        ${_vcs_fmt_type}
-
 
 ###############################################################################
 # misc zsh settings
