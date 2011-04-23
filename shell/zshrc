@@ -34,6 +34,8 @@ if ! gitsync > ~/.gitsynclog 2>&1; then
     echo "Error syncing git. See ~/.gitsynclog."
 fi &
 
+echo "$(date) $(hostname) $LOGNAME" >> ~/.shell_log
+
 # if [[ -a $HOME/etc/cron/$(hostname).cron ]]; then
 #     crontab $HOME/etc/cron/$(hostname).cron
 # fi
@@ -334,8 +336,7 @@ if [ "$TERM" = "dumb" ]
 then
   unsetopt zle
   unsetopt prompt_cr
-  #unsetopt prompt_subst
-  setopt prompt_subst
+  unsetopt prompt_subst
   unfunction precmd
   unfunction preexec
   unfunction setprompt
