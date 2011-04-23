@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+setup_symlink()
+{
+    echo "Creating $0 for $1"
+    if [[ -a $1 ]]; then
+        ln -sf $1 $2
+    fi
+}
+
+setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
+setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
+setup_symlink $HOME/etc/fonts $HOME/.fonts
+setup_symlink $HOME/etc/gdbinit $HOME/.gdbinit
+setup_symlink $HOME/etc/emacs/emacsrc.el $HOME/.emacs
+setup_symlink $HOME/etc/xmonad $HOME/.xmonad

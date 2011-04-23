@@ -1,3 +1,5 @@
+$HOME/etc/shell/setup_symlinks
+
 export SHELL=`which zsh`
 
 export REPORTTIME=10
