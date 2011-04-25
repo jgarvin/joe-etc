@@ -3,7 +3,8 @@
 setup_symlink()
 {
     if [[ -a $1 ]]; then
-        ln -sf $1 -T $2
+        cd $(dirname $2)
+        ln -sf $1 $(basename $2)
     fi
 }
 
