@@ -43,7 +43,9 @@ import XMonad.Prompt.Shell
 
 import Data.Char
 import XMonad.Layout.SimpleDecoration
-import XMonad.Layout.MultiToggle
+import qualified XMonad.Layout.MultiToggle as MultiToggle
+
+import XMonad.Layout.Magnifier
 
 import PickBrowser
 
@@ -98,7 +100,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_Tab ), sendMessage NextLayout)
 
     -- Toggle decorations
-    , ((modMask,               xK_d ), sendMessage (Toggle DECORATIONS))
+    , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
+
+    -- Toggle zoom
+    , ((modMask,               xK_z ), sendMessage (MultiToggle.Toggle MAGNIFICATION) )
 
     -- Resize viewed windows to the correct size
     , ((modMask,               xK_n     ), refresh)
@@ -218,8 +223,12 @@ main = do
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
 data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
-instance Transformer DECORATIONS Window where
+instance MultiToggle.Transformer DECORATIONS Window where
 		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } ) x)
+
+data MAGNIFICATION = MAGNIFICATION deriving (Read, Show, Eq, Typeable)
+instance MultiToggle.Transformer MAGNIFICATION Window where
+		 transform _ x k = k (magnifiercz 1.2 x)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -243,7 +252,11 @@ defaults editor home_folder browser_name = gnomeConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = mkToggle (single DECORATIONS) $ smartBorders $ avoidStruts $ layoutHook gnomeConfig,
+        layoutHook         = MultiToggle.mkToggle (MultiToggle.single DECORATIONS)
+                             $ MultiToggle.mkToggle (MultiToggle.single MAGNIFICATION)
+                             $ smartBorders
+                             $ avoidStruts
+                             $ layoutHook gnomeConfig,
         manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
         logHook            = ewmhDesktopsLogHook
     }

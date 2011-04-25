@@ -1,3 +1,5 @@
+$HOME/etc/shell/setup_symlinks
+
 export SHELL=`which zsh`
 
 export REPORTTIME=10
@@ -338,14 +340,14 @@ $PR_LIGHT_GREEN%_$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
 }
 
-# To help emacs tramp mode, all the fancy terminal stuff confuses it
+# To help emacs tramp mode and global desktop,
+# turn off the fancy stuff.
 if [[ "$TERM" = "dumb" || "$TERM" = "" ]]
 then
   unsetopt zle
   unsetopt prompt_cr
   unsetopt prompt_subst
   unfunction precmd
-  unfunction preexec
   unfunction setprompt
   PS1='$ '
   PS2='$ '
