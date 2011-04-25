@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Without this I don't get psrinfo
+export PATH=$PATH:/usr/sbin
+export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | awk '{ print $1 }'`

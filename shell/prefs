@@ -1,10 +1,12 @@
 #!/bin/sh
 
-# Load tradelink preference
 . `dirname $0`/util
 
-if [[ -d /opt/tradelink ]]; then
-    . `dirname $0`/tlsh
+# Load OS specific preferences
+if [[ -a `dirname $0`/$(uname -s) ]]; then
+    . `dirname $0`/$(uname -s)
+else
+    echo "No shell preferences found for this OS!" >&2
 fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
@@ -53,16 +55,6 @@ export BROWSER="$ZDOTDIR/etc/bin/launch-my-browser"
 # Newer versions of emacs will autoload emacs if ALTERNATE_EDITOR is empty.
 export EDITOR="$ZDOTDIR/etc/bin/launch-emacs"
 
-if [[ -a /proc/cpuinfo ]]; then
-	# Linux
-	export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
-elif which psrinfo > /dev/null; then
-	# Solaris
-	export MAKEFLAGS="-j"`psrinfo -v | grep virtual | wc -l | awk '{ print $1 }'`
-else
-	echo "Couldn't determine number of CPUs for makeflags!"
-fi
-
 if which htop > /dev/null; then
     alias top='htop'
 fi
@@ -98,3 +90,7 @@ fi
 # Without this OO looks terrible under xmonad
 OOO_FORCE_DESKTOP=gnome
 
+# Load tradelink preference
+if [[ -d /opt/tradelink ]]; then
+    . `dirname $0`/tlsh
+fi

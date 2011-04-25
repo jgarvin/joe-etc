@@ -35,9 +35,6 @@ if [[ `uname -s` = "SunOS" ]]; then
 		    fi
 	    fi
     fi
-
-	# Without this I don't get psrinfo
-	export PATH=$PATH:/usr/sbin
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
@@ -97,7 +94,7 @@ if which ggrep &> /dev/null # Use GNU grep if available
 then
 	alias grep='ggrep --color=auto'
 else
-    if grep --version &> /dev/null | grep GNU &> /dev/null
+    if grep --version 2> /dev/null | grep GNU &> /dev/null
     then
         alias grep='grep --color=auto'
     fi
