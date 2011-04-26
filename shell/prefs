@@ -18,24 +18,6 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	path_prepend /home/udesktop178/joeg/opt/bin
 fi
 
-# Although we haven't added $HOME/etc/bin to our path yet,
-# if we're a subshell we may inherit it. We want to remove
-# it temporarily because we're going to find the 'real'
-# locations of different utilities.
-export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
-
-if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
-    mkdir $HOME/etc/real_locations/$(hostname)
-fi
-
-which gdb > $HOME/etc/real_locations/$(hostname)/gdb
-which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
-
-# OK, now put it back in.
-if [[ -d $ZDOTDIR/etc/bin ]]; then
-	path_prepend $ZDOTDIR/etc/bin
-fi
-
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
@@ -93,4 +75,22 @@ OOO_FORCE_DESKTOP=gnome
 # Load tradelink preference
 if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
+fi
+
+# Although we haven't added $HOME/etc/bin to our path yet,
+# if we're a subshell we may inherit it. We want to remove
+# it temporarily because we're going to find the 'real'
+# locations of different utilities.
+export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
+
+if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
+    mkdir $HOME/etc/real_locations/$(hostname)
+fi
+
+which gdb > $HOME/etc/real_locations/$(hostname)/gdb
+which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
+
+# OK, now put it back in.
+if [[ -d $ZDOTDIR/etc/bin ]]; then
+	path_prepend $ZDOTDIR/etc/bin
 fi
