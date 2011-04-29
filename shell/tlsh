@@ -174,20 +174,6 @@ export PATH=/opt/app/emacs-23.1/bin:$PATH
 #     fi
 # }
 
-# icache_wombat eats all my memory when compiled with multiple CPUs
-tlsh_file_name=$0
-tlmake()
-{
-    disable -f tlmake
-    if [[ `basename $PWD` = "icache_wombat" ]]; then
-        echo "Running with 1 CPU. See $tlsh_file_name"
-        MAKEFLAGS=-j1 tlmake $@
-    else
-        tlmake $@
-    fi
-    enable -f tlmake
-}
-
 tlversion()
 {
     disable -f tlversion

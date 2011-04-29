@@ -51,6 +51,9 @@ then
     alias ls='ls --color=auto'
 fi
 
+# Don't clear the screen when less exits
+alias less='less -X'
+
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
@@ -89,6 +92,7 @@ fi
 
 which gdb > $HOME/etc/real_locations/$(hostname)/gdb
 which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
+which tlmake > $HOME/etc/real_locations/$(hostname)/tlmake
 
 # OK, now put it back in.
 if [[ -d $ZDOTDIR/etc/bin ]]; then

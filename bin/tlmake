@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+real_loc=$(cat $HOME/etc/real_locations/$(hostname)/tlmake)
+
+# icache_wombat eats all my memory when compiled with multiple CPUs
+
+tlsh_file_name=$0
+if [[ `basename $PWD` = "icache_wombat" ]]; then
+    num_cpus_to_use=1
+    echo "Running with $num_cpus_to_use CPUs. See $tlsh_file_name"
+    MAKEFLAGS=-j$num_cpus_to_use $real_loc $@
+else
+    $real_loc $@
+fi
