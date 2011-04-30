@@ -53,3 +53,4 @@ haskell-mode
 nautilus-open-terminal
 python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
+calibre
