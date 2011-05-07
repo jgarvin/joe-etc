@@ -1,0 +1,68 @@
+:;exec emacs --quick --no-init-file --name 'ido-prompt' -g 80x1 --load $0 $*
+
+(set-background-color "black")
+(set-foreground-color "green")
+
+(set-frame-name "ido-prompt")
+
+(defun write-string-to-file (string file)
+  (with-temp-buffer
+    (insert string)
+    (when (file-writable-p file)
+      (write-region (point-min)
+		    (point-max)
+		    file))))
+
+(setq args-to-parse (nthcdr 3 command-line-args))
+
+(setq question '())
+(setq choices '())
+(setq output-file '())
+(setq current-mode 'question)
+
+(while args-to-parse
+  (let ((arg (car args-to-parse)))
+    (unless
+	(cond
+	 ((string-equal arg "--question")
+	  (setq current-mode 'question))
+	 ((string-equal arg "--choices")
+	  (setq current-mode 'choices))
+	 ((string-equal arg "--output-file")
+	  (setq current-mode 'output-file)))
+      (set current-mode (append (eval current-mode) (list arg)))))
+  (setq args-to-parse (cdr args-to-parse)))
+
+;; (write-string-to-file
+;;  (mapconcat 'identity question " ") "/tmp/question")
+
+;; (write-string-to-file
+;;  (mapconcat 'identity choices " ") "/tmp/choices")
+
+(setq question (mapconcat 'identity question " "))
+(setq output-file (apply 'concat output-file))
+
+;; disable gui crap
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
+(setq visible-bell t)
+(setq-default mode-line-format nil)
+
+;; load ido mode
+(require 'ido)
+(setq ido-enable-flex-matching t)
+(ido-mode t)
+
+;; setup the window
+(setq resize-mini-windows t)
+(setq max-mini-window-height 1.0)
+
+;; ask the question
+(write-string-to-file
+ (concat
+  (ido-completing-read (concat question ": ") choices) "\n")
+ output-file)
+(kill-emacs)
