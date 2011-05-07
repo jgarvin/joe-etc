@@ -1,0 +1,1 @@
+gconftool-2 --set /desktop/gnome/session/required_components/panel --type string ''

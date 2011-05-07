@@ -1,0 +1,32 @@
+--- config.mk	2007-08-18 01:18:50.000000000 -0500
++++ /tmp/config.mk	2011-04-30 11:56:18.637200987 -0500
+@@ -4,7 +4,7 @@
+ # Customize below to fit your system
+ 
+ # paths
+-PREFIX = /usr/local
++PREFIX = $HOME/etc/opt/dzen
+ MANPREFIX = ${PREFIX}/share/man
+ 
+ X11INC = /usr/X11R6/include
+@@ -19,16 +19,16 @@
+ # Comment  : Add # to the beginning of the respective lines
+ 
+ # Option 1: No Xinerama no XPM
+-LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
+-CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
++#LIBS = -L/usr/lib -lc -L${X11LIB} -lX11
++#CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
+ 
+ # Option 2: No Xinerama with XPM
+ #LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 -lXpm
+ #CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\" -DDZEN_XPM
+ 
+ # Option 3: With Xinerama no XPM
+-#LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 -lXinerama
+-#CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\" -DDZEN_XINERAMA
++LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 -lXinerama
++CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\" -DDZEN_XINERAMA
+ 
+ # Option 4: With Xinerama and XPM
+ #LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 -lXinerama -lXpm
