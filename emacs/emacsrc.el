@@ -164,6 +164,13 @@
        '(("zshrc" . shell-script-mode))
        auto-mode-alist))
 
+;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("ido-prompt" . emacs-lisp-mode))
+       auto-mode-alist))
+
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
 
@@ -372,8 +379,8 @@
 (global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
 
 (add-hook 'c-mode-common-hook
-		  (lambda ()
-            (load-file "~/etc/emacs/c-common.el")))
+	  (lambda ()
+        (load-file "~/etc/emacs/c-common.el")))
 
 (add-hook 'java-mode-hook
           (lambda ()
