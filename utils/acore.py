@@ -38,7 +38,9 @@ def find_scratchhost_binary(app_name):
     name, version = split_versioned_name(app_name)
     bin_path = "/net/scratchhost/export/builds/*" + name + "*-" + version
     scratchList = glob.glob(bin_path)
-    if len(bin_path) and op.exists(scratchList[0]):
+    bin_path = "/net/scratchhost/export/builds/*" + name + "*-" + version + "-unstripped"
+    scratchList.extend(glob.glob(bin_path))
+    if len(scratchList) and op.exists(scratchList[0]):
         return scratchList[0]
 
     return None

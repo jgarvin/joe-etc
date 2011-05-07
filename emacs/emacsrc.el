@@ -366,10 +366,6 @@
 	(message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
-;; lets you delete camelcase words one at a time
-(require 'cc-mode)
-(c-subword-mode 1)
-
 (defun my-delete-leading-whitespace (start end)
   "Delete whitespace at the beginning of each line in region."
   (interactive "*r")
@@ -384,4 +380,8 @@
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (load-file "~/etc/emacs/java.el")))
+            (load "~/etc/emacs/java.el")))
+
+;; lets you delete camelcase words one at a time
+(require 'cc-mode)
+(c-subword-mode 1)

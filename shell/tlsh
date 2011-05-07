@@ -35,9 +35,6 @@ if [[ `uname -s` = "SunOS" ]]; then
 		    fi
 	    fi
     fi
-
-	# Without this I don't get psrinfo
-	export PATH=$PATH:/usr/sbin
 fi
 
 # Try to use .zhistory on local box before resorting to using the network
@@ -97,7 +94,7 @@ if which ggrep &> /dev/null # Use GNU grep if available
 then
 	alias grep='ggrep --color=auto'
 else
-    if grep --version &> /dev/null | grep GNU &> /dev/null
+    if grep --version 2> /dev/null | grep GNU &> /dev/null
     then
         alias grep='grep --color=auto'
     fi
@@ -176,20 +173,6 @@ export PATH=/opt/app/emacs-23.1/bin:$PATH
 #         [[ "$(prtconf | grep Mem | awk '{ print $3 }')" < 4032 ]]
 #     fi
 # }
-
-# icache_wombat eats all my memory when compiled with multiple CPUs
-tlsh_file_name=$0
-tlmake()
-{
-    disable -f tlmake
-    if [[ `basename $PWD` = "icache_wombat" ]]; then
-        echo "Running with 1 CPU. See $tlsh_file_name"
-        MAKEFLAGS=-j1 tlmake $@
-    else
-        tlmake $@
-    fi
-    enable -f tlmake
-}
 
 tlversion()
 {

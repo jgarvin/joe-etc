@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+
+ps_crossplatform()
+{
+    ps aux;
+}
+
+phone()
+{
+    ssh udesktop178 "zsh --interactive -c 'phone $@'"
+}

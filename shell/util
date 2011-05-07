@@ -28,22 +28,6 @@ path_prepend() {
     fi
 }
 
-if test `uname -s` = "Linux"
-then
-	ps_crossplatform()
-	{
-		ps aux;
-	}
-fi
-
-if test `uname -s` = "SunOS"
-then
-	ps_crossplatform()
-	{
-		ps -ef;
-	}
-fi
-
 tsk()
 {
  	# We filter out grep from the list of processes so
