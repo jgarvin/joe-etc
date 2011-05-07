@@ -13,7 +13,13 @@
 		    (point-max)
 		    file))))
 
-(setq args-to-parse (nthcdr 3 command-line-args))
+(setq args-to-parse command-line-args)
+(setq args-to-parse (delete "emacs" args-to-parse))
+(setq args-to-parse (delete "-nw" args-to-parse))
+(setq args-to-parse (delete "--load" args-to-parse))
+(setq args-to-parse (delete "-g" args-to-parse))
+(setq args-to-parse (delete "80x1" args-to-parse))
+(setq args-to-parse (nthcdr 1 args-to-parse))
 
 (setq question '())
 (setq choices '())
