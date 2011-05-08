@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+PYTHONPATH=$HOME/etc/python python \
+    $HOME/etc/utils/ctrl-c-handler.py \
+    build $@
