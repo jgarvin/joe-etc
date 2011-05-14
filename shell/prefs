@@ -48,8 +48,11 @@ fi
 
 if ls --version 2> /dev/null | grep GNU &> /dev/null
 then
-    alias ls='ls --color=auto'
+    alias ls='ls -F --color=auto --group-directories-first'
 fi
+
+# Obey my typos!
+alias -r sl=ls
 
 # Don't clear the screen when less exits
 alias less='less -X'
