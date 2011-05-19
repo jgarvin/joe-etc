@@ -84,7 +84,7 @@ fi
 # if we're a subshell we may inherit it. We want to remove
 # it temporarily because we're going to find the 'real'
 # locations of different utilities.
-export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g)
+export PATH=$(echo $PATH | sed s,/etc/bin,,g)
 
 if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
     mkdir $HOME/etc/real_locations/$(hostname)
