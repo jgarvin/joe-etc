@@ -1,15 +1,18 @@
 export SHELL="bash"
 
 # I prefer to use zsh when available
-if which zsh &> /dev/null
+if [[ ! "$TERM" = "dumb" && ! "$TERM" = "" ]]
 then
-	# This makes sure we don't end up in an endless loop
-	# if somehow the zshrc is configured to exec bash
-	if test "$BASH_LAUNCHED_ZSH" != "Yes"
-	then
-		export BASH_LAUNCHED_ZSH="Yes"
-		exec zsh
-	fi
+    if which zsh &> /dev/null
+    then
+    	# This makes sure we don't end up in an endless loop
+    	# if somehow the zshrc is configured to exec bash
+    	if test "$BASH_LAUNCHED_ZSH" != "Yes"
+    	then
+    		export BASH_LAUNCHED_ZSH="Yes"
+    		exec zsh
+    	fi
+    fi
 fi
 
 # If we must load bash, still load tradelink settings
