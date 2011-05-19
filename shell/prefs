@@ -84,7 +84,7 @@ fi
 # if we're a subshell we may inherit it. We want to remove
 # it temporarily because we're going to find the 'real'
 # locations of different utilities.
-export PATH=$(echo $PATH | sed s,/etc/bin,,g)
+export PATH=$(echo $PATH | sed s,/etc/bin,,g | sed s,/etc/bin/$(uname -s),,g)
 
 if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
     mkdir $HOME/etc/real_locations/$(hostname)
@@ -97,4 +97,6 @@ which tlmake > $HOME/etc/real_locations/$(hostname)/tlmake
 # OK, now put it back in.
 if [[ -d $ZDOTDIR/etc/bin ]]; then
 	path_prepend $ZDOTDIR/etc/bin
+	path_prepend $ZDOTDIR/etc/bin/$(uname -s)
 fi
+

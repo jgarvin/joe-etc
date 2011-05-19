@@ -13,6 +13,8 @@ import popen2
 # TODO: -s to just list cores
 # TODO: Map /opt/tradelink/bin whichVersion scripts to their
 # symlinks in /opt/tradelink/bin/newInst
+# TODO: Search for versions in logfiles (flail integration). Would
+# help with apps whose name is too long.
 
 def extract_name(core_path):
     "Extracts the name of an app from the name of its core filename."
