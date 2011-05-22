@@ -48,7 +48,7 @@ fi
 
 if ls --version 2> /dev/null | grep GNU &> /dev/null
 then
-    alias ls='ls -F --color=auto --group-directories-first'
+    alias ls='ls -F -h --color=auto --group-directories-first'
 fi
 
 # Obey my typos!
@@ -83,23 +83,27 @@ if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
 fi
 
-# Although we haven't added $HOME/etc/bin to our path yet,
-# if we're a subshell we may inherit it. We want to remove
-# it temporarily because we're going to find the 'real'
-# locations of different utilities.
-export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g | sed s,$HOME/etc/bin/$(uname -s),,g)
+if [[ "$(basename $HOME)" = "$(whoami)" ]];
+then
+    $HOME/etc/shell/setup_symlinks
 
-if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
-    mkdir $HOME/etc/real_locations/$(hostname)
+    # Although we haven't added $HOME/etc/bin to our path yet,
+    # if we're a subshell we may inherit it. We want to remove
+    # it temporarily because we're going to find the 'real'
+    # locations of different utilities.
+    export PATH=$(echo $PATH | sed s,$HOME/etc/bin,,g | sed s,$HOME/etc/bin/$(uname -s),,g)
+
+    if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
+        mkdir $HOME/etc/real_locations/$(hostname)
+    fi
+
+    which gdb > $HOME/etc/real_locations/$(hostname)/gdb
+    which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
+    which tlmake > $HOME/etc/real_locations/$(hostname)/tlmake
+
+    # OK, now put it back in.
+    if [[ -d $ZDOTDIR/etc/bin ]]; then
+	    path_prepend $ZDOTDIR/etc/bin
+	    path_prepend $ZDOTDIR/etc/bin/$(uname -s)
+    fi
 fi
-
-which gdb > $HOME/etc/real_locations/$(hostname)/gdb
-which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
-which tlmake > $HOME/etc/real_locations/$(hostname)/tlmake
-
-# OK, now put it back in.
-if [[ -d $ZDOTDIR/etc/bin ]]; then
-	path_prepend $ZDOTDIR/etc/bin
-	path_prepend $ZDOTDIR/etc/bin/$(uname -s)
-fi
-
