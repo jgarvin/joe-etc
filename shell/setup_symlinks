@@ -4,12 +4,15 @@ setup_symlink()
 {
     if [[ -a $1 ]]; then
         cd $(dirname $2)
-        ln -sf $1 $(basename $2)
+	if [[ ! -a $(basename $2) ]]; then
+            ln -sf $1 $(basename $2)
+	fi
     fi
 }
 
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
+setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 
 # SuSE insists on there being a fonts directory.
 mkdir -p $HOME/.fonts
@@ -18,3 +21,4 @@ setup_symlink $HOME/etc/fonts $HOME/.fonts/my-fonts
 setup_symlink $HOME/etc/gdbinit $HOME/.gdbinit
 setup_symlink $HOME/etc/emacs/emacsrc.el $HOME/.emacs
 setup_symlink $HOME/etc/xmonad $HOME/.xmonad
+

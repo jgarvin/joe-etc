@@ -72,7 +72,7 @@ alias cdl=/export/home/$LOGNAME
 # 'ls' output is easier to read when colored
 if which gls &> /dev/null # Use GNU ls if available
 then
-	alias ls='gls --color=auto'
+	alias ls='gls -F --color=auto --group-directories-first'
 else
 	alias ls='ls --color=auto'
 fi

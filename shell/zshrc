@@ -1,4 +1,9 @@
-$HOME/etc/shell/setup_symlinks
+#!/usr/bin/env zsh
+
+if [[ "$(basename $HOME)" = "$(whoami)" ]];
+then
+    $HOME/etc/shell/setup_symlinks
+fi
 
 export SHELL=`which zsh`
 
