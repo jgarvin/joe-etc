@@ -85,8 +85,6 @@ fi
 
 if [[ "$(basename $HOME)" = "$(whoami)" ]];
 then
-    $HOME/etc/shell/setup_symlinks
-
     # Although we haven't added $HOME/etc/bin to our path yet,
     # if we're a subshell we may inherit it. We want to remove
     # it temporarily because we're going to find the 'real'

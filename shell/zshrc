@@ -22,8 +22,6 @@ if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
 fi
 
-export HISTFILE=~/.zhistory
-
 # Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
 
@@ -64,7 +62,7 @@ setopt EXTENDED_HISTORY
 export HISTSIZE=100000
 
 # number of lines saved in the history after logout
-export SAVEHIST=100000
+export SAVEHIST=1000000
 
 # append command to history file once executed
 setopt inc_append_history
@@ -252,3 +250,5 @@ else
  	fi
 	setprompt
 fi
+
+export HISTFILE=$HOME/.zhistory
