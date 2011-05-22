@@ -212,7 +212,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*' menu select
 
 # Must call setprompt for this to do anything
-. $HOME/etc/shell/fancy-prompt
+. $ZDOTDIR/etc/shell/fancy-prompt
 
 # To help emacs tramp mode and global desktop,
 # turn off the fancy stuff.
