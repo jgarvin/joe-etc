@@ -3,6 +3,8 @@ set print asm-demangle on
 
 source ~/etc/stl-views-1.0.3.gdb
 
+set history size 9999999
+set history filename ~/.gdbhistory
 set history save on
 
 define gdbkill

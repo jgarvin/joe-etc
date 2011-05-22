@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-if [[ "$(basename $HOME)" = "$(whoami)" ]];
+if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     $HOME/etc/shell/setup_symlinks
 fi
