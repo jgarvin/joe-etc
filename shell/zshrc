@@ -1,5 +1,9 @@
 #!/usr/bin/env zsh
 
+if [[ "$ZDOTDIR" = "" ]]; then
+    export ZDOTDIR=~
+fi
+
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     $HOME/etc/shell/setup_symlinks
@@ -17,10 +21,6 @@ select-word-style bash
 # Apparently the default changes based on your $EDITOR, but even if my EDITOR
 # is set to emacs the london boxes default me to vi bindings without this.
 bindkey -e
-
-if [[ "$ZDOTDIR" = "" ]]; then
-    export ZDOTDIR=~
-fi
 
 # Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
