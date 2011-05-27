@@ -9,6 +9,8 @@ then
     $HOME/etc/shell/setup_symlinks
 fi
 
+fpath=($ZDOTDIR/etc/shell/completion $fpath)
+
 export SHELL=`which zsh`
 
 export REPORTTIME=10
