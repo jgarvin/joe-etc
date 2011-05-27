@@ -10,6 +10,7 @@ import glob
 import datetime
 import popen2
 
+# TODO: Determine scratchhost binary to open based on timestamps when ambiguous.
 # TODO: -s to just list cores
 # TODO: Map /opt/tradelink/bin whichVersion scripts to their
 # symlinks in /opt/tradelink/bin/newInst

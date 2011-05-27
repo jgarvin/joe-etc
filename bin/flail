@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/flail.py $@
+PYTHONPATH="`dirname $0`/../python)" python \
+    `dirname $0`/../utils/flail.py "$@"

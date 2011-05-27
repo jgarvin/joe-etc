@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/cmp_versions.py $@
+PYTHONPATH="`dirname $0`/etc/python" python \
+    `dirname $0`/etc/utils/cmp_versions.py "$@"
