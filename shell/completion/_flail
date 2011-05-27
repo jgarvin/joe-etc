@@ -1,0 +1,11 @@
+#compdef flail
+
+local arg_string="*: :("
+
+for i in $(ls /var/tmp/tlapp.*); do
+    arg_string="$arg_string $(echo $i | awk -F. '{ print $2 }')"
+done
+
+arg_string="$arg_string)"
+
+_arguments $arg_string
