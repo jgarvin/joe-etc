@@ -90,7 +90,13 @@ def get_log_files():
 
     logfilepaths = [l for l in logfilepaths if not op.isdir(l)]
 
-    logpairs = [(os.stat(f), f) for f in logfilepaths]
+    logpairs = []
+    for f in logfilepaths:
+        try:
+            logpairs.append((os.stat(f), f))
+        except OSError:
+            # Logs may be rotated out from under us, just skip those.
+            continue
 
     if args.user:
         filtered = []
