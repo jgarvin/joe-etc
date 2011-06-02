@@ -19,6 +19,8 @@ import argparse
 # TODO: Snake logs
 # TODO: nic logs
 # TODO: top logs
+# TODO: trading interface logs
+# TODO: Dump regexes flag to get completion options
 
 app_description = ("Automatically finds the most recent log and "
                    "monitors it with less.")
