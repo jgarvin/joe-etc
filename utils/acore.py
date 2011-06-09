@@ -62,8 +62,10 @@ def name_contains_version(app_name):
 def run(command, clear_ld_env=True):
     old_env_vars = {}
     def backup_env_var(var):
-        old_env_vars[var] = os.environ[var]
-        os.environ[var] = ''
+        if os.environ[var]:
+            print >>sys.stderr, "Warning: Unsetting %s for invoking %s" % (var, command)
+            old_env_vars[var] = os.environ[var]
+            os.environ[var] = ''
 
     if clear_ld_env:
         backup_env_var("LD_PRELOAD")
