@@ -59,9 +59,22 @@ def name_contains_version(app_name):
 
     return True
 
-def run(command):
+def run(command, clear_ld_env=True):
+    old_env_vars = {}
+    def backup_env_var(var):
+        old_env_vars[var] = os.environ[var]
+        os.environ[var] = ''
+
+    if clear_ld_env:
+        backup_env_var("LD_PRELOAD")
+        backup_env_var("LD_LIBRARY_PATH")
+
     the_run = popen2.Popen3(command)
     the_run.wait()
+
+    for i in old_env_vars:
+        os.environ[i] = old_env_vars[i]
+
     return the_run.fromchild.read()
 
 def time_str(timestamp):
