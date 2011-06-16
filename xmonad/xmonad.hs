@@ -207,6 +207,7 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , title     =? "Brood War"      --> doFloat
     , className =? "Rti"            --> doFloat
+    , (stringProperty "WM_NAME") =? "SpreadEditor"   --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
