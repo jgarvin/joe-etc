@@ -28,14 +28,19 @@ libghc6-xmonad-doc
 libghc6-xmonad-contrib-dev
 libghc6-xmonad-contrib-doc
 
-# Coding
+# Minimum to build 3rd party C packages
 build-essential
+autoconf
+libtool
+
+# Coding
 libboost-all-dev
 cmake
 scons
 libqt4-dev
 qt4-doc-html
 python-profiler
+global
 
 # Multimedia and ease of use
 wine
@@ -47,10 +52,14 @@ pidgin
 xchat
 xclip
 thunderbird
-global
 sshfs
 haskell-mode
 nautilus-open-terminal
 python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
 calibre
+irssi
+irssi-plugin-otr
+irssi-scripts
+js2-mode
+python-cheetah
