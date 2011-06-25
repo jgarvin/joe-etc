@@ -161,7 +161,8 @@
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
-       '(("zshrc" . shell-script-mode))
+       '(("zshrc" . shell-script-mode)
+	 ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
 ;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
@@ -169,6 +170,13 @@
       (append
        ;; File name (within directory) starts with a dot.
        '(("ido-prompt" . emacs-lisp-mode))
+       auto-mode-alist))
+
+;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("\\.json\\'" . js2-mode))
        auto-mode-alist))
 
 ;; For most modes I'm coding, I don't want line wrap
@@ -382,6 +390,9 @@
           (lambda ()
             (load "~/etc/emacs/java.el")))
 
+(modify-frame-parameters nil '((wait-for-wm . nil)))
+
 ;; lets you delete camelcase words one at a time
 (require 'cc-mode)
 (c-subword-mode 1)
+
