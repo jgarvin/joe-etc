@@ -9,7 +9,6 @@ hardstatus alwayslastline "%t"
 #hardstatus alwayslastline "%{+b dw}:%{-b dw}:%{+b dk}[%{-b dg} %0C:%s%a %{=b dk}]-[   %{-b dw}Load%{+b dk}:%{-b dg}%l %{+b dk}] [%{-b dg}%2`%{+b dk}] %=[ %{-b dg}%1`%{=b dk} ]%{-b dw}:%{+b dw}:%<"
 #hardstatus alwayslastline "%{.bW}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y} %m/%d %C%a "
 
-
 defscrollback 64000
 startup_message off
 
@@ -22,13 +21,17 @@ bind p process b
 # Make it easy to reload config
 bind q source $HOME/.screenrc
 
-# Make it easy to create new tmp windows, depends on zsh letting you type
-# directories to cd to them.
-register t ^`c/tmp^J^`A^H^H^Htmp^J
-bind t process t
+#### MAKE SCREEN SANE
 
-bind o select top
+# Clear the screen when visual programs exit, like a normal terminal.
+altscreen on
 
+# Make it so the scrollbar in virtual terminals will work (e.g. gnome-terminal)
+termcapinfo xterm ti@:te@
+
+# zshrc uses this to decide whether to unset the TERM=screen setting when ssh'ing
+# prompt gets messed up on solaris
+setenv GNU_SCREEN_IS_RUNNING 1
 
 #### EMACSIFICATION
 #### Taken from: http://snarfed.org/emacs_keybindings_in_gnu_screens_copy-scrollback_mode
@@ -45,9 +48,6 @@ markkeys ' '=^@
 bindkey -m -k kP stuff Y
 bindkey -m -k kN stuff V
 
-# failed attempt to make C-space work in i-search too
-# bindkey -m ^@ eval "stuff \033" "stuff ^@"
-
 # special hack for C-e, since it should go *past*
 # the last char. -m means this is for copy mode only.
 bindkey -m ^e stuff "$^f"
@@ -62,6 +62,8 @@ markkeys B=[:E=]:b={:e=}:w=>
 bindkey -m ^[Od stuff {  #"[[}"
 bindkey -m ^[Oc stuff ]  #"}]^f"
 
-# zshrc uses this to decide whether to unset the TERM=screen setting when ssh'ing
-# prompt gets messed up on solaris
-setenv GNU_SCREEN_IS_RUNNING 1
+# Go to top of buffer/bottom of buffer like in emacs
+# Didn't work
+#bindkey -m “^[<” stuff “g”
+#bindkey -m “^[>” stuff “G”
+
