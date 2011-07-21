@@ -18,6 +18,10 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	path_prepend /home/udesktop178/joeg/opt/bin
 fi
 
+if [[ -d $HOME/opt/bin ]]; then
+	path_prepend $HOME/opt/bin
+fi
+
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
     export PYTHONPATH=$HOME/opt/lib/python2.6/site-packages:$PYTHONPATH
 fi
@@ -65,6 +69,9 @@ alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C -X"
+
+# almost never use mv to overwrite
+alias mv="mv -i"
 
 # 99% of the time I want truss to include child processes
 file_name=$0
