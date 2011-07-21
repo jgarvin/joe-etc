@@ -1,0 +1,11 @@
+#compdef acore
+
+local arg_string="*: :("
+
+for i in $(ls /var/core); do
+    arg_string="$arg_string $(echo $i | awk -F. '{ print $2 }')"
+done
+
+arg_string="$arg_string)"
+
+_arguments $arg_string

@@ -1,4 +1,4 @@
 #!/usr/bin/env zsh
 
 browser_list="thunderbird3 thunderbird"
-$HOME/etc/utils/remote_launch $($HOME/etc/utils/pick_best $browser_list)
+`dirname $0`/../utils/remote_launch $(`dirname $0`/../utils/pick_best $browser_list)

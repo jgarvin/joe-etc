@@ -11,7 +11,7 @@ for core in $cores; do
     fi
 done
 
-PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/ctrl-c-handler.py \
+PYTHONPATH="`dirname $0`/../python" python \
+    `dirname $0`/../utils/ctrl-c-handler.py \
     acore $@
 

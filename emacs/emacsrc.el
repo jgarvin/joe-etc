@@ -42,6 +42,11 @@
 (setq tramp-backup-directory-alist backup-directory-alist)
 
 (add-to-list 'load-path "~/etc/drag-stuff")
+(add-to-list 'load-path "~/etc/emacs")
+
+(require 'winpoint)
+(window-point-remember-mode 1)
+
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
 

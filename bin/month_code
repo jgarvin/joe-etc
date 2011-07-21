@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+months=" FGHJKMNQUVXZ"
+
+import sys
+
+if len(sys.argv) == 2:
+    print months[int(sys.argv[1])]

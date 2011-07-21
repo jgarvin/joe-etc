@@ -1,9 +1,15 @@
 #!/usr/bin/env zsh
 
-if [[ "$(basename $HOME)" = "$(whoami)" ]];
+if [[ "$ZDOTDIR" = "" ]]; then
+    export ZDOTDIR=~
+fi
+
+if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     $HOME/etc/shell/setup_symlinks
 fi
+
+fpath=($ZDOTDIR/etc/shell/completion $fpath)
 
 export SHELL=`which zsh`
 
@@ -17,10 +23,6 @@ select-word-style bash
 # Apparently the default changes based on your $EDITOR, but even if my EDITOR
 # is set to emacs the london boxes default me to vi bindings without this.
 bindkey -e
-
-if [[ "$ZDOTDIR" = "" ]]; then
-    export ZDOTDIR=~
-fi
 
 # Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
@@ -212,7 +214,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*' menu select
 
 # Must call setprompt for this to do anything
-. $HOME/etc/shell/fancy-prompt
+. $ZDOTDIR/etc/shell/fancy-prompt
 
 # To help emacs tramp mode and global desktop,
 # turn off the fancy stuff.

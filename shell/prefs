@@ -94,7 +94,7 @@ if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
 fi
 
-if [[ "$(basename $HOME)" = "$(whoami)" ]];
+if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     # Although we haven't added $HOME/etc/bin to our path yet,
     # if we're a subshell we may inherit it. We want to remove

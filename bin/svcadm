@@ -7,8 +7,8 @@ fi
 
 real_loc=$(cat $HOME/etc/real_locations/$(hostname)/svcadm)
 
-cmd=("PYTHONPATH=$HOME/etc/python python " \
-    "$HOME/etc/utils/ctrl-c-handler.py " \
+cmd=("PYTHONPATH=\"`dirname $0`/../python\" python " \
+    "`dirname $0`/../utils/ctrl-c-handler.py " \
     "safeguard $real_loc $@")
 
 if [[ "$SCRIPTING_DEBUG" = "1" ]]; then

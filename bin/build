@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
-PYTHONPATH=$HOME/etc/python python \
-    $HOME/etc/utils/ctrl-c-handler.py \
-    build $@
+PYTHONPATH="`dirname $0`/../python" python \
+    `dirname $0`/etc/utils/ctrl-c-handler.py \
+    build "$@"
