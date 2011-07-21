@@ -179,6 +179,13 @@
        '(("\\.json\\'" . js2-mode))
        auto-mode-alist))
 
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("\\.cpp.cog\\'" . c++-mode)
+         ("\\.hpp.cog\\'" . c++-mode))
+       auto-mode-alist))
+
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
 
@@ -391,6 +398,11 @@
             (load "~/etc/emacs/java.el")))
 
 (modify-frame-parameters nil '((wait-for-wm . nil)))
+
+(autoload 'markdown-mode "markdown-mode.el"
+   "Major mode for editing Markdown files" t)
+(setq auto-mode-alist
+   (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
 (require 'cc-mode)
