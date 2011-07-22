@@ -396,7 +396,7 @@
 
 (add-hook 'c-mode-common-hook
 	  (lambda ()
-        (load-file "~/etc/emacs/c-common.el")))
+        (load "~/etc/emacs/c-common.el")))
 
 (add-hook 'java-mode-hook
           (lambda ()

@@ -1,5 +1,4 @@
-(if (file-exists-p "/home/udesktop178/joeg/global-install/share/gtags/gtags.el")
-    (load-file "/home/udesktop178/joeg/global-install/share/gtags/gtags.el"))
+(add-to-list 'load-path "/home/udesktop178/joeg/global-install/share/gtags/")
 
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
@@ -50,8 +49,8 @@
 
 ;; Prefer 4-space tabs
 (setq c-default-style "bsd")
-(setq-default c-basic-offset 4)
-(setq-default indent-tabs-mode nil)
+(setq c-basic-offset 4)
+(setq indent-tabs-mode nil)
 (setq default-tab-width 4)
 (setq tab-width 4)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
