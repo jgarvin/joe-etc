@@ -92,6 +92,13 @@ OOO_FORCE_DESKTOP=gnome
 # Load tradelink preference
 if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
+else
+    test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
+    if [ "$test_for_vpn" = "" ]; then
+	if [ "$(ls -A $HOME/remote/udesktop178)" = "" ]; then
+	    sshfs udesktop178.wacker.trdlnk.com:/ $HOME/remote/udesktop178 -o reconnect &
+	fi
+    fi
 fi
 
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
