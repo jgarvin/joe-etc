@@ -18,4 +18,5 @@ end
 set script-extension soft
 source ~/etc/rwtime.py
 
+echo Turning off listening for SIGUSR1...\n
 handle SIGUSR1 nostop

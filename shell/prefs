@@ -18,6 +18,14 @@ if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
 	path_prepend /home/udesktop178/joeg/opt/bin
 fi
 
+if [[ -d $HOME/opt/bin ]]; then
+	path_prepend $HOME/opt/bin
+fi
+
+if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
+    export PYTHONPATH=$HOME/opt/lib/python2.6/site-packages:$PYTHONPATH
+fi
+
 # Ack is a nice replacement for grep, just does the right thing
 # Really should be able to add to the existing make type, but will make mk a separate
 # type for now.
@@ -62,6 +70,9 @@ alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C -X"
 
+# almost never use mv to overwrite
+alias mv="mv -i"
+
 # 99% of the time I want truss to include child processes
 file_name=$0
 
@@ -81,6 +92,13 @@ OOO_FORCE_DESKTOP=gnome
 # Load tradelink preference
 if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
+else
+    test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
+    if [ "$test_for_vpn" = "" ]; then
+	if [ "$(ls -A $HOME/remote/udesktop178)" = "" ]; then
+	    sshfs udesktop178.wacker.trdlnk.com:/ $HOME/remote/udesktop178 -o reconnect &
+	fi
+    fi
 fi
 
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
@@ -105,3 +123,4 @@ then
 	    path_prepend $ZDOTDIR/etc/bin/$(uname -s)
     fi
 fi
+

@@ -10,6 +10,8 @@ import argparse
 from proc import run
 
 # TODO: Install missing ubuntu build packages for each module type
+# TODO: --rpath to add rpaths for the prefix
+# TODO: rpath's should use $ORIGIN
 
 parser = argparse.ArgumentParser(description="Build anything.")
 parser.add_argument('-p', '--prefix', type=str, default=None,
