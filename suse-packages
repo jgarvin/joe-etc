@@ -4,3 +4,4 @@ gitk
 cvs
 sshfs
 htop
+gcc-c++

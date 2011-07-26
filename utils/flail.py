@@ -45,7 +45,8 @@ parser.add_argument('-n', '--nth', metavar='N', type=int,
                     dest="nth", help=("Open nth most recent log. Default 1."))
 parser.add_argument(metavar='APPLICATION', type=str,
                     dest="application",
-                    help='Open logs for this application. Treated as substring.')
+                    help='Open logs for this application. Treated as substring.'
+                    ' If a number, then assumed to be desired PID.')
 
 args = parser.parse_args()
 
@@ -70,10 +71,17 @@ if desired_log_number() <= 0:
 if not args.interval:
     args.interval = DEFAULT_INTERVAL
 
+def app_is_pid(app):
+    try:
+        int(app)
+    except ValueError:
+        return False
+    return True
+
 def get_glob_dirs(application):
     glob_prefixes = ["/var/tmp/"]
 
-    if application:
+    if application and not app_is_pid(application):
         glob_app_dirnames = "/opt/tradelink/share/repository/*" + application + "*"
         glob_prefixes.extend(glob.glob(glob_app_dirnames))
 
@@ -81,6 +89,7 @@ def get_glob_dirs(application):
 
 def get_log_files():
     logfilepaths = []
+
     for d in get_glob_dirs(args.application):
         glob_prefix = "tlapp.*"
         if args.application:

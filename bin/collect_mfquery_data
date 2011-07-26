@@ -31,4 +31,6 @@ instr_query_all $(echo $colon_name | awk -F: '{ print $2 }') > $base_filename-in
 if [ -f /var/opt/icache/channel-assignment-log ]; then
     local channel=$(grep $colon_name /var/opt/icache/channel-assignment-log | awk '{ print $3 }')
     icache_buffer_tool read --include-channels $channel > $base_filename-buffer 2>&1 &
+else
+    echo >&2 "Not collecting icache data, icache not found."
 fi
