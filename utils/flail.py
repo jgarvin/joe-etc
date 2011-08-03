@@ -84,7 +84,7 @@ def get_log_files():
     for d in get_glob_dirs(args.application):
         glob_prefix = "tlapp.*"
         if args.application:
-            glob_path = op.join(d, "tlapp.*" + args.application + "*." + socket.gethostname() + "*.log")
+            glob_path = op.join(d, "tlapp.*" + args.application + "*." + socket.gethostname() + "-*.log")
         else:
             glob_path = op.join(d, "tlapp.*" + socket.gethostname() + "*.log")
 
