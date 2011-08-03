@@ -211,8 +211,11 @@ myManageHook = composeAll
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
     , className =? "Do"             --> doIgnore
-    , className =? "gnome-panel"          --> doFloat
-    , (stringProperty "WM_NAME")   =? "VLC"            --> doFullFloat
+    , className =? "gnome-panel"                        --> doFloat
+    , (stringProperty "WM_NAME")   =? "VLC"             --> doFullFloat
+    , (stringProperty "WM_NAME")   =? "SpreadEditor"    --> doFullFloat
+    , (stringProperty "WM_NAME")   =? "Insert Spread"   --> doFullFloat
+    , (stringProperty "WM_NAME")   =? "Choose Contract" --> doFullFloat
     , appName   =? "VLC (XVideo output)" --> doFloat
     , isFullscreen                  --> doFullFloat]
 
