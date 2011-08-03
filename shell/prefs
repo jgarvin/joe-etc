@@ -96,6 +96,7 @@ else
     test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
     if [ "$test_for_vpn" = "" ]; then
 	if [ "$(ls -A $HOME/remote/udesktop178)" = "" ]; then
+	    fusermount -zu remote/udesktop178
 	    sshfs udesktop178.wacker.trdlnk.com:/ $HOME/remote/udesktop178 -o reconnect &
 	fi
     fi
