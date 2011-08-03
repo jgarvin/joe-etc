@@ -18,8 +18,8 @@
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
     (start-process-shell-command "gtags update"
-								 "gtags_buffer"
-								 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
+				 "gtags_buffer"
+				 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
