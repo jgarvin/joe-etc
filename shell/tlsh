@@ -132,6 +132,11 @@ then
 	alias head='ghead'
 fi
 
+if which gseq &> /dev/null # Use GNU head if available
+then
+	alias seq='gseq'
+fi
+
 # Try to use .zhistory on local box before resorting to using the network
 if [[ `basename $SHELL` = "zsh" ]]; then
 	zstyle ':completion:*' cache-path /export/home/joeg/.zshcache
