@@ -43,6 +43,9 @@ parser.add_argument('-i', '--interval', metavar='T', type=int,
 parser.add_argument('-n', '--nth', metavar='N', type=int,
                     default=None,
                     dest="nth", help=("Open nth most recent log. Default 1."))
+parser.add_argument('-o', '--local-only', dest='local_only', action='store_true',
+                    default=False,
+                    help="Don't go out to the repository.")
 parser.add_argument(metavar='APPLICATION', type=str,
                     dest="application",
                     help='Open logs for this application. Treated as substring.'
@@ -81,7 +84,7 @@ def app_is_pid(app):
 def get_glob_dirs(application):
     glob_prefixes = ["/var/tmp/"]
 
-    if application and not app_is_pid(application):
+    if application and not app_is_pid(application) and not args.local_only:
         glob_app_dirnames = "/opt/tradelink/share/repository/*" + application + "*"
         glob_prefixes.extend(glob.glob(glob_app_dirnames))
 
