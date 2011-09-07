@@ -417,7 +417,7 @@
 (setq-default mode-line-format
   (list
     ;; the buffer name; the file name as a tool tip
-    '(:eval (propertize "%b " 'face 'font-lock-keyword-face
+    '(:eval (propertize "%b " 'face 'font-lock-warning-face
         'help-echo (buffer-file-name)))
 
     ;; line and column
@@ -447,12 +447,6 @@
               'help-echo (concat "Buffer is in "
                            (if overwrite-mode "overwrite" "insert") " mode")))
 
-    ;; was this buffer modified since the last save?
-    '(:eval (when (buffer-modified-p)
-              (concat ","  (propertize "Mod"
-                             'face 'font-lock-warning-face
-                             'help-echo "Buffer has been modified"))))
-
     ;; is this buffer read-only?
     '(:eval (when buffer-read-only
               (concat ","  (propertize "RO"
@@ -465,8 +459,42 @@
               'help-echo
               (concat (format-time-string "%c; ")
                       (emacs-uptime "Uptime:%hh"))))
+    ;; was this buffer modified since the last save?
+    '(:eval (when (buffer-modified-p)
+              (concat " "  (propertize "Mod"
+                             'face 'font-lock-warning-face
+                             'help-echo "Buffer has been modified"))))
+
     " --"
     ;; i don't want to see minor-modes; but if you want, uncomment this:
     ;; minor-mode-alist  ;; list of minor modes
     "%-" ;; fill with '-'
     ))
+
+;; Kill whole words at once, even in mid word
+(global-set-key (kbd "M-d")
+    (lambda ()
+      (interactive)
+	(if (char-after)
+	    (progn
+	      (backward-word)
+	      (kill-word 1)))))
+
+;; (looking-at "\s-")
+;; (string-match-p "\s-" " ") ;; nil, wtf?
+;; (string-match-p "\s-" "") ;; nil, makes sense
+
+;; (string-match-p "\s-*" "") ;; nil, wtf?
+;; (string-match-p "\s-*" " ") ;; 0, makes sense
+;; (string-match-p "\s-*" "  ") ;; 0, makes sense
+;; (string-match-p "\s-*" "  ") ;; 0, makes sense
+;; (string-match-p "(\s-)*" " ") ;; nil, wtf?
+
+;; (string-match-p "\s-+" "") ;; nil, makes sense
+;; (string-match-p "\s-+" " ") ;; nil, wtf?
+;; (string-match-p "\s-+" "  ") ;; nil, wtf?
+
+;; (string-match-p "[:space:]" "") ;; nil, makes sense
+;; (string-match-p "[:space:]" " ") ;; nil, wtf?
+;; (string-match-p "[:space:]*" " ") ;; 0, makes sense
+;; (string-match-p "[:space:]*" "  ") ;; 0, makes sense
