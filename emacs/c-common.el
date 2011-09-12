@@ -106,3 +106,37 @@
 		  (set 'folder-list (append folder-list (list name))))))
   folder-list))
 
+;;-------------
+;; Switch between source and header
+;;------------
+;; Association list of extension -> inverse extension
+(setq exts '(("c"   . ("h" "H"))
+			 ("cpp" . ("hpp" "h" "H"))
+             ("hpp" . ("cpp" "c" "C"))
+             ("h"   . ("cpp" "c" "C"))
+			 ("H"   . ("cpp" "c" "C"))
+			 ("C"   . ("hpp" "h" "H"))))
+
+;; Process the association list of extensions and find the last file
+;; that exists
+(defun find-other-file (fname fext)
+  (dolist (value (cdr (assoc fext exts)) result)
+	(let ((path (file-name-directory fname))
+		  (name (file-name-nondirectory fname)))
+	  (if (file-exists-p (concat path name "." value))
+		  (setq result (concat path name "." value))
+		(if (file-exists-p (concat path "private/" name "." value))
+			(setq result (concat path "private/" name "." value))
+		  (if (file-exists-p (concat path "../" name "." value))
+			  (setq result (concat path "../" name "." value))))))))
+
+;; Toggle function that uses the current buffer name to open/find the
+;; other file
+(defun toggle-header-buffer()
+  (interactive)
+  (let ((ext (file-name-extension buffer-file-name))
+        (fname (file-name-sans-extension buffer-file-name)))
+    (find-file (find-other-file fname ext))))
+
+;; Bind the toggle function to a global key
+(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
