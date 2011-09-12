@@ -102,9 +102,12 @@
 (color-theme-euphoria)
 
 ;; Turn off GUI parts
-(setq tool-bar-mode nil)
-(setq menu-bar-mode nil)
-(setq scroll-bar-mode nil)
+(when (functionp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (functionp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(when (functionp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq visible-bell t)
