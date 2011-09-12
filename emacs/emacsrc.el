@@ -321,6 +321,7 @@
 (global-set-key "\M-%" 'query-replace-regexp)
 
 (add-to-list 'load-path "~/etc/")
+(require 'ack)
 (autoload 'ack-same "full-ack" nil t)
 (autoload 'ack "full-ack" nil t)
 (autoload 'ack-find-same-file "full-ack" nil t)
