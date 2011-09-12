@@ -413,9 +413,11 @@
    (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
-(require 'cc-mode)
-(when (functionp 'c-subword-mode)
-  (c-subword-mode 1))
+(if (functionp 'c-subword-mode)
+	(progn
+	  (require 'cc-mode)
+	  (c-subword-mode 1))
+  (subword-mode t))
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
