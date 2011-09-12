@@ -170,7 +170,7 @@
       (append
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode)
-	 ("\\.do\\'" . shell-script-mode))
+		 ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
 ;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
