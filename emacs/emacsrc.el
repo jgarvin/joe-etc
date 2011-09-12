@@ -414,7 +414,8 @@
 
 ;; lets you delete camelcase words one at a time
 (require 'cc-mode)
-(c-subword-mode 1)
+(when (functionp 'c-subword-mode)
+  (c-subword-mode 1))
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
