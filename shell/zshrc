@@ -253,4 +253,16 @@ else
 	setprompt
 fi
 
-export HISTFILE=$HOME/.zhistory
+HIST_DIR=$HOME
+HIST_BACKUP_DIR=$HIST_DIR/.zhistory.backup
+mkdir -p $HIST_DIR
+mkdir -p $HIST_BACKUP_DIR
+HIST_BACKUP_FILE="$HIST_BACKUP_DIR/zhistory.$(date "+%m%d%Y")"
+export HISTFILE=$HIST_DIR/.zhistory
+if [ ! -f "$HIST_BACKUP_FILE" ]; then
+    # Delete files after a year.
+    find "$HIST_BACKUP_DIR" -mtime +365 -type f -exec rm -rf {} \;
+
+    # Make a backup
+    cp -p "$HISTFILE" "$HIST_BACKUP_FILE"
+fi
