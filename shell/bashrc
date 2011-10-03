@@ -1,3 +1,6 @@
+# Keep distinct from zsh history so they don't corrupt one another.
+export HISTFILE=~/.bash_history
+
 export SHELL="bash"
 
 # I prefer to use zsh when available

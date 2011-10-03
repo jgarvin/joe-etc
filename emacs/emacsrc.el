@@ -102,9 +102,12 @@
 (color-theme-euphoria)
 
 ;; Turn off GUI parts
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+(when (functionp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (functionp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(when (functionp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq visible-bell t)
@@ -167,7 +170,7 @@
       (append
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode)
-	 ("\\.do\\'" . shell-script-mode))
+		 ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
 ;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
@@ -199,40 +202,6 @@
 
 (setq auto-mode-alist (cons '("\\.incl$" . c++-mode) auto-mode-alist))
 
-;;-------------
-;; Switch between source and header
-;;------------
-;; Association list of extension -> inverse extension
-(setq exts '(("c"   . ("h" "H"))
-			 ("cpp" . ("hpp" "h" "H"))
-             ("hpp" . ("cpp" "c" "C"))
-             ("h"   . ("cpp" "c" "C"))
-			 ("H"   . ("cpp" "c" "C"))
-			 ("C"   . ("hpp" "h" "H"))))
-
-;; Process the association list of extensions and find the last file
-;; that exists
-(defun find-other-file (fname fext)
-  (dolist (value (cdr (assoc fext exts)) result)
-	(let ((path (file-name-directory fname))
-		  (name (file-name-nondirectory fname)))
-	  (if (file-exists-p (concat path name "." value))
-		  (setq result (concat path name "." value))
-		(if (file-exists-p (concat path "private/" name "." value))
-			(setq result (concat path "private/" name "." value))
-		  (if (file-exists-p (concat path "../" name "." value))
-			  (setq result (concat path "../" name "." value))))))))
-
-;; Toggle function that uses the current buffer name to open/find the
-;; other file
-(defun toggle-header-buffer()
-  (interactive)
-  (let ((ext (file-name-extension buffer-file-name))
-        (fname (file-name-sans-extension buffer-file-name)))
-    (find-file (find-other-file fname ext))))
-
-;; Bind the toggle function to a global key
-(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
 
 ;; So I can delete it
 (setq show-trailing-whitespace t)
@@ -352,6 +321,7 @@
 (global-set-key "\M-%" 'query-replace-regexp)
 
 (add-to-list 'load-path "~/etc/")
+(require 'ack)
 (autoload 'ack-same "full-ack" nil t)
 (autoload 'ack "full-ack" nil t)
 (autoload 'ack-find-same-file "full-ack" nil t)
@@ -410,8 +380,11 @@
    (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
-(require 'cc-mode)
-(c-subword-mode 1)
+(if (functionp 'c-subword-mode)
+	(progn
+	  (require 'cc-mode)
+	  (c-subword-mode 1))
+  (subword-mode t))
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
