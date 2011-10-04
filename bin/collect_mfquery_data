@@ -1,5 +1,7 @@
 #!/bin/env zsh
 
+export TZ=UTC
+
 local contract="$*"
 
 local mfquery_path
