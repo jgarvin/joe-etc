@@ -65,3 +65,5 @@ js2-mode
 python-cheetah
 scrot
 openssh-server
+ocaml
+ocaml-docs
