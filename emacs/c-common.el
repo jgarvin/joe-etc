@@ -182,7 +182,7 @@
 (setq c-types-regexp
       (concat
        "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
-       (regexp-opt '("unsigned" "int" "char" "float" "void") 'words)))
+       (regexp-opt '("short" "long" "unsigned" "int" "char" "float" "void") 'words)))
 
 (font-lock-add-keywords
  'c-mode
