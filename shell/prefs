@@ -125,3 +125,6 @@ then
     fi
 fi
 
+# Protect against accidentally having '.' in $PATH.
+# zsh interprets :: in $PATH to mean :.:
+export PATH=$(echo $PATH | sed 's/::/:/g')
