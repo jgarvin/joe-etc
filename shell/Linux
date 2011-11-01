@@ -9,5 +9,5 @@ ps_crossplatform()
 
 phone()
 {
-    ssh udesktop178 "zsh --interactive -c 'phone $@'"
+    ssh udesktop178 "zsh --interactive -c 'phone "$@"'"
 }

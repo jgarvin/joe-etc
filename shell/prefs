@@ -37,7 +37,7 @@ ack()
 		--type-set mk=.mk \
 		--type-set bejunk=.ii,.utii,.P --type=nobejunk \
 		--type-set pagedisplay=.page \
-		--type-add hh=.ipp $@;
+		--type-add hh=.ipp "$@";
 }
 
 export BROWSER="$ZDOTDIR/etc/bin/launch-my-browser"
@@ -81,7 +81,7 @@ if which truss &> /dev/null; then
     {
         echo "Running truss including children. See $file_name."
         disable -f truss
-        truss -f $@
+        truss -f "$@"
         enable -f truss
     }
 fi

@@ -35,9 +35,9 @@ tsk()
 	# to see running
 	if expr match $1 "grep" > /dev/null
 	then
-		ps_crossplatform | grep -i $@;
+		ps_crossplatform | grep -i "$@";
 	else
-		ps_crossplatform | grep -i $@ | grep -v grep;
+		ps_crossplatform | grep -i "$@" | grep -v grep;
 	fi
 }
 
@@ -47,11 +47,11 @@ error()
 	then
 		if which xmessage > /dev/null;
 		then
-			xmessage "Error: " $@ > /dev/null;
+			xmessage "Error: " "$@" > /dev/null;
 			return 0;
 		fi
 	else
-		echo "Error: " $@ >&2;
+		echo "Error: " "$@" >&2;
 	fi
 }
 
