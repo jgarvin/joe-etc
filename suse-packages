@@ -8,3 +8,9 @@ gcc-c++
 global
 xpdf-poppler
 xpdf-poppler
+texinfo
+source-install
+linux-glibc-devel
+glibc-devel-32bit
+bison
+flex
