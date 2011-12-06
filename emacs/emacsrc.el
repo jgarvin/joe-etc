@@ -25,7 +25,8 @@
 ;; TODO: executing show-all-invisible should only reveal lines in the current buffer, not all
 
 ;; Enable debugging
-(toggle-debug-on-error)
+;;(toggle-debug-on-error)
+(setq-default debug-on-error t)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -202,7 +203,6 @@
 
 (setq auto-mode-alist (cons '("\\.incl$" . c++-mode) auto-mode-alist))
 
-
 ;; So I can delete it
 (setq show-trailing-whitespace t)
 
@@ -232,14 +232,17 @@
 ;; When compiling, make the compile window go away when finished if there are no errors
 (setq compilation-finish-function
       (lambda (buf str)
-        (if (string-match "exited abnormally" str)
-
-            ;;there were errors
-            (message "compilation errors, press C-x ` to visit")
-
-          ;;no errors, make the compilation window go away in 0.5 seconds
-          (run-at-time 0.5 nil 'delete-windows-on buf)
-          (message "NO COMPILATION ERRORS!"))))
+	(if (string-match "ack:.*" (buffer-name buf))
+	    (let ((cur-window (selected-window)))
+	      (select-window (get-buffer-window buf))
+	      (goto-char 0)
+	      (select-window cur-window))
+	  (if (string-match "exited abnormally" str)
+	      ;;there were errors
+	      (message "compilation errors, press C-x ` to visit")
+	    ;;no errors, make the compilation window go away in 0.5 seconds
+	    (run-at-time 0.5 nil 'delete-windows-on buf)
+	    (message "NO COMPILATION ERRORS!")))))
 
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
@@ -327,6 +330,8 @@
 (autoload 'ack-find-same-file "full-ack" nil t)
 (autoload 'ack-find-file "full-ack" nil t)
 (global-set-key "\M-k" 'ack)
+(setq-default ack-guess-type nil)
+(setq-default ack-command (concat (expand-file-name "etc/bin/ack" (getenv "HOME")) " --nocolor --nogroup "))
 
 ;; Threshold after which we consider the file to be large
 ;; and don't want to do anything too expensive.
@@ -452,6 +457,30 @@
 	    (progn
 	      (backward-word)
 	      (kill-word 1)))))
+
+(require 'project-root)
+
+(setq project-roots
+      `(("Autotools C/C++ project"
+         :root-contains-files ("configure.ac")
+	 :on-hit (lambda (p) (message (car p))))
+        ("TL C/C++ project"
+         :filename-regex ,(regexify-ext-list '(tc H C))
+	 :on-hit (lambda (p) (message (car p))))
+	("Personal config files"
+	 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
+	 :on-hit (lambda (p) (message (car p))))))
+
+(global-set-key (kbd "C-c f") 'project-root-find-file)
+(global-set-key (kbd "C-c a") 'project-root-ack)
+(global-set-key (kbd "C-c d") 'project-root-goto-root)
+(global-set-key (kbd "C-c p") 'project-root-run-default-command)
+(global-set-key (kbd "C-c l") 'project-root-browse-seen-projects)
+
+(defun compilation-buffer-name-jg (unused-mode-name)
+  (concat unused-mode-name ": " (with-project-root default-directory)))
+(setq-default compilation-buffer-name-function 'compilation-buffer-name-jg)
+(global-set-key [f9] 'compile)
 
 ;; (looking-at "\s-")
 ;; (string-match-p "\s-" " ") ;; nil, wtf?
