@@ -36,6 +36,10 @@ if [[ $(uname -s) = "Linux" ]]; then
     cd - > /dev/null
 fi
 
+# I want to see my core dumps, up to 4GB
+ulimit -c 8000000
+# "core.%e.%p.%u.%t"
+
 # Sync configuration with github every login.
 if ! gitsync > ~/.gitsynclog 2>&1; then
     echo "Error syncing git. See ~/.gitsynclog."
