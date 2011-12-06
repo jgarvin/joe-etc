@@ -67,3 +67,4 @@ scrot
 openssh-server
 ocaml
 ocaml-docs
+expect-dev # for unbuffer cmd
