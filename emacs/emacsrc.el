@@ -461,11 +461,14 @@
 (require 'project-root)
 
 (setq project-roots
-      `(("Autotools C/C++ project"
+      `(("Autotools project"
          :root-contains-files ("configure.ac")
 	 :on-hit (lambda (p) (message (car p))))
-        ("TL C/C++ project"
+        ("TL project"
          :filename-regex ,(regexify-ext-list '(tc H C))
+	 :on-hit (lambda (p) (message (car p))))
+        ("CMake project"
+	 :root-contains-files ("CMakeLists.txt")
 	 :on-hit (lambda (p) (message (car p))))
 	("Personal config files"
 	 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
