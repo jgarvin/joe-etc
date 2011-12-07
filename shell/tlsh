@@ -181,9 +181,9 @@ tlversion()
     disable -f tlversion
     if [[ `basename $PWD` = "icache_wombat" ]]; then
         echo "Running with 1 CPU. See $tlsh_file_name"
-        MAKEFLAGS=-j1 tlversion $@
+        MAKEFLAGS=-j1 tlversion "$@"
     else
-        tlversion $@
+        tlversion "$@"
     fi
     enable -f tlversion
 }
@@ -212,9 +212,9 @@ print_version_tmps() {
 dry_run_cmd() {
     if [[ -z "$RUN_FOR_REAL" ]]
     then
-        echo $@
+        echo "$@"
     else
-        eval $@
+        eval "$@"
     fi
 }
 

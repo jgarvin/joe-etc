@@ -37,9 +37,9 @@ def split_versioned_name(app_name):
 def find_scratchhost_binary(app_name):
     "Returns the path to the binary on scratchhost if present, otherwise None"
     name, version = split_versioned_name(app_name)
-    bin_path = "/net/devhost/vol/dev/builds/*" + name + "*-" + version
+    bin_path = "/opt/tradelink/bin/archive/*" + name + "*-" + version
     scratchList = glob.glob(bin_path)
-    bin_path = "/net/devhost/vol/dev/builds/*" + name + "*-" + version + "-unstripped"
+    bin_path = "/opt/tradelink/bin/archive/*" + name + "*-" + version + "-unstripped"
     scratchList.extend(glob.glob(bin_path))
     if len(scratchList) and op.exists(scratchList[0]):
         return scratchList[0]

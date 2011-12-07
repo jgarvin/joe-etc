@@ -6,10 +6,10 @@
   "create or update the gnu global tag file"
   (interactive)
   (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
-    (let ((olddir default-directory)
-          (topdir (read-directory-name
-                    "gtags: top of source tree:" default-directory)))
-	  (when (not (string= topdir ""))
+	  (let ((olddir default-directory)
+			(topdir (read-directory-name
+					 "gtags: top of source tree:" default-directory)))
+		(when (not (string= topdir ""))
 		  (progn
 			(cd topdir)
 			(start-process-shell-command "gtags create"
@@ -18,14 +18,14 @@
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
     (start-process-shell-command "gtags update"
-				 "gtags_buffer"
-				 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
+								 "gtags_buffer"
+								 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
-  (lambda()
-    (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-    (local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
+		  (lambda()
+			(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
+			(local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
 
 (require 'gtags)
 (gtags-mode t)
@@ -104,7 +104,7 @@
 				   (not (equal subfolder ".."))
 				   (not (equal subfolder ".")))
 		  (set 'folder-list (append folder-list (list name))))))
-  folder-list))
+	folder-list))
 
 ;;-------------
 ;; Switch between source and header
@@ -140,3 +140,60 @@
 
 ;; Bind the toggle function to a global key
 (global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
+
+;; extra syntax highlighting
+(defface font-lock-bracket-face
+  '((t (:foreground "white")))
+  "Font lock mode face for brackets, e.g. '(', ']', etc."
+  :group 'font-lock-faces)
+(defvar font-lock-bracket-face 'font-lock-bracket-face
+  "Font lock mode face for backets.  Changing this directly
+  affects only new buffers.")
+
+(defvar operators-regexp
+  (regexp-opt '("+" "-" "*" "/" "%" "!"
+                "&" "^" "~" "|"
+                "=" "<" ">"
+                "." "," ";" ":" "?"))
+  "Regexp matching symbols that are operators in most programming
+  languages.")
+
+(setq operators-font-lock-spec
+      (cons operators-regexp
+            (list
+             0 ;; use whole match
+             'font-lock-builtin-face
+             'keep ;; OVERRIDE
+             )))
+
+(defvar brackets-regexp
+  (regexp-opt '("(" ")" "[" "]" "{" "}"))
+  "Regexp matching symbols that are grouping operators in most
+  programming languages.")
+
+(setq brackets-font-lock-spec
+      (cons brackets-regexp
+            (list
+             0 ;; use whole match
+             'font-lock-bracket-face
+             'keep ;; OVERRIDE
+             )))
+
+(setq c-types-regexp
+      (concat
+       "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
+       (regexp-opt '("short" "long" "unsigned" "int" "char" "float" "void") 'words)))
+
+(font-lock-add-keywords
+ 'c-mode
+ (list
+  operators-font-lock-spec
+  brackets-font-lock-spec
+  (cons c-types-regexp 'font-lock-type-face)))
+
+(font-lock-add-keywords
+ 'c++-mode
+ (list
+  operators-font-lock-spec
+  brackets-font-lock-spec
+  (cons c-types-regexp 'font-lock-type-face)))

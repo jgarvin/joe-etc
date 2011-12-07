@@ -6,7 +6,6 @@ browser_list="chromium-browser google-chrome firefox4 firefox3 firefox epiphany 
 if test "$1" = "-n"; then
     temp=`$HOME/etc/utils/pick_best $browser_list`
     echo `basename $temp | tr -d 1234567890`
-    echo `basename $temp | tr -d 1234567890` > $HOME/templog
 else
     $HOME/etc/utils/pick_best $browser_list
 fi

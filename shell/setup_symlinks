@@ -4,13 +4,14 @@ setup_symlink()
 {
     if [[ -a $1 ]]; then
         cd $(dirname $2)
-	if [[ ! -a $(basename $2) ]]; then
+		if [[ ! -a $(basename $2) ]]; then
             ln -sf $1 $(basename $2)
-	fi
+		fi
     fi
 }
 
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
+setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 

@@ -8,11 +8,11 @@ path_append() {
     # Only append a path if it's not already present
     if [ -d "$1" ]; then
         if [[ ":$PATH:" != *":$1:"* ]]; then
-            export PATH="$PATH:$1"
+            echo "$PATH:$1"
         fi
     else
+		echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
-        return 1
     fi
 }
 
@@ -20,11 +20,11 @@ path_prepend() {
     # Only prepend a path if it's not already present
     if [ -d "$1" ]; then
         if [[ ":$PATH:" != *":$1:"* ]]; then
-            export PATH="$1:$PATH"
+            echo "$1:$PATH"
         fi
     else
+		echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
-        return 1
     fi
 }
 
@@ -35,9 +35,9 @@ tsk()
 	# to see running
 	if expr match $1 "grep" > /dev/null
 	then
-		ps_crossplatform | grep -i $@;
+		ps_crossplatform | grep -i "$@";
 	else
-		ps_crossplatform | grep -i $@ | grep -v grep;
+		ps_crossplatform | grep -i "$@" | grep -v grep;
 	fi
 }
 
@@ -47,11 +47,11 @@ error()
 	then
 		if which xmessage > /dev/null;
 		then
-			xmessage "Error: " $@ > /dev/null;
+			xmessage "Error: " "$@" > /dev/null;
 			return 0;
 		fi
 	else
-		echo "Error: " $@ >&2;
+		echo "Error: " "$@" >&2;
 	fi
 }
 

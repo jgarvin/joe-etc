@@ -31,9 +31,10 @@ source $ZDOTDIR/etc/shell/prefs
 source $ZDOTDIR/etc/shell/zsh_util
 
 if [[ $(uname -s) = "Linux" ]]; then
+	local curdir=$PWD
     cd ~/etc
     redo/redo all > ~/.redolog 2>&1
-    cd - > /dev/null
+    cd "$curdir"
 fi
 
 # I want to see my core dumps, up to 4GB
