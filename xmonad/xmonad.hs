@@ -49,6 +49,10 @@ import XMonad.Layout.Magnifier
 
 import PickBrowser
 
+import Data.Monoid                (mappend)
+import XMonad.Layout.MagicFocus   (followOnlyIf)
+import Data.List                  (isInfixOf)
+
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
 -- workspace name. The number of workspaces is determined by the length
@@ -217,6 +221,8 @@ myManageHook = composeAll
     , (stringProperty "WM_NAME")   =? "Insert Spread"   --> doFullFloat
     , (stringProperty "WM_NAME")   =? "Choose Contract" --> doFullFloat
     , appName   =? "VLC (XVideo output)" --> doFloat
+    , className =? "Unity-2d-panel" --> doIgnore
+    , className =? "Unity-2d-launcher" --> doFloat
     , isFullscreen                  --> doFullFloat]
 
 main = do
@@ -232,6 +238,12 @@ instance MultiToggle.Transformer DECORATIONS Window where
 data MAGNIFICATION = MAGNIFICATION deriving (Read, Show, Eq, Typeable)
 instance MultiToggle.Transformer MAGNIFICATION Window where
 		 transform _ x k = k (magnifiercz 1.2 x)
+
+-- Focus follows mouse is annoying for skype, when you mouse over
+-- the video window it brings up the buddy list
+followEventHook event = followOnlyIf (notSkype) event
+  where notSkype =
+          runQuery (fmap (not . ("Call with" `isInfixOf`)) (stringProperty "WM_NAME")) (ev_window event)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -260,6 +272,7 @@ defaults editor home_folder browser_name = gnomeConfig {
                              $ smartBorders
                              $ avoidStruts
                              $ layoutHook gnomeConfig,
+        handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
         manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
         logHook            = ewmhDesktopsLogHook
     }
