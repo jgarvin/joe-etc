@@ -62,9 +62,11 @@ irssi
 irssi-plugin-otr
 irssi-scripts
 js2-mode
-python-cheetah
 scrot
 openssh-server
 ocaml
 ocaml-docs
 expect-dev # for unbuffer cmd
+cmake
+cmake-gui
+pv

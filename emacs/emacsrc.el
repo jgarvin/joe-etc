@@ -142,7 +142,6 @@
 ;; Scroll 1 line at a time
 (setq scroll-step 1)
 
-;; A more useful C-a
 (defun beginning-or-indentation (&optional n)
   "Move cursor to beginning of this line or to its indentation.
   If at indentation position of this line, move to beginning of line.
@@ -153,10 +152,35 @@
   (interactive "P")
   (cond ((or (bolp) n)
 	 (forward-line (- (prefix-numeric-value n))))
-	((save-excursion (skip-chars-backward " \t") (bolp)) ; At indentation.
+	((save-excursion (skip-chars-backward "[:space:]") (bolp)) ; At indentation.
 	 (forward-line 0))
 	(t (back-to-indentation))))
-(global-set-key [(control a)] 'beginning-or-indentation)
+
+(defun end-or-trailing (&optional n)
+  "Move cursor to end of this line or to its indentation.
+  If in middle of of this line, move to last nonwhitespace character on line.
+  If at last nonwhitespace character of this line, move to end of line.
+  With arg N, move backward to the end of the Nth next line.
+  Interactively, N is the prefix arg."
+  (interactive "P")
+  (cond
+   ((or (eolp) n)
+	(message "cond1")
+	(forward-line (prefix-numeric-value (or n 1)))
+	(end-of-line)
+	(skip-chars-backward "[:space:]"))
+   ((save-excursion
+	  (skip-chars-forward "[:space:]")
+	  (eolp)) ; At start of trailing whitespace
+	(message "cond2")
+	(end-of-line))
+   (t
+	(message "cond3")
+	(end-of-line)
+	(skip-chars-backward "[:space:]"))))
+
+(global-set-key "\C-a" 'beginning-or-indentation)
+(global-set-key "\C-e" 'end-or-trailing)
 
 ;; Make C-w consistent with shell usage
 ;; Rebinds cut to C-x C-k though
@@ -192,7 +216,8 @@
       (append
        ;; File name (within directory) starts with a dot.
        '(("\\.cpp.cog\\'" . c++-mode)
-         ("\\.hpp.cog\\'" . c++-mode))
+         ("\\.hpp.cog\\'" . c++-mode)
+		 ("\\.incl$'" . c++-mode))
        auto-mode-alist))
 
 ;; For most modes I'm coding, I don't want line wrap
@@ -200,8 +225,6 @@
 
 ;; Show matching parentheses
 (show-paren-mode 1)
-
-(setq auto-mode-alist (cons '("\\.incl$" . c++-mode) auto-mode-alist))
 
 ;; So I can delete it
 (setq show-trailing-whitespace t)
@@ -463,13 +486,13 @@
 (setq project-roots
       `(("Autotools project"
          :root-contains-files ("configure.ac")
-	 :on-hit (lambda (p) (message (car p))))
+		 :on-hit (lambda (p) (message (car p))))
         ("TL project"
          :filename-regex ,(regexify-ext-list '(tc H C))
-	 :on-hit (lambda (p) (message (car p))))
+		 :on-hit (lambda (p) (message (car p))))
         ("CMake project"
-	 :root-contains-files ("CMakeLists.txt")
-	 :on-hit (lambda (p) (message (car p))))
+		 :root-contains-files ("CMakeLists.txt")
+		 :on-hit (lambda (p) (message (car p))))
 	("Personal config files"
 	 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
 	 :on-hit (lambda (p) (message (car p))))))
@@ -484,6 +507,18 @@
   (concat unused-mode-name ": " (with-project-root default-directory)))
 (setq-default compilation-buffer-name-function 'compilation-buffer-name-jg)
 (global-set-key [f9] 'compile)
+
+;; Ostensibly this is for letting you insert the results of minibuffer
+;; commands into other minibuffer commands, but I like it because it
+;; just lets me use the damn thing without getting the error about
+;; "Command attempted to use minibuffer while in minibuffer"
+(setq enable-recursive-minibuffers t)
+;; This lets you see your recursion depth when using it.
+(minibuffer-depth-indicate-mode)
+
+;; Highlight current line subtly, makes it easier to find cursor
+(global-hl-line-mod)e
+(set-face-background hl-line-face "grey13")
 
 ;; (looking-at "\s-")
 ;; (string-match-p "\s-" " ") ;; nil, wtf?

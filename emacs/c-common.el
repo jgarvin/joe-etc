@@ -182,7 +182,88 @@
 (setq c-types-regexp
       (concat
        "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
-       (regexp-opt '("short" "long" "unsigned" "int" "char" "float" "void") 'words)))
+       (regexp-opt '("short" "long" "unsigned" "signed" "int" "char" "float" "void") 'words)))
+
+;; (setq c-keywords-regexp
+;;       (concat
+;;        "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
+;;        (regexp-opt '(
+;; 					 "and"
+;; 					 "and_eq"
+;; 					 "alignas"
+;; 					 "alignof"
+;; 					 "asm"
+;; 					 "auto"
+;; 					 "bitand"
+;; 					 "bitor"
+;; 					 "bool"
+;; 					 "break"
+;; 					 "case"
+;; 					 "catch"
+;; 					 "class"
+;; 					 "compl"
+;; 					 "const"
+;; 					 "constexpr"
+;; 					 "const_cast"
+;; 					 "continue"
+;; 					 "decltype"
+;; 					 "default"
+;; 					 "delete"
+;; 					 "double"
+;; 					 "dynamic_cast"
+;; 					 "else"
+;; 					 "enum"
+;; 					 "explicit"
+;; 					 "export"
+;; 					 "extern"
+;; 					 "false"
+;; 					 "float"
+;; 					 "for"
+;; 					 "friend"
+;; 					 "goto"
+;; 					 "if"
+;; 					 "inline"
+;; 					 "mutable"
+;; 					 "namespace"
+;; 					 "new"
+;; 					 "noexcept"
+;; 					 "not"
+;; 					 "not_eq"
+;; 					 "nullptr"
+;; 					 "operator"
+;; 					 "or"
+;; 					 "or_eq"
+;; 					 "private"
+;; 					 "protected"
+;; 					 "public"
+;; 					 "register"
+;; 					 "reinterpret_cast"
+;; 					 "return"
+;; 					 "signed"
+;; 					 "sizeof"
+;; 					 "static"
+;; 					 "static_assert"
+;; 					 "static_cast"
+;; 					 "struct"
+;; 					 "switch"
+;; 					 "template"
+;; 					 "this"
+;; 					 "thread_local"
+;; 					 "throw"
+;; 					 "true"
+;; 					 "try"
+;; 					 "typedef"
+;; 					 "typeid"
+;; 					 "typename"
+;; 					 "union"
+;; 					 "unsigned"
+;; 					 "using"
+;; 					 "virtual"
+;; 					 "volatile"
+;; 					 "while"
+;; 					 "xor"
+;; 					 "xor_eq"
+;; 					 ) 'words))
 
 (font-lock-add-keywords
  'c-mode
@@ -190,6 +271,7 @@
   operators-font-lock-spec
   brackets-font-lock-spec
   (cons c-types-regexp 'font-lock-type-face)))
+  ;;(cons c-keywords-regexp 'font-lock-keyword-face)))
 
 (font-lock-add-keywords
  'c++-mode
@@ -197,3 +279,4 @@
   operators-font-lock-spec
   brackets-font-lock-spec
   (cons c-types-regexp 'font-lock-type-face)))
+  ;;(cons c-keywords-regexp 'font-lock-keyword-face)))
