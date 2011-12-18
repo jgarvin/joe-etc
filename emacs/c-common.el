@@ -55,6 +55,9 @@
 (setq tab-width 4)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
 
+;; Make tab stop list match the 4 space indent
+(setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
+
 ;; TODO: Make this automatic for new .h files
 (defun ff/headerize ()
   "Adds the #define HEADER_H, etc."
@@ -90,12 +93,7 @@
   (let ((compilation-read-command nil))
     (smart-compile)))
 
-(defun tlmake-install ()
-  (interactive)
-  (compile "tlmake install"))
-
 (define-key global-map [f9] 'ff/fast-compile)
-(define-key global-map [f10] 'tlmake-install)
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))
 	(dolist (subfolder (directory-files folder))

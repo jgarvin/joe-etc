@@ -11,15 +11,11 @@ fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
-	path_prepend $ANDROID_PATH/tools
-fi
-
-if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
-	path_prepend /home/udesktop178/joeg/opt/bin
+	export PATH=$(path_prepend $ANDROID_PATH/tools)
 fi
 
 if [[ -d $HOME/opt/bin ]]; then
-	path_prepend $HOME/opt/bin
+	export PATH=$(path_prepend $HOME/opt/bin)
 fi
 
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
@@ -101,13 +97,13 @@ fi
 if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
 else
-    test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
-    if [ "$test_for_vpn" = "" ]; then
-		if [ "$(ls -A $HOME/remote/udesktop178)" = "" ]; then
-			fusermount -zu remote/udesktop178
-			sshfs udesktop178.wacker.trdlnk.com:/ $HOME/remote/udesktop178 -o reconnect &
-		fi
-    fi
+    # test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
+    # if [ "$test_for_vpn" = "" ]; then
+	# 	if [ "$(ls -A $HOME/remote/udesktop178)" = "" ]; then
+	# 		fusermount -zu remote/udesktop178
+	# 		sshfs udesktop178.wacker.trdlnk.com:/ $HOME/remote/udesktop178 -o reconnect &
+	# 	fi
+    # fi
 fi
 
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];

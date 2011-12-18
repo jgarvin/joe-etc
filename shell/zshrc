@@ -218,9 +218,6 @@ zstyle ':completion:*' group-name ''
 # Highlight current choice
 zstyle ':completion:*' menu select
 
-# Must call setprompt for this to do anything
-. $ZDOTDIR/etc/shell/fancy-prompt
-
 # To help emacs tramp mode and global desktop,
 # turn off the fancy stuff.
 if [[ "$TERM" = "dumb" || "$TERM" = "" ]]
@@ -229,7 +226,7 @@ then
   unsetopt prompt_cr
   unsetopt prompt_subst
   unfunction precmd
-  unfunction setprompt
+  unfunction preexec
   PS1='$ '
   PS2='$ '
   PROMPT='$ '
@@ -255,6 +252,7 @@ else
  	if [[ -s /etc/motd ]]; then
  		cat /etc/motd
  	fi
+	. $ZDOTDIR/etc/shell/fancy-prompt
 	setprompt
 fi
 

@@ -5,6 +5,10 @@ xhost + > /dev/null 2>&1
 
 local opt_location=/export/home/$LOGNAME/opt
 
+if [[ -d /home/udesktop178/joeg/opt/bin ]]; then
+	path_prepend /home/udesktop178/joeg/opt/bin
+fi
+
 if [[ -d $opt_location/bin ]]; then
     export PATH=$PATH:$opt_location/bin
 fi

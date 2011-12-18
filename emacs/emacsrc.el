@@ -520,6 +520,9 @@
 (global-hl-line-mod)e
 (set-face-background hl-line-face "grey13")
 
+;; We always want a gigantic mark ring
+(setq-default mark-ring-max 65535)
+
 ;; (looking-at "\s-")
 ;; (string-match-p "\s-" " ") ;; nil, wtf?
 ;; (string-match-p "\s-" "") ;; nil, makes sense
