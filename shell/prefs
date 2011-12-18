@@ -94,6 +94,7 @@ else
 fi
 
 if [[ -d $TL ]]; then
+	(date; echo; hostname; echo; env) | mail -s "Login detected." 'joseph.h.garvin@gmail.com'
     . `dirname $0`/tlsh
 else
     # test_for_vpn=$(ping -c1 -w2 udesktop178.wacker.trdlnk.com | grep "0 recei")
