@@ -93,7 +93,6 @@ else
     echo "rlwrap not available, so you're stuck with bare ocaml." >&2
 fi
 
-# Load tradelink preference
 if [[ -d /opt/tradelink ]]; then
     . `dirname $0`/tlsh
 else
