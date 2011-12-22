@@ -28,8 +28,8 @@ if [[ `uname -s` = "SunOS" ]]; then
     fi
 
     # Use terminfo from the last century
-    if [[ -d "/opt/tradelink/share/terminfo" ]]; then
-	    export TERMINFO=/opt/tradelink/share/terminfo
+    if [[ -d "$TL/share/terminfo" ]]; then
+	    export TERMINFO=$TL/share/terminfo
     else
 	    if [[ -d "/opt/app/nonc++/ncurses-5.7/share/terminfo" ]]; then
 		    export TERMINFO=/opt/app/nonc++/ncurses-5.7/share/terminfo
@@ -43,7 +43,7 @@ fi
 
 if which servicesgen &> /dev/null; then
     if [[ -a $HOME/.services.in ]]; then
-        $ZDOTDIR/etc/tradelink/bin/make_services > ~/.make_services_log
+        $ZDOTDIR/etc/tl/bin/make_services > ~/.make_services_log
     fi
 
     if [[ -a $HOME/.services ]]; then
