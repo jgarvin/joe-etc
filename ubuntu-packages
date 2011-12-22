@@ -70,3 +70,4 @@ expect-dev # for unbuffer cmd
 cmake
 cmake-gui
 pv
+nmap
