@@ -31,8 +31,7 @@
 (gtags-mode t)
 (djcb-gtags-create-or-update)
 
-(add-to-list 'load-path "~/etc/autopair-read-only")
-
+(add-to-list 'load-path "~/etc/emacs/autopair-read-only")
 (require 'autopair)
 (autopair-mode)
 (local-set-key (kbd "C-y") 'yank-and-indent)

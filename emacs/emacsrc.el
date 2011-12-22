@@ -89,7 +89,7 @@
   (add-to-list 'default-frame-alist '(font . "Consolas-11")))
 
 ;; Color theme
-(add-to-list 'load-path "~/etc/color-theme-6.6.0")
+(add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
 (require 'color-theme)
 (setq color-theme-is-global t)
 (color-theme-initialize)
