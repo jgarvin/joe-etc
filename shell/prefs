@@ -115,7 +115,7 @@ then
 
     # Protect against having '.' in $PATH.
     # zsh interprets '::' in $PATH to mean ':.:'
-	# This can happen after removing paths above.
+    # This can happen after removing paths above.
     PATH=$(echo $PATH | sed 's/::/:/g')
 
     if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
