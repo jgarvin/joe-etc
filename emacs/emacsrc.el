@@ -517,7 +517,7 @@
 (minibuffer-depth-indicate-mode)
 
 ;; Highlight current line subtly, makes it easier to find cursor
-(global-hl-line-mod)e
+(global-hl-line-mode)
 (set-face-background hl-line-face "grey13")
 
 ;; We always want a gigantic mark ring
