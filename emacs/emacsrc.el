@@ -56,7 +56,6 @@
   (yank)
   (call-interactively 'indent-region))
 
-(load-file "~/etc/undo-tree.el")
 (require 'undo-tree)
 (global-undo-tree-mode)
 (define-key undo-tree-map (kbd "C-/") nil)
