@@ -2,7 +2,7 @@
 
 gmake -f - <<EOF
 
-servicesin_global = /opt/tradelink/share/lib/ds/services.in
+servicesin_global = $TL/share/lib/ds/services.in
 servicesin_local = \$(HOME)/.services.in
 services = \$(HOME)/.services
 
