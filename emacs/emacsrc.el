@@ -21,7 +21,6 @@
 ;; TODO: When doing a find/replace, take the region from the last all whitespace line to the next all
 ;; whitespace line, and indent it.
 
-;; TODO: hide-lines should put something in the status bar to indicate things are hidden
 ;; TODO: executing show-all-invisible should only reveal lines in the current buffer, not all
 
 ;; Enable debugging
@@ -50,11 +49,6 @@
 
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
-
-(load-file "~/etc/hide-lines.el")
-(require 'hide-lines)
-(global-set-key "\C-ch" 'hide-lines)
-(global-set-key "\C-cu" 'show-all-invisible)
 
 (defun yank-and-indent ()
   "Yank and then indent the newly formed region according to mode."
