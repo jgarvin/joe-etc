@@ -11,6 +11,7 @@ path_append() {
             echo "$PATH:$1"
         fi
     else
+	echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
@@ -22,6 +23,7 @@ path_prepend() {
             echo "$1:$PATH"
         fi
     else
+	echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
