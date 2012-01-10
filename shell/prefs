@@ -119,7 +119,7 @@ then
     PATH=$(echo $PATH | sed 's/::/:/g')
 
     if [[ ! -a $HOME/etc/real_locations/$(hostname) ]]; then
-        mkdir $HOME/etc/real_locations/$(hostname)
+        mkdir -p $HOME/etc/real_locations/$(hostname)
     fi
 
     which gdb > $HOME/etc/real_locations/$(hostname)/gdb
@@ -129,8 +129,15 @@ then
     # OK, now put it back in.
     if [[ -d $ZDOTDIR/etc/bin ]]; then
 	    PATH=$(path_prepend $ZDOTDIR/etc/bin)
-	    PATH=$(path_prepend $ZDOTDIR/etc/bin/$(uname -s))
+	    os_bin="$ZDOTDIR/etc/bin/$(uname -s)"
+	    mkdir -p "$os_bin"
+	    PATH=$(path_prepend $os_bin)
     fi
 fi
+
+sshmount() {
+    mkdir -p $ZDOTDIR/remote/$1
+    sshfs $LOGNAME@$1:/home/$LOGNAME $ZDOTDIR/remote/$1
+}
 
 export PATH
