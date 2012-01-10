@@ -14,3 +14,4 @@ xmonad-x86_64-*
 xmonad.errors
 .redo
 .svn
+xmonad/lib/PickBrowser.hs
