@@ -1,8 +1,7 @@
 #!/usr/bin/env zsh
 
 real_loc=$(cat $HOME/etc/real_locations/$(hostname)/gdb)
-cmd="`dirname $0`/../utils/trapper.py '(gdb)' $real_loc \"$@\""
 
 echo "Starting interruptible gdb. See file $0."
 echo "Running: $cmd"
-eval $cmd
+`dirname $0`/../utils/trapper.py '(gdb)' $real_loc "$@"
