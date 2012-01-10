@@ -53,6 +53,8 @@ import Data.Monoid                (mappend)
 import XMonad.Layout.MagicFocus   (followOnlyIf)
 import Data.List                  (isInfixOf)
 
+import XMonad.Actions.CycleWS (nextScreen, prevScreen, shiftNextScreen, shiftPrevScreen)
+
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
 -- workspace name. The number of workspaces is determined by the length
@@ -154,25 +156,31 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- Restart xmonad
     , ((modMask              , xK_q     ),
           broadcastMessage ReleaseResources >> restart "xmonad" True)
+
+    -- Move screens
+    , ((modMask              , xK_e     ), prevScreen)
+    , ((modMask              , xK_r     ), nextScreen)
+    , ((modMask .|. shiftMask, xK_e     ), shiftPrevScreen)
+    , ((modMask .|. shiftMask, xK_r     ), shiftNextScreen)
     ]
-    ++
+    -- ++
 
-    --
-    -- mod-[1..9], Switch to workspace N
-    -- mod-shift-[1..9], Move client to workspace N
-    --
-    [((m .|. modMask, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
-        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-	++
+    -- --
+    -- -- mod-[1..9], Switch to workspace N
+    -- -- mod-shift-[1..9], Move client to workspace N
+    -- --
+    -- [((m .|. modMask, k), windows $ f i)
+    --     | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
+    --     , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+    --     ++
 
-    --
-    -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
-    -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
-    --
-    [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    -- --
+    -- -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
+    -- -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+    -- --
+    -- [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_e, xK_r] [0..]
+    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events

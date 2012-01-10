@@ -1,6 +1,10 @@
 #!/bin/sh
 
-export MAKEFLAGS="-j"`cat /proc/cpuinfo | grep processor | wc -l`
+CORECOUNT=0
+for i in $(cat /proc/cpuinfo | grep -i 'cpu cores' | cut -d' ' -f 3); do
+	CORECOUNT=$(($CORECOUNT + $i))
+done
+export MAKEFLAGS="-j$CORECOUNT"
 
 ps_crossplatform()
 {
