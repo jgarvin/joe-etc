@@ -19,7 +19,7 @@ setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 mkdir -p $HOME/.fonts
 setup_symlink $HOME/etc/fonts $HOME/.fonts/my-fonts
 
-setup_symlink $HOME/etc/gdbinit $HOME/gdb/.gdbinit
+setup_symlink $HOME/etc/gdb/gdbinit $HOME/.gdbinit
 setup_symlink $HOME/etc/emacs/emacsrc.el $HOME/.emacs
 setup_symlink $HOME/etc/xmonad $HOME/.xmonad
 
