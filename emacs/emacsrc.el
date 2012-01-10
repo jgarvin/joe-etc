@@ -73,7 +73,7 @@
 ;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
-(setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii")))
+(setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii" ".d" ".o")))
 
 (load-file "~/etc/breadcrumb.el")
 (require 'breadcrumb)
@@ -514,6 +514,9 @@
 
 ;; We always want a gigantic mark ring
 (setq-default mark-ring-max 65535)
+
+;; Needed for ido-mode to work in large source trees
+(setq ido-max-directory-size 100000)
 
 ;; (looking-at "\s-")
 ;; (string-match-p "\s-" " ") ;; nil, wtf?

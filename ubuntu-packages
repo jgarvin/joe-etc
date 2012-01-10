@@ -71,3 +71,5 @@ cmake
 cmake-gui
 pv
 nmap
+doxygen
+doxygen-doc
