@@ -1,0 +1,15 @@
+#!/bin/sh
+
+filter_comments() {
+	sed 's/\(.*\)#\(.*\)/\1/g' "$@"
+}
+
+if uname -a | grep Ubuntu &> /dev/null
+then
+	# sed invocation removes comments, pounds on their own line
+	# and when they trail after a package name
+	filter_comments $(dirname $0)/../ubuntu-packages | \
+		xargs sudo aptitude install --assume-yes
+else
+	echo >&2 "Couldn't find package file for this OS/distro. See $0"
+fi

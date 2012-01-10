@@ -163,16 +163,16 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask .|. shiftMask, xK_e     ), shiftPrevScreen)
     , ((modMask .|. shiftMask, xK_r     ), shiftNextScreen)
     ]
-    -- ++
+    ++
 
-    -- --
-    -- -- mod-[1..9], Switch to workspace N
-    -- -- mod-shift-[1..9], Move client to workspace N
-    -- --
-    -- [((m .|. modMask, k), windows $ f i)
-    --     | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
-    --     , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    --     ++
+    --
+    -- mod-[1..9], Switch to workspace N
+    -- mod-shift-[1..9], Move client to workspace N
+    --
+    [((m .|. modMask, k), windows $ f i)
+        | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
+        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+    --    ++
 
     -- --
     -- -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
