@@ -74,3 +74,4 @@ nmap
 doxygen
 doxygen-doc
 rlwrap
+libnss3-tools
