@@ -16,7 +16,8 @@ then
     		exec zsh
     	fi
     fi
+
+    # If we must load bash, still load settings
+    source $HOME/etc/shell/prefs
 fi
 
-# If we must load bash, still load tradelink settings
-source $HOME/etc/shell/prefs
