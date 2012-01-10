@@ -137,7 +137,7 @@ fi
 
 sshmount() {
     mkdir -p $ZDOTDIR/remote/$1
-    sshfs $LOGNAME@$1:/home/$LOGNAME $ZDOTDIR/remote/$1
+    sshfs $LOGNAME@$1:/ $ZDOTDIR/remote/$1
 }
 
 export PATH
