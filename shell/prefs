@@ -87,9 +87,11 @@ OOO_FORCE_DESKTOP=gnome
 # Add sensible bindings for ocaml
 if which rlwrap &> /dev/null
 then
-    alias ocaml='rlwrap ocaml'
-else
-    echo "rlwrap not available, so you're stuck with bare ocaml." >&2
+	if which ocaml &> /dev/null
+	then
+		alias ocaml='rlwrap ocaml'
+	else
+		echo "rlwrap not available, so you're stuck with bare ocaml." >&2
 fi
 
 if [[ -d $TL ]]; then
