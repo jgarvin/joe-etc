@@ -4,9 +4,9 @@ setup_symlink()
 {
     if [[ -a $1 ]]; then
         cd $(dirname $2)
-		if [[ ! -a $(basename $2) ]]; then
+	if [[ ! -a $(basename $2) ]]; then
             ln -sf $1 $(basename $2)
-		fi
+	fi
     fi
 }
 
@@ -23,3 +23,15 @@ setup_symlink $HOME/etc/gdb/gdbinit $HOME/.gdbinit
 setup_symlink $HOME/etc/emacs/emacsrc.el $HOME/.emacs
 setup_symlink $HOME/etc/xmonad $HOME/.xmonad
 
+# Works on earlier Ubuntu versions
+xmonad_path=$(which xmonad)
+if [ ! "$xmonad_path" = "" ]; then
+    echo "export WINDOW_MANAGER=$xmonad_path" >> $HOME/.gnomerc
+fi
+
+# Works on Lucid Lynx, probably not for later Unity based versions.
+if which gconftool-2 &> /dev/null; then
+    if which xmonad &> /dev/null; then
+	gconftool-2 -s /desktop/gnome/session/required_components/windowmanager xmonad --type string
+    fi
+fi
