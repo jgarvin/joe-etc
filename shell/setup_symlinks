@@ -1,14 +1,6 @@
 #!/usr/bin/env zsh
 
-setup_symlink()
-{
-    if [[ -a $1 ]]; then
-        cd $(dirname $2)
-	if [[ ! -a $(basename $2) ]]; then
-            ln -sf $1 $(basename $2)
-	fi
-    fi
-}
+. `dirname $0`/util
 
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
 setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
@@ -34,4 +26,9 @@ if which gconftool-2 &> /dev/null; then
     if which xmonad &> /dev/null; then
 	gconftool-2 -s /desktop/gnome/session/required_components/windowmanager xmonad --type string
     fi
+fi
+
+if which git &> /dev/null; then
+	# Make git only push the current branch
+	git config --global push.default=current
 fi
