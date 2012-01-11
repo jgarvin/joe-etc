@@ -195,3 +195,13 @@ color_index() {
   done
   echo -e "$blank_line" "\n" # Bottom border
 }
+
+setup_symlink()
+{
+    if [[ -a $1 ]]; then
+        cd $(dirname $2)
+	if [[ ! -a $(basename $2) ]]; then
+            ln -sf $1 $(basename $2)
+	fi
+    fi
+}
