@@ -485,9 +485,12 @@
         ("CMake project"
 		 :root-contains-files ("CMakeLists.txt")
 		 :on-hit (lambda (p) (message (car p))))
-	("Personal config files"
-	 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
-	 :on-hit (lambda (p) (message (car p))))))
+		("Personal config files"
+		 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
+		 :on-hit (lambda (p) (message (car p))))
+        ("Fallback to current folder"
+		 :root-contains-files (".")
+		 :on-hit (lambda (p) (message (car p))))))
 
 (global-set-key (kbd "C-c f") 'project-root-find-file)
 (global-set-key (kbd "C-c a") 'project-root-ack)
