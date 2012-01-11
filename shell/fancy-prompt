@@ -5,6 +5,32 @@
 # Source: http://aperiodic.net/phil/prompt/
 ################################################################################
 
+export __CURRENT_GIT_BRANCH=
+export __CURRENT_GIT_VARS_INVALID=1
+
+zsh_git_invalidate_vars() {
+    export __CURRENT_GIT_VARS_INVALID=1
+}
+zsh_git_compute_vars() {
+    export __CURRENT_GIT_BRANCH="$(parse_git_branch)"
+    export __CURRENT_GIT_VARS_INVALID=
+}
+
+parse_git_branch() {
+    git branch --no-color 2> /dev/null \
+	| grep '*' | sed 's/\*\ *//g'
+}
+
+chpwd_functions+='zsh_git_chpwd_update_vars'
+zsh_git_chpwd_update_vars() {
+    zsh_git_invalidate_vars
+}
+
+get_git_prompt_info() {
+    test -n "$__CURRENT_GIT_VARS_INVALID" && zsh_git_compute_vars
+    echo $__CURRENT_GIT_BRANCH
+}
+
 function precmd {
 
     local TERMWIDTH
@@ -44,8 +70,11 @@ preexec () {
 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
 	echo -n "\ek$CMD\e\\"
     fi
-}
 
+    case "$(history $HISTCMD)" in
+        *git*) zsh_git_invalidate_vars ;;
+    esac
+}
 
 setprompt () {
     ###
@@ -134,7 +163,7 @@ $PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_URCORNER$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
 %(?..$PR_LIGHT_RED%?$PR_BLUE:)\
 ${(e)PR_APM}$PR_YELLOW%D{%H:%M}\
-$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)$(get_git_prompt_info)$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_NO_COLOUR '
 
