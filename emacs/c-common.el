@@ -125,7 +125,11 @@
 		(if (file-exists-p (concat path "private/" name "." value))
 			(setq result (concat path "private/" name "." value))
 		  (if (file-exists-p (concat path "../" name "." value))
-			  (setq result (concat path "../" name "." value))))))))
+			  (setq result (concat path "../" name "." value))
+			(if (file-exists-p (concat path name "INLINES." value))
+				(setq result (concat path name "INLINES." value))
+			  (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
+				  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
 
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
