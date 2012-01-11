@@ -136,8 +136,21 @@ then
 fi
 
 sshmount() {
-    mkdir -p $ZDOTDIR/remote/$1
-    sshfs $LOGNAME@$1:/ $ZDOTDIR/remote/$1
+    remote_path="$ZDOTDIR/remote/$1-root"
+
+    # create mount point
+    mkdir -p "$remote_path"
+
+    # make future instances passwordless
+    ssh-add &> /dev/null # idempotent, registers key
+    cat $ZDOTDIR/.ssh/id_rsa.pub | ssh $LOGNAME@$1 'cat - >> .ssh/authorized_keys'
+
+    # Remount
+    fusermount -u "$remote_path" &> /dev/null
+    sshfs $LOGNAME@$1:/ "$remote_path"
+
+    cd $ZDOTDIR/remote
+    ln -Tsf "$1-root/home/$LOGNAME" "$1"
 }
 
 export PATH
