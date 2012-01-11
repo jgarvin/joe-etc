@@ -271,10 +271,10 @@ if [ ! -f "$HIST_BACKUP_FILE" ]; then
 fi
 
 synergy_conf="$ZDOTDIR/etc/synergy/$(hostname).conf"
-if [ -f $synergy_conf ]; then
-    if which synergys &> /dev/null; then
-	if ! tsk synergys &> /dev/null; then
+if [ -f "$synergy_conf" ] && \
+    which synergys &> /dev/null && \
+    ! tsk synergys &> /dev/null && \
+    [ -n "$DISPLAY" ]
+then
 	    synergys -f --config $synergy_conf > $ZDOTDIR/.synergy_log 2>&1 &; disown
-	fi
-    fi
 fi
