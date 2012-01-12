@@ -9,9 +9,11 @@ path_append() {
     if [ -d "$1" ]; then
         if [[ ":$PATH:" != *":$1:"* ]]; then
             echo "$PATH:$1"
+		else
+			echo "$PATH"
         fi
     else
-	echo "$PATH"
+		echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
@@ -19,11 +21,13 @@ path_append() {
 path_prepend() {
     # Only prepend a path if it's not already present
     if [ -d "$1" ]; then
-        if [[ ":$PATH:" != *":$1:"* ]]; then
+		if ! (echo $PATH | grep ":$1:" &> /dev/null); then
             echo "$1:$PATH"
-        fi
+		else
+			echo "$PATH"
+		fi
     else
-	echo "$PATH"
+		echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
