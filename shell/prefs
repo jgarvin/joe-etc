@@ -14,8 +14,8 @@ if [[ -d $ANDROID_PATH ]]; then
 	export PATH=$(path_prepend $ANDROID_PATH/tools)
 fi
 
-if [[ -d $HOME/opt/bin ]]; then
-	export PATH=$(path_prepend $HOME/opt/bin)
+if [[ -d "$HOME/opt/bin" ]]; then
+ 	export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
@@ -30,7 +30,7 @@ ack()
 	~/etc/bin/ack \
 		--type-set incl=.incl \
 		--type-set tc=.tc --sort-files \
-		--type-set bejunk=.ii,.utii,.P --type=nobejunk \
+		--type-set bejunk=.ii,.utii,.P,.d --type=nobejunk \
 		--type-set pagedisplay=.page \
 		--type-add hh=.ipp "$@";
 }
@@ -126,7 +126,7 @@ then
 	    PATH=$(path_prepend $ZDOTDIR/etc/bin)
 	    os_bin="$ZDOTDIR/etc/bin/$(uname -s)"
 	    mkdir -p "$os_bin"
-	    PATH=$(path_prepend $os_bin)
+	    PATH=$(path_prepend "$os_bin")
     fi
 fi
 
