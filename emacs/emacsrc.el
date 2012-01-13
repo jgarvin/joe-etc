@@ -1,30 +1,10 @@
-;; TODO: Tab should OBEY. If the line is already indented, assume I want to insert a tab.
+;; TODO: 'n' and 'p' should go up and down without ctrl
+;; when in a read only buffer. will make navigating ack
+;; output easier.
 
-;; TODO: Make canceling telling global path just disable it
-
-;; TODO: vc-annotate on CVS should use current working version when on a branch
-
-;; TODO: If you undo, the mark should be reset.
-
-;; Ideal tab behavior:
-;; Indent line if not indented
-;; If indented already, and are at beginning of line, insert a tab
-;; If not indented already, and not at beginning of line, do code completion
-
-;; Module: use indentation already used in file!
-;; Nice to have: Next/prev buffer that is a file in same folder or subfolder, has the effect
-;; of letting me browse project files. Nice for having dual emacs groups for different projects...
-
-;; TODO: "automatic vertical indenting", know how much I like to space out my functions and classes
-;; and automatically make sure that many lines are preserved when I copy/paste
-
-;; TODO: When doing a find/replace, take the region from the last all whitespace line to the next all
-;; whitespace line, and indent it.
-
-;; TODO: executing show-all-invisible should only reveal lines in the current buffer, not all
+;; TODO: No global prompt for /tmp
 
 ;; Enable debugging
-;;(toggle-debug-on-error)
 (setq-default debug-on-error t)
 
 (when (getenv "DISPLAY")
@@ -508,8 +488,6 @@
 ;; just lets me use the damn thing without getting the error about
 ;; "Command attempted to use minibuffer while in minibuffer"
 (setq enable-recursive-minibuffers t)
-;; This lets you see your recursion depth when using it.
-(minibuffer-depth-indicate-mode)
 
 ;; Highlight current line subtly, makes it easier to find cursor
 (global-hl-line-mode)
@@ -521,21 +499,8 @@
 ;; Needed for ido-mode to work in large source trees
 (setq ido-max-directory-size 100000)
 
-;; (looking-at "\s-")
-;; (string-match-p "\s-" " ") ;; nil, wtf?
-;; (string-match-p "\s-" "") ;; nil, makes sense
-
-;; (string-match-p "\s-*" "") ;; nil, wtf?
-;; (string-match-p "\s-*" " ") ;; 0, makes sense
-;; (string-match-p "\s-*" "  ") ;; 0, makes sense
-;; (string-match-p "\s-*" "  ") ;; 0, makes sense
-;; (string-match-p "(\s-)*" " ") ;; nil, wtf?
-
-;; (string-match-p "\s-+" "") ;; nil, makes sense
-;; (string-match-p "\s-+" " ") ;; nil, wtf?
-;; (string-match-p "\s-+" "  ") ;; nil, wtf?
-
-;; (string-match-p "[:space:]" "") ;; nil, makes sense
-;; (string-match-p "[:space:]" " ") ;; nil, wtf?
-;; (string-match-p "[:space:]*" " ") ;; 0, makes sense
-;; (string-match-p "[:space:]*" "  ") ;; 0, makes sense
+;; Starting in emacs 23 there's some stupid default abbreviation
+;; for trying to correct mispellings of 'else', problem is it doesn't
+;; understand context, so a legit variable named elSE will always get
+;; changed to Else.
+(abbrev-mode 0)
