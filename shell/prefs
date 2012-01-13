@@ -140,9 +140,12 @@ sshmount() {
     ssh-add &> /dev/null # idempotent, registers key
     cat $ZDOTDIR/.ssh/id_rsa.pub | ssh $LOGNAME@$1 'cat - >> .ssh/authorized_keys'
 
+	# apparently these are best for performance
+	sshfs_opts="-o allow_other,reconnect,transform_symlinks,"
+
     # Remount
     fusermount -u "$remote_path" &> /dev/null
-    sshfs $LOGNAME@$1:/ "$remote_path"
+    sshfs $LOGNAME@$1:/ "$remote_path" $sshfs_opts
 
     cd $ZDOTDIR/remote
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
