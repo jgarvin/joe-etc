@@ -29,7 +29,10 @@
 
 (require 'gtags)
 (gtags-mode t)
-(djcb-gtags-create-or-update)
+(if (string-match (concat "^/home/"
+						  (getenv "LOGNAME") ".*")
+				  default-directory)
+	(djcb-gtags-create-or-update))
 
 (add-to-list 'load-path "~/etc/emacs/autopair-read-only")
 (require 'autopair)

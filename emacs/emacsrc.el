@@ -4,6 +4,9 @@
 
 ;; TODO: No global prompt for /tmp
 
+;; for emacsclient
+(server-start)
+
 ;; Enable debugging
 (setq-default debug-on-error t)
 
