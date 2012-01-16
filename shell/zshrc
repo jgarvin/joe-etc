@@ -41,11 +41,6 @@ fi
 ulimit -c 8000000
 # "core.%e.%p.%u.%t"
 
-# Sync configuration with github every login.
-if ! gitsync > ~/.gitsynclog 2>&1; then
-    echo "Error syncing git. See ~/.gitsynclog."
-fi &
-
 echo "DATE=$(date) HOST=$(hostname) USER=$LOGNAME TERM=$TERM" >> ~/.shell_log
 
 cdr()
@@ -278,3 +273,5 @@ if [ -f "$synergy_conf" ] && \
 then
 	    synergys -f --config $synergy_conf > $ZDOTDIR/.synergy_log 2>&1 &; disown
 fi
+
+$ZDOTDIR/etc/bin/sync-repos

@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+pushd
+cd $ZDOTDIR/remote
+for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
+	if [ ! "$i" = "." ] && \
+		[ -d "$i/etc" ]; then
+		cd "$i/etc"
+		date >> ~/.gitsynclog
+		if ! git pull "$ZDOTDIR/etc" master >> ~/.gitsynclog 2>&1; then
+			    echo "Error syncing git. See ~/.gitsynclog."
+		fi
+		echo >> ~/.gitsynclog
+	fi &
+done
+popd
