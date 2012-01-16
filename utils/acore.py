@@ -12,8 +12,6 @@ import popen2
 
 # TODO: Determine scratchhost binary to open based on timestamps when ambiguous.
 # TODO: -s to just list cores
-# TODO: Map /opt/tradelink/bin whichVersion scripts to their
-# symlinks in /opt/tradelink/bin/newInst
 # TODO: Search for versions in logfiles (flail integration). Would
 # help with apps whose name is too long.
 
@@ -37,9 +35,9 @@ def split_versioned_name(app_name):
 def find_scratchhost_binary(app_name):
     "Returns the path to the binary on scratchhost if present, otherwise None"
     name, version = split_versioned_name(app_name)
-    bin_path = "/opt/tradelink/bin/archive/*" + name + "*-" + version
+    bin_path = os.getenv("TL") + "bin/archive/*" + name + "*-" + version
     scratchList = glob.glob(bin_path)
-    bin_path = "/opt/tradelink/bin/archive/*" + name + "*-" + version + "-unstripped"
+    bin_path = os.getenv("TL") + "bin/archive/*" + name + "*-" + version + "-unstripped"
     scratchList.extend(glob.glob(bin_path))
     if len(scratchList) and op.exists(scratchList[0]):
         return scratchList[0]
@@ -47,7 +45,7 @@ def find_scratchhost_binary(app_name):
     return None
 
 def name_contains_version(app_name):
-    """Returns True if the given name contains a tradelink version number,
+    """Returns True if the given name contains a version number,
     e.g. 'foo-1.2' will return True but 'foo' will not."""
     hyphen_split = app_name.rsplit('-', 1)
     if len(hyphen_split) == 1:
