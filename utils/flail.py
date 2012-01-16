@@ -85,7 +85,7 @@ def get_glob_dirs(application):
     glob_prefixes = ["/var/tmp/"]
 
     if application and not app_is_pid(application) and not args.local_only:
-        glob_app_dirnames = "/opt/tradelink/share/repository/*" + application + "*"
+        glob_app_dirnames = os.getenv("TL") + "share/repository/*" + application + "*"
         glob_prefixes.extend(glob.glob(glob_app_dirnames))
 
     return glob_prefixes
