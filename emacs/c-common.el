@@ -1,7 +1,41 @@
-(add-to-list 'load-path "/home/udesktop178/joeg/global-install/share/gtags/")
+;; (add-to-list 'load-path "/home/udesktop/share/gtags/")
+
+(defun extract-version-number (x)
+  (mapcar 'string-to-int
+		  (split-string (car (cdr (split-string x "-"))) "\\.")))
+
+(defun pick-greater-version-helper (x y)
+  (cond ((= (car x) (car y))
+		 (if (> (length (cdr x)) 0)
+			 (pick-greater-version-helper (cdr x) (cdr y))
+		   (error x y (length (cdr x)))))
+		((> (car x) (car y)) 0)
+		((< (car x) (car y)) 1)))
+
+(defun pick-greater-version (x y)
+  (if (= (pick-greater-version-helper
+		  (extract-version-number x)
+		  (extract-version-number y)) 0)
+	  x
+	y))
+
+;; ;; Defer to locally installed global if it exists
+;; ;; And use the highest version number installed
+;; (let ((global-install
+;; 	   (reduce 'pick-greater-version
+;; 			   (filter! 'file-directory-p
+;; 						(mapcar (lambda (x) (concat "~/opt/" x))
+;; 								(directory-files "~/opt" nil "global-?.?"))))))
+;;   (add-to-list 'load-path (concat global-install "/share/gtags")))
+
+(if (file-directory-p "~/opt/share/gtags")
+    (add-to-list 'load-path "~/opt/share/gtags"))
 
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
+(require 'gtags)
+(gtags-mode t)
+
 (defun djcb-gtags-create-or-update ()
   "create or update the gnu global tag file"
   (interactive)
@@ -14,12 +48,12 @@
 			(cd topdir)
 			(start-process-shell-command "gtags create"
 										 "gtags_buffer"
-										 "~/etc/utils/remote_launch gtags -q && echo 'created tagfile'")
+										 "gtags -q && echo 'created tagfile'")
 			(cd olddir)))) ; restore
     ;;  tagfile already exists; update it
     (start-process-shell-command "gtags update"
 								 "gtags_buffer"
-								 "~/etc/utils/remote_launch global -u 2> /dev/null && echo 'updated tagfile'")))
+								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-mode-hook
@@ -27,8 +61,6 @@
 			(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
 			(local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
 
-(require 'gtags)
-(gtags-mode t)
 (if (string-match (concat "^/home/"
 						  (getenv "LOGNAME") ".*")
 				  default-directory)

@@ -67,9 +67,7 @@
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
-(if (> (display-pixel-width) 1280)
-	(add-to-list 'default-frame-alist '(font . "Consolas-12"))
-  (add-to-list 'default-frame-alist '(font . "Consolas-11")))
+(custom-set-faces '(default ((t (:height 105 :family "Consolas" :embolden f)))))
 
 ;; Color theme
 (add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
@@ -93,9 +91,9 @@
 ;; Get rid of the visual bell for some common 'errors'
 (setq ring-bell-function
       (lambda ()
-		(unless (memq this-command
-                          '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
-		  (ding))))
+	(unless (memq this-command
+		      '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
+	  (ding))))
 
 ;; Show me the region until I do something on it
 (setq transient-mark-mode t)
