@@ -61,6 +61,23 @@
 			(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
 			(local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
 
+;; In later gtags versions these aren't set by default.
+(define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\^?" 'scroll-down)
+(define-key gtags-select-mode-map " " 'scroll-up)
+(define-key gtags-select-mode-map "\C-b" 'scroll-down)
+(define-key gtags-select-mode-map "\C-f" 'scroll-up)
+(define-key gtags-select-mode-map "k" 'previous-line)
+(define-key gtags-select-mode-map "j" 'next-line)
+(define-key gtags-select-mode-map "p" 'previous-line)
+(define-key gtags-select-mode-map "n" 'next-line)
+(define-key gtags-select-mode-map "q" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "u" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
+(define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
+(define-key gtags-select-mode-map "\e." 'gtags-select-tag)
+
 (if (string-match (concat "^/home/"
 						  (getenv "LOGNAME") ".*")
 				  default-directory)
@@ -73,24 +90,29 @@
 
 (setq require-final-newline t)
 
-;; Don't indent whole files because they're in a namespace block
-(c-set-offset 'innamespace 0)
-
 (setq c-hungry-delete-key t)
 (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
 (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
 
+(if (string-match ".*jgl.*" (system-name))
+    (progn
+      (setq my-indent-size 2)
+      (c-set-offset 'innamespace 2))
+  (progn
+    (setq my-indent-size 4)
+    (c-set-offset 'innamespace 0)))
+
 ;; Prefer 4-space tabs
 (setq c-default-style "bsd")
-(setq c-basic-offset 4)
+(setq c-basic-offset my-indent-size)
 (setq indent-tabs-mode nil)
-(setq default-tab-width 4)
-(setq tab-width 4)
+(setq default-tab-width my-indent-size)
+(setq tab-width my-indent-size)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
 
 ;; Make tab stop list match the 4 space indent
-(setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
+;;(setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
 
 ;; TODO: Make this automatic for new .h files
 (defun ff/headerize ()

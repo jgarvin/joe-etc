@@ -7,6 +7,19 @@
 ;; for emacsclient
 (server-start)
 
+;; When running a local install of emacs, still pull in officially
+;; installed packages.
+(when (and (file-directory-p "/usr/share/emacs/site-lisp")
+					 (not (memq "/usr/share/emacs/site-lisp" load-path)))
+	(add-to-list 'load-path "/usr/share/emacs/site-lisp"))
+
+;; Color theme
+(add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
+(require 'color-theme)
+(setq color-theme-is-global t)
+(color-theme-initialize)
+(color-theme-euphoria)
+
 ;; Enable debugging
 (setq-default debug-on-error t)
 
@@ -68,13 +81,6 @@
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
 (custom-set-faces '(default ((t (:height 105 :family "Consolas" :embolden f)))))
-
-;; Color theme
-(add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
-(require 'color-theme)
-(setq color-theme-is-global t)
-(color-theme-initialize)
-(color-theme-euphoria)
 
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
