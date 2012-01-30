@@ -31,5 +31,5 @@ echo "Rsyncing from $source_path to $target_path..."
 
 if [ "$DRY_RUN" = "" ]; then
 		mkdir -p "$target_path"
-		rsync -arv --append-verify "$source_path"/* "$target_path"
+		rsync -arv --append-verify "$source_path/" "$target_path/"
 fi
