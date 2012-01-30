@@ -95,11 +95,6 @@ then
 	fi
 fi
 
-if [[ -d $TL ]]; then
-	(date; echo; hostname; echo; env) | mail -s "Login detected." 'joseph.h.garvin@gmail.com'
-    . `dirname $0`/tlsh
-fi
-
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     # Although we haven't added $HOME/etc/bin to our path yet,
