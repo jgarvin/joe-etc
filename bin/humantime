@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+if [ -z "$1" ]; then
+    echo "Usage: humantime \$time"
+    return 1
+fi
+
+python -c "import time,sys; arg = sys.argv[1]; digits = len(arg) - 10; whole = long(arg) // 10**digits; frac = long(arg) % 10**digits; fracStr = ('%%.0%dd' % digits) % frac; print time.strftime('%m/%d/%Y %H:%M:%S', time.localtime(whole)) + '.' + fracStr" $1
