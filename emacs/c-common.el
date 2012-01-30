@@ -34,7 +34,6 @@
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
 (require 'gtags)
-(gtags-mode t)
 
 (defun djcb-gtags-create-or-update ()
   "create or update the gnu global tag file"
@@ -55,11 +54,21 @@
 								 "gtags_buffer"
 								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
+(defun gtags-select-tag-and-kill-buffer ()
+  (interactive)
+  (let ((buf (current-buffer)))
+    (gtags-select-tag)
+    (kill-buffer buf)))
+
 ;; Rebind the normal find tag functions to use the GNU global versions
-(add-hook 'gtags-mode-hook
-		  (lambda()
-			(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-			(local-set-key (kbd "M-,") 'gtags-find-rtag)))  ; reverse tag
+(add-hook 'gtags-select-mode-hook
+ 		  (lambda()
+				(local-set-key (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))  ; reverse tag
+
+
+;; Rebind the normal find tag functions to use the GNU global versions
+(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
+(local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
 
 ;; In later gtags versions these aren't set by default.
 (define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
@@ -76,12 +85,13 @@
 (define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
 (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
 (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
-(define-key gtags-select-mode-map "\e." 'gtags-select-tag)
 
 (if (string-match (concat "^/home/"
 						  (getenv "LOGNAME") ".*")
 				  default-directory)
 	(djcb-gtags-create-or-update))
+
+(gtags-mode t)
 
 (add-to-list 'load-path "~/etc/emacs/autopair-read-only")
 (require 'autopair)
@@ -94,6 +104,9 @@
 (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
 (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
+
+;; TODO: Ask on SO why innamespace offset isn't applying to
+;; to comments.
 
 (if (string-match ".*jgl.*" (system-name))
     (progn
