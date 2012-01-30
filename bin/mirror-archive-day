@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+exchange="$1"
+
+year=$(echo "$2" | cut -d'-' -f 1)
+month=$(echo "$2" | cut -d'-' -f 2)
+day=$(echo "$2" | cut -d'-' -f 3)
+
+archive_path="$CNAME/ARCHIVE/TIER1/$PNAME/RAW/$exchange/primary/$year/$month/$day"
+
+source_path="/$archive_path"
+target_path="$HOME/local_archive/$archive_path"
+
+if [ ! -d "$source_path" ]; then
+		echo >&2 "Source directory does not exist: $source_path"
+		exit 1
+fi
+
+mkdir -p "$target_path"
+
+echo "Copying from $source_path to $target_path..."
+cp "$source_path"/* "$target_path"
