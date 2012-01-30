@@ -146,4 +146,8 @@ sshmount() {
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
 }
 
+if [ -d /j* ]; then
+		source "$HOME/etc/shell/jsh"
+fi
+
 export PATH
