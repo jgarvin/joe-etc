@@ -27,9 +27,9 @@ if [ ! -d "$source_path" ]; then
 		exit 1
 fi
 
-echo "Copying from $source_path to $target_path..."
+echo "Rsyncing from $source_path to $target_path..."
 
 if [ "$DRY_RUN" = "" ]; then
 		mkdir -p "$target_path"
-		cp "$source_path"/* "$target_path"
+		rsync -arv --append-verify "$source_path"/* "$target_path"
 fi
