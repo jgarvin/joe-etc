@@ -4,10 +4,15 @@ import sys
 
 val = sys.argv[1]
 
+if val.startswith("0x"):
+    hexval = val[2:]
+    print "'%c' %d" % (int(hexval, 16), int(hexval, 16))
+    sys.exit(0)
+
 try:
-    print "%c" % int(val)
+    print "'%c' 0x%x" % (int(val), int(val))
     sys.exit(0)
 except ValueError:
-    print ord(val)
+    print "%d 0x%x" % (ord(val), ord(val))
     sys.exit(0)
 
