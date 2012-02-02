@@ -2,16 +2,9 @@
 
 REAL_NAME="Joseph Garvin"
 
-basep=$(ls -d /j*)
-
-git clone https://$LOGNAME@"$CNAME"git/"$PNAME_LOWER"/"$PNAME_LOWER".git
-pushd
+cmd=$(echo git clone https://$LOGNAME@"$CNAME"git/"$PNAME_LOWER"/"$PNAME_LOWER".git)
+echo "Running:" "$cmd"
+eval "$cmd"
 cd "$PNAME_LOWER"
-
-if which gtags &> /dev/null; then
-		gtags -q
-fi
-
-git config user.email "$LOGNAME"@"$basep""trading.com"
+git config user.email "$LOGNAME"@"$CNAME""trading.com"
 git config user.name "$REAL_NAME"
-popd
