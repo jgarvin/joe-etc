@@ -2,4 +2,6 @@
 
 export CNAME=$(ls -d /j* | sed 's/\///g')
 export PNAME=$(ls -d /"$CNAME"/ARCHIVE/TIER1/J* | xargs basename | sed 's/@//g')
+export PNAME_LOWER=$(echo $PNAME | tr '[:upper:]' '[:lower:]')
+
 
