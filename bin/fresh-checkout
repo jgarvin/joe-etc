@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+
+REAL_NAME="Joseph Garvin"
+
+basep=$(ls -d /j*)
+
+git clone https://$LOGNAME@"$CNAME/"git/"$PNAME_LOWER"/"$PNAME_LOWER".git
+pushd
+cd "$PNAME_LOWER"
+gtags -q
+git config user.email "$LOGNAME"@"$basep""trading.com"
+git config user.name "$REAL_NAME"
+popd
