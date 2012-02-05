@@ -132,8 +132,8 @@ sshmount() {
     ssh-add &> /dev/null # idempotent, registers key
     cat $ZDOTDIR/.ssh/id_rsa.pub | ssh $LOGNAME@$1 'cat - >> .ssh/authorized_keys'
 
-	# apparently these are best for performance
-	sshfs_opts="-o allow_other,reconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
+    # apparently these are best for performance
+    sshfs_opts="-o allow_other,reconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
 
     # Remount
     fusermount -u "$remote_path" &> /dev/null
