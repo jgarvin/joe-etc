@@ -28,10 +28,8 @@ fi
 ack()
 {
 	~/etc/bin/ack \
+	        --sort-files \
 		--type-set incl=.incl \
-		--type-set tc=.tc --sort-files \
-		--type-set bejunk=.ii,.utii,.P,.d --type=nobejunk \
-		--type-set pagedisplay=.page \
 		--type-add hh=.ipp "$@";
 }
 
