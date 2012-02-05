@@ -144,7 +144,7 @@ sshmount() {
 }
 
 if [ -d /j* ]; then
-		source "$HOME/etc/shell/jsh"
+    source "$HOME/etc/shell/jsh"
 fi
 
 export PATH
