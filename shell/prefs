@@ -150,4 +150,6 @@ if [ -d /j* ]; then
 		source "$HOME/etc/shell/jsh"
 fi
 
+export MAKEFLAGS="-j"
+
 export PATH

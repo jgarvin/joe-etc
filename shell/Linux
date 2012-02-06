@@ -1,17 +1,6 @@
 #!/bin/sh
 
-CORECOUNT=0
-for i in $(cat /proc/cpuinfo | grep -i 'cpu cores' | cut -d' ' -f 3); do
-	CORECOUNT=$(($CORECOUNT + $i))
-done
-export MAKEFLAGS="-j$CORECOUNT"
-
 ps_crossplatform()
 {
     ps aux;
-}
-
-phone()
-{
-    ssh udesktop178 "zsh --interactive -c 'phone "$@"'"
 }
