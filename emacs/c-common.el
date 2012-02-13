@@ -63,8 +63,7 @@
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-select-mode-hook
  		  (lambda()
-				(local-set-key (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))  ; reverse tag
-
+				(define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
@@ -210,7 +209,11 @@
     (find-file (find-other-file fname ext))))
 
 ;; Bind the toggle function to a global key
-(global-set-key "\M-t" 'toggle-header-buffer) ;; TODO: Think of better key
+(global-set-key "\M-t" 'toggle-header-buffer)
+
+(require 'whitespace)
+(setq whitespace-style '(face lines))
+(whitespace-mode t)
 
 ;; extra syntax highlighting
 (defface font-lock-bracket-face
