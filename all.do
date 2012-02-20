@@ -1,1 +1,1 @@
-redo-ifchange xmonad/lib/PickBrowser.hs bin/ack
+redo-ifchange xmonad/lib/PickBrowser.hs

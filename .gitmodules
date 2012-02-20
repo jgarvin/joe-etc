@@ -10,3 +10,6 @@
 [submodule "redo"]
 	path = redo
 	url = https://github.com/apenwarr/redo.git
+[submodule "ack"]
+	path = ack
+	url = https://github.com/petdance/ack.git
