@@ -1,1 +1,1 @@
-redo xmonad/lib/PickBrowser.hs > ~/.pickbrowserlog 2>&1
+redo-ifchange xmonad/lib/PickBrowser.hs bin/ack
