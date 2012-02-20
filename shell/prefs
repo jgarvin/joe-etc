@@ -151,7 +151,7 @@ sshmount() {
 		fi
 }
 
-if [ -d /j* ]; then
+if zsh -c "echo /j* 2> /dev/null" 2> /dev/null; then
     source "$HOME/etc/shell/jsh"
 fi
 
