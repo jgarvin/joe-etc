@@ -82,3 +82,4 @@ texlive-font-utils # for epstopdf, needed by doxygen to do graphviz class diagra
 mesa-utils
 timeout
 indent
+xfce4-terminal

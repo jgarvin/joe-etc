@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if test "$TL_SITE" = ""; then
-    gnome-terminal --disable-factory
+if which xfce4-terminal &> /dev/null; then
+		xfce4-terminal
 else
-    $HOME/etc/utils/remote_launch gnome-terminal --disable-factory --command \"ssh udesktop178\"
+		gnome-terminal --disable-factory
 fi
