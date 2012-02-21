@@ -508,8 +508,3 @@
 ;; Needed for ido-mode to work in large source trees
 (setq ido-max-directory-size 100000)
 
-;; Starting in emacs 23 there's some stupid default abbreviation
-;; for trying to correct mispellings of 'else', problem is it doesn't
-;; understand context, so a legit variable named elSE will always get
-;; changed to Else.
-(abbrev-mode 0)
