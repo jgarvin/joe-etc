@@ -1,1 +1,0 @@
-(load "~/etc/emacsrc.el")

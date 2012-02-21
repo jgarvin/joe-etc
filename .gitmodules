@@ -10,9 +10,9 @@
 [submodule "redo"]
 	path = redo
 	url = https://github.com/apenwarr/redo.git
-[submodule "shell/zsh-highlighting"]
-	path = shell/zsh-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "jsh"]
 	path = jsh
 	url = ssh://jgarvin@chdv-jgl1105/home/jgarvin/jsh
+[submodule "ack"]
+	path = ack
+	url = https://github.com/petdance/ack.git

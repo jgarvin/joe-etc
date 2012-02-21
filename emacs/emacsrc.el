@@ -10,8 +10,8 @@
 ;; When running a local install of emacs, still pull in officially
 ;; installed packages.
 (when (and (file-directory-p "/usr/share/emacs/site-lisp")
-					 (not (memq "/usr/share/emacs/site-lisp" load-path)))
-	(add-to-list 'load-path "/usr/share/emacs/site-lisp"))
+	   (not (memq "/usr/share/emacs/site-lisp" load-path)))
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp"))
 
 ;; Color theme
 (add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
@@ -29,12 +29,12 @@
   (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
   ;; When remotely logging in, need to remap alt for emacs keybindings to work
   (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
-	(setq x-alt-keysym 'meta)))
+    (setq x-alt-keysym 'meta)))
 
 (setq backup-directory-alist
-	  `((".*" . ,"~/backup")))
+      `((".*" . ,"~/backup")))
 (setq auto-save-file-name-transforms
-	  `((".*" ,"~/backup" t)))
+      `((".*" ,"~/backup" t)))
 (setq tramp-backup-directory-alist backup-directory-alist)
 
 (add-to-list 'load-path "~/etc/drag-stuff")
@@ -145,19 +145,19 @@
   (interactive "P")
   (cond
    ((or (eolp) n)
-	(message "cond1")
-	(forward-line (prefix-numeric-value (or n 1)))
-	(end-of-line)
-	(skip-chars-backward "[:space:]"))
+    (message "cond1")
+    (forward-line (prefix-numeric-value (or n 1)))
+    (end-of-line)
+    (skip-chars-backward "[:space:]"))
    ((save-excursion
-	  (skip-chars-forward "[:space:]")
-	  (eolp)) ; At start of trailing whitespace
-	(message "cond2")
-	(end-of-line))
+      (skip-chars-forward "[:space:]")
+      (eolp)) ; At start of trailing whitespace
+    (message "cond2")
+    (end-of-line))
    (t
-	(message "cond3")
-	(end-of-line)
-	(skip-chars-backward "[:space:]"))))
+    (message "cond3")
+    (end-of-line)
+    (skip-chars-backward "[:space:]"))))
 
 (global-set-key "\C-a" 'beginning-or-indentation)
 (global-set-key "\C-e" 'end-or-trailing)
@@ -175,7 +175,7 @@
       (append
        ;; File name (within directory) starts with a dot.
        '(("zshrc" . shell-script-mode)
-		 ("\\.do\\'" . shell-script-mode))
+	 ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
 ;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
@@ -197,7 +197,7 @@
        ;; File name (within directory) starts with a dot.
        '(("\\.cpp.cog\\'" . c++-mode)
          ("\\.hpp.cog\\'" . c++-mode)
-		 ("\\.incl$'" . c++-mode))
+	 ("\\.incl$'" . c++-mode))
        auto-mode-alist))
 
 ;; For most modes I'm coding, I don't want line wrap
@@ -211,8 +211,8 @@
 
 ;; Delete trailing whitespace automagically
 (add-hook 'write-file-hooks
-  (lambda ()
-    (delete-trailing-whitespace)))
+	  (lambda ()
+	    (delete-trailing-whitespace)))
 
 ;; Most useful binding ever
 (global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
@@ -220,10 +220,10 @@
 ;; By default compilation frame is half the window. Yuck.
 (setq compilation-window-height 8)
 
- ;; keep the window focused on the messages during compilation
+;; keep the window focused on the messages during compilation
 (setq compilation-scroll-output t)
 
- ;; Keep the highlight on the compilation error
+;; Keep the highlight on the compilation error
 (setq next-error-highlight t)
 
 (defun buffer-mode (buffer-or-string)
@@ -253,8 +253,8 @@
 (defun indent-newline-indent ()
   (interactive)
   (progn
-	(indent-according-to-mode)
-	(newline-and-indent)))
+    (indent-according-to-mode)
+    (newline-and-indent)))
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
@@ -266,8 +266,8 @@
   "Tries to close the current frame, if it's the only one left just exits."
   (interactive)
   (if (= (length (frame-list)) 1)
-	  (save-buffers-kill-emacs)
-	(delete-frame)))
+      (save-buffers-kill-emacs)
+    (delete-frame)))
 
 ;; Close windows, not emacs.
 (global-set-key "\C-x\C-c" 'close-frame-or-exit)
@@ -286,27 +286,27 @@
   (interactive "bBuffer to make unique: ")
   (setq buffer (get-buffer buffer))
   (cond ((buffer-file-name buffer)
-		 (let ((name (file-name-nondirectory (buffer-file-name buffer))))
-		   (loop for ob in (buffer-list)
-				 do (if (and (not (eq ob buffer))
-							 (buffer-file-name ob)
-							 (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
-							   (or (equal ob-file-name name)
-								   (string-match (concat name "\\.~.*~$") ob-file-name))) )
-						(kill-buffer ob)))))
-		(default (message "This buffer has no file name."))))
+	 (let ((name (file-name-nondirectory (buffer-file-name buffer))))
+	   (loop for ob in (buffer-list)
+		 do (if (and (not (eq ob buffer))
+			     (buffer-file-name ob)
+			     (let ((ob-file-name (file-name-nondirectory (buffer-file-name ob))))
+			       (or (equal ob-file-name name)
+				   (string-match (concat name "\\.~.*~$") ob-file-name))) )
+			(kill-buffer ob)))))
+	(default (message "This buffer has no file name."))))
 
 (defun unindent-region-with-tab ()
   (interactive)
   (save-excursion
-	(if (< (point) (mark)) (exchange-point-and-mark))
-	(let ((save-mark (mark)))
-	  (if (= (point) (line-beginning-position)) (previous-line 1))
-	  (goto-char (line-beginning-position))
-	  (while (>= (point) save-mark)
-		(goto-char (line-beginning-position))
-		(if (= (string-to-char "\t") (char-after (point))) (delete-char 1))
-		(previous-line 1)))))
+    (if (< (point) (mark)) (exchange-point-and-mark))
+    (let ((save-mark (mark)))
+      (if (= (point) (line-beginning-position)) (previous-line 1))
+      (goto-char (line-beginning-position))
+      (while (>= (point) save-mark)
+	(goto-char (line-beginning-position))
+	(if (= (string-to-char "\t") (char-after (point))) (delete-char 1))
+	(previous-line 1)))))
 
 (defun unindent-block()
   (interactive)
@@ -315,7 +315,7 @@
 
 (defun shift-region(numcols)
   (if (< (point)(mark))
-    (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
+      (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
     (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
   (setq region-start (region-beginning))
   (setq region-finish (region-end))
@@ -344,9 +344,9 @@
 ;; Make more notepad like out of the box
 (setq default-major-mode 'text-mode)
 (setq text-mode-hook				; Enable auto-fill-mode
-	  '(lambda ()
-		 (let ((ext (file-name-extension (buffer-file-name))))
-		   (when (and (not (or (string-equal ext "tc")
+      '(lambda ()
+	 (let ((ext (file-name-extension (buffer-file-name))))
+	   (when (and (not (or (string-equal ext "tc")
                                (string-equal ext "in")
                                (string-equal ext "tmp")
                                (string-equal ext "log")))
@@ -362,7 +362,7 @@
     (setq auto-save-default nil)
     (buffer-disable-undo)
     (fundamental-mode)
-	(message "Large buffer: Undo disabled, made read only, autosave disabled.")))
+    (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
 (defun my-delete-leading-whitespace (start end)
@@ -375,7 +375,7 @@
 
 (add-hook 'c-mode-common-hook
 	  (lambda ()
-        (load "~/etc/emacs/c-common.el")))
+	    (load "~/etc/emacs/c-common.el")))
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -384,102 +384,102 @@
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 (autoload 'markdown-mode "markdown-mode.el"
-   "Major mode for editing Markdown files" t)
+  "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
-   (cons '("\\.md" . markdown-mode) auto-mode-alist))
+      (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
 (if (functionp 'c-subword-mode)
-	(progn
-	  (require 'cc-mode)
-	  (c-subword-mode 1))
+    (progn
+      (require 'cc-mode)
+      (c-subword-mode 1))
   (subword-mode t))
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
-  (list
-    ;; the buffer name; the file name as a tool tip
-    '(:eval (propertize "%b " 'face 'font-lock-warning-face
-        'help-echo (buffer-file-name)))
+	      (list
+	       ;; the buffer name; the file name as a tool tip
+	       '(:eval (propertize "%b " 'face 'font-lock-warning-face
+				   'help-echo (buffer-file-name)))
 
-    ;; line and column
-    "(" ;; '%02' to set to 2 chars at least; prevents flickering
-      (propertize "%02l" 'face 'font-lock-type-face) ","
-      (propertize "%02c" 'face 'font-lock-type-face)
-    ") "
+	       ;; line and column
+	       "(" ;; '%02' to set to 2 chars at least; prevents flickering
+	       (propertize "%02l" 'face 'font-lock-type-face) ","
+	       (propertize "%02c" 'face 'font-lock-type-face)
+	       ") "
 
-    ;; relative position, size of file
-    "["
-    (propertize "%p" 'face 'font-lock-comment-face) ;; % above top
-    "/"
-    (propertize "%I" 'face 'font-lock-comment-face) ;; size
-    "] "
+	       ;; relative position, size of file
+	       "["
+	       (propertize "%p" 'face 'font-lock-comment-face) ;; % above top
+	       "/"
+	       (propertize "%I" 'face 'font-lock-comment-face) ;; size
+	       "] "
 
-    ;; the current major mode for the buffer.
-    "["
+	       ;; the current major mode for the buffer.
+	       "["
 
-    '(:eval (propertize "%m" 'face 'font-lock-string-face
-              'help-echo buffer-file-coding-system))
-    "] "
+	       '(:eval (propertize "%m" 'face 'font-lock-string-face
+				   'help-echo buffer-file-coding-system))
+	       "] "
 
 
-    "[" ;; insert vs overwrite mode, input-method in a tooltip
-    '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
-              'face 'font-lock-variable-name-face
-              'help-echo (concat "Buffer is in "
-                           (if overwrite-mode "overwrite" "insert") " mode")))
+	       "[" ;; insert vs overwrite mode, input-method in a tooltip
+	       '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
+				   'face 'font-lock-variable-name-face
+				   'help-echo (concat "Buffer is in "
+						      (if overwrite-mode "overwrite" "insert") " mode")))
 
-    ;; is this buffer read-only?
-    '(:eval (when buffer-read-only
-              (concat ","  (propertize "RO"
-                             'face 'font-lock-type-face
-                             'help-echo "Buffer is read-only"))))
-    "] "
+	       ;; is this buffer read-only?
+	       '(:eval (when buffer-read-only
+			 (concat ","  (propertize "RO"
+						  'face 'font-lock-type-face
+						  'help-echo "Buffer is read-only"))))
+	       "] "
 
-    ;; add the time, with the date and the emacs uptime in the tooltip
-    '(:eval (propertize (format-time-string "%H:%M")
-              'help-echo
-              (concat (format-time-string "%c; ")
-                      (emacs-uptime "Uptime:%hh"))))
-    ;; was this buffer modified since the last save?
-    '(:eval (when (buffer-modified-p)
-              (concat " "  (propertize "Mod"
-                             'face 'font-lock-warning-face
-                             'help-echo "Buffer has been modified"))))
+	       ;; add the time, with the date and the emacs uptime in the tooltip
+	       '(:eval (propertize (format-time-string "%H:%M")
+				   'help-echo
+				   (concat (format-time-string "%c; ")
+					   (emacs-uptime "Uptime:%hh"))))
+	       ;; was this buffer modified since the last save?
+	       '(:eval (when (buffer-modified-p)
+			 (concat " "  (propertize "Mod"
+						  'face 'font-lock-warning-face
+						  'help-echo "Buffer has been modified"))))
 
-    " --"
-    ;; i don't want to see minor-modes; but if you want, uncomment this:
-    ;; minor-mode-alist  ;; list of minor modes
-    "%-" ;; fill with '-'
-    ))
+	       " --"
+	       ;; i don't want to see minor-modes; but if you want, uncomment this:
+	       ;; minor-mode-alist  ;; list of minor modes
+	       "%-" ;; fill with '-'
+	       ))
 
 ;; Kill whole words at once, even in mid word
 (global-set-key (kbd "M-d")
-    (lambda ()
-      (interactive)
-	(if (char-after)
-	    (progn
-	      (backward-word)
-	      (kill-word 1)))))
+		(lambda ()
+		  (interactive)
+		  (if (char-after)
+		      (progn
+			(backward-word)
+			(kill-word 1)))))
 
 (require 'project-root)
 
 (setq project-roots
       `(("Autotools project"
          :root-contains-files ("configure.ac")
-		 :on-hit (lambda (p) (message (car p))))
+	 :on-hit (lambda (p) (message (car p))))
         ("TL project"
          :filename-regex ,(regexify-ext-list '(tc H C))
-		 :on-hit (lambda (p) (message (car p))))
+	 :on-hit (lambda (p) (message (car p))))
         ("CMake project"
-		 :root-contains-files ("CMakeLists.txt")
-		 :on-hit (lambda (p) (message (car p))))
-		("Personal config files"
-		 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
-		 :on-hit (lambda (p) (message (car p))))
+	 :root-contains-files ("CMakeLists.txt")
+	 :on-hit (lambda (p) (message (car p))))
+	("Personal config files"
+	 :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
+	 :on-hit (lambda (p) (message (car p))))
         ("Fallback to current folder"
-		 :root-contains-files (".")
-		 :on-hit (lambda (p) (message (car p))))))
+	 :root-contains-files (".")
+	 :on-hit (lambda (p) (message (car p))))))
 
 (global-set-key (kbd "C-c f") 'project-root-find-file)
 (global-set-key (kbd "C-c a") 'project-root-ack)
