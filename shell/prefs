@@ -150,6 +150,12 @@ sshmount() {
 		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $remote_key_file &> /dev/null; then
 				cat $ZDOTDIR/.ssh/id_rsa.pub >> $remote_key_file
 		fi
+
+		# make sure ssh'ing to self is passwordless
+		local_key_file="$ZDOTDIR/.ssh/authorized_keys"
+		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
+				cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
+		fi
 }
 
 if [ -d $ZDOTDIR/jsh ]; then
