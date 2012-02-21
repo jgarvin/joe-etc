@@ -38,7 +38,7 @@ export BROWSER="$ZDOTDIR/etc/bin/launch-my-browser"
 # Newer versions of emacs will autoload emacs if ALTERNATE_EDITOR is empty.
 export EDITOR="$ZDOTDIR/etc/bin/launch-emacs"
 
-if which htop > /dev/null; then
+if which htop &> /dev/null; then
     alias top='htop'
 fi
 
