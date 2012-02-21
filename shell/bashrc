@@ -8,16 +8,7 @@ if [[ ! "$TERM" = "dumb" && ! "$TERM" = "" ]]
 then
     if which zsh &> /dev/null
     then
-    	# This makes sure we don't end up in an endless loop
-    	# if somehow the zshrc is configured to exec bash
-    	if test "$BASH_LAUNCHED_ZSH" != "Yes"
-    	then
-    		export BASH_LAUNCHED_ZSH="Yes"
-    		exec zsh
-    	fi
+				exec zsh
     fi
-
-    # If we must load bash, still load settings
-    source $HOME/etc/shell/prefs
 fi
 
