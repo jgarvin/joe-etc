@@ -117,7 +117,7 @@ prepend-timestamp()
 
 # Intuitively, searches current folder and subfolders
 search () {
-	find \( -type f -o -type d \) -name \*$1\*
+	find \( -type f -o -type d \) -iname \*$1\*
 }
 
 # bash function to decompress archives - http://www.shell-fu.org/lister.php?id=375
