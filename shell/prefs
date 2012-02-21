@@ -56,7 +56,8 @@ fi
 alias -r sl=ls
 
 # Don't clear the screen when less exits
-alias less='less -X'
+# also, searching should start from last line of screen
+alias less='less -X -a'
 
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
@@ -151,8 +152,8 @@ sshmount() {
 		fi
 }
 
-if [ -d /j* ]; then
-    source "$HOME/etc/shell/jsh"
+if [ -d $ZDOTDIR/jsh ]; then
+    source $ZDOTDIR/jsh/init.zsh
 fi
 
 export MAKEFLAGS="-j"
