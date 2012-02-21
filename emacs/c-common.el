@@ -354,3 +354,9 @@
   brackets-font-lock-spec
   (cons c-types-regexp 'font-lock-type-face)))
   ;;(cons c-keywords-regexp 'font-lock-keyword-face)))
+
+;; Starting in emacs 23 there's some stupid default abbreviation
+;; for trying to correct mispellings of 'else', problem is it doesn't
+;; understand context, so a legit variable named elSE will always get
+;; changed to Else.
+(abbrev-mode 0)
