@@ -27,7 +27,9 @@ setup_symlink $HOME/etc/Xdefaults $HOME/.Xdefaults
 # Works on earlier Ubuntu versions
 xmonad_path=$(which xmonad)
 if [ ! "$xmonad_path" = "" ]; then
-    echo "export WINDOW_MANAGER=$xmonad_path" >> $HOME/.gnomerc
+		if ! grep "export WINDOW_MANAGER=" $HOME/.gnomerc &> /dev/null; then
+				echo "export WINDOW_MANAGER=$xmonad_path" >> $HOME/.gnomerc
+		fi
 fi
 
 # Works on Lucid Lynx, probably not for later Unity based versions.
