@@ -7,23 +7,9 @@ for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
 			date >> ~/.gitsynclog
 			echo $i >> ~/.gitsynclog
 
-			(if [ ! -d "$i/etc" ]; then
-			    echo "Detected new remote host: $i"
-
-					remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
-					rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
-					cd "$ZDOTDIR/remote/$remote_home"
-					HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
-
-					echo "Done setting up new remote host: $i"
-			fi)  >> ~/.gitsynclog 2>&1
-
-			(if 	[ -d "$i/etc" ]; then
-					cd "$i/etc"
-					if ! git pull "$ZDOTDIR/etc" master; then
-							echo "Error syncing git. See ~/.gitsynclog."
-					fi
-					echo
-			fi) >> ~/.gitsynclog 2>&1
-	fi &; disown
+			remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
+			rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
+			cd "$ZDOTDIR/remote/$remote_home"
+			HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
+	fi >> ~/.gitsynclog 2>&1 &; disown
 done
