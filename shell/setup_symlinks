@@ -4,7 +4,15 @@
 
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
 setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
+
+# Many distros have in place already
+if [ -f $HOME/.bashrc ] && [ ! -L $HOME/.bashrc ]; then
+		echo >&2 "Moving existing .bashrc to .bashrc.old"
+		mv $HOME/.bashrc $HOME/.bashrc.old
+fi
+
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
+
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 
 # SuSE insists on there being a fonts directory.
