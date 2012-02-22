@@ -9,11 +9,11 @@ path_append() {
     if [ -d "$1" ]; then
         if [[ ":$PATH:" != *":$1:"* ]]; then
             echo "$PATH:$1"
-		else
-			echo "$PATH"
+				else
+						echo "$PATH"
         fi
     else
-		echo "$PATH"
+				echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
@@ -21,13 +21,13 @@ path_append() {
 path_prepend() {
     # Only prepend a path if it's not already present
     if [ -d "$1" ]; then
-		if ! (echo $PATH | grep ":$1:" &> /dev/null); then
+				if ! (echo $PATH | grep ":$1:" &> /dev/null); then
             echo "$1:$PATH"
-		else
-			echo "$PATH"
-		fi
+				else
+						echo "$PATH"
+				fi
     else
-		echo "$PATH"
+				echo "$PATH"
         echo "Error, tried to prepend path $1 but it doesn't exist." >&2
     fi
 }
@@ -37,167 +37,167 @@ tsk()
  	# We filter out grep from the list of processes so
 	# long as grep isn't the process we're actually trying
 	# to see running
-	if expr match $1 "grep" > /dev/null
-	then
-		ps_crossplatform | grep -i "$@";
-	else
-		ps_crossplatform | grep -i "$@" | grep -v grep;
-	fi
+		if expr match $1 "grep" > /dev/null
+		then
+				ps_crossplatform | grep -i "$@";
+		else
+				ps_crossplatform | grep -i "$@" | grep -v grep;
+		fi
 }
 
 error()
 {
-	if test -n "$DISPLAY"
-	then
-		if which xmessage > /dev/null;
+		if test -n "$DISPLAY"
 		then
-			xmessage "Error: " "$@" > /dev/null;
-			return 0;
+				if which xmessage > /dev/null;
+				then
+						xmessage "Error: " "$@" > /dev/null;
+						return 0;
+				fi
+		else
+				echo "Error: " "$@" >&2;
 		fi
-	else
-		echo "Error: " "$@" >&2;
-	fi
 }
 
 is_symlink()
 {
-	if test -e $1
-	then
-		if test -L $1
+		if test -e $1
 		then
-			echo -n '' > /dev/null;
-		else
-			error "$1 isn't a symlink.";
-			return 1;
+				if test -L $1
+				then
+						echo -n '' > /dev/null;
+				else
+						error "$1 isn't a symlink.";
+						return 1;
+				fi
 		fi
-	fi
 
-	return 0;
+		return 0;
 }
 
 try_apps()
 {
-	for app in "$@"
-	do
-		app_no_opts="$(echo $app | cut -d ' ' -f 1)";
-		if which $app_no_opts > /dev/null;
-		then
-			eval "$app";
-			if test "$?" = "130" -o "$?" = "0" # SIGINT is OK
-			then
-				break;
-			else
-				if test "$app" = "$1";
+		for app in "$@"
+		do
+				app_no_opts="$(echo $app | cut -d ' ' -f 1)";
+				if which $app_no_opts > /dev/null;
 				then
-					error "Nonzero exit code from:" $app;
+						eval "$app";
+						if test "$?" = "130" -o "$?" = "0" # SIGINT is OK
+						then
+								break;
+						else
+								if test "$app" = "$1";
+								then
+										error "Nonzero exit code from:" $app;
+								fi
+						fi
+				else
+						if test "$app" = "$1";
+						then
+								error "Could not find:" $1;
+						fi
 				fi
-			fi
-		else
-			if test "$app" = "$1";
-			then
-				error "Could not find:" $1;
-			fi
-		fi
-	done
+		done
 }
 
 # Tries harder and harder to kill a process,
 # but starts the nice way.
 nice_kill()
 {
-	to_kill=$1
+		to_kill=$1
 
-	for sig in INT TERM KILL
-	do
-		echo "Trying SIG$sig on $to_kill"
-		kill -$sig $to_kill;
-		if (! ps $to_kill );
-		then
-			echo "Killed successfully."
-			return 0;
-		fi
-		sleep 1;
-	done
+		for sig in INT TERM KILL
+		do
+				echo "Trying SIG$sig on $to_kill"
+				kill -$sig $to_kill;
+				if (! ps $to_kill );
+				then
+						echo "Killed successfully."
+						return 0;
+				fi
+				sleep 1;
+		done
 
-	echo "Could not kill!"
-	return 1;
+		echo "Could not kill!"
+		return 1;
 }
 
 # ALL of the children of a pid
 if which pstree > /dev/null
 then
-	pid_children()
-	{
-		pstree -p $1 | egrep -o '\([0-9]+\)' | tr -d '()'
-	}
+		pid_children()
+		{
+				pstree -p $1 | egrep -o '\([0-9]+\)' | tr -d '()'
+		}
 elif which ptree > /dev/null
 then
 	# Need to actually test this on Solaris
-	pid_children()
-	{
-		ptree $1 | awk '{ print $1 }'
-	}
+		pid_children()
+		{
+				ptree $1 | awk '{ print $1 }'
+		}
 fi
 
 # Tries killing a process the nice way, by name.
 # Will NOT commit suicide.
 nice_pkill()
 {
-	echo "Killing processes with name $1 avoiding children of "$MAIN_SCRIPT_PID
+		echo "Killing processes with name $1 avoiding children of "$MAIN_SCRIPT_PID
 
-	suicide_regex="("
-	first="true"
-	for child in $(pid_children $MAIN_SCRIPT_PID)
-	do
-		if test $first = "true"
+		suicide_regex="("
+		first="true"
+		for child in $(pid_children $MAIN_SCRIPT_PID)
+		do
+				if test $first = "true"
+				then
+						first="false"
+				else
+						suicide_regex=$suicide_regex"|"
+				fi
+				suicide_regex=$suicide_regex$child
+		done
+		suicide_regex=$suicide_regex")"
+
+		echo "Pid finding command: pgrep $1 | egrep -v $suicide_regex"
+		to_kill=$(pgrep $1 | egrep -v "$suicide_regex" | grep -v $$ );
+
+		echo "Going to kill: "$to_kill
+
+		pgrep $1 | egrep -v $suicide_regex
+
+		if test "$to_kill" != ""
 		then
-			first="false"
-		else
-			suicide_regex=$suicide_regex"|"
+				nice_kill $to_kill;
 		fi
-		suicide_regex=$suicide_regex$child
-	done
-	suicide_regex=$suicide_regex")"
-
-	echo "Pid finding command: pgrep $1 | egrep -v $suicide_regex"
-	to_kill=$(pgrep $1 | egrep -v "$suicide_regex" | grep -v $$ );
-
-	echo "Going to kill: "$to_kill
-
-	pgrep $1 | egrep -v $suicide_regex
-
-	if test "$to_kill" != ""
-	then
-		nice_kill $to_kill;
-	fi
 }
 
 color_index() {
   # Show an index of all available bash colors
-  echo -e "\n              Usage: \\\033[*;**(;**)m"
-  echo -e   "            Default: \\\033[0m"
-  local blank_line="\033[0m\n     \033[0;30;40m$(printf "%41s")\033[0m"
-  echo -e "$blank_line" # Top border
-  for STYLE in 2 0 1 4 9; do
-    echo -en "     \033[0;30;40m "
+		echo -e "\n              Usage: \\\033[*;**(;**)m"
+		echo -e   "            Default: \\\033[0m"
+		local blank_line="\033[0m\n     \033[0;30;40m$(printf "%41s")\033[0m"
+		echo -e "$blank_line" # Top border
+		for STYLE in 2 0 1 4 9; do
+				echo -en "     \033[0;30;40m "
     # Display black fg on white bg
-    echo -en "\033[${STYLE};30;47m${STYLE};30\033[0;30;40m "
-    for FG in {31..37}; do
-        CTRL="\033[${STYLE};${FG};40m"
-        echo -en "${CTRL}"
-        echo -en "${STYLE};${FG}\033[0;30;40m "
-    done
-    echo -e "$blank_line" # Separators
-  done
-  echo -en "     \033[0;30;40m "
+				echo -en "\033[${STYLE};30;47m${STYLE};30\033[0;30;40m "
+				for FG in {31..37}; do
+						CTRL="\033[${STYLE};${FG};40m"
+						echo -en "${CTRL}"
+						echo -en "${STYLE};${FG}\033[0;30;40m "
+				done
+				echo -e "$blank_line" # Separators
+		done
+		echo -en "     \033[0;30;40m "
   # Background colors
-  echo -en "\033[0;37;40m*;40\033[0;30;40m \033[0m" # Display white fg on black bg
-  for BG in {41..47}; do
-      CTRL="\033[0;30;${BG}m"
-      echo -en "${CTRL}"
-      echo -en "*;${BG}\033[0;30;40m "
-  done
-  echo -e "$blank_line" "\n" # Bottom border
+		echo -en "\033[0;37;40m*;40\033[0;30;40m \033[0m" # Display white fg on black bg
+		for BG in {41..47}; do
+				CTRL="\033[0;30;${BG}m"
+				echo -en "${CTRL}"
+				echo -en "*;${BG}\033[0;30;40m "
+		done
+		echo -e "$blank_line" "\n" # Bottom border
 }
 
 setup_symlink()
@@ -205,6 +205,7 @@ setup_symlink()
     if [[ -a "$1" ]]; then
         cd $(dirname "$2")
 				if [[ ! -a $(basename "$2") ]]; then
+						echo "Running: ln -sf \"$1\" $(basename \"$2\")"
             ln -sf "$1" $(basename "$2")
 				fi
     fi
