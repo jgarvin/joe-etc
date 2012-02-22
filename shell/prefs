@@ -156,6 +156,9 @@ sshmount() {
 		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
 				cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
 		fi
+
+		# now setup home folder :D
+		$ZDOTDIR/etc/bin/sync-repos
 }
 
 if [ -d $ZDOTDIR/etc/jsh ]; then
