@@ -205,8 +205,7 @@ setup_symlink()
     if [[ -a "$1" ]]; then
         cd $(dirname "$2")
 				if [[ ! -a $(basename "$2") ]]; then
-						echo "Running: ln -sf \"$1\" $(basename \"$2\")"
-            ln -sf "$1" $(basename "$2")
+						ln -sf $(relpath "$PWD" "$1") $(basename "$2")
 				fi
     fi
 }
