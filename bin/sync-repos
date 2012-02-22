@@ -2,7 +2,8 @@
 
 cd $ZDOTDIR/remote
 for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
-	if [ ! "$i" = "." ]; then
+	# Filter '.' and broken symlinks
+	if [ ! "$i" = "." ]  && [ -e "$i" ]; then
 			date >> ~/.gitsynclog
 			echo $i >> ~/.gitsynclog
 
@@ -25,5 +26,5 @@ for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
 					fi
 					echo
 			fi) >> ~/.gitsynclog 2>&1
-	fi &
+	fi &; disown
 done
