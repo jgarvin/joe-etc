@@ -158,8 +158,8 @@ sshmount() {
 		fi
 }
 
-if [ -d $ZDOTDIR/jsh ]; then
-    source $ZDOTDIR/jsh/init.zsh
+if [ -d $ZDOTDIR/etc/jsh ]; then
+    source $ZDOTDIR/jsh/etc/init.zsh
 fi
 
 export MAKEFLAGS="-j"
