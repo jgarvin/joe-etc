@@ -9,6 +9,9 @@ for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
 
 			remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
 
+			# Sync ssh to make logins passwordless
+		  rsync -art "$ZDOTDIR/.ssh" "$ZDOTDIR/remote/$remote_home"
+
 			# Sync installed apps
 			rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/remote/$remote_home"
 
