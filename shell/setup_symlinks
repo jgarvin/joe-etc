@@ -34,4 +34,9 @@ fi
 if which git &> /dev/null; then
 	# Make git only push the current branch
 	git config --global push.default=current
+
+	# I like colors :D
+	git config --global color.diff auto
+	git config --global color.status auto
+	git config --global color.branch auto
 fi
