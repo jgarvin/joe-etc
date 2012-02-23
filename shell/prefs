@@ -143,18 +143,17 @@ sshmount() {
     cd $ZDOTDIR/remote
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
 
-    # make future instances passwordless
     ssh-add &> /dev/null # idempotent, registers key
-		mkdir -p "$1-root/home/$LOGNAME/.ssh"
-		remote_key_file="$1-root/home/$LOGNAME/.ssh/authorized_keys"
-		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $remote_key_file &> /dev/null; then
-				cat $ZDOTDIR/.ssh/id_rsa.pub >> $remote_key_file
-		fi
 
 		# make sure ssh'ing to self is passwordless
 		local_key_file="$ZDOTDIR/.ssh/authorized_keys"
 		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
 				cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
+		fi
+
+		touch $ZDOTDIR/remote/hostlist
+		if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
+				echo "$1" >> $ZDOTDIR/remote/hostlist
 		fi
 
 		# now setup home folder :D
