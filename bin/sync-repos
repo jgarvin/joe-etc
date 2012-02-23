@@ -8,6 +8,11 @@ for i in $(find . -maxdepth 1 -regex '.*[^root]'); do
 			echo $i >> ~/.gitsynclog
 
 			remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
+
+			# Sync installed apps
+			rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/remote/$remote_home"
+
+			# Sync settings
 			rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
 			cd "$ZDOTDIR/remote/$remote_home"
 			HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
