@@ -280,9 +280,6 @@ if [ -d "$ZDOTDIR/remote" ]; then
 	$ZDOTDIR/etc/bin/sync-repos
 fi
 
-export ZSH_CUSTOM_ENV=""
-export ZSH_OLD_ENV=""
-
 check_env_files()
 {
 		# Find environment specific settings
@@ -297,19 +294,19 @@ check_env_files()
 
 		if [ -n "$ZSH_OLD_ENV" ]; then
 				echo "Restoring old environment"
-				local output=$(cat $ZSH_OLD_ENV)
-				for i in $output; do
+				for i in $(cat "$ZSH_OLD_ENV"); do
 						local varname=$(echo $i | cut -d'=' -f 1)
 						local value=$(echo $i | cut -d'=' -f 2)
 						echo "Restoring $varname=$value"
 						export $varname="$value"
 				done
+				export ZSH_CUSTOM_ENV=""
+				export ZSH_OLD_ENV=""
 		fi
 
 		if [ -n "$abspath_env" ]; then
 				echo >&2 "Switching environment to $abspath_env"
-				local output=$(eval $(cat $abspath_env))
-				for i in $output; do
+				for i in $(eval $(cat "$abspath_env")); do
 						local varname=$(echo $i | cut -d'=' -f 1)
 						local value=$(echo $i | cut -d'=' -f 2)
 						echo "Setting $varname=$value"
@@ -319,7 +316,7 @@ check_env_files()
 								export ZSH_OLD_ENV
 						fi
 
-						echo "$varname=$value" >> $ZSH_OLD_ENV
+						echo "$varname=$(eval \$$varname)" >> $ZSH_OLD_ENV
 						export $varname="$value"
 				done
 				export ZSH_CUSTOM_ENV="$abspath_env"
