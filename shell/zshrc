@@ -282,14 +282,19 @@ fi
 
 check_env_files()
 {
+		# TODO: Make sure file is owned and only writable by me.
+
 		# Find environment specific settings
 		local custom_env=$(find_up -name 'zsh-custom-env')
 
 		abspath_env=$(readlink -f "$custom_env")
 
-		# We're already in this environment, do nothing
+		# We're already in this environment
 		if [ "$ZSH_CUSTOM_ENV" = "$abspath_env" ]; then
-				return
+				if [ "$ZSH_ENV_MTIME" = "$(stat -c %Y "$abspath_env")" ]; then
+						# And it hasn't changed, so just return.
+						return
+				fi
 		fi
 
 		if [ -n "$ZSH_OLD_ENV" ]; then
@@ -302,6 +307,7 @@ check_env_files()
 				done
 				export ZSH_CUSTOM_ENV=""
 				export ZSH_OLD_ENV=""
+				export ZSH_ENV_MTIME=""
 		fi
 
 		if [ -n "$abspath_env" ]; then
@@ -325,6 +331,7 @@ check_env_files()
 						export $varname="$value"
 				done
 				export ZSH_CUSTOM_ENV="$abspath_env"
+				export ZSH_ENV_MTIME="$(stat -c %Y "$abspath_env")"
 		fi
 }
 
