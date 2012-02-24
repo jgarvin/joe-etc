@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+typeset -ga chpwd_functions
+
 if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
 fi
@@ -277,3 +279,51 @@ fi
 if [ -d "$ZDOTDIR/remote" ]; then
 	$ZDOTDIR/etc/bin/sync-repos
 fi
+
+export ZSH_CUSTOM_ENV=""
+export ZSH_OLD_ENV=""
+
+check_env_files()
+{
+		# Find environment specific settings
+		local custom_env=$(find_up -name 'zsh-custom-env')
+
+		abspath_env=$(readlink -f "$custom_env")
+
+		# We're already in this environment, do nothing
+		if [ "$ZSH_CUSTOM_ENV" = "$abspath_env" ]; then
+				return
+		fi
+
+		if [ -n "$ZSH_OLD_ENV" ]; then
+				echo "Restoring old environment"
+				local output=$(cat $ZSH_OLD_ENV)
+				for i in $output; do
+						local varname=$(echo $i | cut -d'=' -f 1)
+						local value=$(echo $i | cut -d'=' -f 2)
+						echo "Restoring $varname=$value"
+						export $varname="$value"
+				done
+		fi
+
+		if [ -n "$abspath_env" ]; then
+				echo >&2 "Switching environment to $abspath_env"
+				local output=$(eval $(cat $abspath_env))
+				for i in $output; do
+						local varname=$(echo $i | cut -d'=' -f 1)
+						local value=$(echo $i | cut -d'=' -f 2)
+						echo "Setting $varname=$value"
+
+						if [ -z "$ZSH_OLD_ENV" ]; then
+								ZSH_OLD_ENV=$(mktemp)
+								export ZSH_OLD_ENV
+						fi
+
+						echo "$varname=$value" >> $ZSH_OLD_ENV
+						export $varname="$value"
+				done
+				export ZSH_CUSTOM_ENV="$abspath_env"
+		fi
+}
+
+chpwd_functions+='check_env_files'
