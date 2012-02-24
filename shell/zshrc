@@ -280,6 +280,14 @@ if [ -d "$ZDOTDIR/remote" ]; then
 	$ZDOTDIR/etc/bin/sync-repos
 fi
 
+# Make copy of ZSH_OLD_ENV and use it,
+# so that we don't interfer with parent shells.
+if [ -n "$ZSH_OLD_ENV" ]; then
+		newold=$(mktemp)
+		cp "$ZSH_OLD_ENV" "$newold"
+		export ZSH_OLD_ENV="$newold"
+fi
+
 check_env_files()
 {
 		# TODO: Make sure file is owned and only writable by me.
@@ -291,7 +299,7 @@ check_env_files()
 
 		# We're already in this environment
 		if [ "$ZSH_CUSTOM_ENV" = "$abspath_env" ]; then
-				if [ "$ZSH_ENV_MTIME" = "$(stat -c %Y "$abspath_env")" ]; then
+				if [ "$ZSH_ENV_MTIME" = "$(stat -c %Y "$abspath_env" 2> /dev/null)" ]; then
 						# And it hasn't changed, so just return.
 						return
 				fi
@@ -305,6 +313,7 @@ check_env_files()
 						echo >&2 "Restoring $varname=$value"
 						export $varname="$value"
 				done
+				rm $ZSH_OLD_ENV
 				export ZSH_CUSTOM_ENV=""
 				export ZSH_OLD_ENV=""
 				export ZSH_ENV_MTIME=""
