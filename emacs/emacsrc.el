@@ -80,9 +80,7 @@
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
-(if (> (display-pixel-width) 1280)
-    (add-to-list 'default-frame-alist '(font . "Consolas-12"))
-  (add-to-list 'default-frame-alist '(font . "Consolas-11")))
+(custom-set-faces '(default ((t (:height 105 :family "Consolas" :embolden f)))))
 
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
