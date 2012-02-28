@@ -2,15 +2,15 @@
 
 # Give dev google-chrome build priority.
 if which google-chrome &> /dev/null; then
-		chrome_version=$(google-chrome --version)
-		if echo $chrome_version | grep dev &> /dev/null; then
-				if test "$1" = "-n"; then
-						echo google-chrome
-				else
-						google-chrome --allow-outdated-plugins
-				fi
-				exit
-		fi
+    chrome_version=$(google-chrome --version)
+    if echo $chrome_version | grep dev &> /dev/null; then
+	if test "$1" = "-n"; then
+	    echo google-chrome
+	else
+	    google-chrome --allow-outdated-plugins
+	fi
+	exit
+    fi
 fi
 
 browser_list="chromium-browser google-chrome firefox4 firefox3 firefox epiphany mozilla"
