@@ -13,4 +13,4 @@ else
 fi
 
 echo "Launching $binary" >> ~/.launch_emacs_log
-$binary -c -a emacs "$@"
+$binary "$@"
