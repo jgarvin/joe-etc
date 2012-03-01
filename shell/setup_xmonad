@@ -1,0 +1,28 @@
+#!/usr/bin/env zsh
+
+# Works on earlier Ubuntu versions
+xmonad_path=$(which xmonad)
+if which xmonad &> /dev/null; then
+    if ! grep "export WINDOW_MANAGER=" $HOME/.gnomerc &> /dev/null; then
+        echo "export WINDOW_MANAGER=$HOME/etc/bin/launch-xmonad" >> $HOME/.gnomerc
+    fi
+fi
+
+# Setup desktop file for gconftool to point to that launches
+# xmonad via interactive zsh shell so we get desired paths.
+mkdir -p $HOME/.local/share/applications
+cat > $HOME/.local/share/applications/launch-xmonad.desktop <<EOF
+ [Desktop Entry]
+ Version=1.0
+ Type=Application
+ Name=launch-xmonad
+ Comment=The xmonad launcher!
+ Exec=/usr/bin/zsh -ic xmonad
+EOF
+
+# Works on Lucid Lynx, probably not for later Unity based versions.
+if which gconftool-2 &> /dev/null; then
+    if which xmonad &> /dev/null; then
+        gconftool-2 -s /desktop/gnome/session/required_components/windowmanager "launch-xmonad" --type string
+    fi
+fi
