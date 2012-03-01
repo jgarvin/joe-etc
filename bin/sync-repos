@@ -2,22 +2,22 @@
 
 cd $ZDOTDIR/remote
 for i in $(timeout 5 find . -maxdepth 1 -regex '.*[^root]'); do
-	# Filter '.' and broken symlinks
+    # Filter '.' and broken symlinks
     if [ ! "$i" = "." ]  && [ -e "$i" ]; then
-	date >> ~/.gitsynclog
-	echo $i >> ~/.gitsynclog
+        date >> ~/.gitsynclog
+        echo $i >> ~/.gitsynclog
 
-	remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
+        remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
 
-	# Sync ssh to make logins passwordless
-	rsync -art "$ZDOTDIR/.ssh" "$ZDOTDIR/remote/$remote_home"
+        # Sync ssh to make logins passwordless
+        rsync -art "$ZDOTDIR/.ssh" "$ZDOTDIR/remote/$remote_home"
 
-	# Sync installed apps
-	rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/remote/$remote_home"
+        # Sync installed apps
+        rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/remote/$remote_home"
 
-	# Sync settings
-	rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
-	cd "$ZDOTDIR/remote/$remote_home"
-	HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
+        # Sync settings
+        rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
+        cd "$ZDOTDIR/remote/$remote_home"
+        HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
     fi >> ~/.gitsynclog 2>&1 &; disown
 done
