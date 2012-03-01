@@ -69,7 +69,10 @@
 ;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
 (setq ido-default-file-method 'selected-window)
 (setq ido-default-buffer-method 'selected-window)
-(setq completion-ignored-extensions (append completion-ignored-extensions '(".fpo" ".ii" ".d" ".o")))
+(setq completion-ignored-extensions
+			(append completion-ignored-extensions '(".fpo" ".ii" ".d" ".o")))
+(setq ido-ignore-files
+			(append ido-ignore-files '(".*-g" ".*-O2")))
 
 (load-file "~/etc/breadcrumb.el")
 (require 'breadcrumb)
@@ -506,5 +509,5 @@
 (setq-default mark-ring-max 65535)
 
 ;; Needed for ido-mode to work in large source trees
-(setq ido-max-directory-size 100000)
+(setq ido-max-directory-size 200000)
 
