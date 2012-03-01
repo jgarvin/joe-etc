@@ -1,16 +1,7 @@
 #!/usr/bin/env zsh
 
-echo "=======================" >> ~/.launch_emacs_log
-echo $(date) >> ~/.launch_emacs_log
-echo "Running" >> ~/.launch_emacs_log
+# By launching emacs through an interactive zsh,
+# we know we get the proper environment. With the
+# paths we actually want.
 
-if [ -f $HOME/opt/bin/emacs ]; then
-    echo "Choosing opt binary" >> ~/.launch_emacs_log
-    binary="$HOME/opt/bin/emacs"
-else
-    echo "Choosing system binary" >> ~/.launch_emacs_log
-    binary=$(which emacs)
-fi
-
-echo "Launching $binary" >> ~/.launch_emacs_log
-$binary "$@"
+zsh -ic emacs "$@"
