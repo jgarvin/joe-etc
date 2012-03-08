@@ -176,12 +176,13 @@
 ;; Switch between source and header
 ;;------------
 ;; Association list of extension -> inverse extension
-(setq exts '(("c"   . ("h" "H"))
-			 ("cpp" . ("hpp" "h" "H"))
-             ("hpp" . ("cpp" "c" "C"))
-             ("h"   . ("cpp" "c" "C"))
-			 ("H"   . ("cpp" "c" "C"))
-			 ("C"   . ("hpp" "h" "H"))))
+(setq exts '(("c"   . ("hpp" "h" "H"))
+						 ("cc"  . ("hpp" "h" "H"))
+						 ("cpp" . ("hpp" "h" "H"))
+             ("hpp" . ("cpp" "c" "C" "cc" "CC"))
+             ("h"   . ("cpp" "c" "C" "cc" "CC"))
+						 ("H"   . ("cpp" "c" "C" "cc" "CC"))
+						 ("C"   . ("hpp" "h" "H"))))
 
 ;; Process the association list of extensions and find the last file
 ;; that exists
