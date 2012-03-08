@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+# Search upwards, stopping as soon as a result is found.
+
+cdcount=0
+while true; do
+		result=$(find . -maxdepth 1 "$@" | sed 's/.\///')
+		if [ ! "$result" = "" ]; then
+				if (( $cdcount )); then
+						(( cdcount = $cdcount - 1 ))
+						for i in {0..$cdcount}; do
+								echo -n "../"
+						done
+				fi
+				echo $result
+				exit 0
+		else
+				if [ "$PWD" = "/" ]; then
+						exit 1
+				else
+						(( cdcount = $cdcount + 1 ))
+						cd ..
+				fi
+		fi
+done

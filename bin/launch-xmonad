@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+# By launching xmonad through an interactive zsh,
+# we know we get the proper environment. With the
+# paths we actually want.
+
+zsh -ic xmonad "$@"
+
