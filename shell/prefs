@@ -11,11 +11,11 @@ fi
 
 export ANDROID_PATH=~/opt/android-sdk-linux_x86-1.6_r1;
 if [[ -d $ANDROID_PATH ]]; then
-	export PATH=$(path_prepend $ANDROID_PATH/tools)
+        export PATH=$(path_prepend $ANDROID_PATH/tools)
 fi
 
 if [[ -d "$HOME/opt/bin" ]]; then
- 	export PATH=$(path_prepend "$HOME/opt/bin")
+        export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
@@ -27,10 +27,10 @@ fi
 # type for now.
 ack()
 {
-	~/etc/bin/ack \
-	        --sort-files \
-		--type-set incl=.incl \
-		--type-add hh=.ipp "$@";
+        ~/etc/bin/ack \
+                --sort-files \
+                --type-set incl=.incl \
+                --type-add hh=.ipp "$@";
 }
 
 export BROWSER="$ZDOTDIR/etc/bin/launch-my-browser"
@@ -86,12 +86,12 @@ OOO_FORCE_DESKTOP=gnome
 # Add sensible bindings for ocaml
 if which rlwrap &> /dev/null
 then
-	if which ocaml &> /dev/null
-	then
-		alias ocaml='rlwrap ocaml'
-	else
-		echo "rlwrap not available, so you're stuck with bare ocaml." >&2
-	fi
+        if which ocaml &> /dev/null
+        then
+                alias ocaml='rlwrap ocaml'
+        else
+                echo "rlwrap not available, so you're stuck with bare ocaml." >&2
+        fi
 fi
 
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
@@ -116,10 +116,10 @@ then
 
     # OK, now put it back in.
     if [[ -d $ZDOTDIR/etc/bin ]]; then
-	    PATH=$(path_prepend $ZDOTDIR/etc/bin)
-	    os_bin="$ZDOTDIR/etc/bin/$(uname -s)"
-	    mkdir -p "$os_bin"
-	    PATH=$(path_prepend "$os_bin")
+            PATH=$(path_prepend $ZDOTDIR/etc/bin)
+            os_bin="$ZDOTDIR/etc/bin/$(uname -s)"
+            mkdir -p "$os_bin"
+            PATH=$(path_prepend "$os_bin")
     fi
 fi
 
@@ -131,36 +131,36 @@ sshmount() {
 
     # apparently these are best for performance
     sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
-		#sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
+                #sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
 
     # Remount
     fusermount -u "$remote_path" &> /dev/null
     if ! sshfs "$sshfs_opts" "$LOGNAME"@"$1":/ "$remote_path"; then
-				echo >&2 "sshfs failed!"
-				return 1
-		fi
+                                echo >&2 "sshfs failed!"
+                                return 1
+                fi
 
     cd $ZDOTDIR/remote
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
 
     ssh-add &> /dev/null # idempotent, registers key
 
-		# make sure ssh'ing to self is passwordless
-		local_key_file="$ZDOTDIR/.ssh/authorized_keys"
-		if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
-				cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
-		fi
+                # make sure ssh'ing to self is passwordless
+                local_key_file="$ZDOTDIR/.ssh/authorized_keys"
+                if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
+                                cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
+                fi
 
-		touch $ZDOTDIR/remote/hostlist
-		if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
-				echo "$1" >> $ZDOTDIR/remote/hostlist
-		fi
+                touch $ZDOTDIR/remote/hostlist
+                if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
+                                echo "$1" >> $ZDOTDIR/remote/hostlist
+                fi
 
-		# now setup home folder :D
-		$ZDOTDIR/etc/bin/sync-repos
+                # now setup home folder :D
+                $ZDOTDIR/etc/bin/sync-repos
 }
 
-if [ -d $ZDOTDIR/etc/jsh ]; then
+if [ -f $ZDOTDIR/etc/jsh/init.zsh ]; then
     source $ZDOTDIR/etc/jsh/init.zsh
 fi
 
