@@ -256,6 +256,7 @@
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
+;; TODO: disable for assembly
 (defun indent-newline-indent ()
   (interactive)
   (progn
