@@ -215,8 +215,9 @@
 ;; Delete trailing whitespace automagically
 (add-hook 'write-file-hooks
           (lambda ()
-            (untabify (point-min) (point-max))
             (delete-trailing-whitespace)))
+
+;; TODO: Filter untabify for makefiles
 
 (setq indent-tabs-mode nil)
 
