@@ -27,7 +27,6 @@ select-word-style bash
 # is set to emacs the london boxes default me to vi bindings without this.
 bindkey -e
 
-# Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
 
 # Apply zsh specific utils
