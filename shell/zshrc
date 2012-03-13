@@ -307,9 +307,10 @@ check_env_files()
 
 		if [ -n "$ZSH_OLD_ENV" ]; then
 				echo >&2 "Restoring old environment"
-				for i in $(cat "$ZSH_OLD_ENV"); do
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$ZSH_OLD_ENV")); IFS=$saveIFS
+				for i in $entries; do
 						local varname=$(echo $i | cut -d'=' -f 1)
-						local value=$(echo $i | cut -d'=' -f 2)
+						local value=$(echo $i | cut -d'=' -f 2-)
 						echo >&2 "Restoring $varname=$value"
 						export $varname="$value"
 				done
@@ -321,9 +322,10 @@ check_env_files()
 
 		if [ -n "$abspath_env" ]; then
 				echo >&2 "Switching environment to $abspath_env"
-				for i in $(cat "$abspath_env"); do
-						local varname=$(echo $i | cut -d'=' -f 1)
-						local value=$(echo $i | cut -d'=' -f 2)
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$abspath_env")); IFS=$saveIFS
+				for i in $entries; do
+						local varname="$(echo $i | cut -d'=' -f 1)"
+						local value="$(echo $i | cut -d'=' -f 2-)"
 						echo >&2 "Setting $varname=$value"
 
 						if [ -z "$ZSH_OLD_ENV" ]; then
