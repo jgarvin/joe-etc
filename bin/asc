@@ -4,15 +4,16 @@ import sys
 
 val = sys.argv[1]
 
+# TODO: Can't get ASCII value of numbers
+
 if val.startswith("0x"):
-    hexval = val[2:]
-    print "'%c' %d" % (int(hexval, 16), int(hexval, 16))
-    sys.exit(0)
+    val = int(val, 16)
+elif val.startswith("0b"):
+    val = int(val, 2)
+else:
+    try:
+        val = int(val)
+    except ValueError:
+        val = ord(val)
 
-try:
-    print "'%c' 0x%x" % (int(val), int(val))
-    sys.exit(0)
-except ValueError:
-    print "%d 0x%x" % (ord(val), ord(val))
-    sys.exit(0)
-
+print "'%c' 0x%x %d %s" % (val, val, val, bin(val))
