@@ -2,10 +2,13 @@
 
 import sys
 
-f = sys.argv[1]
+if len(sys.argv) >= 2:
+    f = open(sys.argv[1])
+else:
+    f = sys.stdin
 
 countmap = {}
-for line in open(f).readlines():
+for line in f:
     if line in countmap:
         countmap[line] += 1
     else:
