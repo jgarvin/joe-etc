@@ -72,7 +72,7 @@ switchcnf() {
 }
 
 if [ -e "$base_dir/$name-$folder_type" ]; then
-		# switch to configuration that already exist
+		# switch to configurations that already exist
 		switchcnf
 		exit 0
 fi
