@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 
 typeset -ga chpwd_functions
+typeset -ga preexec_functions
+typeset -ga precmd_functions
 
 if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
@@ -348,3 +350,5 @@ check_env_files()
 }
 
 chpwd_functions+='check_env_files'
+preexec_functions+='check_env_files'
+precmd_functions+='check_env_files'

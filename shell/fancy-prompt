@@ -31,7 +31,7 @@ get_git_prompt_info() {
     echo $__CURRENT_GIT_BRANCH
 }
 
-function precmd {
+function fancy_precmd {
 
     local TERMWIDTH
     (( TERMWIDTH = ${COLUMNS} - 1 ))
@@ -63,9 +63,11 @@ function precmd {
     fi
 }
 
+precmd_functions+='fancy_precmd'
+
 
 setopt extended_glob
-preexec () {
+fancy_preexec () {
     if [[ "$TERM" == "screen" ]]; then
 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
 	echo -n "\ek$CMD\e\\"
@@ -75,6 +77,8 @@ preexec () {
         *git*) zsh_git_invalidate_vars ;;
     esac
 }
+
+preexec_functions+='fancy_preexec'
 
 setprompt () {
     ###
