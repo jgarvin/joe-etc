@@ -336,13 +336,14 @@ check_env_files()
 								export ZSH_OLD_ENV
 						fi
 
-						local old_val=$(env | grep $varname=)
+						local old_val=$(env | grep -E "^$varname=")
 						if [ -z "$old_val" ]; then
 								echo "$varname=" >> $ZSH_OLD_ENV
 						else
 								echo "$old_val" >> $ZSH_OLD_ENV
 						fi
-						export $varname="$value"
+
+						eval "export $i"
 				done
 				export ZSH_CUSTOM_ENV="$abspath_env"
 				export ZSH_ENV_MTIME="$(stat -c %Y "$abspath_env")"
