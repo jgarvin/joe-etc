@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+
+import fileinput
+
+countmap = {}
+for line in fileinput.input():
+    if line in countmap:
+        countmap[line] += 1
+    else:
+        countmap[line] = 1
+
+for line in countmap:
+    print "Line: %s Count: %s" % (line, countmap[line])
+

@@ -31,11 +31,7 @@
   (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
     (setq x-alt-keysym 'meta)))
 
-(setq backup-directory-alist
-      `((".*" . ,"~/backup")))
-(setq auto-save-file-name-transforms
-      `((".*" ,"~/backup" t)))
-(setq tramp-backup-directory-alist backup-directory-alist)
+(setq make-backup-files nil)
 
 (add-to-list 'load-path "~/etc/drag-stuff")
 (add-to-list 'load-path "~/etc/emacs")

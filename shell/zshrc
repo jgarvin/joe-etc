@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 
 typeset -ga chpwd_functions
+typeset -ga preexec_functions
+typeset -ga precmd_functions
 
 if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
@@ -27,7 +29,6 @@ select-word-style bash
 # is set to emacs the london boxes default me to vi bindings without this.
 bindkey -e
 
-# Apply TL specific settings
 source $ZDOTDIR/etc/shell/prefs
 
 # Apply zsh specific utils
@@ -308,9 +309,10 @@ check_env_files()
 
 		if [ -n "$ZSH_OLD_ENV" ]; then
 				echo >&2 "Restoring old environment"
-				for i in $(cat "$ZSH_OLD_ENV"); do
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$ZSH_OLD_ENV")); IFS=$saveIFS
+				for i in $entries; do
 						local varname=$(echo $i | cut -d'=' -f 1)
-						local value=$(echo $i | cut -d'=' -f 2)
+						local value=$(echo $i | cut -d'=' -f 2-)
 						echo >&2 "Restoring $varname=$value"
 						export $varname="$value"
 				done
@@ -322,9 +324,11 @@ check_env_files()
 
 		if [ -n "$abspath_env" ]; then
 				echo >&2 "Switching environment to $abspath_env"
-				for i in $(cat "$abspath_env"); do
-						local varname=$(echo $i | cut -d'=' -f 1)
-						local value=$(echo $i | cut -d'=' -f 2)
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$abspath_env")); IFS=$saveIFS
+				for i in $entries; do
+						local varname="$(echo $i | cut -d'=' -f 1)"
+						# TODO: Should only sed out surrounding unescaped quotes
+						local value="$(echo $i | cut -d'=' -f 2- | sed 's/\"//g')"
 						echo >&2 "Setting $varname=$value"
 
 						if [ -z "$ZSH_OLD_ENV" ]; then
@@ -332,13 +336,14 @@ check_env_files()
 								export ZSH_OLD_ENV
 						fi
 
-						local old_val=$(env | grep $varname=)
+						local old_val=$(env | grep -E "^$varname=")
 						if [ -z "$old_val" ]; then
 								echo "$varname=" >> $ZSH_OLD_ENV
 						else
 								echo "$old_val" >> $ZSH_OLD_ENV
 						fi
-						export $varname="$value"
+
+						eval "export $i"
 				done
 				export ZSH_CUSTOM_ENV="$abspath_env"
 				export ZSH_ENV_MTIME="$(stat -c %Y "$abspath_env")"
@@ -346,3 +351,5 @@ check_env_files()
 }
 
 chpwd_functions+='check_env_files'
+preexec_functions+='check_env_files'
+precmd_functions+='check_env_files'

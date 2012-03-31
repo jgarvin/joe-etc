@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+(for i in **/*.[CH];
+		do echo $i | xargs git blame -w | cut -d '(' -f 2 | grep -o -E '^[^0-9]*' | sed 's/ //g';
+done) | count_uniques

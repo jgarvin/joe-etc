@@ -131,33 +131,33 @@ sshmount() {
 
     # apparently these are best for performance
     sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
-                #sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
+    #sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
 
     # Remount
     fusermount -u "$remote_path" &> /dev/null
     if ! sshfs "$sshfs_opts" "$LOGNAME"@"$1":/ "$remote_path"; then
-                                echo >&2 "sshfs failed!"
-                                return 1
-                fi
+        echo >&2 "sshfs failed!"
+        return 1
+    fi
 
     cd $ZDOTDIR/remote
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
 
     ssh-add &> /dev/null # idempotent, registers key
 
-                # make sure ssh'ing to self is passwordless
-                local_key_file="$ZDOTDIR/.ssh/authorized_keys"
-                if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
-                                cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
-                fi
+    # make sure ssh'ing to self is passwordless
+    local_key_file="$ZDOTDIR/.ssh/authorized_keys"
+    if ! grep "$(cat $ZDOTDIR/.ssh/id_rsa.pub)" $local_key_file  &> /dev/null; then
+        cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
+    fi
 
-                touch $ZDOTDIR/remote/hostlist
-                if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
-                                echo "$1" >> $ZDOTDIR/remote/hostlist
-                fi
+    touch $ZDOTDIR/remote/hostlist
+    if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
+        echo "$1" >> $ZDOTDIR/remote/hostlist
+    fi
 
-                # now setup home folder :D
-                $ZDOTDIR/etc/bin/sync-repos
+    # now setup home folder :D
+    $ZDOTDIR/etc/bin/sync-repos
 }
 
 if [ -f $ZDOTDIR/etc/jsh/init.zsh ]; then

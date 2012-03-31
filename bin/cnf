@@ -1,0 +1,89 @@
+#!/usr/bin/env zsh
+
+clean=false
+
+base_dir=$(dirname $(find_up -name zsh-custom-env))
+
+if [ -z "$base_dir" ]; then
+		echo "Not in a sandbox."
+		exit 1
+fi
+
+# No arguments: print current configuration
+if [ "$#" = "0" ]; then
+		cd "$base_dir"
+		for link in $(find . -maxdepth 1 -type l); do
+				linkname=$(basename $link)
+				target=$(readlink $link)
+				targetsuffix=$(echo $target | awk -F'-' '{ print $NF }')
+				targetname=$(echo $target | sed "s/-$targetsuffix$//")
+				if [ "$targetsuffix" = "$linkname" ]; then
+						echo "$linkname: $targetname"
+				fi
+		done
+		cat "$base_dir/zsh-custom-env"
+		exit 0
+fi
+
+folder_type="config"
+
+# 1 hyphenless argument, assume it's a config name.
+if [ "$#" = "1" ] && [[ ! "$1" =~ "-"  ]]; then
+		name="$1"
+else
+		# Multiple arguments, actually parse it out.
+		while [ "$#" -gt "0" ]
+		do
+				case $1 in
+						-t)
+								folder_type="$2"
+								shift
+								;;
+						-n)
+								name="$2"
+								shift
+								;;
+						-c)
+								clean=true
+								;;
+						*)
+								echo "Unknown argument: $1"
+								exit 1
+								;;
+				esac
+				shift
+		done
+fi
+
+if [ -z "$folder_type" ]; then
+		echo >&2 "Need to know which folder type to duplicate."
+		exit 1
+fi
+
+if [ -z "$name" ]; then
+		echo >&2 "Need new $folder_type name."
+		exit 1
+fi
+
+switchcnf() {
+		echo "Switching to $folder_type $name..."
+		cd "$base_dir"
+		ln -Tsf "$name-$folder_type" "$folder_type"
+}
+
+if [ -e "$base_dir/$name-$folder_type" ]; then
+		# switch to configurations that already exist
+		switchcnf
+		exit 0
+fi
+
+# otherwise create them
+if $clean; then
+		echo "Creating empty $folder_type..."
+		mkdir -p "$base_dir/$name-$folder_type"
+else
+		echo "Forking current $folder_type..."
+		cp -H -r "$base_dir/$folder_type" "$base_dir/$name-$folder_type"
+fi
+
+switchcnf

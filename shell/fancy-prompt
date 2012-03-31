@@ -31,7 +31,7 @@ get_git_prompt_info() {
     echo $__CURRENT_GIT_BRANCH
 }
 
-function precmd {
+function fancy_precmd {
 
     local TERMWIDTH
     (( TERMWIDTH = ${COLUMNS} - 1 ))
@@ -43,7 +43,7 @@ function precmd {
     PR_FILLBAR=""
     PR_PWDLEN=""
 
-    local promptsize=${#${(%):---(%n@%m:%l)---()--}}
+    local promptsize=${#${(%):---(%n@%m)---()--}}
     local pwdsize=${#${(%):-%~}}
 
     if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
@@ -63,9 +63,11 @@ function precmd {
     fi
 }
 
+precmd_functions+='fancy_precmd'
+
 
 setopt extended_glob
-preexec () {
+fancy_preexec () {
     if [[ "$TERM" == "screen" ]]; then
 	local CMD=${1[(wr)^(*=*|sudo|-*)]}
 	echo -n "\ek$CMD\e\\"
@@ -75,6 +77,8 @@ preexec () {
         *git*) zsh_git_invalidate_vars ;;
     esac
 }
+
+preexec_functions+='fancy_preexec'
 
 setprompt () {
     ###
@@ -155,7 +159,7 @@ setprompt () {
 
     PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
 $PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-$PR_GREEN%(!.%SROOT%s.%n)$PR_GREEN@%m:%l\
+$PR_GREEN%(!.%SROOT%s.%n)$PR_GREEN@%m\
 $PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_HBAR${(e)PR_FILLBAR}$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
 $PR_MAGENTA%$PR_PWDLEN<...<%~%<<\
 $PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_URCORNER$PR_SHIFT_OUT\
