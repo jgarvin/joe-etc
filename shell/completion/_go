@@ -1,0 +1,11 @@
+#compdef go
+
+local arg_string="*: :("
+
+cat $ZDOTDIR/.zsh-custom-locs | while read i; do
+    arg_string="$arg_string $(basename $i)"
+done
+
+arg_string="$arg_string)"
+
+_arguments $arg_string
