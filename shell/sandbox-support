@@ -88,7 +88,7 @@ if [ -f $ZDOTDIR/.zsh-custom-locs ]; then
 		done
 
 		if $changed; then
-				newlocs=$(mktemp)
+				local newlocs=$(mktemp)
 				for i in $tokeep; do
 						echo $i >> "$newlocs"
 				done
@@ -97,9 +97,19 @@ if [ -f $ZDOTDIR/.zsh-custom-locs ]; then
 fi
 
 go() {
-		target_sbox="$1"
+		local target_sbox="$1"
 
-		best_loose_match=""
+		if [ -z "$target_sbox" ]; then
+				local root=$(find_up -name "zsh-custom-env")
+				if [ -n "$root" ]; then
+						cd "$root"
+				else
+						echo >&2 "Need sandbox name."
+						return 1
+				fi
+		fi
+
+		local best_loose_match=""
 
 		cat "$ZDOTDIR/.zsh-custom-locs" | while read i; do
 				if [ "$(basename $i)" = "$target_sbox" ]; then
@@ -107,15 +117,16 @@ go() {
 						return 0
 				fi
 
-
-				if [[ "$(basename $i)" == "*$target_sbox*" ]] && [ -z $best_loose_match ]; then
-						best_loose_match="$target_sbox"
+				if [[ "$(basename $i)" =~ ".*$target_sbox.*" ]] && [ -z $best_loose_match ]; then
+						best_loose_match="$i"
 				fi
 		done
 
 		if [ -n "$best_loose_match" ]; then
 				cd "$best_loose_match"
 		fi
+
+		return 1
 }
 
 chpwd_functions+='check_env_files'
