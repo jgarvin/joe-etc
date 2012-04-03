@@ -16,7 +16,7 @@ if [ "$#" = "0" ]; then
 				linkname=$(basename $link)
 				target=$(readlink $link)
 				targetsuffix=$(echo $target | awk -F'-' '{ print $NF }')
-				targetname=$(echo $target | sed "s/-$targetsuffix$//")
+				targetname=$(echo $target | sed -e 's/\.//g' -e 's/\///g' | sed "s/-$targetsuffix$//")
 				if [ "$targetsuffix" = "$linkname" ]; then
 						echo "$linkname: $targetname"
 				fi
