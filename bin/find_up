@@ -2,10 +2,16 @@
 
 # Search upwards, stopping as soon as a result is found.
 
+# Resolve symlinks before resolving parent dirs. If you have a symlink
+# to a folder 2 levels deep in the folder of zsh-custom-env, and you
+# go into the symlink and "find_up" without this being set, it incorrectly
+# thinks it only needs to go 1 dir up instead of 2.
+setopt chasedots
+
 cdcount=0
 while true; do
 		result=$(find . -maxdepth 1 "$@" | sed 's/.\///')
-		if [ ! "$result" = "" ]; then
+		if [ -n "$result" ]; then
 				if (( $cdcount )); then
 						(( cdcount = $cdcount - 1 ))
 						for i in {0..$cdcount}; do
@@ -13,7 +19,7 @@ while true; do
 						done
 				fi
 				echo $result
-				exit 0
+				break
 		else
 				if [ "$PWD" = "/" ]; then
 						exit 1
