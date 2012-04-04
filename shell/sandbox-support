@@ -1,5 +1,9 @@
 #!/usr/bin/env zsh
 
+typeset -ga chpwd_functions
+typeset -ga preexec_functions
+typeset -ga precmd_functions
+
 # Make copy of ZSH_OLD_ENV and use it,
 # so that we don't interfer with parent shells.
 if [ -n "$ZSH_OLD_ENV" ]; then
@@ -102,7 +106,7 @@ go() {
 		if [ -z "$target_sbox" ]; then
 				local root=$(find_up -name "zsh-custom-env")
 				if [ -n "$root" ]; then
-						cd "$root"
+						cd $(dirname "$root")
 				else
 						echo >&2 "Need sandbox name."
 						return 1
@@ -124,6 +128,7 @@ go() {
 
 		if [ -n "$best_loose_match" ]; then
 				cd "$best_loose_match"
+				return 0
 		fi
 
 		return 1
