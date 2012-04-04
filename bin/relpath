@@ -1,13 +1,22 @@
 #!/bin/bash
 
-# Written by 'pini' on stackoverflow
+# Originally written by 'pini' on stackoverflow, now has edits
 # URL: http://stackoverflow.com/a/5027832/50385
 
 # both $1 and $2 are absolute paths
 # returns $2 relative to $1
 
-source=$1
-target=$2
+# cd'ing needed for '.' and '..' to work
+
+set -e
+
+if [ ! "$#" = "2" ]; then
+		echo >&2 "Source and target (2 arguments) are required."
+		exit 1
+fi
+
+source=$(cd $1 && pwd)
+target=$(cd $2 && pwd)
 
 common_part=$source
 back=
@@ -16,4 +25,5 @@ while [ "${target#$common_part}" = "${target}" ]; do
   back="../${back}"
 done
 
-echo ${back}${target#$common_part/}
+echo ${back}${target#$common_part/} | \
+		sed 's/\([^\\]\)\/\//\1\//g' # Remove extra /'s
