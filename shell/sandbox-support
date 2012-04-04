@@ -76,8 +76,8 @@ check_env_files()
 # Purge old locations
 if [ -f $ZDOTDIR/.zsh-custom-locs ]; then
 		local changed=false
-		local tokeep
-		typeset -A tokeep
+		#local tokeep
+		typeset -a tokeep
 		cat $ZDOTDIR/.zsh-custom-locs | while read i; do
 				if [ -f "$i/zsh-custom-env" ]; then
 						tokeep+="$i"
@@ -89,8 +89,8 @@ if [ -f $ZDOTDIR/.zsh-custom-locs ]; then
 
 		if $changed; then
 				local newlocs=$(mktemp)
-				for i in $tokeep; do
-						echo $i >> "$newlocs"
+				for i in {1..${#tokeep}}; do
+						echo $tokeep[$i] >> "$newlocs"
 				done
 				mv -f "$newlocs" $ZDOTDIR/.zsh-custom-locs
 		fi
