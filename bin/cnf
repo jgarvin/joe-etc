@@ -15,12 +15,9 @@ if [ "$#" = "0" ]; then
 		for link in $(find . -maxdepth 1 -type l); do
 				linkname=$(basename $link)
 				target=$(readlink $link)
-				targetsuffix=$(echo $target | awk -F'-' '{ print $NF }')
-				targetname=$(echo $target | sed "s/-$targetsuffix$//")
-				if [ "$targetsuffix" = "$linkname" ]; then
-						echo "$linkname: $targetname"
-				fi
-		done
+
+				echo "$linkname: $target"
+		done | sort -u
 		cat "$base_dir/zsh-custom-env"
 		exit 0
 fi

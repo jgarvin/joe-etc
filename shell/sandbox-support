@@ -1,0 +1,134 @@
+#!/usr/bin/env zsh
+
+# Make copy of ZSH_OLD_ENV and use it,
+# so that we don't interfer with parent shells.
+if [ -n "$ZSH_OLD_ENV" ]; then
+		newold=$(mktemp)
+		cp "$ZSH_OLD_ENV" "$newold"
+		export ZSH_OLD_ENV="$newold"
+fi
+
+check_env_files()
+{
+		# TODO: Make sure file is owned and only writable by me.
+
+		# Find environment specific settings
+		local custom_env=$(find_up -name 'zsh-custom-env')
+
+		abspath_env=$(readlink -f "$custom_env")
+
+		# We're already in this environment
+		if [ "$ZSH_CUSTOM_ENV" = "$abspath_env" ]; then
+				if [ "$ZSH_ENV_MTIME" = "$(stat -c %Y "$abspath_env" 2> /dev/null)" ]; then
+						# And it hasn't changed, so just return.
+						return
+				fi
+		fi
+
+		if [ -n "$ZSH_OLD_ENV" ]; then
+				echo >&2 "Restoring old environment"
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$ZSH_OLD_ENV")); IFS=$saveIFS
+				for i in $entries; do
+						local varname=$(echo $i | cut -d'=' -f 1)
+						local value=$(echo $i | cut -d'=' -f 2-)
+						echo >&2 "Restoring $varname=$value"
+						export $varname="$value"
+				done
+				rm $ZSH_OLD_ENV
+				export ZSH_CUSTOM_ENV=""
+				export ZSH_OLD_ENV=""
+				export ZSH_ENV_MTIME=""
+		fi
+
+		if [ -n "$abspath_env" ]; then
+				echo >&2 "Switching environment to $abspath_env"
+				saveIFS=$IFS; IFS=$'\n'; entries=($(cat "$abspath_env")); IFS=$saveIFS
+				for i in $entries; do
+						local varname="$(echo $i | cut -d'=' -f 1)"
+						# TODO: Should only sed out surrounding unescaped quotes
+						local value="$(echo $i | cut -d'=' -f 2- | sed 's/\"//g')"
+						echo >&2 "Setting $varname=$value"
+
+						if [ -z "$ZSH_OLD_ENV" ]; then
+								ZSH_OLD_ENV=$(mktemp)
+								export ZSH_OLD_ENV
+						fi
+
+						local old_val=$(env | grep -E "^$varname=")
+						if [ -z "$old_val" ]; then
+								echo "$varname=" >> $ZSH_OLD_ENV
+						else
+								echo "$old_val" >> $ZSH_OLD_ENV
+						fi
+
+						eval "export $i"
+				done
+				export ZSH_CUSTOM_ENV="$abspath_env"
+				export ZSH_ENV_MTIME="$(stat -c %Y "$abspath_env")"
+
+				holding_dir=$(dirname "$ZSH_CUSTOM_ENV")
+				if ! grep "$holding_dir" $ZDOTDIR/.zsh-custom-locs &> /dev/null; then
+						echo "$holding_dir" >> $ZDOTDIR/.zsh-custom-locs
+				fi
+		fi
+}
+
+# Purge old locations
+if [ -f $ZDOTDIR/.zsh-custom-locs ]; then
+		local changed=false
+		#local tokeep
+		typeset -a tokeep
+		cat $ZDOTDIR/.zsh-custom-locs | while read i; do
+				if [ -f "$i/zsh-custom-env" ]; then
+						tokeep+="$i"
+				else
+						echo >&2 "Purging $i from $ZDOTDIR/.zsh-custom-locs"
+						changed=true
+				fi
+		done
+
+		if $changed; then
+				local newlocs=$(mktemp)
+				for i in {1..${#tokeep}}; do
+						echo $tokeep[$i] >> "$newlocs"
+				done
+				mv -f "$newlocs" $ZDOTDIR/.zsh-custom-locs
+		fi
+fi
+
+go() {
+		local target_sbox="$1"
+
+		if [ -z "$target_sbox" ]; then
+				local root=$(find_up -name "zsh-custom-env")
+				if [ -n "$root" ]; then
+						cd "$root"
+				else
+						echo >&2 "Need sandbox name."
+						return 1
+				fi
+		fi
+
+		local best_loose_match=""
+
+		cat "$ZDOTDIR/.zsh-custom-locs" | while read i; do
+				if [ "$(basename $i)" = "$target_sbox" ]; then
+						cd "$i"
+						return 0
+				fi
+
+				if [[ "$(basename $i)" =~ ".*$target_sbox.*" ]] && [ -z $best_loose_match ]; then
+						best_loose_match="$i"
+				fi
+		done
+
+		if [ -n "$best_loose_match" ]; then
+				cd "$best_loose_match"
+		fi
+
+		return 1
+}
+
+chpwd_functions+='check_env_files'
+preexec_functions+='check_env_files'
+precmd_functions+='check_env_files'
