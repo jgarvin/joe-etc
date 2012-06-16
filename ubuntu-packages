@@ -83,3 +83,6 @@ mesa-utils
 timeout
 indent
 xfce4-terminal
+valgrind
+units
+manpages-posix

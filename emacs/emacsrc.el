@@ -359,7 +359,7 @@
                                (string-equal ext "tmp")
                                (string-equal ext "log")))
                       (< (buffer-size) uncomfortable-buffer-size))
-             (longlines-mode 1)))))
+             (visual-line-mode 1)))))
 
 ;; Taken from Trey Jackson's answer on superuser.com
 ;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file

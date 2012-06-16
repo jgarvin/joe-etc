@@ -79,7 +79,7 @@ setopt inc_append_history
 
 setopt autopushd             # Push things onto the directory stack
 setopt autocd                # cd to a dir when just its name is given
-setopt chasedots             # Resolve symlinks before resolving parent dirs
+#setopt chasedots             # Resolve symlinks before resolving parent dirs
 setopt autolist              # Do a list on ambiguous completion
 setopt automenu              # Do a menu after <Tab><Tab>
 setopt autoparamslash        # Append a slash for directory completion
