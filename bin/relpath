@@ -12,9 +12,20 @@ if [ ! "$#" = "2" ]; then
 		exit 1
 fi
 
+source_dir="$1"
+target_dir="$2"
+
+if [ ! -d "$source_dir" ]; then
+		source_dir=$(dirname "$source_dir")
+fi
+
+if [ ! -d "$target_dir" ]; then
+		target_dir=$(dirname "$target_dir")
+fi
+
 # cd'ing needed for '.' and '..' to work
-source=$(cd $1 && pwd)
-target=$(cd $2 && pwd)
+source=$(cd "$source_dir" && pwd)
+target=$(cd "$target_dir" && pwd)
 
 common_part=$source
 back=
