@@ -121,8 +121,10 @@ go() {
 						return 0
 				fi
 
-				if [[ "$(basename $i)" =~ ".*$target_sbox.*" ]] && [ -z $best_loose_match ]; then
-						best_loose_match="$i"
+				if [[ "$(basename $i)" -regex-match ".*$target_sbox.*" ]]; then
+						if [ -z $best_loose_match ]; then
+								best_loose_match="$i"
+						fi
 				fi
 		done
 
