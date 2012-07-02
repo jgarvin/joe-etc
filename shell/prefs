@@ -57,9 +57,9 @@ alias -r sl=ls
 
 # Don't clear the screen when less exits
 # also, searching should start from last line of screen
-alias less='less -X -a'
+alias less='less -X -a -R'
 # Make sure we do the same in the pager env var so it applies to git!
-export PAGER="less -X -a"
+export PAGER="less -X -a -R"
 
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
