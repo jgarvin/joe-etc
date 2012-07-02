@@ -2,6 +2,8 @@
 
 . `dirname $0`/util
 
+setopt chasedots
+
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
 setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
