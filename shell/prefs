@@ -132,7 +132,7 @@ sshmount() {
     mkdir -p "$remote_path"
 
     # apparently these are best for performance
-    sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
+    sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour,workaround=rename"
     #sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
 
     # Remount
