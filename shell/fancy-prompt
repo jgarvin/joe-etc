@@ -59,7 +59,7 @@ function fancy_precmd {
     if which ibam &> /dev/null; then
 	PR_APM_RESULT=`ibam --percentbattery`
     elif which apm &> /dev/null; then
-	PR_APM_RESULT=`apm`
+	PR_APM_RESULT=`apm 2>&1`
     fi
 }
 
