@@ -42,14 +42,18 @@ if which htop &> /dev/null; then
     alias top='htop'
 fi
 
-if grep --version 2> /dev/null | grep GNU &> /dev/null
+if grep --version 2> /dev/null | grep "Free Software" &> /dev/null
 then
     alias grep='grep --color=auto'
 fi
 
-if ls --version 2> /dev/null | grep GNU &> /dev/null
+if ls --version 2> /dev/null | grep "Free Software" &> /dev/null
 then
-    alias ls='ls -F -h --color=auto --group-directories-first'
+		if ls --version 2> /dev/null | grep "GNU" &> /dev/null; then
+				alias ls='ls -F -h --color=auto --group-directories-first'
+		else
+				alias ls='ls -F -h --color=auto'
+		fi
 fi
 
 # Obey my typos!
