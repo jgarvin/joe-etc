@@ -150,7 +150,7 @@ extract () {
 # Completion settings
 ################################################################################
 
-autoload -Uz compinit && compinit
+autoload -Uz compinit &> /dev/null && compinit
 
 zstyle ':completion:*' completer \
     _expand \
@@ -283,3 +283,19 @@ if [ -d "$ZDOTDIR/remote" ]; then
 fi
 
 source $ZDOTDIR/etc/shell/sandbox-support
+
+
+zsh_version=$(zsh --version | cut -d' ' -f 2)
+zsh_major=$(echo $zsh_version | cut -d'.' -f 1)
+zsh_minor=$(echo $zsh_version | cut -d'.' -f 2)
+zsh_micro=$(echo $zsh_version | cut -d'.' -f 3)
+
+if (( $zsh_major < 4 )) || (( $zsh_minor < 3 )); then
+		function precmd {
+		    # Old versions of zsh won't run precmd_functions for us,
+		    # so we implement it manually.
+		    for func in $precmd_functions; do
+				    $func
+		    done
+		}
+fi

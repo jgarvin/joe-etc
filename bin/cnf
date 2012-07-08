@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+setopt chasedots
+
 clean=false
 
 base_dir=$(dirname $(find_up -name zsh-custom-env))
@@ -18,7 +20,7 @@ if [ "$#" = "0" ]; then
 
 				echo "$linkname: $target"
 		done | sort -u
-		cat "$base_dir/zsh-custom-env"
+		cat zsh-custom-env
 		exit 0
 fi
 

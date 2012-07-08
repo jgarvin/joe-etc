@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+
+# TODO: Logic for ssh'ing?
+# Yeah, look for being a subfolder of ~/remote
+# Then just execute self
+
+set -e
+
+setopt chasedots
+
+bld_list_dir=$(dirname $(find_up -name bld-list))
+
+cd $bld_list_dir
+
+for i in $(cat bld-list); do
+    echo "Building: $i from: $PWD"
+		if [ -d "$i" ]; then
+				pushd "$i"
+				make
+				popd
+		else
+				pushd $(dirname "$i")
+				make $(basename "$i")
+				popd
+		fi
+done

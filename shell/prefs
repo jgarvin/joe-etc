@@ -42,14 +42,18 @@ if which htop &> /dev/null; then
     alias top='htop'
 fi
 
-if grep --version 2> /dev/null | grep GNU &> /dev/null
+if grep --version 2> /dev/null | grep "Free Software" &> /dev/null
 then
     alias grep='grep --color=auto'
 fi
 
-if ls --version 2> /dev/null | grep GNU &> /dev/null
+if ls --version 2> /dev/null | grep "Free Software" &> /dev/null
 then
-    alias ls='ls -F -h --color=auto --group-directories-first'
+		if ls --version 2> /dev/null | grep "GNU" &> /dev/null; then
+				alias ls='ls -F -h --color=auto --group-directories-first'
+		else
+				alias ls='ls -F -h --color=auto'
+		fi
 fi
 
 # Obey my typos!
@@ -57,9 +61,9 @@ alias -r sl=ls
 
 # Don't clear the screen when less exits
 # also, searching should start from last line of screen
-alias less='less -X -a'
+alias less='less -X -a -R'
 # Make sure we do the same in the pager env var so it applies to git!
-export PAGER="less -X -a"
+export PAGER="less -X -a -R"
 
 alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
 
@@ -132,7 +136,7 @@ sshmount() {
     mkdir -p "$remote_path"
 
     # apparently these are best for performance
-    sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
+    sshfs_opts="-oreconnect,transform_symlinks,ssh_command=$ZDOTDIR/etc/bin/ssharcfour,workaround=rename"
     #sshfs_opts="-o ssh_command=$ZDOTDIR/etc/bin/ssharcfour"
 
     # Remount
