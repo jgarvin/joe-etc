@@ -130,7 +130,7 @@ then
 fi
 
 sshmount() {
-    remote_path="$ZDOTDIR/remote/$1-root"
+    remote_path="$ZDOTDIR/rmt/$1-root"
 
     # create mount point
     mkdir -p "$remote_path"
@@ -146,7 +146,7 @@ sshmount() {
         return 1
     fi
 
-    cd $ZDOTDIR/remote
+    cd $ZDOTDIR/rmt
     ln -Tsf "$1-root/home/$LOGNAME" "$1"
 
     ssh-add &> /dev/null # idempotent, registers key
@@ -157,9 +157,9 @@ sshmount() {
         cat $ZDOTDIR/.ssh/id_rsa.pub >> $local_key_file
     fi
 
-    touch $ZDOTDIR/remote/hostlist
-    if ! grep "$1" $ZDOTDIR/remote/hostlist &> /dev/null; then
-        echo "$1" >> $ZDOTDIR/remote/hostlist
+    touch $ZDOTDIR/rmt/hostlist
+    if ! grep "$1" $ZDOTDIR/rmt/hostlist &> /dev/null; then
+        echo "$1" >> $ZDOTDIR/rmt/hostlist
     fi
 
     # now setup home folder :D

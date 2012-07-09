@@ -278,7 +278,7 @@ then
 	    synergys -f --config $synergy_conf > $ZDOTDIR/.synergy_log 2>&1 &; disown
 fi
 
-if [ -d "$ZDOTDIR/remote" ]; then
+if [ -d "$ZDOTDIR/rmt" ]; then
 	$ZDOTDIR/etc/bin/sync-repos
 fi
 

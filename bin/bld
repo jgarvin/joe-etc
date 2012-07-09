@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # TODO: Logic for ssh'ing?
-# Yeah, look for being a subfolder of ~/remote
+# Yeah, look for being a subfolder of ~/rmt
 # Then just execute self
 
 set -e

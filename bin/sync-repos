@@ -7,7 +7,7 @@ if which timeout &> /dev/null; then
 		timeout_arg="5"
 fi
 
-cd $ZDOTDIR/remote
+cd $ZDOTDIR/rmt
 for i in $($timeout_app $timeout_arg find . -maxdepth 1 -regex '.*[^root]'); do
     # Filter '.' and broken symlinks
     if [ ! "$i" = "." ]  && [ -e "$i" ]; then
@@ -17,15 +17,15 @@ for i in $($timeout_app $timeout_arg find . -maxdepth 1 -regex '.*[^root]'); do
         remote_home=$(echo "$i" | sed 's/\.\///') # strip leading ./
 
         # Sync ssh to make logins passwordless
-        rsync -art "$ZDOTDIR/.ssh" "$ZDOTDIR/remote/$remote_home"
+        rsync -art "$ZDOTDIR/.ssh" "$ZDOTDIR/rmt/$remote_home"
 
         # Sync settings
-        rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/remote/$remote_home"
-        cd "$ZDOTDIR/remote/$remote_home"
-        HOME="$ZDOTDIR/remote/$remote_home" "etc/shell/setup_symlinks"
+        rsync -art "$ZDOTDIR/etc" "$ZDOTDIR/rmt/$remote_home"
+        cd "$ZDOTDIR/rmt/$remote_home"
+        HOME="$ZDOTDIR/rmt/$remote_home" "etc/shell/setup_symlinks"
 
         # Sync installed apps in the background, it can take
 				# awhile.
-        rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/remote/$remote_home" &
+        rsync -art "$ZDOTDIR/opt" "$ZDOTDIR/rmt/$remote_home" &
     fi >> ~/.gitsynclog 2>&1 &; disown
 done
