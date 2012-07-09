@@ -170,6 +170,6 @@ if [ -f $ZDOTDIR/etc/jsh/init.zsh ]; then
     source $ZDOTDIR/etc/jsh/init.zsh
 fi
 
-export MAKEFLAGS="-j$(grep 'core id' /proc/cpuinfo | sort -u | wc -l)"
+export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 
 export PATH
