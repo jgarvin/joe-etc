@@ -209,9 +209,9 @@
 (setq show-trailing-whitespace t)
 
 ;; Delete trailing whitespace automagically
-(add-hook 'write-file-hooks
-          (lambda ()
-            (delete-trailing-whitespace)))
+;; (add-hook 'write-file-hooks
+;;           (lambda ()
+;;             (delete-trailing-whitespace)))
 
 ;; TODO: Filter untabify for makefiles
 
@@ -474,6 +474,9 @@
          :on-hit (lambda (p) (message (car p))))
         ("TL project"
          :filename-regex ,(regexify-ext-list '(tc H C))
+         :on-hit (lambda (p) (message (car p))))
+        ("bld project"
+         :root-contains-files ("bld-list")
          :on-hit (lambda (p) (message (car p))))
         ("CMake project"
          :root-contains-files ("CMakeLists.txt")
