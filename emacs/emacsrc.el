@@ -263,6 +263,10 @@
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
+(add-hook 'asm-mode-hook
+	  (lambda ()
+	    (local-set-key (kbd "RET") 'newline)))
+
 ;; If I'm searching and I hit backspace, I mean backspace dammit.
 (define-key isearch-mode-map '[backspace] 'isearch-delete-char)
 
