@@ -161,13 +161,15 @@ else:
 if args.tparams:
     inlines += it + 'template<%s>\n' % args.tparams
 inlines += it + classheader[:-1] + '\n'
-inlines += it + '::' + classheader[:-1]
+inlines += it + '::' + args.classname
 inlines += '(' + args.ctorparams + ')\n'
 firstField = True
 
 if args.base:
     inlines += it
     params = [i.split(' ')[-1] for i in args.ctorparams.split(',')]
+    params = [i.replace('*', '') for i in params] # depointerify
+    params = [i.replace('&', '') for i in params] # dereferenceify
     params = ', '.join(params)
     inlines += ': ' + args.base + '(' + params + ')\n'
     firstField = False
