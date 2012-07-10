@@ -32,6 +32,8 @@ parser.add_argument('-t', '--template', metavar='PARAMS', type=str,
                     dest="tparams", help='Template parameters')
 parser.add_argument('-r', '--ctorparams', metavar='PARAMS', type=str,
                     dest="ctorparams", help='Constructor parameters', default="")
+parser.add_argument('-o', '--stdout', default=False, action='store_true',
+                    dest="stdout", help='Don\'t save, print to stdout')
 parser.add_argument(metavar='FILE', type=str,
                     dest="input_file", help='File to read field defs from.')
 args = parser.parse_args()
@@ -247,6 +249,11 @@ if args.namespace:
 
 inlines += "#endif"
 
-print header
-print
-print inlines
+if args.stdout:
+    print header
+    print
+    print inlines
+else:
+    open(args.classname + '.H', 'w').write(header)
+    open(args.classname + 'INLINES.C', 'w').write(inlines)
+    
