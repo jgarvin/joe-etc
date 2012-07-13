@@ -109,6 +109,11 @@ def EndElementHandler(name):
     global templates, cur_template
     if name == "template":
         templates.append(cur_template)
+    elif name == "sequence":
+        end_sequence = Obj()
+        end_sequence.ftype = "end_sequence"
+        end_sequence.name = ""
+        cur_template.fields.append(end_sequence)
 
 parser.StartElementHandler = StartElementHandler
 parser.EndElementHandler = EndElementHandler
@@ -134,10 +139,18 @@ for t in templates:
     print "==========================================="
     print "Template: " + t.name
     pmap_bits = 0
+    last_was_end_sequence = False
     for field in t.fields:
+        if last_was_end_sequence:
+            last_was_end_sequence = False
+            print '------EndSequence------'
+
         if field.ftype == "sequence":
             print '-------Sequence-------'
             pmap_bits = 0
+            continue
+        elif field.ftype == "end_sequence":
+            last_was_end_sequence = True
             continue
 
         field_op = field.operator
@@ -149,7 +162,7 @@ for t in templates:
             field_op = field.exponent.operator
 
         format_str = "%%%ds %%%ds" % (max_field_name_width, max_op_width)
-        print format_str % (field.name, field.operator),
+        print format_str % (field.name, field_op),
 
         if pmap_required[(field_op, field.optional)]:
             format_str = " %8s"
