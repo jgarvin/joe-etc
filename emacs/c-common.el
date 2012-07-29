@@ -143,17 +143,7 @@
 
 ;; Run makefile, or if there isn't one
 (defun smart-compile()
-  (if (or (file-exists-p "makefile")
-		  (file-exists-p "Makefile")
-		  (file-exists-p "../Makefile"))
-	  (compile "make -k -j2")
-	(if (file-expand-wildcards "*.tc")
-		(compile "tlmake")
-	  (compile (concat
-				"make -k -j2 "
-				(file-name-sans-extension
-				 (file-name-nondirectory buffer-file-name)))))))
-
+  (compile "bld"))
 
 (defun ff/fast-compile ()
   "Compiles without asking anything."
