@@ -16,11 +16,11 @@ for i in $(cat bld-list); do
     echo "Building: $i from: $PWD"
 		if [ -d "$i" ]; then
 				pushd "$i"
-				make
+				make "$@"
 				popd
 		else
 				pushd $(dirname "$i")
-				make $(basename "$i")
+				make $(basename "$i") "$@"
 				popd
 		fi
 done
