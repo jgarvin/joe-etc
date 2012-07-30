@@ -13,5 +13,5 @@ done
 
 PYTHONPATH="`dirname $0`/../python" python \
     `dirname $0`/../utils/ctrl-c-handler.py \
-    acore $@
+    acore "$@"
 
