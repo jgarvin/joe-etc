@@ -73,6 +73,10 @@ alias ssh="ssh -C -X"
 # almost never use mv to overwrite
 alias mv="mv -i"
 
+find_biggest() {
+		find ${1-.} -type f -exec du -k {} + | sort -k1n -k2 | tail -n 20
+}
+
 # 99% of the time I want truss to include child processes
 file_name=$0
 
@@ -173,3 +177,8 @@ fi
 export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 
 export PATH
+
+# Have to do rehash as an alias rather than being part of the bld
+# script so that it will execute in the same shell. rehash updates
+# the $PATH autocomplete entries after building.
+alias bld='~/etc/bin/bld && rehash'
