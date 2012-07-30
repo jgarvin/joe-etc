@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-PYTHONPATH="`dirname $0`/../python)" python \
+PYTHONPATH="`dirname $0`/../python" python \
     `dirname $0`/../utils/flail.py "$@"
