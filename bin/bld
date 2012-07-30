@@ -2,7 +2,7 @@
 
 # TODO: Logic for ssh'ing?
 # Yeah, look for being a subfolder of ~/rmt
-# Then just execute self
+# Then just execute self on remote host
 
 set -e
 
