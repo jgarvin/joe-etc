@@ -519,3 +519,4 @@
 ;; Needed for ido-mode to work in large source trees
 (setq ido-max-directory-size 200000)
 
+(put 'upcase-region 'disabled nil)
