@@ -15,10 +15,10 @@ define gdbquit
 quit
 end
 
-set scheduler-locking on
-
 set script-extension soft
 source ~/etc/rwtime.py
 
 echo Turning off listening for SIGUSR1...\n
 handle SIGUSR1 nostop
+
+set scheduler-locking on
