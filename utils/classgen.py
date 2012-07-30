@@ -26,8 +26,8 @@ parser.add_argument('-n', '--namespace', metavar='NSPACE', type=str,
                     default=None)
 parser.add_argument('-c', '--class', metavar='NAME', type=str,
                     dest="classname", help='Name for class', required=True)
-parser.add_argument('-b', '--base', metavar='NAME', type=str,
-                    dest="base", help='Base class', default=None)
+parser.add_argument('-b', '--base', metavar='NAME', type=str, action='append',
+                    dest="base", help='Public base class', default=None)
 parser.add_argument('-t', '--template', metavar='PARAMS', type=str,
                     dest="tparams", help='Template parameters')
 parser.add_argument('-r', '--ctorparams', metavar='PARAMS', type=str,
@@ -86,7 +86,13 @@ def fieldName(n):
             
 header += it + 'class %s' % args.classname
 if args.base:
-    header += ' : public %s' % args.base
+    header += ' : '
+    bFirst = True
+    for base in args.base:
+        if not bFirst:
+            header += ", "
+        header += 'public %s' % base
+        bFirst = False
 header += ' {\n'
 header += it + 'public:\n'
 
@@ -103,20 +109,21 @@ for field in fields:
 
         returnT = returnType(field[1])
 
-        if op == 'G':
+        if op == 'G': # get
             if returnT == "char*":
                 returnT = "const char*"
             header += it + '  %s get%s() const;\n' % (returnT, field[0])
-        elif op == 'S':
+        elif op == 'S': # set
             header += it + '  void set%s(%s %s);\n' % (field[0], returnT, fieldName(field[0])[:-1])
-        elif op == 'I':
+        elif op == 'I': # increment
             header += it + '  void inc%s();\n' % field[0]
-        elif op == 'A':
+        elif op == 'A': # add
             header += it + '  void add%s(%s delta);\n' % (field[0], returnT)
-        elif op == 'GM':
+        elif op == 'GM': #
             header += it + '  %s get%s();\n' % (returnT, field[0])
+        elif op == 'C':
+            header += it + '  void clear%s();\n' % field[0]
         else:
-            continue
             print >>sys.stderr, "Invalid op!: %s" % op
             sys.exit(1)
 
@@ -135,7 +142,7 @@ if args.namespace:
 
 header += '#include <%s/%sINLINES.C>\n\n' % (args.namespace, args.classname) 
 
-header += "#endif"
+header += "#endif\n"
 
 inlines_header_guard = []
 if args.namespace:
@@ -171,7 +178,7 @@ if args.base:
     params = [i.replace('*', '') for i in params] # depointerify
     params = [i.replace('&', '') for i in params] # dereferenceify
     params = ', '.join(params)
-    inlines += ': ' + args.base + '(' + params + ')\n'
+    inlines += ': ' + args.base[0] + '(' + params + ')\n'
     firstField = False
 
 for field in fields:
@@ -238,8 +245,13 @@ for field in fields:
             inlines += it + '{\n'
             inlines += it + '  return %s;\n' % fieldName(field[0])
             inlines += it + '}'
+        elif op == 'C':
+            inlines += it + 'void ' + classheader
+            inlines += it + '::clear%s()\n' % field[0]
+            inlines += it + '{\n'
+            inlines += it + '  %s[0] = \'\\0\';\n' % (fieldName(field[0]))
+            inlines += it + '}'
         else:
-            continue
             print >>sys.stderr, "Invalid op!: %s" % op
             sys.exit(1)
 
@@ -249,7 +261,7 @@ if args.namespace:
     inlines += '}\n\n'
     it = ''
 
-inlines += "#endif"
+inlines += "#endif\n"
 
 if args.stdout:
     print header
