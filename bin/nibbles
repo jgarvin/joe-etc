@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+PYTHONPATH="`dirname $0`/../python" python \
+    `dirname $0`/../utils/nibbles.py "$@"
