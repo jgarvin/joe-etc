@@ -17,11 +17,43 @@ check_env_files()
 		# TODO: Make sure file is owned and only writable by me.
 		# TODO: Let earlier env variable settings affect later ones
 		# TODO: Support not yet dereferenced vars
+		# TODO: Blacklist of folders for circumventing checking
 
 		# Find environment specific settings
 		local custom_env=$(find_up -name 'zsh-custom-env')
 
+		# Only run in folders with custom env
+		if [ "$custom_env" = "" ]; then
+				return
+		fi
+
 		abspath_env=$(readlink -f "$custom_env")
+
+		local root=$(dirname "$abspath_env")
+
+		if [ -d "$root"/bin ]; then
+				# Check for binaries within path, except in the bin folder itself,
+				# and ignore hidden folders (since git samples and the like are in
+				# there).
+				for i in $(find "$root" -type f -perm -o+x -not -path "$root/bin/*" \( ! -regex '.*/\..*' \)); do
+						if file "$i" | grep executable &> /dev/null; then
+								if [ ! -f "$root/bin/$(basename $i)" ]; then
+										echo "Adding $(basename $i) to sandbox path..."
+								fi
+								ln -sf "$i" "$root/bin"
+						fi
+				done
+
+				# Check to make sure binaries in path are still valid
+				for i in $(find "$root"/bin -type l); do
+						# Looks paradoxical, but if $i is a present symlink to
+						# an invalid file, then the conditonal is satisifed.
+						if [ ! -f "$i" ]; then
+								echo "Removing $(basename $i) from sandbox path..."
+								rm -f "$i"
+						fi
+				done
+		fi
 
 		# We're already in this environment
 		if [ "$ZSH_CUSTOM_ENV" = "$abspath_env" ]; then
