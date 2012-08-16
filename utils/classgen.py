@@ -14,7 +14,21 @@ funcmap = { 'G' : 'get',
             'S' : 'set',
             'I' : 'inc',
             'A' : 'add',
-            'GM' : 'get' } 
+            'GM' : 'get' }
+
+def getTypeSize(t):
+    if "[" in t:
+        return getTypeSize(t.split("[")[0]) * int(t.split("[")[1][:-1]) 
+    elif "int64_t" in t:
+        return 8
+    elif "int32_t" in t:
+        return 4
+    elif "int16_t" in t:
+        return 2
+    elif "int8_t" in t:
+        return 1
+    elif "char":
+        return 1
 
 import sys
 import argparse
@@ -58,8 +72,12 @@ def genOpening(header_guard):
 fields=[]
 input_file = args.input_file 
 for line in open(input_file).readlines()[1:]:
+    if len(line) and line[0] == '#': # comment syntax
+        continue
     field, ftype, ops = line.split(',')
     fields.append((field, ftype, ops))
+
+#fields.sort(key=lambda x: getTypeSize(x[1]), reverse=True)
 
 header = genOpening(header_header_guard)
 header += "#include <cstddef>\n\n"
@@ -216,37 +234,37 @@ for field in fields:
         if op == 'G':
             if returnT == "char*":
                 returnT = "const char*"
-            inlines += it + returnT + ' ' + classheader 
+            inlines += it + "inline " + returnT + ' ' + classheader 
             inlines += it + '::get%s() const\n' % (field[0])
             inlines += it + '{\n'
             inlines += it + '  return %s;\n' % fieldName(field[0])
             inlines += it + '}'
         elif op == 'S':
-            inlines += it + 'void ' + classheader 
+            inlines += it + 'inline void ' + classheader 
             inlines += it + '::set%s(%s %s)\n' % (field[0], returnT, fieldName(field[0])[:-1])
             inlines += it + '{\n'
             inlines += it + '  %s = %s;\n' % (fieldName(field[0]), fieldName(field[0])[:-1])
             inlines += it + '}'
         elif op == 'I':
-            inlines += it + 'void ' + classheader
+            inlines += it + 'inline void ' + classheader
             inlines += it + '::inc%s()\n' % field[0]
             inlines += it + '{\n'
             inlines += it + '  ++%s;\n' % (fieldName(field[0]))
             inlines += it + '}'
         elif op == 'A':
-            inlines += it + 'void ' + classheader
+            inlines += it + 'inline void ' + classheader
             inlines += it + '::add%s(%s delta)\n' % (field[0], returnT)
             inlines += it + '{\n'
             inlines += it + '  %s += delta;\n' % (fieldName(field[0]))
             inlines += it + '}'
         elif op == 'GM':
-            inlines += it + returnT + ' ' + classheader
+            inlines += it + "inline " + returnT + ' ' + classheader
             inlines += it + '::get%s()\n' % (field[0])
             inlines += it + '{\n'
             inlines += it + '  return %s;\n' % fieldName(field[0])
             inlines += it + '}'
         elif op == 'C':
-            inlines += it + 'void ' + classheader
+            inlines += it + 'inline void ' + classheader
             inlines += it + '::clear%s()\n' % field[0]
             inlines += it + '{\n'
             inlines += it + '  %s[0] = \'\\0\';\n' % (fieldName(field[0]))
