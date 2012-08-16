@@ -44,7 +44,7 @@ check_env_files()
 								[ "$dir" -nt "$dir/.last_scan_marker" ]; then
 								touch "$dir/.last_scan_marker"
 								
-								for i in $(find "$dir" -type f -perm -o+x ); do
+								for i in $(find "$dir" -maxdepth 1 -type f -perm -o+x \( ! -regex '.*/\..*' \)); do
 										if file "$i" | grep executable &> /dev/null; then
 												if [ ! -f "$root/bin/$(basename $i)" ]; then
 														echo "Adding $(basename $i) to sandbox path..."
