@@ -21,29 +21,40 @@ check_env_files()
 
 		# Find environment specific settings
 		local custom_env=$(find_up -name 'zsh-custom-env')
-
-		# Only run in folders with custom env
-		if [ "$custom_env" = "" ]; then
-				return
-		fi
-
-		abspath_env=$(readlink -f "$custom_env")
-
+		local abspath_env=$(readlink -f "$custom_env")
 		local root=$(dirname "$abspath_env")
+		local relative_root=$(dirname "$custom_env")
 
-		if [ -d "$root"/bin ]; then
+		if [ ! "$custom_env" = "" ] && [ -d "$root"/bin ]; then
 				# Check for binaries within path, except in the bin folder itself,
 				# and ignore hidden folders (since git samples and the like are in
 				# there).
-				for i in $(find "$root" -type f -perm -o+x -not -path "$root/bin/*" \( ! -regex '.*/\..*' \)); do
-						if file "$i" | grep executable &> /dev/null; then
-								if [ ! -f "$root/bin/$(basename $i)" ]; then
-										echo "Adding $(basename $i) to sandbox path..."
-								fi
-								ln -sf "$i" "$root/bin"
+
+				# Trigger a full rescan when the bin directory changes, might
+				# have wiped all the symlinks so they'd get regen'd.
+				full_rescan=false
+				if [ ! -f "$root/bin/.last_scan_marker" ] || \
+						[ "$root/bin" -nt "$root/bin/.last_scan_marker" ]; then
+								touch "$root/bin/.last_scan_marker"
+								full_rescan=true
+				fi
+				
+				for dir in $(find "$root" -mindepth 1 -type d -not -path "$root/bin" \( ! -regex '.*/\..*' \)); do
+						if $full_rescan || [ ! -f "$dir/.last_scan_marker" ] || \
+								[ "$dir" -nt "$dir/.last_scan_marker" ]; then
+								touch "$dir/.last_scan_marker"
+								
+								for i in $(find "$dir" -type f -perm -o+x ); do
+										if file "$i" | grep executable &> /dev/null; then
+												if [ ! -f "$root/bin/$(basename $i)" ]; then
+														echo "Adding $(basename $i) to sandbox path..."
+														ln -sf $(relpath "$root/bin" "$i")/$(basename "$i") "$root/bin"
+												fi
+										fi
+								done
 						fi
 				done
-
+				
 				# Check to make sure binaries in path are still valid
 				for i in $(find "$root"/bin -type l); do
 						# Looks paradoxical, but if $i is a present symlink to
