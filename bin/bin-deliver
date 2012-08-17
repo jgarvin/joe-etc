@@ -1,0 +1,50 @@
+#!/usr/bin/env zsh
+
+typeset -a binary_list
+local copy_path=""
+
+while [ "$#" -gt "0" ]
+do
+    case $1 in
+				-b)
+						binary_list+="$2"
+						shift
+						;;
+				-p)
+						copy_path="$2"
+						shift
+						;;
+    esac
+    shift
+done
+
+if [ -z "$binary_list" ]; then
+		echo >&2 "Need at least one binary to copy."
+		exit 1
+fi
+
+if [ -z "$copy_path" ]; then
+		echo >&2 "Need path to copy binaries to."
+		exit 1
+fi
+
+for i in $binary_list; do
+		bin_loc="$(which $i)"
+
+		# Need to copy any non-system libs with the binaries
+		for lib in $(ldd $bin_loc | grep -vE '( /lib)|( /usr/lib)|(/lib64)|(linux-vdso)' | awk '{ print $3 }'); do
+				binary_list+="$lib"
+				if [ -h "$lib" ]; then
+						binary_list+="$(readlink -f "$lib")"
+				fi
+		done
+done
+
+cmd="rsync -a"
+for i in $binary_list; do
+		echo "Command so far: $cmd"
+		cmd="$cmd $i" 
+done
+cmd="$cmd $copy_path"
+echo "Running: $cmd"
+eval $cmd
