@@ -35,24 +35,24 @@
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
 (require 'gtags)
 
-(defun djcb-gtags-create-or-update ()
-  "create or update the gnu global tag file"
-  (interactive)
-  (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
-	  (let ((olddir default-directory)
-			(topdir (read-directory-name
-					 "gtags: top of source tree:" default-directory)))
-		(when (not (string= topdir ""))
-		  (progn
-			(cd topdir)
-			(start-process-shell-command "gtags create"
-										 "gtags_buffer"
-										 "gtags -q && echo 'created tagfile'")
-			(cd olddir)))) ; restore
-    ;;  tagfile already exists; update it
-    (start-process-shell-command "gtags update"
-								 "gtags_buffer"
-								 "global -u 2> /dev/null && echo 'updated tagfile'")))
+;; (defun djcb-gtags-create-or-update ()
+;;   "create or update the gnu global tag file"
+;;   (interactive)
+;;   (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
+;; 	  (let ((olddir default-directory)
+;; 			(topdir (read-directory-name
+;; 					 "gtags: top of source tree:" default-directory)))
+;; 		(when (not (string= topdir ""))
+;; 		  (progn
+;; 			(cd topdir)
+;; 			(start-process-shell-command "gtags create"
+;; 										 "gtags_buffer"
+;; 										 "gtags -q && echo 'created tagfile'")
+;; 			(cd olddir)))) ; restore
+;;     ;;  tagfile already exists; update it
+;;     (start-process-shell-command "gtags update"
+;; 								 "gtags_buffer"
+;; 								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 (defun gtags-select-tag-and-kill-buffer ()
   (interactive)
@@ -85,10 +85,10 @@
 (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
 (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
 
-(if (string-match (concat "^/home/"
-						  (getenv "LOGNAME") ".*")
-				  default-directory)
-	(djcb-gtags-create-or-update))
+;; (if (string-match (concat "^/home/"
+;; 						  (getenv "LOGNAME") ".*")
+;; 				  default-directory)
+;; 	(djcb-gtags-create-or-update))
 
 (gtags-mode t)
 
