@@ -213,6 +213,9 @@
 ;;           (lambda ()
 ;;             (delete-trailing-whitespace)))
 
+(add-hook 'sh-mode-hook
+	  (lambda () (setq indent-tabs-mode nil)))
+
 ;; TODO: Filter untabify for makefiles
 
 (setq indent-tabs-mode nil)
