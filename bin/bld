@@ -15,13 +15,20 @@ cd $bld_list_dir
 echo "Building from: $PWD"
 for i in $(cat bld-list); do
     echo "Building: $i"
-		if [ -d "$i" ]; then
-				pushd "$i"
-				make "$@"
-				popd
-		else
-				pushd $(dirname "$i")
-				make $(basename "$i") "$@"
-				popd
-		fi
+    if [ -d "$i" ]; then
+        pushd "$i"
+        make "$@"
+        popd
+    else
+        pushd $(dirname "$i")
+        make $(basename "$i") "$@"
+        popd
+    fi
 done
+
+if which gtags &> /dev/null; then
+    echo "Regenerating tags"
+    if ! global -u &> /dev/null; then
+        gtags
+    fi &
+fi
