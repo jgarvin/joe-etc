@@ -33,6 +33,7 @@ check_env_files()
 				# Trigger a full rescan when the bin directory changes, might
 				# have wiped all the symlinks so they'd get regen'd.
 				full_rescan=false
+        binaries_changed=false
 				if [ ! -f "$root/bin/.last_scan_marker" ] || \
 						[ "$root/bin" -nt "$root/bin/.last_scan_marker" ]; then
 								touch "$root/bin/.last_scan_marker"
@@ -49,6 +50,7 @@ check_env_files()
 												if [ ! -f "$root/bin/$(basename $i)" ]; then
 														echo "Adding $(basename $i) to sandbox path..."
 														ln -sf $(relpath "$root/bin" "$i")/$(basename "$i") "$root/bin"
+                            binaries_changed=true
 												fi
 										fi
 								done
@@ -62,8 +64,13 @@ check_env_files()
 						if [ ! -f "$i" ]; then
 								echo "Removing $(basename $i) from sandbox path..."
 								rm -f "$i"
+                binaries_changed=true
 						fi
 				done
+
+        if $binaries_changed; then
+            rehash
+        fi
 		fi
 
 		# We're already in this environment
