@@ -13,7 +13,7 @@ bld_list_dir=$(dirname $(find_up -name bld-list))
 cd $bld_list_dir
 
 echo "Building from: $PWD"
-for i in $(cat bld-list); do
+for i in $(cat bld-list | grep -v '^#'); do
     echo "Building: $i"
     if [ -d "$i" ]; then
         pushd "$i"
