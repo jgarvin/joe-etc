@@ -88,6 +88,7 @@ setopt listpacked            # Use variable column widths
 setopt globdots              # Assume leading . for hidden files
 setopt COMPLETE_IN_WORD      # allow completion in the middle of a word
 setopt extended_glob         # Lets you negate patterns, e.g. all non .c files: ^*.c
+setopt histignorespace       # don't put shell commands starting with space into history
 
 # system beep is irritating for tab completion
 unsetopt beep
