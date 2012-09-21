@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+import fileinput
+
+countmap = set()
+for line in fileinput.input():
+    if line in countmap:
+        continue
+    else:
+        countmap.add(line)
+        print line[:-1]
+
