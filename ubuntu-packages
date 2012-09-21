@@ -86,3 +86,4 @@ xfce4-terminal
 valgrind
 units
 manpages-posix
+apt-file
