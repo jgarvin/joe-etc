@@ -187,7 +187,7 @@ color_index() {
 						echo -en "${CTRL}"
 						echo -en "${STYLE};${FG}\033[0;30;40m "
 				done
-				echo -e "$blank_line" # Separators
+		 		echo -e "$blank_line" # Separators
 		done
 		echo -en "     \033[0;30;40m "
   # Background colors
@@ -202,16 +202,16 @@ color_index() {
 
 setup_symlink()
 {
-    if [[ -a "$1" ]]; then
+    if [ -e "$1" ]; then
         cd $(dirname "$2")
-				target_file=$(basename "$2")
-				if [[ -a "$target_file" ]] && [ ! -L "$target_file" ]; then
-						echo >&2 "Moving existing $target_file to ${target_file}.old"
-						mv "$target_file" "$target_file".old
-				fi
+        target_file=$(basename "$2")
+        if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+            echo >&2 "Moving existing $target_file to ${target_file}.old"
+            mv "$target_file" "$target_file".old
+        fi
 
-				if [[ ! -a "$target_file" ]]; then
-						ln -sf $(relpath "$PWD" "$1") "$target_file"
-				fi
+        if [ ! -e "$target_file" ]; then
+            ln -sf $($HOME/etc/bin/relpath "$PWD" "$1")/$(basename "$1") "$target_file"
+        fi
     fi
 }
