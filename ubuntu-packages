@@ -23,10 +23,10 @@ mercurial
 # Xmonad
 cabal-install
 xmonad
-libghc6-xmonad-dev
-libghc6-xmonad-doc
-libghc6-xmonad-contrib-dev
-libghc6-xmonad-contrib-doc
+libghc-xmonad-dev
+libghc-xmonad-doc
+libghc-xmonad-contrib-dev
+libghc-xmonad-contrib-doc
 
 # Minimum to build 3rd party C packages
 build-essential
@@ -57,12 +57,6 @@ haskell-mode
 nautilus-open-terminal
 python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
-calibre
-irssi
-irssi-plugin-otr
-irssi-scripts
-js2-mode
-scrot
 openssh-server
 ocaml
 ocaml-docs
