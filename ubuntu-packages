@@ -43,7 +43,6 @@ python-profiler
 global
 
 # Multimedia and ease of use
-wine
 vlc
 ubuntu-restricted-extras
 
@@ -81,3 +80,5 @@ valgrind
 units
 manpages-posix
 apt-file
+python-setuptools
+python-matplotlib
