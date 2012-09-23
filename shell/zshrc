@@ -18,6 +18,8 @@ fpath=($ZDOTDIR/etc/shell/completion $fpath)
 
 export SHELL=`which zsh`
 
+export PYTHONSTARTUP="$HOME/etc/utils/history.py"
+
 export REPORTTIME=10
 
 # Now deleting a word won't erase a whole path.
