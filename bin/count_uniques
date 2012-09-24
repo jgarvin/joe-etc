@@ -10,5 +10,5 @@ for line in fileinput.input():
         countmap[line] = 1
 
 for line in countmap:
-    print "Line: %s Count: %s" % (line, countmap[line])
+    print "Line: %s Count: %s" % (line[:-1], countmap[line])
 
