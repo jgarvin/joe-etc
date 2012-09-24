@@ -48,9 +48,12 @@ check_env_files()
 								for i in $(find "$dir" -maxdepth 1 -type f -perm -o+x \( ! -regex '.*/\..*' \)); do
 										if file "$i" | grep executable &> /dev/null; then
 												if [ ! -f "$root/bin/$(basename $i)" ]; then
-														echo "Adding $(basename $i) to sandbox path..."
-														ln -sf $(relpath "$root/bin" "$i")/$(basename "$i") "$root/bin"
-                            binaries_changed=true
+                            # Prevent overriding existing apps and shell builtins
+                            if ! which "$(basename $i)" &> /dev/null; then
+														    echo "Adding $(basename $i) to sandbox path..."
+														    ln -sf $(relpath "$root/bin" "$i")/$(basename "$i") "$root/bin"
+                                binaries_changed=true
+                            fi
 												fi
 										fi
 								done
