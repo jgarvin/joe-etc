@@ -4,14 +4,21 @@
 # Yeah, look for being a subfolder of ~/rmt
 # Then just execute self on remote host
 
-set -e
-
 setopt chasedots
 
-bld_list_dir=$(dirname $(find_up -name bld-list))
+bld_list_loc=$(find_up -name bld-list)
+if [ -z "$bld_list_loc" ]; then
+    echo >&2 "ERROR: No bld-list file found. Are you in a sandbox?"
+    exit 1
+fi
+
+set -e
+
+bld_list_dir=$(dirname "$bld_list_loc")
 
 cd $bld_list_dir
 
+(
 echo "Building from: $PWD"
 for i in $(cat bld-list | grep -v '^#'); do
     echo "Building: $i"
@@ -32,3 +39,4 @@ if which gtags &> /dev/null; then
         gtags
     fi &
 fi
+) 2>&1 | tee .bldlog
