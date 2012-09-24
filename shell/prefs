@@ -178,7 +178,4 @@ export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 
 export PATH
 
-# Have to do rehash as an alias rather than being part of the bld
-# script so that it will execute in the same shell. rehash updates
-# the $PATH autocomplete entries after building.
-alias bld='~/etc/bin/bld && rehash'
+alias gdb='gdb --quiet'
