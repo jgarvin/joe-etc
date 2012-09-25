@@ -40,3 +40,4 @@ if which gtags &> /dev/null; then
     fi &
 fi
 ) 2>&1 | tee .bldlog
+exit $pipestatus[1]
