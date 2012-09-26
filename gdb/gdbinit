@@ -21,4 +21,14 @@ source ~/etc/rwtime.py
 echo Turning off listening for SIGUSR1...\n
 handle SIGUSR1 nostop
 
+
+python
+import sys
+import os
+import os.path as op
+sys.path.insert(0, op.join(os.environ["HOME"], 'etc/gdb/boostpp'))
+from boost.v1_40.printers import register_boost_printers
+register_boost_printers(None)
+end
+
 set scheduler-locking on
