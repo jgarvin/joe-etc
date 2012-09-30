@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+PYTHONPATH="`dirname $0`/../python:`dirname $0`/../sh" python \
+    `dirname $0`/../utils/make-backup.py "$@"

@@ -16,3 +16,6 @@
 [submodule "gdb/boostpp"]
 	path = gdb/boostpp
 	url = git://github.com/ruediger/Boost-Pretty-Printer.git
+[submodule "sh"]
+	path = sh
+	url = https://github.com/amoffat/sh.git
