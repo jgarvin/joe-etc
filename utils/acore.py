@@ -9,6 +9,7 @@ import getpass
 import glob
 import datetime
 import popen2
+import sh
 
 # TODO: Determine scratchhost binary to open based on timestamps when ambiguous.
 # TODO: -s to just list cores
@@ -23,26 +24,12 @@ def extract_name(core_path):
     core_name_parts = tmp.rsplit('.', 1)
 
     if len(core_name_parts) < 2:
-        print >> sys.stderr, ("Couldn't figure out name of app based on filename "
-                              "of core %s" % core_path)
-        sys.exit(1)
+        return "<Unknown>"
 
     return core_name_parts[0]
 
 def split_versioned_name(app_name):
     return app_name.rsplit('-', 1)
-
-def find_scratchhost_binary(app_name):
-    "Returns the path to the binary on scratchhost if present, otherwise None"
-    name, version = split_versioned_name(app_name)
-    bin_path = os.getenv("TL") + "bin/archive/*" + name + "*-" + version
-    scratchList = glob.glob(bin_path)
-    bin_path = os.getenv("TL") + "bin/archive/*" + name + "*-" + version + "-unstripped"
-    scratchList.extend(glob.glob(bin_path))
-    if len(scratchList) and op.exists(scratchList[0]):
-        return scratchList[0]
-
-    return None
 
 def name_contains_version(app_name):
     """Returns True if the given name contains a version number,
@@ -82,8 +69,6 @@ def time_str(timestamp):
     return core_time.strftime("%c")
 
 if "-h" in sys.argv or "--help" in sys.argv:
-    print "acore by Joe G."
-    print
     print "Automatically finds the most recent core and opens it in gdb."
     print "Usage: acore [-r] [appname]"
     print
@@ -96,33 +81,27 @@ if len(sys.argv) > 2:
     sys.exit(1)
 
 coreList = glob.glob("/var/core/core.*")
+for f in sh.find(".", "-name", "core").stdout.split("\n"):
+    if f:
+        coreList.append(f)
 
 if len(coreList) == 0:
-    print >> sys.stderr, "There are no cores in /var/core to open."
+    print >> sys.stderr, "Found no cores in /var/core or current directory."
     sys.exit(1)
 
-if len(sys.argv) == 1:
-    # If a specific app wasn't requested, see if all available cores are for
-    # the same app.
-    core_names = [extract_name(core) for core in coreList]
-    if len(set(core_names)) == 1:
-        chosenCoreName = core_names[0]
-    else:
-        print >> sys.stderr, ("There are cores from multiple apps available, "
-                              "specify the core you want: ")
-        for core in coreList:
-            print >> sys.stderr, extract_name(core)
-        sys.exit(1)
-else:
+if len(sys.argv) != 1:
     chosenCoreName = sys.argv[1]
+    for c in coreList:
+        if chosenCoreName in c:
+            chosenCore = c
 
-possibleCores = glob.glob("/var/core/core.*" + chosenCoreName + "*.*")
+possibleCores = coreList
 
 if len(possibleCores) == 0:
     print >> sys.stderr, "No core for %s was found." % sys.argv[1]
     sys.exit(1)
 elif len(possibleCores) == 1:
-    chosenCore = [possibleCores[0], op.getmtime(possibleCores[0])]
+    chosenCore = possibleCores[0]
 else:
     possibleCores = [[core, op.getmtime(core)] for core in possibleCores]
     possibleCores.sort(key=lambda x: x[1], reverse=True)
@@ -157,123 +136,39 @@ else:
 
             break
 
-    chosenCore = possibleCores[choice]
+    chosenCore = possibleCores[choice][0]
 
-chosenBinary = None
-if name_contains_version(chosenCoreName):
-    # First try looking on scratchhost for the official unstripped binary.
-    scratchhost_binary = find_scratchhost_binary(chosenCoreName)
-    if scratchhost_binary:
-        print "Found corresponding binary on scratchhost."
-        chosenBinary = scratchhost_binary
+def findBinaryForCore(coreName):
+    """Uses strings on the binary to find potential
+    binary names, then picks the one with the most
+    recent mtime, since we assume these cores are from
+    development."""
+    
+    strings = sh.strings(coreName).split("\n")
+    strings = [s for s in strings if s]
+    candidate = ("", 0)
+    for s in strings:
+        if op.exists(s):
+            finfo = sh.file(s)
+            if "ELF" in finfo and "executable" in finfo:
+                mtime = op.getmtime(s)
+                if mtime > candidate[1]:
+                    candidate = (s, mtime)
 
+    return candidate[0]
+    
+chosenBinary = findBinaryForCore(chosenCore)
 if not chosenBinary:
-    # Inspect the core to see if we can find the binary.
-    pargs_command = "pargs " + chosenCore[0]
-    pargs_output = run(pargs_command)
-    pargs_output = pargs_output.split("\n")
+    print >>sys.stderr, "Couldn't find binary for core: " + chosenBinary
+    sys.exit(1)
 
-    pargs_error = ("Error, don't know where to look for binary on "
-                   "scratchhost and couldn't extract the path to the "
-                   "binary using pargs. "
-                   "Failed pargs command: %s" % pargs_command)
-
-    if len(pargs_output) < 2:
-        print "error 1 %s " % pargs_output
-        print >> sys.stderr, pargs_error
-        sys.exit(1)
-
-    binary_path = pargs_output[1].split(':', 1)
-    if len(binary_path) == 1:
-        print >> sys.stderr, pargs_error
-        sys.exit(1)
-
-    binary_path = binary_path[1].strip()
-    if op.isabs(binary_path):
-        chosenBinary = os.path.realpath(binary_path)
-    else:
-        # Use strings to get the PWD from the core, which we can join with
-        # the relative path in argv[0] to locate the binary.
-        # At the same, time, see if the '_' env variable is defined, which is
-        # set by shells just before they execute external commands. WM's
-        # launching apps won't always set it, but manual runs in the shell will.
-        # It's the most reliable.
-        strings_command = "strings " + chosenCore[0] + " | egrep '^(_=|PWD=)'"
-        strings_output = run(strings_command)
-        strings_output = strings_output.split("\n")
-
-        def good_candidate(candidate):
-            return op.exists(candidate) and not op.isdir(candidate)
-
-        candidate = None
-        for line in strings_output:
-            if line.strip().startswith("_="):
-                candidate = line.strip().split("=", 1)[1]
-                if good_candidate(candidate):
-                    chosenBinary = candidate
-                    break
-            if line.strip().startswith("PWD="):
-                directory = line.strip().split("=", 1)[1]
-                candidate = op.normpath(op.join(directory, binary_path))
-                if good_candidate(candidate):
-                    chosenBinary = candidate
-                    break
-
-        if not chosenBinary:
-            print >> sys.stderr, "Unable to locate binary for core."
-            print >> sys.stderr, "No binary found on scratchhost."
-            print >> sys.stderr, "Extracted argv[0] from core: %s" % binary_path
-            if candidate:
-                print >> sys.stderr, "Found unsuitable candidate: %s" % candidate
-                print >> sys.stderr, "Candidate either didn't exist or was a directory."
-            sys.exit(1)
-
-if name_contains_version(op.basename(chosenBinary)):
-    # First try looking on scratchhost for the official unstripped binary.
-    scratchhost_binary = find_scratchhost_binary(op.basename(chosenBinary))
-    if scratchhost_binary:
-        chosenBinary = scratchhost_binary
-
-# A script runs periodically that changes the group for cores in /var/core
-# to be corefans instead of root, but we can't trust it's configured correctly
-# for all hosts. If the binary is less than 500MB, copy it to /export/home/$USER
-# and open it there, otherwise warn and ask if we should copy it anyway.
-try:
-    local_home = op.join("/export/home", getpass.getuser())
-    local_core_folder = op.join(local_home, "cores")
-    core_megs = op.getsize(chosenCore[0]) / 1024. / 1024.
-    agree = True
-    if core_megs > 500:
-        print >> sys.stderr, ("Warning: Core file is large (%dMB).\n\tStill copy to "
-                              "%s? [yn]" % (core_megs, local_core_folder))
-        agree = raw_input()
-        agree = 'y' == agree or 'Y' == agree
-
-    if agree:
-        if not op.exists(local_home):
-            os.mkdir(local_home)
-        if not op.exists(local_core_folder):
-            os.mkdir(local_core_folder)
-
-        # Append the epoch timestamp on to the end to make the file unique
-        target_core_name = op.basename(chosenCore[0]) + "." + str(chosenCore[1])
-        target_core_path = op.join(local_core_folder, target_core_name)
-
-        copy_command = "cp -p " + chosenCore[0] + " " + target_core_path
-        if os.WEXITSTATUS(os.system(copy_command)):
-            print >> sys.stderr, "Error, copy failed."
-            print >> sys.stderr, "Copy command was: " + copy_command
-            sys.exit(1)
-
-        chosenCore[0] = target_core_path
-except OSError:
-    # We probably don't have permissions.
-    pass
-
-print "Core timestamp: " + time_str(chosenCore[1])
+print "Core timestamp: " + time_str(op.getmtime(chosenCore))
 print "Binary timestamp: " + time_str(op.getmtime(chosenBinary))
 
-gdb_command = "gdb " + chosenBinary + " " + chosenCore[0]
+print "Chosen core: " + chosenCore
+print "Chosen binary: " + chosenBinary
+
+gdb_command = "gdb " + chosenBinary + " " + chosenCore
 print "Running: " + gdb_command
 
 sys.exit(os.WEXITSTATUS(os.system(gdb_command)))
