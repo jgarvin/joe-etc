@@ -122,7 +122,7 @@ def EndElementHandler(name):
         cur_stack.pop()
     elif name == "sequence":
         # Sometimes sequences aren't given an explicit length in the
-        # XML, but it's presence in the bitstream regardless, so we
+        # XML, but it's present in the bitstream regardless, so we
         # patch it in here.
         foundLengthField = False
         for f in cur_stack[-1].fields:
@@ -163,7 +163,13 @@ def traverseFields(container, depth, pmap_counters):
         if field.ftype == "sequence" or field.ftype == "group":
             format_str = "%%%ds" % max_field_name_width
             print '\t'*depth,format_str % ("{{{{{{{{{{{{")
-            print '\t'*depth,format_str % (field.ftype[0].upper() + ":" + field.name)
+            print '\t'*depth,format_str % (field.ftype[0].upper() + ":" + field.name),
+            if field.ftype == "group" and field.optional:
+                pmap_bit = pmap_counters[-1]
+                pmap_counters[-1] += 1
+                print " %8s" % ("PMAP_%02d" % pmap_bit)
+            else:
+                print
             traverseFields(field, depth+1, pmap_counters)
             print '\t'*depth,format_str % ("}}}}}}}}}}}}")
             continue
