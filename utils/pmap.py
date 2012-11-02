@@ -206,6 +206,10 @@ def traverseFields(container, depth, pmap_counters):
             print " %8s" % ' ',
         if is_nullable[(field_op, field_is_optional)]:
             print " Nullable",
+        else:
+            print " %8s" % ' ',
+        format_str = " %8s"
+        print format_str % field.ftype,
         print
     pmap_counters.pop()
     
