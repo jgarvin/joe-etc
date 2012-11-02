@@ -59,7 +59,7 @@ operator_names = [ "constant", "copy", "default", "delta", "increment" ]
 
 def build_field(name, attributes):
     new_field = Obj()
-    new_field.ftype = name
+    new_field.ftype = name.lower()
     new_field.name = None
     if attributes.has_key("name"):
         new_field.name = attributes["name"]
