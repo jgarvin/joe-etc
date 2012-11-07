@@ -209,7 +209,13 @@ def traverseFields(container, depth, pmap_counters):
         else:
             print " %8s" % ' ',
         format_str = " %8s"
-        print format_str % field.ftype,
+
+        type_str = field.ftype
+        if field.operator == "delta" and field.ftype[0] == 'u':
+            # Deltas of unsigned types are actually signed!
+            type_str = "(u)" + field.ftype[1:]
+        print format_str % type_str,
+
         print
     pmap_counters.pop()
     
