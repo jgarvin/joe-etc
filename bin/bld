@@ -16,6 +16,21 @@ set -e
 
 bld_list_dir=$(dirname "$bld_list_loc")
 
+while [ "$#" -gt "0" ]
+do
+    case $1 in
+				-d)
+						echo "$bld_list_dir"
+            exit 0
+						;;
+        *)
+            echo "Unknown argument: $1"
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 cd $bld_list_dir
 
 (
@@ -24,11 +39,13 @@ for i in $(cat bld-list | grep -v '^#'); do
     echo "Building: $i"
     if [ -d "$i" ]; then
         pushd "$i"
-        make "$@"
+        # Taskset stuff is a temporary hack
+        taskset 0xFFFFFFFF make "$@"
         popd
     else
         pushd $(dirname "$i")
-        make $(basename "$i") "$@"
+        # Taskset stuff is a temporary hack
+        taskset 0xFFFFFFFF make $(basename "$i") "$@"
         popd
     fi
 done
