@@ -24,8 +24,8 @@ do
             exit 0
 						;;
         *)
-            echo "Unknown argument: $1"
-            exit 1
+            # Pass everything else onto make
+            break
             ;;
     esac
     shift
