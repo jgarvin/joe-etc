@@ -82,3 +82,4 @@ manpages-posix
 apt-file
 python-setuptools
 python-matplotlib
+manpages-posix-dev
