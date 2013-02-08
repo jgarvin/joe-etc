@@ -33,6 +33,10 @@ done
 
 cd $bld_list_dir
 
+# Makefiles tend to assume bashisms
+export SHELL=$(which bash)
+echo "Shell set to: $SHELL"
+
 (
 echo "Building from: $PWD"
 for i in $(cat bld-list | grep -v '^#'); do
