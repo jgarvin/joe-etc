@@ -51,6 +51,8 @@
 (require 'undo-tree)
 (global-undo-tree-mode)
 (define-key undo-tree-map (kbd "C-/") nil)
+(setq-default undo-limit 1000000)
+(setq-default undo-strong-limit 1000000)
 
 (setq tramp-default-method "ssh")
 (setq tramp-default-user "joeg")
@@ -528,7 +530,7 @@
 (setq-default mark-ring-max 65535)
 
 ;; Needed for ido-mode to work in large source trees
-(setq ido-max-directory-size 200000)
+(setq ido-max-directory-size 3000000)
 
 (put 'upcase-region 'disabled nil)
 (custom-set-variables

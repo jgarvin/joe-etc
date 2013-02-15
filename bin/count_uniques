@@ -1,14 +1,27 @@
 #!/usr/bin/env python
 
 import fileinput
+import signal
+import sys
 
+global countmap
 countmap = {}
+
+def print_countmap():
+    global countmap
+    for line in countmap:
+        print "Line: %s Count: %s" % (line[:-1], countmap[line])
+    
+def sigint_handler(signal, frame):
+    print_countmap()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, sigint_handler)
+
 for line in fileinput.input():
     if line in countmap:
         countmap[line] += 1
     else:
         countmap[line] = 1
 
-for line in countmap:
-    print "Line: %s Count: %s" % (line[:-1], countmap[line])
-
+print_countmap()
