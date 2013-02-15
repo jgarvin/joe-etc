@@ -65,8 +65,6 @@ alias less='less -X -a -R'
 # Make sure we do the same in the pager env var so it applies to git!
 export PAGER="less -X -a -R"
 
-alias ipython="ipython -colors Linux -noconfirm_exit -nobanner"
-
 # Harmless over LAN on modern CPUs, and very useful when logged into london.
 alias ssh="ssh -C -X"
 
