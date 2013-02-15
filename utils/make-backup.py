@@ -45,6 +45,11 @@ for root, dirs, files in os.walk(args.dir):
             gitIgnorePath.append(root)
         path = op.join(root, filename)
         print path
+        if op.islink(path):
+            # Without this check the stat below will fail
+            # when we have a bad symlink, like the .# kind emacs
+            # creates deliberately to lock files.
+            continue
         filesize = os.stat(path).st_size
         relpath = op.relpath(path, args.dir)
         if filesize > 102400: # 100KB
