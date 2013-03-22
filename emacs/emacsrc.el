@@ -81,7 +81,12 @@
 (global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
 (global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
-(custom-set-faces '(default ((t (:height 105 :family "Consolas" :embolden f)))))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(default ((t (:height 105 :family "Consolas" :embolden f)))))
 
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
@@ -274,6 +279,9 @@
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 (global-set-key (kbd "C-o") 'open-line-and-indent)
+
+(setq auto-mode-alist
+	  (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
 
 (add-hook 'asm-mode-hook
 	  (lambda ()
@@ -532,3 +540,10 @@
 (setq ido-max-directory-size 3000000)
 
 (put 'upcase-region 'disabled nil)
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "Evince") (output-dvi "Evince") (output-pdf "Evince") (output-html "Evince"))))
+ '(ediff-split-window-function (quote split-window-horizontally)))
