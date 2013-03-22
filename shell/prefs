@@ -179,3 +179,5 @@ export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 export PATH
 
 alias gdb='gdb --quiet'
+alias -g L='| less'
+alias -r l='less'
