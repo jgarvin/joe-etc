@@ -265,8 +265,15 @@
     (indent-according-to-mode)
     (newline-and-indent)))
 
+(defun open-line-and-indent ()
+  (interactive)
+  (progn
+    (open-line 1)
+    (indent-according-to-mode)))
+
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key (kbd "C-m") 'newline-and-indent)
+(global-set-key (kbd "C-o") 'open-line-and-indent)
 
 (add-hook 'asm-mode-hook
 	  (lambda ()
