@@ -77,7 +77,7 @@ capitalizeWord (x:xs) = toUpper x : xs
 myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
-    [ ((modMask .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
+    [ ((modMask .|. controlMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
     , ((modMask,  xK_f), sendMessage ToggleStruts)
