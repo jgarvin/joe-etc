@@ -269,7 +269,7 @@ defaults editor home_folder browser_name = gnomeConfig {
         focusedBorderColor = "#0000ff",
 
       -- key bindings
-        keys               = myKeys (joinPath [home_folder, "etc/bin/launch-my-browser"]) browser_name editor,
+        keys               = myKeys browser_name browser_name editor,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
