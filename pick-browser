@@ -3,7 +3,7 @@
 set -u;
 set -e;
 
-for browser in chromium-browser firefox3 firefox epiphany mozilla
+for browser in google-chrome chromium-browser firefox3 firefox epiphany mozilla
 do
 	if which $browser 2>&1 > /dev/null
 	then

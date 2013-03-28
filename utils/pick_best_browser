@@ -13,7 +13,7 @@ if which google-chrome &> /dev/null; then
     fi
 fi
 
-browser_list="chromium-browser google-chrome firefox4 firefox3 firefox epiphany mozilla"
+browser_list="google-chrome chromium-browser firefox4 firefox3 firefox epiphany mozilla"
 
 # -n means "name only", we remove the path and any digits
 if test "$1" = "-n"; then
