@@ -83,7 +83,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
+    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
 
     -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
