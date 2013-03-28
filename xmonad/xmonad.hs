@@ -85,9 +85,6 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- launch emacs
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
 
-    -- launch scratch terminal
-    , ((modMask .|. controlMask,  xK_t), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
-
     -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
 
