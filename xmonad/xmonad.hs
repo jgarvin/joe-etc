@@ -91,11 +91,11 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
     -- launch pidgin
-    -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
+    -- -- Need a bit more knowledge for this one, not sure how to give priorities for windows
+    -- , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
 
-    -- launch xchat
-    , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
+    -- -- launch xchat
+    -- , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
 
     -- close focused window
     , ((modMask , xK_c     ), kill)
