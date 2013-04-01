@@ -104,7 +104,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask , xK_c     ), kill)
 
     -- Rotate through the available layout algorithms
-    , ((modMask,               xK_Tab ), sendMessage NextLayout)
+    , ((modMask,               xK_backslash ), sendMessage NextLayout)
 
     -- Toggle decorations
     , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
