@@ -83,10 +83,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs"))
-
-    -- launch scratch terminal
-    , ((modMask,  xK_o), runOrRaiseNext "gnome-terminal" (className =? "Gnome-terminal" <||> className =? "gnome-terminal"))
+    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
 
     -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
@@ -94,11 +91,11 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
 
     -- launch pidgin
-    -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
+    -- -- Need a bit more knowledge for this one, not sure how to give priorities for windows
+    -- , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
 
-    -- launch xchat
-    , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
+    -- -- launch xchat
+    -- , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
 
     -- close focused window
     , ((modMask , xK_c     ), kill)
@@ -107,10 +104,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_backslash ), sendMessage NextLayout)
 
     -- Toggle decorations
-    , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
+    -- , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
 
     -- Toggle zoom
-    , ((modMask,               xK_z ), sendMessage (MultiToggle.Toggle MAGNIFICATION) )
+    -- , ((modMask,               xK_z ), sendMessage (MultiToggle.Toggle MAGNIFICATION) )
 
     -- Resize viewed windows to the correct size
     , ((modMask,               xK_n     ), refresh)
@@ -241,13 +238,13 @@ main = do
   browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
-data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
-instance MultiToggle.Transformer DECORATIONS Window where
-		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } ) x)
+-- data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
+-- instance MultiToggle.Transformer DECORATIONS Window where
+-- 		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } ) x)
 
-data MAGNIFICATION = MAGNIFICATION deriving (Read, Show, Eq, Typeable)
-instance MultiToggle.Transformer MAGNIFICATION Window where
-		 transform _ x k = k (magnifiercz 1.2 x)
+-- data MAGNIFICATION = MAGNIFICATION deriving (Read, Show, Eq, Typeable)
+-- instance MultiToggle.Transformer MAGNIFICATION Window where
+-- 		 transform _ x k = k (magnifiercz 1.2 x)
 
 -- Focus follows mouse is annoying for skype, when you mouse over
 -- the video window it brings up the buddy list
@@ -267,19 +264,16 @@ defaults editor home_folder browser_name = gnomeConfig {
         focusFollowsMouse  = True,
         borderWidth        = 5,
         modMask            = mod4Mask,
-        numlockMask        = mod2Mask,
         workspaces         = myWorkspaces,
         normalBorderColor  = "#dddddd",
         focusedBorderColor = "#0000ff",
 
       -- key bindings
-        keys               = myKeys (joinPath [home_folder, "etc/bin/launch-my-browser"]) browser_name editor,
+        keys               = myKeys browser_name browser_name editor,
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = MultiToggle.mkToggle (MultiToggle.single DECORATIONS)
-                             $ MultiToggle.mkToggle (MultiToggle.single MAGNIFICATION)
-                             $ smartBorders
+        layoutHook         = smartBorders
                              $ avoidStruts
                              $ layoutHook gnomeConfig,
         handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,

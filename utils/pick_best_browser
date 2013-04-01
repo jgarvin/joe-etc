@@ -1,19 +1,6 @@
 #!/usr/bin/env zsh
 
-# Give dev google-chrome build priority.
-if which google-chrome &> /dev/null; then
-    chrome_version=$(google-chrome --version)
-    if echo $chrome_version | grep dev &> /dev/null; then
-        if test "$1" = "-n"; then
-            echo google-chrome
-        else
-            google-chrome --allow-outdated-plugins
-        fi
-        exit
-    fi
-fi
-
-browser_list="google-chrome chromium-browser firefox4 firefox3 firefox epiphany mozilla"
+browser_list="firefox google-chrome chromium-browser"
 
 # -n means "name only", we remove the path and any digits
 if test "$1" = "-n"; then

@@ -1,6 +1,6 @@
 # The basics
 zsh
-emacs-snapshot-gtk
+emacs
 emacs-goodies-el
 chromium-browser
 htop
@@ -39,7 +39,6 @@ cmake
 scons
 libqt4-dev
 qt4-doc-html
-python-profiler
 global
 
 # Multimedia and ease of use
@@ -58,10 +57,9 @@ python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
 openssh-server
 ocaml
-ocaml-docs
 expect-dev # for unbuffer cmd
 cmake
-cmake-gui
+cmake-qt-gui
 pv
 nmap
 doxygen
@@ -73,7 +71,6 @@ gnome-do
 graphviz
 texlive-font-utils # for epstopdf, needed by doxygen to do graphviz class diagrams
 mesa-utils
-timeout
 indent
 xfce4-terminal
 valgrind
