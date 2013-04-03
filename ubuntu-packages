@@ -83,3 +83,4 @@ manpages-posix-dev
 libssl-dev
 zlib1g-dev
 e2fslibs-dev
+xwrits

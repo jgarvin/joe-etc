@@ -177,8 +177,8 @@ export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 export PATH
 
 alias gdb='gdb --quiet'
-alias -g L='| /usr/bin/less'
-alias -r l='/usr/bin/less'
+alias -g L='| /usr/bin/less -X -a -R'
+alias -r l='/usr/bin/less -X -a -R'
 less() {
     echo "Use L or l!!!!" >&2
     return 1
