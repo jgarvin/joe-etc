@@ -52,7 +52,7 @@ for root, dirs, files in os.walk(args.dir):
             continue
         filesize = os.stat(path).st_size
         relpath = op.relpath(path, args.dir)
-        if filesize > 102400: # 100KB
+        if filesize > 102400*2: # 200KB
             # PDFs are ok, they maybe big
             if op.splitext(path)[-1] != ".pdf":
                 tooLarge.add(relpath)
