@@ -547,3 +547,10 @@
   ;; If there is more than one, they won't work right.
  '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "Evince") (output-dvi "Evince") (output-pdf "Evince") (output-html "Evince"))))
  '(ediff-split-window-function (quote split-window-horizontally)))
+
+
+; Code to get the current class name, will try this if I can't get
+; autocomplete working
+;; (replace-regexp-in-string "INLINES$" ""
+;;  (file-name-sans-extension
+;;   (file-name-nondirectory (buffer-file-name))))
