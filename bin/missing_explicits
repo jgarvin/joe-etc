@@ -1,0 +1,25 @@
+#!/bin/zsh
+
+set -x
+
+rm -f **/*.new
+
+# Typically arguments will be all the headers, e.g. **/*.H
+# You can manually omit classes that are onerous to make explicit
+# this way.
+for i in "$@"; do
+    # We assume filename and classname match up
+    local className=$(basename $(echo $i | cut -d'.' -f1))
+    
+    # Add explicit to constructors, except for copy constructors,
+    # thus the sed conditional
+    cat "$i" | \
+        sed -r -e "s/(const\s+${className}\s*\&)/\1/g" \
+        -e tx \
+        -e "s/(^\s*)(${className}[(]\s*[^,]+\s*[)]);/\1explicit \2;/g" \
+        -e ':x' > "$i.new"
+done
+
+rm -f **/*.new
+
+set +x
