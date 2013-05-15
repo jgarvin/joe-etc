@@ -1,3 +1,4 @@
+
 --
 -- xmonad example config file.
 --
@@ -77,7 +78,7 @@ capitalizeWord (x:xs) = toUpper x : xs
 myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
-    [ ((modMask .|. controlMask, xK_t), spawn $ XMonad.terminal conf)
+    [ ((modMask .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
     , ((modMask,  xK_f), sendMessage ToggleStruts)
@@ -98,7 +99,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
 
     -- close focused window
-    , ((modMask , xK_c     ), kill)
+    , ((modMask , xK_x     ), kill)
 
     -- Rotate through the available layout algorithms
     , ((modMask,               xK_backslash ), sendMessage NextLayout)
@@ -263,7 +264,7 @@ defaults editor home_folder browser_name = gnomeConfig {
         terminal           = joinPath [home_folder, "etc/bin/homeshell"],
         focusFollowsMouse  = True,
         borderWidth        = 5,
-        modMask            = mod4Mask,
+        modMask            = controlMask .|. mod1Mask,
         workspaces         = myWorkspaces,
         normalBorderColor  = "#dddddd",
         focusedBorderColor = "#0000ff",
