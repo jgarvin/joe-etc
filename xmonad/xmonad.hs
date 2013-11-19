@@ -78,7 +78,7 @@ capitalizeWord (x:xs) = toUpper x : xs
 myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
-    [ ((modMask .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
+    [ ((modMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
     , ((modMask,  xK_f), sendMessage ToggleStruts)
@@ -86,7 +86,6 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- launch emacs
     , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
 
-    -- launch firefox
     , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
 
     , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
@@ -111,16 +110,16 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- , ((modMask,               xK_z ), sendMessage (MultiToggle.Toggle MAGNIFICATION) )
 
     -- Resize viewed windows to the correct size
-    , ((modMask,               xK_n     ), refresh)
+    --, ((modMask,               xK_n     ), refresh)
 
     -- Move focus to the next window
     --, ((modMask,               xK_Tab   ), windows W.focusDown)
 
     -- Move focus to the next window
-    , ((modMask,               xK_j     ), windows W.focusDown)
+    , ((modMask,               xK_e     ), windows W.focusDown)
 
     -- Move focus to the previous window
-    , ((modMask,               xK_k     ), windows W.focusUp  )
+    , ((modMask,               xK_o     ), windows W.focusUp  )
 
     -- Move focus to the master window
     , ((modMask,               xK_m     ), windows W.focusMaster  )
@@ -129,19 +128,19 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_Return), windows W.swapMaster)
 
     -- Swap the focused window with the next window
-    , ((modMask .|. shiftMask, xK_j     ), windows W.swapDown  )
+    , ((modMask .|. shiftMask, xK_e     ), windows W.swapDown  )
 
     -- Swap the focused window with the previous window
-    , ((modMask .|. shiftMask, xK_k     ), windows W.swapUp    )
+    , ((modMask .|. shiftMask, xK_o     ), windows W.swapUp    )
 
     -- Shrink the master area
-    , ((modMask,               xK_h     ), sendMessage Shrink)
+    , ((modMask,               xK_n    ), sendMessage Shrink)
 
     -- Expand the master area
-    , ((modMask,               xK_l     ), sendMessage Expand)
+    , ((modMask,               xK_i     ), sendMessage Expand)
 
     -- Push window back into tiling
-    , ((modMask,               xK_t     ), withFocused $ windows . W.sink)
+    , ((modMask .|. shiftMask,               xK_t     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     , ((modMask              , xK_comma ), sendMessage (IncMasterN 1))
@@ -157,10 +156,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- Move screens
-    , ((modMask              , xK_e     ), prevScreen)
-    , ((modMask              , xK_r     ), nextScreen)
-    , ((modMask .|. shiftMask, xK_e     ), shiftPrevScreen)
-    , ((modMask .|. shiftMask, xK_r     ), shiftNextScreen)
+    , ((modMask              , xK_r     ), prevScreen)
+    , ((modMask              , xK_d     ), nextScreen)
+    , ((modMask .|. shiftMask, xK_r     ), shiftPrevScreen)
+    , ((modMask .|. shiftMask, xK_d     ), shiftNextScreen)
     ]
     ++
 
