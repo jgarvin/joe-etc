@@ -78,7 +78,7 @@ capitalizeWord (x:xs) = toUpper x : xs
 myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
     -- launch a terminal
-    [ ((modMask, xK_t), spawn $ XMonad.terminal conf)
+    [ ((modMask .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
     , ((modMask,  xK_f), sendMessage ToggleStruts)
@@ -140,7 +140,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_i     ), sendMessage Expand)
 
     -- Push window back into tiling
-    , ((modMask .|. shiftMask,               xK_t     ), withFocused $ windows . W.sink)
+    , ((modMask .|. shiftMask,               xK_h     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     , ((modMask              , xK_comma ), sendMessage (IncMasterN 1))
@@ -156,10 +156,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- Move screens
-    , ((modMask              , xK_r     ), prevScreen)
-    , ((modMask              , xK_d     ), nextScreen)
-    , ((modMask .|. shiftMask, xK_r     ), shiftPrevScreen)
-    , ((modMask .|. shiftMask, xK_d     ), shiftNextScreen)
+    , ((modMask              , xK_h     ), prevScreen)
+    , ((modMask              , xK_s     ), nextScreen)
+    , ((modMask              , xK_a     ), shiftNextScreen >> nextScreen)
+    , ((modMask              , xK_t     ), shiftPrevScreen >> prevScreen)
     ]
     ++
 
