@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-browser_list="firefox google-chrome chromium-browser"
+browser_list="google-chrome chromium-browser firefox"
 
 # -n means "name only", we remove the path and any digits
 if test "$1" = "-n"; then

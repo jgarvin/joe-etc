@@ -34,6 +34,10 @@ if op.exists(backupDateFile):
 else:
     print "No previous backup detected, making backup"
 
+f = open(backupDateFile, 'w')
+f.write(curDateStr)
+f.close()    
+
 backupDir = op.basename(args.dir)
 
 gitIgnorePath = []
@@ -104,6 +108,3 @@ tarsnap_args.append(backupDir)
 os.chdir(op.dirname(args.dir))
 sh.tarsnap(*tarsnap_args, _err=sys.stderr, _out=sys.stdout)
 
-f = open(backupDateFile, 'w')
-f.write(curDateStr)
-f.close()
