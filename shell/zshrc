@@ -280,7 +280,7 @@ if which xwrits &> /dev/null && \
     ! tsk xwrits &> /dev/null && \
     [ -n "$DISPLAY" ]
 then
-    xwrits +multiscreen +mouse typetime=40 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1 &; disown
+    xwrits +multiscreen +mouse typetime=22 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1 &; disown
 fi
 
 if [ -d "$ZDOTDIR/rmt" ]; then
@@ -315,3 +315,12 @@ fi
         fi
     done
 fi) &; disown
+
+watch-build() {
+    while true; do
+        redo-ifchange $1 && $1
+        echo >&2 "Exit code: $?"
+        inotifywait -q -q $(redo-sources)
+        clear
+    done
+}
