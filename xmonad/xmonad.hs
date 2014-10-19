@@ -101,7 +101,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask , xK_x     ), kill)
 
     -- Rotate through the available layout algorithms
-    , ((modMask,               xK_backslash ), sendMessage NextLayout)
+    , ((modMask,               xK_y ), sendMessage NextLayout)
 
     -- Toggle decorations
     -- , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
@@ -156,10 +156,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- Move screens
-    , ((modMask              , xK_h     ), prevScreen)
-    , ((modMask              , xK_s     ), nextScreen)
-    , ((modMask              , xK_a     ), shiftNextScreen >> nextScreen)
-    , ((modMask              , xK_t     ), shiftPrevScreen >> prevScreen)
+    , ((modMask              , xK_BackSpace     ), prevScreen)
+    , ((modMask              , xK_space     ), nextScreen)
+    , ((modMask              , xK_t     ), shiftNextScreen >> nextScreen)
+    , ((modMask              , xK_a     ), shiftPrevScreen >> prevScreen)
     ]
     ++
 

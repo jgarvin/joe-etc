@@ -89,10 +89,14 @@ tooLarge -= ignored_set
 tooLarge -= executable
 print "Too large after: " + str(tooLarge)
 
+doExit = False
 for f in tooLarge:
     print "File is too large!: " + tooLarge.pop()
-    sys.exit(1)
+    doExit = True
 
+if doExit:
+    sys.exit(1)
+ 
 #tarsnap_args = ["--dry-run"]
 tarsnap_args = []
 tarsnap_args.append("-c")

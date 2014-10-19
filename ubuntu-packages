@@ -85,3 +85,5 @@ zlib1g-dev
 e2fslibs-dev
 xwrits
 moreutils # for sponge
+sox
+libsox-fmt-all

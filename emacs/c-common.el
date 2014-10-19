@@ -1,58 +1,9 @@
-;; (add-to-list 'load-path "/home/udesktop/share/gtags/")
-
-(defun extract-version-number (x)
-  (mapcar 'string-to-int
-		  (split-string (car (cdr (split-string x "-"))) "\\.")))
-
-(defun pick-greater-version-helper (x y)
-  (cond ((= (car x) (car y))
-		 (if (> (length (cdr x)) 0)
-			 (pick-greater-version-helper (cdr x) (cdr y))
-		   (error x y (length (cdr x)))))
-		((> (car x) (car y)) 0)
-		((< (car x) (car y)) 1)))
-
-(defun pick-greater-version (x y)
-  (if (= (pick-greater-version-helper
-		  (extract-version-number x)
-		  (extract-version-number y)) 0)
-	  x
-	y))
-
-;; ;; Defer to locally installed global if it exists
-;; ;; And use the highest version number installed
-;; (let ((global-install
-;; 	   (reduce 'pick-greater-version
-;; 			   (filter! 'file-directory-p
-;; 						(mapcar (lambda (x) (concat "~/opt/" x))
-;; 								(directory-files "~/opt" nil "global-?.?"))))))
-;;   (add-to-list 'load-path (concat global-install "/share/gtags")))
-
 (if (file-directory-p "~/opt/share/gtags")
     (add-to-list 'load-path "~/opt/share/gtags"))
 
 ;; Function to generate tags with GNU Global
 ;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
 (require 'gtags)
-
-;; (defun djcb-gtags-create-or-update ()
-;;   "create or update the gnu global tag file"
-;;   (interactive)
-;;   (if (not (= 0 (call-process "global" nil nil nil " -p"))) ; tagfile doesn't exist?
-;; 	  (let ((olddir default-directory)
-;; 			(topdir (read-directory-name
-;; 					 "gtags: top of source tree:" default-directory)))
-;; 		(when (not (string= topdir ""))
-;; 		  (progn
-;; 			(cd topdir)
-;; 			(start-process-shell-command "gtags create"
-;; 										 "gtags_buffer"
-;; 										 "gtags -q && echo 'created tagfile'")
-;; 			(cd olddir)))) ; restore
-;;     ;;  tagfile already exists; update it
-;;     (start-process-shell-command "gtags update"
-;; 								 "gtags_buffer"
-;; 								 "global -u 2> /dev/null && echo 'updated tagfile'")))
 
 (defun gtags-select-tag-and-kill-buffer ()
   (interactive)
@@ -62,8 +13,8 @@
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (add-hook 'gtags-select-mode-hook
- 		  (lambda()
-				(define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))
+	  (lambda()
+	    (define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))
 
 ;; Rebind the normal find tag functions to use the GNU global versions
 (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
@@ -84,11 +35,6 @@
 (define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
 (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
 (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
-
-;; (if (string-match (concat "^/home/"
-;; 						  (getenv "LOGNAME") ".*")
-;; 				  default-directory)
-;; 	(djcb-gtags-create-or-update))
 
 (gtags-mode t)
 
@@ -123,9 +69,6 @@
 (setq tab-width my-indent-size)
 (c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
 
-;; Make tab stop list match the 4 space indent
-;;(setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
-
 ;; TODO: Make this automatic for new .h files
 (defun ff/headerize ()
   "Adds the #define HEADER_H, etc."
@@ -154,42 +97,42 @@
 (define-key global-map [f9] 'ff/fast-compile)
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))
-	(dolist (subfolder (directory-files folder))
-	  (let ((name (concat folder "/" subfolder)))
-		(when (and (file-directory-p name)
-				   (not (equal subfolder ".."))
-				   (not (equal subfolder ".")))
-		  (set 'folder-list (append folder-list (list name))))))
-	folder-list))
+    (dolist (subfolder (directory-files folder))
+      (let ((name (concat folder "/" subfolder)))
+	(when (and (file-directory-p name)
+		   (not (equal subfolder ".."))
+		   (not (equal subfolder ".")))
+	  (set 'folder-list (append folder-list (list name))))))
+    folder-list))
 
 ;;-------------
 ;; Switch between source and header
 ;;------------
 ;; Association list of extension -> inverse extension
 (setq exts '(("c"   . ("hpp" "h" "H"))
-						 ("cc"  . ("hpp" "h" "H"))
-						 ("cpp" . ("hpp" "h" "H"))
+	     ("cc"  . ("hpp" "h" "H"))
+	     ("cpp" . ("hpp" "h" "H"))
              ("hpp" . ("cpp" "c" "C" "cc" "CC"))
              ("h"   . ("cpp" "c" "C" "cc" "CC"))
-						 ("H"   . ("cpp" "c" "C" "cc" "CC"))
-						 ("C"   . ("hpp" "h" "H"))))
+	     ("H"   . ("cpp" "c" "C" "cc" "CC"))
+	     ("C"   . ("hpp" "h" "H"))))
 
 ;; Process the association list of extensions and find the last file
 ;; that exists
 (defun find-other-file (fname fext)
   (dolist (value (cdr (assoc fext exts)) result)
-	(let ((path (file-name-directory fname))
-		  (name (file-name-nondirectory fname)))
-	  (if (file-exists-p (concat path name "." value))
-		  (setq result (concat path name "." value))
-		(if (file-exists-p (concat path "private/" name "." value))
-			(setq result (concat path "private/" name "." value))
-		  (if (file-exists-p (concat path "../" name "." value))
-			  (setq result (concat path "../" name "." value))
-			(if (file-exists-p (concat path name "INLINES." value))
-				(setq result (concat path name "INLINES." value))
-			  (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
-				  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
+    (let ((path (file-name-directory fname))
+	  (name (file-name-nondirectory fname)))
+      (if (file-exists-p (concat path name "." value))
+	  (setq result (concat path name "." value))
+	(if (file-exists-p (concat path "private/" name "." value))
+	    (setq result (concat path "private/" name "." value))
+	  (if (file-exists-p (concat path "../" name "." value))
+	      (setq result (concat path "../" name "." value))
+	    (if (file-exists-p (concat path name "INLINES." value))
+		(setq result (concat path name "INLINES." value))
+	      (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
+		  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
 
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
@@ -336,7 +279,7 @@
   operators-font-lock-spec
   brackets-font-lock-spec
   (cons c-types-regexp 'font-lock-type-face)))
-  ;;(cons c-keywords-regexp 'font-lock-keyword-face)))
+;;(cons c-keywords-regexp 'font-lock-keyword-face)))
 
 (font-lock-add-keywords
  'c++-mode
@@ -344,7 +287,7 @@
   operators-font-lock-spec
   brackets-font-lock-spec
   (cons c-types-regexp 'font-lock-type-face)))
-  ;;(cons c-keywords-regexp 'font-lock-keyword-face)))
+;;(cons c-keywords-regexp 'font-lock-keyword-face)))
 
 ;; Starting in emacs 23 there's some stupid default abbreviation
 ;; for trying to correct mispellings of 'else', problem is it doesn't

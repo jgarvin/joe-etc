@@ -18,7 +18,17 @@
 (require 'color-theme)
 (setq color-theme-is-global t)
 (color-theme-initialize)
-(color-theme-euphoria)
+(load-file "~/etc/emacs/cyberpunk-theme.el")
+
+(load-file "~/etc/emacs/cl-lib-0.3.el") ;; needed for emacs <23
+
+;; (add-to-list 'load-path
+;;               "~/etc/emacs/yasnippet")
+;; (require 'yasnippet)
+;; (yas-global-mode 1)
+;; (delete "~/.emacs.d/snippets" yas/root-directory)
+;; (setq yas/root-directory (cons "~/etc/emacs/snippets" yas/root-directory))
+;; (setq yas/root-directory (remove-duplicates yas/root-directory :test 'string=))
 
 ;; Enable debugging
 (setq-default debug-on-error t)
@@ -54,10 +64,6 @@
 (setq-default undo-limit 1000000)
 (setq-default undo-strong-limit 1000000)
 
-(setq tramp-default-method "ssh")
-(setq tramp-default-user "joeg")
-(require 'tramp)
-
 (require 'ido)
 ;; Without this, when running emacs as sudo .ido.last will become
 ;; root owned. Super annoying.
@@ -71,15 +77,6 @@
       (append completion-ignored-extensions '(".fpo" ".ii" ".d" ".o")))
 (setq ido-ignore-files
       (append ido-ignore-files '(".*-g" ".*-O2")))
-
-(load-file "~/etc/breadcrumb.el")
-(require 'breadcrumb)
-(setq bc-bookmark-limit 10000)
-(global-set-key (kbd "C-S-SPC")         'bc-set) ;; Shift-SPACE for set bookmark
-(global-set-key [(control meta j)]      'bc-previous) ;; M-j for jump to previous
-(global-set-key [(control meta k)]      'bc-next) ;; Shift-M-j for jump to next
-(global-set-key [(control meta l)]      'bc-goto-current) ;; C-c j for jump to current bookmark
-(global-set-key [(control x)(control j)]        'bc-list) ;; C-x M-j for the bookmark menu list
 
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
@@ -97,15 +94,8 @@
   (scroll-bar-mode -1))
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
-(setq visible-bell t)
 (fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
 
-;; Get rid of the visual bell for some common 'errors'
-(setq ring-bell-function
-      (lambda ()
-        (unless (memq this-command
-                      '(isearch-abort abort-recursive-edit exit-minibuffer keyboard-quit))
-          (ding))))
 
 ;; Show me the region until I do something on it
 (setq transient-mark-mode t)
@@ -128,19 +118,61 @@
 ;; Scroll 1 line at a time
 (setq scroll-step 1)
 
-(defun beginning-or-indentation (&optional n)
-  "Move cursor to beginning of this line or to its indentation.
-  If at indentation position of this line, move to beginning of line.
-  If at beginning of line, move to beginning of previous line.
-  Else, move to indentation position of this line.
-  With arg N, move backward to the beginning of the Nth previous line.
-  Interactively, N is the prefix arg."
-  (interactive "P")
-  (cond ((or (bolp) n)
-         (forward-line (- (prefix-numeric-value n))))
-        ((save-excursion (skip-chars-backward "[:space:]") (bolp)) ; At indentation.
-         (forward-line 0))
-        (t (back-to-indentation))))
+;; autosave often so I don't have to manually save anymore
+(setq auto-save-timeout 1
+      auto-save-interval 1)
+(global-unset-key "\C-x\C-s")
+;; quiet, please! No dinging!
+(setq visible-bell t)
+(setq ring-bell-function 'ding)
+
+;; save when emacs loses focus
+(when
+   (and (featurep 'x) window-system)
+ (defvar on-blur--saved-window-id 0 "Last known focused window.")
+ (defvar on-blur--timer nil "Timer refreshing known focused window.")
+ (defun on-blur--refresh ()
+   "Runs on-blur-hook if emacs has lost focus."
+   (let* ((active-window (x-window-property
+                          "_NET_ACTIVE_WINDOW" nil "WINDOW" 0 nil t))
+          (active-window-id (if (numberp active-window)
+                                active-window
+                              (string-to-number
+                               (format "%x%04x"
+                                       (car active-window)
+                                       (cdr active-window)) 16)))
+          (emacs-window-id (string-to-number
+                            (frame-parameter nil 'outer-window-id))))
+     (when (and
+            (= emacs-window-id on-blur--saved-window-id)
+            (not (= active-window-id on-blur--saved-window-id)))
+       (run-hooks 'on-blur-hook))
+     (setq on-blur--saved-window-id active-window-id)
+     (run-with-timer 1 nil 'on-blur--refresh)))
+ (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t)))
+ (on-blur--refresh))
+
+;; make sure autosave calls after-save-hook, for some reason
+;; doesn't by default
+(defadvice do-auto-save (after after-auto-save activate)
+  (run-hooks 'after-save-hook))
+(defadvice save-some-buffers (after after-save-some-buffers activate)
+  (run-hooks 'after-save-hook))
+
+;; autosave under all these circumstances too, never want to save
+;; manually
+(defadvice switch-to-buffer (before save-buffer-now activate)
+  (when buffer-file-name (save-buffer)))
+(defadvice other-window (before other-window-now activate)
+  (when buffer-file-name (save-buffer)))
+(defadvice other-frame (before other-frame-now activate)
+  (when buffer-file-name (save-buffer)))
+
+(setq auto-save-visited-file-name t)
+
+;; should get used to using delete key on kineses
+(global-unset-key "\C-d")
+(global-set-key [delete] 'delete-char)
 
 (defun end-or-trailing (&optional n)
   "Move cursor to end of this line or to its indentation.
@@ -165,6 +197,20 @@
     (end-of-line)
     (skip-chars-backward "[:space:]"))))
 
+(defun beginning-or-indentation (&optional n)
+  "Move cursor to beginning of this line or to its indentation.
+  If at indentation position of this line, move to beginning of line.
+  If at beginning of line, move to beginning of previous line.
+  Else, move to indentation position of this line.
+  With arg N, move backward to the beginning of the Nth previous line.
+  Interactively, N is the prefix arg."
+  (interactive "P")
+  (cond ((or (bolp) n)
+         (forward-line (- (prefix-numeric-value n))))
+        ((save-excursion (skip-chars-backward "[:space:]") (bolp)) ; At indentation.
+         (forward-line 0))
+        (t (back-to-indentation))))
+
 (global-set-key "\C-a" 'beginning-or-indentation)
 (global-set-key "\C-e" 'end-or-trailing)
 
@@ -173,8 +219,20 @@
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 
-;; Don't use alt-x, use C-x C-m, alt is a pain
-(global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key (kbd "S-SPC") 'dabbrev-expand)
+(global-set-key (kbd "M-SPC") 'dabbrev-expand)
+(global-unset-key (kbd "M-/"))
+
+;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
+(global-set-key
+     "\C-x\C-m"
+     (lambda ()
+       (interactive)
+       (call-interactively
+        (intern
+         (ido-completing-read
+          "M-x "
+          (all-completions "" obarray 'commandp))))))
 
 ;; Emacs won't load shell-script-mode for zsh automatically
 (setq auto-mode-alist
@@ -214,11 +272,6 @@
 
 ;; So I can delete it
 (setq show-trailing-whitespace t)
-
-;; Delete trailing whitespace automagically
-;; (add-hook 'write-file-hooks
-;;           (lambda ()
-;;             (delete-trailing-whitespace)))
 
 (add-hook 'sh-mode-hook
 	  (lambda () (setq indent-tabs-mode nil)))
@@ -490,34 +543,6 @@
                         (backward-word)
                         (kill-word 1)))))
 
-(require 'project-root)
-
-(setq project-roots
-      `(("Autotools project"
-         :root-contains-files ("configure.ac")
-         :on-hit (lambda (p) (message (car p))))
-        ("TL project"
-         :filename-regex ,(regexify-ext-list '(tc H C))
-         :on-hit (lambda (p) (message (car p))))
-        ("bld project"
-         :root-contains-files ("bld-list")
-         :on-hit (lambda (p) (message (car p))))
-        ("CMake project"
-         :root-contains-files ("CMakeLists.txt")
-         :on-hit (lambda (p) (message (car p))))
-        ("Personal config files"
-         :path-matches ,(format "\\(%s\\)*" (expand-file-name "etc" (getenv "HOME")))
-         :on-hit (lambda (p) (message (car p))))
-        ("Fallback to current folder"
-         :root-contains-files (".")
-         :on-hit (lambda (p) (message (car p))))))
-
-(global-set-key (kbd "C-c f") 'project-root-find-file)
-(global-set-key (kbd "C-c a") 'project-root-ack)
-(global-set-key (kbd "C-c d") 'project-root-goto-root)
-(global-set-key (kbd "C-c p") 'project-root-run-default-command)
-(global-set-key (kbd "C-c l") 'project-root-browse-seen-projects)
-
 (defun compilation-buffer-name-jg (unused-mode-name)
   (concat unused-mode-name ": " (with-project-root default-directory)))
 (setq-default compilation-buffer-name-function 'compilation-buffer-name-jg)
@@ -546,7 +571,8 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "Evince") (output-dvi "Evince") (output-pdf "Evince") (output-html "Evince"))))
- '(ediff-split-window-function (quote split-window-horizontally)))
+ '(ediff-split-window-function (quote split-window-horizontally))
+ '(safe-local-variable-values (quote ((eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem" (buffer-file-name) (getenv "HOME")))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py" (getenv "HOME")))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s" (buffer-file-name) (getenv "HOME") (buffer-name)))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s" (buffer-file-name) (getenv "HOME") (buffer-name)))))))))
 
 
 ; Code to get the current class name, will try this if I can't get
@@ -554,3 +580,44 @@
 ;; (replace-regexp-in-string "INLINES$" ""
 ;;  (file-name-sans-extension
 ;;   (file-name-nondirectory (buffer-file-name))))
+
+
+;; doesn't work, later autosaves don't go to the file
+;; (defun rename-file-and-buffer ()
+;;   "Rename the current buffer and file it is visiting."
+;;   (interactive)
+;;   (let ((filename (buffer-file-name)))
+;;     (if (not (and filename (file-exists-p filename)))
+;;         (message "Buffer is not visiting a file!")
+;;       (let ((new-name (read-file-name "New name: " filename)))
+;;         (cond
+;;          ((vc-backend filename) (vc-rename-file filename new-name))
+;;          (t
+;;           (rename-file filename new-name t)
+;;           (set-visited-file-name new-name t t)))))))
+;; (global-set-key (kbd "C-x C-r") 'rename-file-and-buffer)
+
+
+(defun quick-copy-line ()
+  "Copy the whole line that point is on and move to the beginning of the next line.
+    Consecutive calls to this command append each line to the
+    kill-ring."
+  (interactive)
+  (let ((beg (line-beginning-position 1))
+	(end (line-beginning-position 2)))
+    (if (eq last-command 'quick-copy-line)
+	(kill-append (buffer-substring beg end) (< end beg))
+      (kill-new (buffer-substring beg end))))
+  (beginning-of-line 2))
+
+(defun quick-cut-line ()
+  "Cut the whole line that point is on.  Consecutive calls to this command append each line to the kill-ring."
+  (interactive)
+  (let ((beg (line-beginning-position 1))
+	(end (line-beginning-position 2)))
+    (if (eq last-command 'quick-cut-line)
+	(kill-append (buffer-substring beg end) (< end beg))
+      (kill-new (buffer-substring beg end)))
+    (delete-region beg end))
+  (beginning-of-line 1)
+  (setq this-command 'quick-cut-line))
