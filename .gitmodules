@@ -19,3 +19,12 @@
 [submodule "sh"]
 	path = sh
 	url = https://github.com/amoffat/sh.git
+[submodule "ace-jump-mode"]
+	path = ace-jump-mode
+	url = ./ace-jump-mode
+[submodule "smartparens"]
+	path = smartparens
+	url = ./smartparens
+[submodule "dash"]
+	path = dash
+	url = ./dash

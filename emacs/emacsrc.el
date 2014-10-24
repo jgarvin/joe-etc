@@ -216,11 +216,15 @@
 
 ;; Make C-w consistent with shell usage
 ;; Rebinds cut to C-x C-k though
-(global-set-key "\C-w" 'backward-kill-word)
+
+;; turns out don't want this since i have kinesis, C-backspace
+;; is better
+;;(global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 
 (global-set-key (kbd "S-SPC") 'dabbrev-expand)
 (global-set-key (kbd "M-SPC") 'dabbrev-expand)
+(setq dabbrev-case-fold-search t)
 (global-unset-key (kbd "M-/"))
 
 ;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
@@ -621,3 +625,80 @@
     (delete-region beg end))
   (beginning-of-line 1)
   (setq this-command 'quick-cut-line))
+
+;;
+;; ace jump mode major function
+;; 
+(add-to-list 'load-path "~/etc/ace-jump-mode")
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+;; you can select the key you prefer to
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+;; 
+;; enable a more powerful jump back function from ace jump mode
+;;
+(autoload
+  'ace-jump-mode-pop-mark
+  "ace-jump-mode"
+  "Ace jump back:-)"
+  t) 
+(eval-after-load "ace-jump-mode"
+  '(ace-jump-mode-enable-mark-sync))
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+(setq ace-jump-mode-scope 'window)
+
+(setq find-file-wildcards t)
+
+(defun get-point (symbol &optional arg)
+      "get the point"
+      (funcall symbol arg)
+      (point)
+     )
+
+(defun copy-thing (begin-of-thing end-of-thing &optional arg)
+       "copy thing between beg & end into kill ring"
+        (save-excursion
+          (let ((beg (get-point begin-of-thing 1))
+         	 (end (get-point end-of-thing arg)))
+            (copy-region-as-kill beg end)))
+     )
+
+(defun copy-word (&optional arg)
+      "Copy words at point into kill-ring"
+       (interactive "P")
+       (copy-thing 'backward-word 'forward-word arg)
+       ;;(paste-to-mark arg)
+     )
+
+(add-to-list 'load-path "~/etc/dash")
+(require 'dash)
+(add-to-list 'load-path "~/etc/smartparens")
+(require 'smartparens-config)
+(smartparens-global-mode 1)
+
+;; (defun curly-sexp (func)
+;;   (lambda (&optional arg)
+;;     (interactive "P")
+;;     (sp-restrict-to-pairs "{" func)))
+
+;; (fset 'testingvar2 (curly-sexp 'sp-forward-exp))
+
+;; (testingvar2)
+
+;; (call-interactively 'testingvar2)
+;; (sp-restrict-to-pairs "{" 'sp-forward-sexp)
+;; (sp-restrict-to-pairs "{" 'sp-down-sexp)
+
+;; (defun sp-pair-curly-down-sexp (&optional arg)
+
+;; (defun sp-pair-forward-sexp (&optional arg)
+;;   (interactive "P")
+;;   (sp-restrict-to-object 'sp-prefix-pair-object 'sp-forward-sexp))
+
+;; (sp-restrict-to-object 'sp-prefix-pair-object 'sp-forward-sexp)
+
+
