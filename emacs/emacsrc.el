@@ -1,11 +1,8 @@
-;; TODO: 'n' and 'p' should go up and down without ctrl
-;; when in a read only buffer. will make navigating ack
-;; output easier.
-
-;; TODO: No global prompt for /tmp
-
 ;; for emacsclient
 (server-start)
+
+;; Enable debugging
+(setq-default debug-on-error t)
 
 ;; When running a local install of emacs, still pull in officially
 ;; installed packages.
@@ -13,25 +10,28 @@
            (not (memq "/usr/share/emacs/site-lisp" load-path)))
   (add-to-list 'load-path "/usr/share/emacs/site-lisp"))
 
-;; Color theme
-(add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
-(require 'color-theme)
-(setq color-theme-is-global t)
-(color-theme-initialize)
-(load-file "~/etc/emacs/cyberpunk-theme.el")
+(when (< emacs-major-version 24)
+  (load-file "~/etc/emacs/cl-lib-0.3.el"))
 
-(load-file "~/etc/emacs/cl-lib-0.3.el") ;; needed for emacs <23
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/") t)
+  )
 
-;; (add-to-list 'load-path
-;;               "~/etc/emacs/yasnippet")
-;; (require 'yasnippet)
-;; (yas-global-mode 1)
-;; (delete "~/.emacs.d/snippets" yas/root-directory)
-;; (setq yas/root-directory (cons "~/etc/emacs/snippets" yas/root-directory))
-;; (setq yas/root-directory (remove-duplicates yas/root-directory :test 'string=))
+(add-to-list 'load-path "~/etc/dash")
+(require 'dash)
+(add-to-list 'load-path "~/etc/smartparens")
+(require 'smartparens-config)
+(smartparens-global-mode 1)
 
-;; Enable debugging
-(setq-default debug-on-error t)
+(load-file "~/etc/emacs/ido-custom.el")
+(load-file "~/etc/emacs/yasnippet-custom.el")
+(load-file "~/etc/emacs/save.el")
+(load-file "~/etc/emacs/pair.el")
+(load-file "~/etc/emacs/gui.el")
+(load-file "~/etc/emacs/python.el")
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -64,111 +64,21 @@
 (setq-default undo-limit 1000000)
 (setq-default undo-strong-limit 1000000)
 
-(require 'ido)
-;; Without this, when running emacs as sudo .ido.last will become
-;; root owned. Super annoying.
-(setq ido-save-directory-list-file (concat "~/.ido." (getenv "LOGNAME") ".last"))
-(ido-mode t)
-(setq ido-enable-flex-matching t)
-;; Without these two lines when I try to reopen a file in a new frame it jumps to the old one >_<
-(setq ido-default-file-method 'selected-window)
-(setq ido-default-buffer-method 'selected-window)
-(setq completion-ignored-extensions
-      (append completion-ignored-extensions '(".fpo" ".ii" ".d" ".o")))
-(setq ido-ignore-files
-      (append ido-ignore-files '(".*-g" ".*-O2")))
-
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:height 105 :family "Consolas" :embolden f)))))
-
-;; Turn off GUI parts
-(when (functionp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (functionp 'menu-bar-mode)
-  (menu-bar-mode -1))
-(when (functionp 'scroll-bar-mode)
-  (scroll-bar-mode -1))
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
-(fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
-
-
 ;; Show me the region until I do something on it
 (setq transient-mark-mode t)
 
 ;; Make killing the line also delete it
 (setq kill-whole-line t)
 
-;; Stop this crazy blinking cursor
-(blink-cursor-mode 0)
-
 ;; when on a TAB, the cursor has the TAB length
 (setq-default x-stretch-cursor t)
-
-;; Show column number in the mode line
-(column-number-mode 1)
-
-;; Show current buffer name in titlebar (instead of emacs@whatever)
-(setq frame-title-format "%b")
 
 ;; Scroll 1 line at a time
 (setq scroll-step 1)
 
-;; autosave often so I don't have to manually save anymore
-(setq auto-save-timeout 1
-      auto-save-interval 1)
-(global-unset-key "\C-x\C-s")
 ;; quiet, please! No dinging!
 (setq visible-bell t)
 (setq ring-bell-function 'ding)
-
-;; save when emacs loses focus
-(when
-   (and (featurep 'x) window-system)
- (defvar on-blur--saved-window-id 0 "Last known focused window.")
- (defvar on-blur--timer nil "Timer refreshing known focused window.")
- (defun on-blur--refresh ()
-   "Runs on-blur-hook if emacs has lost focus."
-   (let* ((active-window (x-window-property
-                          "_NET_ACTIVE_WINDOW" nil "WINDOW" 0 nil t))
-          (active-window-id (if (numberp active-window)
-                                active-window
-                              (string-to-number
-                               (format "%x%04x"
-                                       (car active-window)
-                                       (cdr active-window)) 16)))
-          (emacs-window-id (string-to-number
-                            (frame-parameter nil 'outer-window-id))))
-     (when (and
-            (= emacs-window-id on-blur--saved-window-id)
-            (not (= active-window-id on-blur--saved-window-id)))
-       (run-hooks 'on-blur-hook))
-     (setq on-blur--saved-window-id active-window-id)
-     (run-with-timer 1 nil 'on-blur--refresh)))
- (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t)))
- (on-blur--refresh))
-
-;; make sure autosave calls after-save-hook, for some reason
-;; doesn't by default
-(defadvice do-auto-save (after after-auto-save activate)
-  (run-hooks 'after-save-hook))
-(defadvice save-some-buffers (after after-save-some-buffers activate)
-  (run-hooks 'after-save-hook))
-
-;; autosave under all these circumstances too, never want to save
-;; manually
-(defadvice switch-to-buffer (before save-buffer-now activate)
-  (when buffer-file-name (save-buffer)))
-(defadvice other-window (before other-window-now activate)
-  (when buffer-file-name (save-buffer)))
-(defadvice other-frame (before other-frame-now activate)
-  (when buffer-file-name (save-buffer)))
-
-(setq auto-save-visited-file-name t)
 
 ;; should get used to using delete key on kineses
 (global-unset-key "\C-d")
@@ -246,14 +156,6 @@
          ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
-;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
-(setq auto-mode-alist
-      (append
-       ;; File name (within directory) starts with a dot.
-       '(("ido-prompt" . emacs-lisp-mode))
-       auto-mode-alist))
-
-;; Emacs won't load emacs-lisp-mode for ido-prompt automatically
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
@@ -565,18 +467,55 @@
 ;; We always want a gigantic mark ring
 (setq-default mark-ring-max 65535)
 
-;; Needed for ido-mode to work in large source trees
-(setq ido-max-directory-size 3000000)
-
 (put 'upcase-region 'disabled nil)
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "Evince") (output-dvi "Evince") (output-pdf "Evince") (output-html "Evince"))))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(TeX-view-program-selection
+   (quote
+    (((output-dvi style-pstricks)
+      "Evince")
+     (output-dvi "Evince")
+     (output-pdf "Evince")
+     (output-html "Evince"))))
  '(ediff-split-window-function (quote split-window-horizontally))
- '(safe-local-variable-values (quote ((eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem" (buffer-file-name) (getenv "HOME")))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py" (getenv "HOME")))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s" (buffer-file-name) (getenv "HOME") (buffer-name)))) nil t) (eval add-hook (quote after-save-hook) (lambda nil (shell-command (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s" (buffer-file-name) (getenv "HOME") (buffer-name)))))))))
+ '(haskell-mode-hook (quote (turn-on-haskell-indent)))
+ '(safe-local-variable-values
+   (quote
+    ((eval add-hook
+	   (quote after-save-hook)
+	   (lambda nil
+	     (shell-command
+	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
+		      (buffer-file-name)
+		      (getenv "HOME"))))
+	   nil t)
+     (eval add-hook
+	   (quote after-save-hook)
+	   (lambda nil
+	     (shell-command
+	      (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
+		      (getenv "HOME"))))
+	   nil t)
+     (eval add-hook
+	   (quote after-save-hook)
+	   (lambda nil
+	     (shell-command
+	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+		      (buffer-file-name)
+		      (getenv "HOME")
+		      (buffer-name))))
+	   nil t)
+     (eval add-hook
+	   (quote after-save-hook)
+	   (lambda nil
+	     (shell-command
+	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+		      (buffer-file-name)
+		      (getenv "HOME")
+		      (buffer-name)))))))))
 
 
 ; Code to get the current class name, will try this if I can't get
@@ -635,6 +574,11 @@
   "ace-jump-mode"
   "Emacs quick move minor mode"
   t)
+(autoload
+  'ace-jump-line-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
 ;; you can select the key you prefer to
 (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 
@@ -673,32 +617,5 @@
        (copy-thing 'backward-word 'forward-word arg)
        ;;(paste-to-mark arg)
      )
-
-(add-to-list 'load-path "~/etc/dash")
-(require 'dash)
-(add-to-list 'load-path "~/etc/smartparens")
-(require 'smartparens-config)
-(smartparens-global-mode 1)
-
-;; (defun curly-sexp (func)
-;;   (lambda (&optional arg)
-;;     (interactive "P")
-;;     (sp-restrict-to-pairs "{" func)))
-
-;; (fset 'testingvar2 (curly-sexp 'sp-forward-exp))
-
-;; (testingvar2)
-
-;; (call-interactively 'testingvar2)
-;; (sp-restrict-to-pairs "{" 'sp-forward-sexp)
-;; (sp-restrict-to-pairs "{" 'sp-down-sexp)
-
-;; (defun sp-pair-curly-down-sexp (&optional arg)
-
-;; (defun sp-pair-forward-sexp (&optional arg)
-;;   (interactive "P")
-;;   (sp-restrict-to-object 'sp-prefix-pair-object 'sp-forward-sexp))
-
-;; (sp-restrict-to-object 'sp-prefix-pair-object 'sp-forward-sexp)
 
 

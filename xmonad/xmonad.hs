@@ -170,15 +170,15 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     [((m .|. modMask, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    --    ++
+        ++
 
     -- --
     -- -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     -- --
-    -- [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
-    --     | (key, sc) <- zip [xK_e, xK_r] [0..]
-    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip [xK_f, xK_u, xK_p] [0..]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -238,9 +238,20 @@ main = do
   browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 
+-- decoFunc = simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } )
+-- decoFunc = simpleDeco
+
+myTheme = defaultTheme { decoWidth = -1, fontName = "-*-helvetica-bold-r-*-*-18-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" }
+          
+-- myDeco = simpleDeco shrinkText myTheme (layoutHook gnomeConfig)
+
 -- data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
 -- instance MultiToggle.Transformer DECORATIONS Window where
--- 		 transform _ x k = k (simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } ) x)
+--     transform _ x k = k (myDeco x) (\(myDeco x') -> x')
+
+-- data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
+-- instance MultiToggle.Transformer DECORATIONS Window where
+--     transform _ x k = k (simpleDeco x) (\(simpleDeco x') -> x)
 
 -- data MAGNIFICATION = MAGNIFICATION deriving (Read, Show, Eq, Typeable)
 -- instance MultiToggle.Transformer MAGNIFICATION Window where
@@ -275,6 +286,8 @@ defaults editor home_folder browser_name = gnomeConfig {
       -- hooks, layouts
         layoutHook         = smartBorders
                              $ avoidStruts
+                             -- $ myDeco,
+                             $ simpleDeco shrinkText myTheme
                              $ layoutHook gnomeConfig,
         handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
         manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,

@@ -90,7 +90,7 @@ tooLarge -= executable
 print "Too large after: " + str(tooLarge)
 
 doExit = False
-for f in tooLarge:
+while tooLarge:
     print "File is too large!: " + tooLarge.pop()
     doExit = True
 
