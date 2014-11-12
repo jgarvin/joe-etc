@@ -80,7 +80,7 @@ relative_git_path = op.relpath(gitIgnorePath[0], args.dir)
 ignored_set = set()
 for f in ignored_files:
     if f: # Usually one empty newline to filter
-        ignored_set.add(op.join(relative_git_path, f))
+        ignored_set.add(op.join(relative_git_path, f).lstrip("./"))
 print "Ignored files: " + str(ignored_set)
 print "Ignored executables: " + str(executable)
 

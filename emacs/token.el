@@ -42,6 +42,11 @@
 ;;
 ;; for jumping we only need the words in the window
 ;; for insertion we want the more general possibilities...
+;;
+;; 'toke <tok>' jumps directly to token
+;; 'line <tok>' jumps to start of line
+;; 'post toke <tok>'
+;; 'post line <tok>'
 
 (defun get-buffer-words ()
   (setq words '())

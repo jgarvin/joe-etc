@@ -31,7 +31,9 @@
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
 (load-file "~/etc/emacs/gui.el")
-(load-file "~/etc/emacs/python.el")
+(load-file "~/etc/emacs/python-custom.el")
+(load-file "~/etc/emacs/dired-custom.el")
+(load-file "~/etc/emacs/mandimus.el")
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
