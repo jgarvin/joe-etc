@@ -2,7 +2,7 @@
 (server-start)
 
 ;; Enable debugging
-(setq-default debug-on-error t)
+;; (setq-default debug-on-error t)
 
 ;; When running a local install of emacs, still pull in officially
 ;; installed packages.
@@ -34,6 +34,15 @@
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/mandimus.el")
+(load-file "~/etc/emacs/erc-custom.el")
+
+;; (add-hook 'buffer-menu-mode-hook
+;; 	  (lambda ()
+;; 	    (auto-revert-mode)))
+
+(setq scroll-step 1)
+(setq scroll-conservatively 10000)
+(setq auto-window-vscroll nil)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -58,7 +67,13 @@
   "Yank and then indent the newly formed region according to mode."
   (interactive)
   (yank)
-  (call-interactively 'indent-region))
+  (save-excursion
+    ;; workaround for python mode
+    ;; indentation doesn't workis existing indentation isn't in the region
+    (exchange-point-and-mark)
+    (beginning-of-line)
+    (call-interactively 'indent-region)))
+(global-set-key (kbd "C-y") 'yank-and-indent)
 
 (require 'undo-tree)
 (global-undo-tree-mode)
@@ -74,9 +89,6 @@
 
 ;; when on a TAB, the cursor has the TAB length
 (setq-default x-stretch-cursor t)
-
-;; Scroll 1 line at a time
-(setq scroll-step 1)
 
 ;; quiet, please! No dinging!
 (setq visible-bell t)
@@ -224,21 +236,15 @@
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
-;; TODO: disable for assembly
-(defun indent-newline-indent ()
-  (interactive)
-  (progn
-    (indent-according-to-mode)
-    (newline-and-indent)))
-
 (defun open-line-and-indent ()
   (interactive)
-  (progn
-    (open-line 1)
+  (indent-according-to-mode)
+  (open-line 1)
+  (save-excursion
+    (next-line)
     (indent-according-to-mode)))
 
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key (kbd "C-m") 'newline-and-indent)
+(global-set-key (kbd "RET") 'reindent-then-newline-and-indent)
 (global-set-key (kbd "C-o") 'open-line-and-indent)
 
 (setq auto-mode-alist
@@ -442,14 +448,6 @@
                "%-" ;; fill with '-'
                ))
 
-;; Kill whole words at once, even in mid word
-(global-set-key (kbd "M-d")
-                (lambda ()
-                  (interactive)
-                  (if (char-after)
-                      (progn
-                        (backward-word)
-                        (kill-word 1)))))
 
 (defun compilation-buffer-name-jg (unused-mode-name)
   (concat unused-mode-name ": " (with-project-root default-directory)))
@@ -462,14 +460,11 @@
 ;; "Command attempted to use minibuffer while in minibuffer"
 (setq enable-recursive-minibuffers t)
 
-;; Highlight current line subtly, makes it easier to find cursor
-(global-hl-line-mode)
-(set-face-background hl-line-face "grey13")
-
 ;; We always want a gigantic mark ring
 (setq-default mark-ring-max 65535)
 
 (put 'upcase-region 'disabled nil)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -520,52 +515,6 @@
 		      (buffer-name)))))))))
 
 
-; Code to get the current class name, will try this if I can't get
-; autocomplete working
-;; (replace-regexp-in-string "INLINES$" ""
-;;  (file-name-sans-extension
-;;   (file-name-nondirectory (buffer-file-name))))
-
-
-;; doesn't work, later autosaves don't go to the file
-;; (defun rename-file-and-buffer ()
-;;   "Rename the current buffer and file it is visiting."
-;;   (interactive)
-;;   (let ((filename (buffer-file-name)))
-;;     (if (not (and filename (file-exists-p filename)))
-;;         (message "Buffer is not visiting a file!")
-;;       (let ((new-name (read-file-name "New name: " filename)))
-;;         (cond
-;;          ((vc-backend filename) (vc-rename-file filename new-name))
-;;          (t
-;;           (rename-file filename new-name t)
-;;           (set-visited-file-name new-name t t)))))))
-;; (global-set-key (kbd "C-x C-r") 'rename-file-and-buffer)
-
-
-(defun quick-copy-line ()
-  "Copy the whole line that point is on and move to the beginning of the next line.
-    Consecutive calls to this command append each line to the
-    kill-ring."
-  (interactive)
-  (let ((beg (line-beginning-position 1))
-	(end (line-beginning-position 2)))
-    (if (eq last-command 'quick-copy-line)
-	(kill-append (buffer-substring beg end) (< end beg))
-      (kill-new (buffer-substring beg end))))
-  (beginning-of-line 2))
-
-(defun quick-cut-line ()
-  "Cut the whole line that point is on.  Consecutive calls to this command append each line to the kill-ring."
-  (interactive)
-  (let ((beg (line-beginning-position 1))
-	(end (line-beginning-position 2)))
-    (if (eq last-command 'quick-cut-line)
-	(kill-append (buffer-substring beg end) (< end beg))
-      (kill-new (buffer-substring beg end)))
-    (delete-region beg end))
-  (beginning-of-line 1)
-  (setq this-command 'quick-cut-line))
 
 ;;
 ;; ace jump mode major function
@@ -606,18 +555,36 @@
      )
 
 (defun copy-thing (begin-of-thing end-of-thing &optional arg)
-       "copy thing between beg & end into kill ring"
-        (save-excursion
-          (let ((beg (get-point begin-of-thing 1))
-         	 (end (get-point end-of-thing arg)))
-            (copy-region-as-kill beg end)))
-     )
+  "copy thing between beg & end into kill ring"
+  (save-excursion
+    (let ((beg (get-point begin-of-thing 1))
+	  (end (get-point end-of-thing arg)))
+      (copy-region-as-kill beg end)))
+  )
 
 (defun copy-word (&optional arg)
-      "Copy words at point into kill-ring"
-       (interactive "P")
-       (copy-thing 'backward-word 'forward-word arg)
-       ;;(paste-to-mark arg)
-     )
+  "Copy words at point into kill-ring"
+  (interactive "P")
+  (copy-thing 'backward-word 'forward-word arg) 
+  ;;(paste-to-mark arg)
+  )
 
 
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "M-=") 'er/contract-region)
+
+(require 'change-inner)
+(global-set-key (kbd "M-i") 'change-inner)
+(global-set-key (kbd "M-o") 'change-outer)
+
+(defun chomp (str)
+      "Chomp leading and tailing whitespace from STR."
+      (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+                                        (: (* (any " \t\n")) eos)))
+                                ""
+                                str))
+
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program
+      (chomp (shell-command-to-string "~/etc/utils/pick_best_browser")))

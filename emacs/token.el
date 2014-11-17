@@ -3,21 +3,21 @@
 (setq giant-buffer-size (* 1 1024 1024))
 (setq giant-line (* 4 4096))
 
-(defun safe-start ()
+(defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
-      (max (buffer-size) (- (point) 10000))
+      (max 0 (- (point) 10000))
     (save-excursion
       (beginning-of-buffer)
       (point))))
 
-(defun safe-stop ()
+(defun md-safe-stop ()
   (if (< giant-buffer-size (buffer-size))
-      (max (buffer-size) (- (point) 10000))
+      (min (buffer-size) (+ (point) 10000))
     (save-excursion
       (end-of-buffer)
       (point))))
 
-(defun iter-words-impl (action start end)
+(defun md-iter-words-impl (action start end)
   (save-excursion
     (goto-char start)
     (beginning-of-line)
@@ -25,11 +25,11 @@
       (funcall action (thing-at-point 'word t))
       (forward-word))))
 
-(defun iter-buffer-words (action)
-  (iter-words-impl action (safe-start) (safe-stop)))
+(defun md-iter-buffer-words (action)
+  (md-iter-words-impl action (md-safe-start) (md-safe-stop)))
 
-(defun iter-window-words (action)
-  (iter-words-impl action (window-start) (window-stop)))
+;; (defun md-iter-window-words (action)
+;;   (md-iter-words-impl action (window-start) (window-stop)))
 
 ;; TODO
 ;; alright, now that we have this machinery...
@@ -48,25 +48,27 @@
 ;; 'post toke <tok>'
 ;; 'post line <tok>'
 
-(defun get-buffer-words ()
-  (setq words '())
-  (iter-buffer-words
-   (lambda (word)
-     (setq words (cons word words))))
-  (delete-dups words)
-  words)
+(defun md-get-buffer-words ()
+  (save-window-excursion
+    (setq words '())
+    (md-iter-buffer-words
+     (lambda (word)
+       (setq words (cons word words))))
+    (delete-dups words)
+    words))
 
-(defun get-window-words ()
-  (setq words '())
-  (iter-buffer-words
-   (lambda (word)
-     (setq words (cons word words))))
-  (delete-dups words)
-  words)
+(defun md-get-window-words ()
+  (save-window-excursion
+    (setq words '())
+    (md-iter-buffer-words
+     (lambda (word)
+       (setq words (cons word words))))
+    (delete-dups words)
+    words))
 
-;;(search-forward "buffer" (safe-stop))
+;; (search-forward "buffer" (safe-stop))
 
-(defun find-nearest-word-impl (word start end)
+(defun md-find-nearest-word-impl (word start end)
   (setq sites '())
   (save-excursion
     (goto-char start)
@@ -84,9 +86,9 @@
       (goto-char (nth 0 sites))
     (error "No instance of word.")))
 
-(defun find-nearest-word-buffer (word)
-  (find-nearest-word-impl word (safe-start) (safe-stop)))
+(defun md-find-nearest-word-buffer (word)
+  (md-find-nearest-word-impl word (md-safe-start) (md-safe-stop)))
 
-(defun find-nearest-word-window (word)
-  (find-nearest-word-impl word (window-start) (window-end)))
+(defun md-find-nearest-word-window (word)
+  (md-find-nearest-word-impl word (window-start) (window-end)))
 

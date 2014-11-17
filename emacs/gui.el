@@ -31,3 +31,9 @@
 
 ;; Show current buffer name in titlebar (instead of emacs@whatever)
 (setq frame-title-format "%b")
+
+;; Highlight current line subtly, makes it easier to find cursor
+(global-hl-line-mode)
+(set-face-background hl-line-face "grey13")
+
+
