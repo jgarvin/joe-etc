@@ -6,6 +6,9 @@
 (setq erc-nickserv-passwords
       `((freenode     ((,freenode-nick . ,freenode-nick-pass)))))
 
+;; without this will autojoin channels before identifying
+(setq erc-autojoin-timing 'ident)
+
 ;; auto-resize the text wrapping based on frame size
 (make-variable-buffer-local 'erc-fill-column)
 (add-hook 'window-configuration-change-hook 

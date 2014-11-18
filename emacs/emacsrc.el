@@ -63,17 +63,6 @@
 (require 'drag-stuff)
 (drag-stuff-global-mode t)
 
-(defun yank-and-indent ()
-  "Yank and then indent the newly formed region according to mode."
-  (interactive)
-  (yank)
-  (save-excursion
-    ;; workaround for python mode
-    ;; indentation doesn't workis existing indentation isn't in the region
-    (exchange-point-and-mark)
-    (beginning-of-line)
-    (call-interactively 'indent-region)))
-(global-set-key (kbd "C-y") 'yank-and-indent)
 
 (require 'undo-tree)
 (global-undo-tree-mode)
@@ -236,6 +225,12 @@
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
+(defun yank-and-indent ()
+  "Yank and then indent the newly formed region according to mode."
+  (interactive)
+  (yank)
+  (indent-according-to-mode))
+
 (defun open-line-and-indent ()
   (interactive)
   (indent-according-to-mode)
@@ -244,8 +239,22 @@
     (next-line)
     (indent-according-to-mode)))
 
+(defun kill-and-indent (&optional ARG)
+  (interactive)
+  (kill-line ARG)
+  (indent-according-to-mode))
+
+(defun yank-and-indent-safe (&optional ARG)
+  (interactive)
+  (yank)
+  (save-excursion
+    (when (re-search-backward "[^[:blank:]]" (point-at-bol) t)
+      (indent-according-to-mode))))
+
 (global-set-key (kbd "RET") 'reindent-then-newline-and-indent)
 (global-set-key (kbd "C-o") 'open-line-and-indent)
+(global-set-key (kbd "C-y") 'yank-and-indent)
+(global-set-key (kbd "C-k") 'kill-and-indent)
 
 (setq auto-mode-alist
 	  (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))

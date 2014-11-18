@@ -38,11 +38,6 @@
 
 (gtags-mode t)
 
-(add-to-list 'load-path "~/etc/emacs/autopair-read-only")
-(require 'autopair)
-(autopair-mode)
-(local-set-key (kbd "C-y") 'yank-and-indent)
-
 (setq require-final-newline t)
 
 (setq c-hungry-delete-key t)
@@ -50,39 +45,16 @@
 (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
 (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
 
-;; TODO: Ask on SO why innamespace offset isn't applying to
-;; to comments.
-
-(if (string-match ".*jgl.*" (system-name))
-    (progn
-      (setq my-indent-size 2)
-      (c-set-offset 'innamespace 2))
-  (progn
-    (setq my-indent-size 4)
-    (c-set-offset 'innamespace 0)))
-
 ;; Prefer 4-space tabs
+(setq my-indent-size 4)
+(c-set-offset 'innamespace 0) ;; don't indent top level namespace
+(c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
+
 (setq c-default-style "bsd")
 (setq c-basic-offset my-indent-size)
 (setq indent-tabs-mode nil)
 (setq default-tab-width my-indent-size)
 (setq tab-width my-indent-size)
-(c-set-offset 'case-label '+)     ;; 'case' indented once after 'switch'
-
-;; TODO: Make this automatic for new .h files
-(defun ff/headerize ()
-  "Adds the #define HEADER_H, etc."
-  (interactive)
-  (let ((flag-name (replace-regexp-in-string
-                    "[\. \(\)]" "_"
-                    (upcase (file-name-nondirectory (buffer-name))))))
-    (goto-char (point-max))
-    (insert "\n#endif\n")
-    (goto-char (point-min))
-    (insert (concat "#ifndef " flag-name "\n"))
-    (insert (concat "#define " flag-name "\n"))
-    )
-  )
 
 ;; Run makefile, or if there isn't one
 (defun smart-compile()
@@ -148,146 +120,6 @@
 (require 'whitespace)
 (setq whitespace-style '(face lines))
 (whitespace-mode t)
-
-;; extra syntax highlighting
-(defface font-lock-bracket-face
-  '((t (:foreground "white")))
-  "Font lock mode face for brackets, e.g. '(', ']', etc."
-  :group 'font-lock-faces)
-(defvar font-lock-bracket-face 'font-lock-bracket-face
-  "Font lock mode face for backets.  Changing this directly
-  affects only new buffers.")
-
-(defvar operators-regexp
-  (regexp-opt '("+" "-" "*" "/" "%" "!"
-                "&" "^" "~" "|"
-                "=" "<" ">"
-                "." "," ";" ":" "?"))
-  "Regexp matching symbols that are operators in most programming
-  languages.")
-
-(setq operators-font-lock-spec
-      (cons operators-regexp
-            (list
-             0 ;; use whole match
-             'font-lock-builtin-face
-             'keep ;; OVERRIDE
-             )))
-
-(defvar brackets-regexp
-  (regexp-opt '("(" ")" "[" "]" "{" "}"))
-  "Regexp matching symbols that are grouping operators in most
-  programming languages.")
-
-(setq brackets-font-lock-spec
-      (cons brackets-regexp
-            (list
-             0 ;; use whole match
-             'font-lock-bracket-face
-             'keep ;; OVERRIDE
-             )))
-
-(setq c-types-regexp
-      (concat
-       "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
-       (regexp-opt '("short" "long" "unsigned" "signed" "int" "char" "float" "void") 'words)))
-
-;; (setq c-keywords-regexp
-;;       (concat
-;;        "\\<[_a-zA-Z][_a-zA-Z0-9]*_t\\>" "\\|"
-;;        (regexp-opt '(
-;; 					 "and"
-;; 					 "and_eq"
-;; 					 "alignas"
-;; 					 "alignof"
-;; 					 "asm"
-;; 					 "auto"
-;; 					 "bitand"
-;; 					 "bitor"
-;; 					 "bool"
-;; 					 "break"
-;; 					 "case"
-;; 					 "catch"
-;; 					 "class"
-;; 					 "compl"
-;; 					 "const"
-;; 					 "constexpr"
-;; 					 "const_cast"
-;; 					 "continue"
-;; 					 "decltype"
-;; 					 "default"
-;; 					 "delete"
-;; 					 "double"
-;; 					 "dynamic_cast"
-;; 					 "else"
-;; 					 "enum"
-;; 					 "explicit"
-;; 					 "export"
-;; 					 "extern"
-;; 					 "false"
-;; 					 "float"
-;; 					 "for"
-;; 					 "friend"
-;; 					 "goto"
-;; 					 "if"
-;; 					 "inline"
-;; 					 "mutable"
-;; 					 "namespace"
-;; 					 "new"
-;; 					 "noexcept"
-;; 					 "not"
-;; 					 "not_eq"
-;; 					 "nullptr"
-;; 					 "operator"
-;; 					 "or"
-;; 					 "or_eq"
-;; 					 "private"
-;; 					 "protected"
-;; 					 "public"
-;; 					 "register"
-;; 					 "reinterpret_cast"
-;; 					 "return"
-;; 					 "signed"
-;; 					 "sizeof"
-;; 					 "static"
-;; 					 "static_assert"
-;; 					 "static_cast"
-;; 					 "struct"
-;; 					 "switch"
-;; 					 "template"
-;; 					 "this"
-;; 					 "thread_local"
-;; 					 "throw"
-;; 					 "true"
-;; 					 "try"
-;; 					 "typedef"
-;; 					 "typeid"
-;; 					 "typename"
-;; 					 "union"
-;; 					 "unsigned"
-;; 					 "using"
-;; 					 "virtual"
-;; 					 "volatile"
-;; 					 "while"
-;; 					 "xor"
-;; 					 "xor_eq"
-;; 					 ) 'words))
-
-(font-lock-add-keywords
- 'c-mode
- (list
-  operators-font-lock-spec
-  brackets-font-lock-spec
-  (cons c-types-regexp 'font-lock-type-face)))
-;;(cons c-keywords-regexp 'font-lock-keyword-face)))
-
-(font-lock-add-keywords
- 'c++-mode
- (list
-  operators-font-lock-spec
-  brackets-font-lock-spec
-  (cons c-types-regexp 'font-lock-type-face)))
-;;(cons c-keywords-regexp 'font-lock-keyword-face)))
 
 ;; Starting in emacs 23 there's some stupid default abbreviation
 ;; for trying to correct mispellings of 'else', problem is it doesn't
