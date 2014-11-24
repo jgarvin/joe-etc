@@ -2,7 +2,8 @@
 (server-start)
 
 ;; Enable debugging
-;; (setq-default debug-on-error t)
+(setq-default debug-on-error t)
+(setq message-log-max t)
 
 ;; When running a local install of emacs, still pull in officially
 ;; installed packages.
@@ -36,9 +37,19 @@
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/erc-custom.el")
 
-;; (add-hook 'buffer-menu-mode-hook
-;; 	  (lambda ()
-;; 	    (auto-revert-mode)))
+;; automagically tail log files
+(add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
+
+(defun etc-log-tail-handler ()
+  (end-of-buffer)
+  (make-variable-buffer-local 'auto-revert-interval)
+  (setq auto-revert-interval 1)
+  (auto-revert-set-timer)
+  (make-variable-buffer-local 'auto-revert-verbose)
+  (setq auto-revert-verbose nil)
+  (read-only-mode t))
+
+(add-hook 'auto-revert-tail-mode-hook 'etc-log-tail-handler)
 
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)
@@ -142,14 +153,14 @@
 
 ;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
 (global-set-key
-     "\C-x\C-m"
-     (lambda ()
-       (interactive)
-       (call-interactively
-        (intern
-         (ido-completing-read
-          "M-x "
-          (all-completions "" obarray 'commandp))))))
+ "\C-x\C-m"
+ (lambda ()
+   (interactive)
+   (call-interactively
+    (intern
+     (ido-completing-read
+      "M-x "
+      (all-completions "" obarray 'commandp))))))
 
 ;; Emacs won't load shell-script-mode for zsh automatically
 (setq auto-mode-alist
@@ -183,7 +194,7 @@
 (setq show-trailing-whitespace t)
 
 (add-hook 'sh-mode-hook
-	  (lambda () (setq indent-tabs-mode nil)))
+          (lambda () (setq indent-tabs-mode nil)))
 
 ;; TODO: Filter untabify for makefiles
 
@@ -233,6 +244,7 @@
 
 (defun open-line-and-indent ()
   (interactive)
+  (message "how about this version")
   (indent-according-to-mode)
   (open-line 1)
   (save-excursion
@@ -257,11 +269,11 @@
 (global-set-key (kbd "C-k") 'kill-and-indent)
 
 (setq auto-mode-alist
-	  (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
+      (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
 
 (add-hook 'asm-mode-hook
-	  (lambda ()
-	    (local-set-key (kbd "RET") 'newline)))
+          (lambda ()
+            (local-set-key (kbd "RET") 'newline)))
 
 ;; If I'm searching and I hit backspace, I mean backspace dammit.
 (define-key isearch-mode-map '[backspace] 'isearch-delete-char)
@@ -381,6 +393,10 @@
           (lambda ()
             (load "~/etc/emacs/c-common.el")))
 
+(add-hook 'elisp-mode-hook
+          (lambda ()
+            (load "~/etc/emacs/elisp-custom.el")))
+
 (add-hook 'java-mode-hook
           (lambda ()
             (load "~/etc/emacs/java.el")))
@@ -491,37 +507,37 @@
  '(safe-local-variable-values
    (quote
     ((eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
-		      (buffer-file-name)
-		      (getenv "HOME"))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
+                      (buffer-file-name)
+                      (getenv "HOME"))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
-		      (getenv "HOME"))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
+                      (getenv "HOME"))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-		      (buffer-file-name)
-		      (getenv "HOME")
-		      (buffer-name))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-		      (buffer-file-name)
-		      (getenv "HOME")
-		      (buffer-name)))))))))
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name)))))))))
 
 
 
@@ -558,16 +574,16 @@
 (setq find-file-wildcards t)
 
 (defun get-point (symbol &optional arg)
-      "get the point"
-      (funcall symbol arg)
-      (point)
-     )
+  "get the point"
+  (funcall symbol arg)
+  (point)
+  )
 
 (defun copy-thing (begin-of-thing end-of-thing &optional arg)
   "copy thing between beg & end into kill ring"
   (save-excursion
     (let ((beg (get-point begin-of-thing 1))
-	  (end (get-point end-of-thing arg)))
+          (end (get-point end-of-thing arg)))
       (copy-region-as-kill beg end)))
   )
 
@@ -588,12 +604,17 @@
 (global-set-key (kbd "M-o") 'change-outer)
 
 (defun chomp (str)
-      "Chomp leading and tailing whitespace from STR."
-      (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
-                                        (: (* (any " \t\n")) eos)))
-                                ""
-                                str))
+  "Chomp leading and tailing whitespace from STR."
+  (replace-regexp-in-string (rx (or (: bos (* (any " \t\n")))
+                                    (: (* (any " \t\n")) eos)))
+                            ""
+                            str))
 
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program
       (chomp (shell-command-to-string "~/etc/utils/pick_best_browser")))
+
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 100)
+(global-set-key "\C-c\ \C-e" 'recentf-open-files)

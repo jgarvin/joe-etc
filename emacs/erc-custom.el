@@ -12,14 +12,14 @@
 ;; auto-resize the text wrapping based on frame size
 (make-variable-buffer-local 'erc-fill-column)
 (add-hook 'window-configuration-change-hook 
-	  '(lambda ()
-	     (save-excursion
-	       (walk-windows
-		(lambda (w)
-		  (let ((buffer (window-buffer w)))
-		    (set-buffer buffer)
-		    (when (eq major-mode 'erc-mode)
-		      (setq erc-fill-column (- (window-width w) 2)))))))))
+          '(lambda ()
+             (save-excursion
+               (walk-windows
+                (lambda (w)
+                  (let ((buffer (window-buffer w)))
+                    (set-buffer buffer)
+                    (when (eq major-mode 'erc-mode)
+                      (setq erc-fill-column (- (window-width w) 2)))))))))
 
 ;; when wrapping use a little indent to make things clear
 (setq erc-fill-prefix "    ")
@@ -27,8 +27,8 @@
 ;; make it easy to use mandimus to jump to chat window
 (make-variable-buffer-local 'frame-title-format)
 (add-hook 'erc-mode-hook
-	  (lambda ()
-	    (setq frame-title-format "chat: %b")))
+          (lambda ()
+            (setq frame-title-format "chat: %b")))
 
 ;; replace ERC> with #emacs>
 (setq erc-prompt (lambda () (concat "[" (buffer-name) "]")))
@@ -55,7 +55,7 @@
 
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
-          '(("freenode.net" "#emacs" "#python" "##c++" "##linux")))
+      '(("freenode.net" "#emacs" "#python" "##c++" "##linux")))
 
 (defun irc-maybe ()
   "Connect to IRC."
@@ -73,10 +73,10 @@ The function is suitable for `erc-after-connect'."
       (when (y-or-n-p (format "Current nick is '%s'. Do you want to ghost?"
                               nick))
         (erc-message "PRIVMSG" (format "NickServ GHOST %s %s"
-				       nick-orig password))
-	(erc-cmd-NICK nick-orig)
-	(erc-message "PRIVMSG" (format "NickServ identify %s %s"
-				       nick-orig password))))))
+                                       nick-orig password))
+        (erc-cmd-NICK nick-orig)
+        (erc-message "PRIVMSG" (format "NickServ identify %s %s"
+                                       nick-orig password))))))
 (add-hook 'erc-after-connect 'erc-ghost-maybe)
 
 ;; ;; keep prompt and text at the bottom
@@ -90,4 +90,4 @@ The function is suitable for `erc-after-connect'."
 ;; no need to see these from people not talking
 (setq erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
 
-;(erc-update-modules)
+                                        ;(erc-update-modules)

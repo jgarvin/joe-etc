@@ -5,12 +5,9 @@
 (color-theme-initialize)
 (load-file "~/etc/emacs/cyberpunk-theme.el")
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:height 105 :family "Consolas" :embolden f)))))
+(setq my-font-choice "Consolas-10")
+(set-face-attribute 'default nil :font my-font-choice :height 105)
+;;(set-frame-font my-font-choice nil t)
 
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)

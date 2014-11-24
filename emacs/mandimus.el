@@ -1,3 +1,26 @@
+(setq md-startup-cursor-color (face-attribute 'cursor :background))
+
+(defun md-new-mic-state-impl (state)
+  (cond
+   ((string= state "on") (set-cursor-color "green"))
+   ((string= state "off") (set-cursor-color "red"))
+   ((string= state "sleeping") (set-cursor-color "yellow"))
+   ((string= state "disconnected") (set-cursor-color "orange"))
+   (t (set-cursor-color md-startup-cursor-color))))
+
+(defun md-new-mic-state (state)
+  (dolist (frame (frame-list))
+    (with-selected-frame frame
+      (md-new-mic-state-impl state))))
+
+(defun md-previous-whitespace-separated-thing ()
+  (interactive)
+  (re-search-backward "[[:blank:]]" (point-at-bol) t))
+
+(defun md-next-whitespace-separated-thing ()
+  (interactive)
+  (re-search-forward "[[:blank:]]" (point-at-eol) t))
+
 (defun md-select-minibuffer ()
   (select-window (minibuffer-window)))
 
@@ -25,6 +48,26 @@
       (not (md-causes-move 'erc-bol))
     (bobp)))
 
+(defun md-get-most-recently-modified-file (dir regex)
+  (let ((best))
+    (dolist (info (directory-files-and-attributes dir t regex t))
+      (let* ((file  (nth 0 info))
+	     (mtime (nth 6 info))
+	     (high  (nth 1 mtime))
+	     (low   (nth 0 mtime)))
+	(when (or (not best)
+		  (< (nth 1 best) high)
+		  (= (nth 1 best) high) (< (nth 2 best) low))
+	  (setq best (list file high low)))))
+    (nth 0 best)))
+
+(defun md-open-most-recent-file (dir regex)
+  (interactive)
+  (find-file (md-get-most-recently-modified-file dir regex)))
+
+;; (md-open-most-recent-file "/tmp" "server-[^.]*.log")
+;; (md-get-most-recently-modified-file "/tmp" "server-[^.]*.log")
+
 (defun md-need-capitalization ()
   (interactive)
   (cond
@@ -51,8 +94,8 @@
 	  "")))
     (cond
      ((bobp) nil)
-     ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      (isearch-mode nil)
+     ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)
      ((save-excursion
 	(re-search-backward space-inhibiting-before-characters (- (point) 1) t)) nil)

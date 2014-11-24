@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;; sp-select-next-thing isn't the right function, if there's a nested
 ;; instance nearby we'll try aligning that instead which is wrong. We
 ;; want "select containing sexp"
@@ -23,7 +25,6 @@
   ;; ...but it should pick closest indentation?
   (/= (mod (current-indentation) python-indent-offset) 0))
 
-;; maybe these should be advice rather than new functions? don't know
 
 (defun maybe-reindent-then-newline-and-indent ()
   (interactive)
@@ -33,8 +34,9 @@
 
 (defun open-line-and-maybe-indent ()
   (interactive)
+  (message "rammed a special version")
   (let ((indent-level (current-indentation))
-	(needed-indenting (line-needs-indenting)))
+        (needed-indenting (line-needs-indenting)))
     (when needed-indenting
       (indent-according-to-mode))
     (open-line 1)
@@ -43,34 +45,36 @@
       ;; if we didn't need indentation, restore the
       ;; existing level of it
       (when (not needed-indenting)
-	(indent-line-to indent-level)))))
+        (indent-line-to indent-level)))))
 
-;; (defun pycustom-yank-and-indent ()
-;;   (interactive)
-;;   (yank)
-;;   (save-excursion
-;;     ;; workaround for python mode
-;;     ;; indentation doesn't work if existing indentation isn't in the region
-;;     (exchange-point-and-mark)
-;;     (beginning-of-line)
-;;     (call-interactively 'indent-region)))
-
-;; TODO: If I yank from start of line, then don't add extra indentation levels?
+;; TODO: when region starts and ends on the same line, we do want to indent
 (defun pycustom-yank-and-indent ()
   ;; indentation doesn't work if existing indentation isn't in the region
   (interactive)
   (yank)
-  (save-excursion
-    (let ((start (save-excursion (goto-char (region-beginning)) (point-at-bol)))
-	  (end   (save-excursion (goto-char (region-end)) (point-at-eol))))
-      ;; often when copy and pasting a block the cursor will be on the next line,
-      ;; which we don't actually intend to affect
-      (when (save-excursion (not (re-search-backward "[^[:blank:]]" (point-at-bol) t)))
-	(setq end (save-excursion (previous-line) (point-at-eol))))
-      (goto-char start)
-      (while (< (point) end)
-	(indent-according-to-mode)
-	(next-line)))))
+  (when (save-excursion (not (re-search-backward "[^[:blank:]]" (point-at-bol) t)))
+    (setq end (save-excursion (previous-line) (point-at-eol))))
+  (goto-char (region-beginning))
+  (while (< (point) (region-end))
+    (indent-according-to-mode)
+    (next-line)))
+
+;; (defun pycustom-yank-and-indent ()
+;;   ;; indentation doesn't work if existing indentation isn't in the region
+;;   (interactive)
+;;   (yank)
+;;   (save-excursion
+;;     (let ((start (save-excursion (goto-char (region-beginning)) (point-at-bol)))
+;;           (end   (save-excursion (goto-char (region-end)) (point-at-eol))))
+;;       ;; often when copy and pasting a block the cursor will be on the next line,
+;;       ;; which we don't actually intend to affect
+;;       (when (save-excursion (not (re-search-backward "[^[:blank:]]" (point-at-bol) t)))
+;;         (setq end (save-excursion (previous-line) (point-at-eol))))
+;;       (goto-char start)
+;;       (while (< (point) end)
+;;         (indent-according-to-mode)
+;;         (next-line)))))
+
 
 (defun in-leading-whitespace ()
   (interactive)
@@ -78,29 +82,34 @@
     (save-excursion
       (beginning-of-line)
       (if (re-search-forward "[^[:blank:]]" (point-at-eol) t)
-	  (> (point) p)
-	t))))
+          (> (point) p)
+        t))))
 
 ;; when killing a whole line, preserve indentation when
 ;; moving the line up, unlike other modes
 (defun pycustom-kill-and-indent (&optional ARG)
   (interactive)
   (if (in-leading-whitespace)
-    (let (indent-level needed-indenting)
-      (save-excursion
-	(next-line)
-	(setq indent-level (current-indentation))
-	(setq needed-indenting (line-needs-indenting)))
-      (kill-line ARG)
-      (if (not needed-indenting)
-	  (indent-line-to indent-level)
-	(indent-according-to-mode)))
+      (let (indent-level needed-indenting)
+        (save-excursion
+          (next-line)
+          (setq indent-level (current-indentation))
+          (setq needed-indenting (line-needs-indenting)))
+        (kill-line ARG)
+        (if (not needed-indenting)
+            (indent-line-to indent-level)
+          (indent-according-to-mode)))
     (kill-line ARG)))
 
-(add-hook
- 'python-mode-hook
- (lambda ()
-   (local-set-key (kbd "RET") 'maybe-reindent-then-newline-and-indent)
-   (local-set-key (kbd "C-o") 'open-line-and-maybe-indent)
-   (local-set-key (kbd "C-y") 'pycustom-yank-and-indent)
-   (local-set-key (kbd "C-k") 'pycustom-kill-and-indent)))
+(defun python-advice (old new)
+  (advice-add old :before-until
+	      (lambda ()
+		(message "will at least the advice was given")
+		(if (equal major-mode 'python-mode)
+		    (or (funcall new) t)
+		  nil))))
+
+(python-advice #'yank-and-indent #'pycustom-yank-and-indent)
+(python-advice #'open-line-and-indent #'open-line-and-maybe-indent)
+(python-advice #'kill-and-indent #'pycustom-kill-and-indent)
+(python-advice #'reindent-then-newline-and-indent #'maybe-reindent-then-newline-and-indent)

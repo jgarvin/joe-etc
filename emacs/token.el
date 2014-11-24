@@ -28,8 +28,8 @@
 (defun md-iter-buffer-words (action)
   (md-iter-words-impl action (md-safe-start) (md-safe-stop)))
 
-;; (defun md-iter-window-words (action)
-;;   (md-iter-words-impl action (window-start) (window-stop)))
+(defun md-iter-window-words (action)
+  (md-iter-words-impl action (window-start) (window-end)))
 
 ;; TODO
 ;; alright, now that we have this machinery...
@@ -60,7 +60,7 @@
 (defun md-get-window-words ()
   (save-window-excursion
     (setq words '())
-    (md-iter-buffer-words
+    (md-iter-window-words
      (lambda (word)
        (setq words (cons word words))))
     (delete-dups words)
