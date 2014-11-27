@@ -6,6 +6,7 @@
    ((string= state "off") (set-cursor-color "red"))
    ((string= state "sleeping") (set-cursor-color "yellow"))
    ((string= state "disconnected") (set-cursor-color "orange"))
+   ((string= state "server-disconnected") (set-cursor-color "purple"))
    (t (set-cursor-color md-startup-cursor-color))))
 
 (defun md-new-mic-state (state)
@@ -53,17 +54,39 @@
     (dolist (info (directory-files-and-attributes dir t regex t))
       (let* ((file  (nth 0 info))
 	     (mtime (nth 6 info))
-	     (high  (nth 1 mtime))
-	     (low   (nth 0 mtime)))
+	     (high  (nth 0 mtime))
+	     (low   (nth 1 mtime)))
 	(when (or (not best)
 		  (< (nth 1 best) high)
-		  (= (nth 1 best) high) (< (nth 2 best) low))
+		  (and (= (nth 1 best) high) (< (nth 2 best) low)))
 	  (setq best (list file high low)))))
     (nth 0 best)))
 
+(defvar-local md-most-recent-check-timer nil "Buffer local timer.")
+
+(defun md-cancel-recent-timer ()
+  (when (timerp md-most-recent-check-timer)
+    (cancel-timer md-most-recent-check-timer)))
+
+(add-hook 'kill-buffer-hook 'md-cancel-recent-timer)
+
+(defun md-setup-most-recent-check (dir regex)
+  (setq md-most-recent-check-timer
+	(run-with-idle-timer 1 t 'md-open-if-not-most-recent dir regex)))
+  
+(defun md-open-if-not-most-recent (dir regex)
+  (interactive)
+  (let ((most-recent (md-get-most-recently-modified-file dir regex)))
+    (when (not (string= (buffer-file-name (current-buffer)) most-recent))
+      (find-alternate-file most-recent)
+      (md-setup-most-recent-check dir regex))))
+
 (defun md-open-most-recent-file (dir regex)
   (interactive)
-  (find-file (md-get-most-recently-modified-file dir regex)))
+  ;;(message "how about this")
+  (find-file (md-get-most-recently-modified-file dir regex))
+  ;;(message "and this?")
+  (md-setup-most-recent-check dir regex))
 
 ;; (md-open-most-recent-file "/tmp" "server-[^.]*.log")
 ;; (md-get-most-recently-modified-file "/tmp" "server-[^.]*.log")

@@ -36,6 +36,7 @@
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/erc-custom.el")
+(load-file "~/etc/emacs/projectile-custom.el")
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
@@ -219,19 +220,19 @@
     major-mode))
 
 ;; When compiling, make the compile window go away when finished if there are no errors
-(setq compilation-finish-function
-      (lambda (buf str)
-        (if (string-match "ack:.*" (buffer-name buf))
-            (let ((cur-window (selected-window)))
-              (select-window (get-buffer-window buf))
-              (goto-char 0)
-              (select-window cur-window))
-          (if (string-match "exited abnormally" str)
-              ;;there were errors
-              (message "compilation errors, press C-x ` to visit")
-            ;;no errors, make the compilation window go away in 0.5 seconds
-            (run-at-time 0.5 nil 'delete-windows-on buf)
-            (message "NO COMPILATION ERRORS!")))))
+;; (setq compilation-finish-function
+;;       (lambda (buf str)
+;;         (if (string-match "ack:.*" (buffer-name buf))
+;;             (let ((cur-window (selected-window)))
+;;               (select-window (get-buffer-window buf))
+;;               (goto-char 0)
+;;               (select-window cur-window))
+;;           (if (string-match "exited abnormally" str)
+;;               ;;there were errors
+;;               (message "compilation errors, press C-x ` to visit")
+;;             ;;no errors, make the compilation window go away in 0.5 seconds
+;;             (run-at-time 0.5 nil 'delete-windows-on buf)
+;;             (message "NO COMPILATION ERRORS!")))))
 
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
@@ -618,3 +619,7 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 100)
 (global-set-key "\C-c\ \C-e" 'recentf-open-files)
+
+;; never what I want, almost always a typo. Why would you put this
+;; right next to the key for a new frame?
+(global-unset-key (kbd "C-x 5 1"))
