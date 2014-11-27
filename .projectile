@@ -24,3 +24,5 @@ xmonad/lib/PickBrowser.hs
 /icons
 /fonts
 /smartparens
+/emacs/color-theme-6.6.0
+/emacs/autopair-read-only

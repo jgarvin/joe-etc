@@ -71,15 +71,25 @@
 (add-hook 'kill-buffer-hook 'md-cancel-recent-timer)
 
 (defun md-setup-most-recent-check (dir regex)
-  (setq md-most-recent-check-timer
-	(run-with-idle-timer 1 t 'md-open-if-not-most-recent dir regex)))
+  ;; prevent redundant timers.. shouldn't happen
+  (unless (timerp md-most-recent-check-timer)
+    (setq md-most-recent-check-timer
+	  (run-with-idle-timer 1 t 'md-open-if-not-most-recent (current-buffer) dir regex))))
   
-(defun md-open-if-not-most-recent (dir regex)
+(defun md-open-if-not-most-recent (buf dir regex)
   (interactive)
-  (let ((most-recent (md-get-most-recently-modified-file dir regex)))
-    (when (not (string= (buffer-file-name (current-buffer)) most-recent))
-      (find-alternate-file most-recent)
-      (md-setup-most-recent-check dir regex))))
+  ;; even though the timer *variable* is buffer local, the timer still
+  ;; executes regardless of what buffer we're in, so we have to take
+  ;; care of basing our checks on the window that's actually currently
+  ;; displaying the buffer
+  (let ((most-recent (md-get-most-recently-modified-file dir regex))
+	(window (get-buffer-window buf 'visible)))
+    (when (and window
+	       (not (string= (buffer-file-name buf) most-recent)))
+      (save-window-excursion
+	(select-window window)
+	(find-alternate-file most-recent)
+	(md-setup-most-recent-check dir regex)))))
 
 (defun md-open-most-recent-file (dir regex)
   (interactive)

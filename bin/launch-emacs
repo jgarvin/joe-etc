@@ -4,4 +4,4 @@
 # we know we get the proper environment. With the
 # paths we actually want.
 
-zsh -ic emacs "$@"
+emacsclient --alternate-editor='emacs' "$@"
