@@ -26,3 +26,6 @@ xmonad/lib/PickBrowser.hs
 /smartparens
 /emacs/color-theme-6.6.0
 /emacs/autopair-read-only
+ubuntu-packages
+/gdb/boostpp
+/ace-jump-mode

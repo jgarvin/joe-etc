@@ -394,7 +394,7 @@
           (lambda ()
             (load "~/etc/emacs/c-common.el")))
 
-(add-hook 'elisp-mode-hook
+(add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (load "~/etc/emacs/elisp-custom.el")))
 

@@ -1,13 +1,19 @@
 (setq md-startup-cursor-color (face-attribute 'cursor :background))
 
+(defvar md-cursor-color md-startup-cursor-color)
+
+(defun md-update-cursor-color (color)
+  (setq md-cursor-color color)
+  (set-cursor-color color))
+
 (defun md-new-mic-state-impl (state)
   (cond
-   ((string= state "on") (set-cursor-color "green"))
-   ((string= state "off") (set-cursor-color "red"))
-   ((string= state "sleeping") (set-cursor-color "yellow"))
-   ((string= state "disconnected") (set-cursor-color "orange"))
-   ((string= state "server-disconnected") (set-cursor-color "purple"))
-   (t (set-cursor-color md-startup-cursor-color))))
+   ((string= state "on") (md-update-cursor-color "green"))
+   ((string= state "off") (md-update-cursor-color "red"))
+   ((string= state "sleeping") (md-update-cursor-color "yellow"))
+   ((string= state "disconnected") (md-update-cursor-color "orange"))
+   ((string= state "server-disconnected") (md-update-cursor-color "purple"))
+   (t (md-update-cursor-color md-startup-cursor-color))))
 
 (defun md-new-mic-state (state)
   (dolist (frame (frame-list))

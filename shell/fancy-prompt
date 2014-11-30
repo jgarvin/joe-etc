@@ -178,5 +178,11 @@ $PR_NO_COLOUR '
 $PR_BLUE$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
 $PR_LIGHT_GREEN%_$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
+
+    # Don't display the RPROMPT in Emacs (ansi-term)
+    if [ "$EMACS" != '' ];
+    then
+        RPROMPT=''
+    fi
 }
 
