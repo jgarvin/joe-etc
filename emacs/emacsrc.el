@@ -36,7 +36,11 @@
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/erc-custom.el")
+(load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/projectile-custom.el")
+(load-file "~/etc/emacs/proced-custom.el")
+
+
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
@@ -416,6 +420,8 @@
       (c-subword-mode 1))
   (subword-mode t))
 
+(defvar-local mandimus-last-word-event "")
+
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
               (list
@@ -441,9 +447,16 @@
 
                '(:eval (propertize "%m" 'face 'font-lock-string-face
                                    'help-echo buffer-file-coding-system))
+               '(:eval (when (equal major-mode 'term-mode)
+                         (if (term-in-line-mode)
+                                          (propertize " - Line"
+                                                  'face 'font-lock-string-face
+                                                  'help-echo "Terminal is in line mode")
+                                        (propertize " - Char"
+                                                  'face 'font-lock-string-face
+                                                  'help-echo "Terminal is in char mode"))))
                "] "
-
-
+               
                "[" ;; insert vs overwrite mode, input-method in a tooltip
                '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
                                    'face 'font-lock-variable-name-face
@@ -468,10 +481,14 @@
                                                   'face 'font-lock-warning-face
                                                   'help-echo "Buffer has been modified"))))
 
-               " --"
+               " -- "
+               '(:eval (when mandimus-last-word-event
+                         (propertize (format "%S" mandimus-last-word-event)
+                                     'face 'font-lock-function-name-face
+                                     'help-echo "Words last interpreted by Dragon")))
                ;; i don't want to see minor-modes; but if you want, uncomment this:
-               ;; minor-mode-alist  ;; list of minor modes
-               "%-" ;; fill with '-'
+               ;;minor-mode-alist  ;; list of minor modes
+               " %-" ;; fill with '-'
                ))
 
 

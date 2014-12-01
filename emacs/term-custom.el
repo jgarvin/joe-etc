@@ -34,10 +34,10 @@
 
 (defun etc-start-or-open-top ()
   (interactive)
-  (let ((buf (get-buffer "*@top*")))
+  (let ((buf (get-buffer "*Proced*")))
     (if buf
 	(switch-to-buffer buf)
-      (ansi-term "/usr/bin/top" "@top"))))
+      (proced))))
 
 ;; (defvar-local etc-last-point-read-only -1)
 

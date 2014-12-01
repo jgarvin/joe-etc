@@ -1,3 +1,6 @@
+(defun mandimus-word-event (words)
+  (setq mandimus-last-word-event words))
+
 (setq md-startup-cursor-color (face-attribute 'cursor :background))
 
 (defvar md-cursor-color md-startup-cursor-color)
@@ -19,6 +22,12 @@
   (dolist (frame (frame-list))
     (with-selected-frame frame
       (md-new-mic-state-impl state))))
+
+(defun md-give-new-frame-color (frame)
+  (with-selected-frame frame
+    (md-update-cursor-color md-cursor-color)))
+
+(add-hook 'after-make-frame-functions 'md-give-new-frame-color)
 
 (defun md-previous-whitespace-separated-thing ()
   (interactive)
@@ -130,7 +139,7 @@
        (space-inhibiting-characters
 	(if (member major-mode '(text-mode fundamental-mode erc-mode))
 	    "[?!.]"
-	  "")))
+	  "[)\]}]")))
     (cond
      ((bobp) nil)
      (isearch-mode nil)
