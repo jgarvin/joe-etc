@@ -27,6 +27,9 @@
 (require 'smartparens-config)
 (smartparens-global-mode 1)
 
+;; store passwords in file outside git ;)
+(load "~/.emacspass")
+
 (load-file "~/etc/emacs/ido-custom.el")
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
@@ -39,8 +42,8 @@
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
-
-
+(load-file "~/etc/emacs/email-custom.el")
+(load-file "~/etc/emacs/w3m-custom.el")
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))

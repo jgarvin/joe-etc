@@ -1,3 +1,45 @@
+(defvar md-inhibit-quit nil)
+(defvar md-quit-flag nil)
+
+(defun maybe-keyboard-quit ()
+  (message "calling my function")
+  (interactive)
+  (if (not md-inhibit-quit)
+      (progn
+        (message "no need to inhibit")
+        (setq md-quit-flag nil)
+        (keyboard-quit))
+    (progn
+      (message "setting flag, fake")
+      (setq md-quit-flag t))))
+
+(defadvice server-eval-and-print (around md-wrap activate)
+  ;(message "entering")
+  (setq md-quit-flag nil)
+  (setq md-inhibit-quit t)
+  (let ((result ad-do-it))
+      (setq ad-return-val result))
+  (when md-quit-flag
+    ;; have to set these manually despite let
+    ;; because keyboard-quit will signal
+    (message "sending real quit")
+    (setq md-inhibit-quit nil)
+    (setq md-quit-flag nil)
+    (call-interactively #'keyboard-quit))
+  ;(message "exiting")
+  (setq md-inhibit-quit nil)
+  (setq md-quit-flag nil)
+  )
+      
+;; (defadvice server-execute (around md-wrap (proc files nowait commands dontkill frame tty-name) activate)
+;;   (ad-do-it proc files nowait commands dontkill frame tty-name))
+    
+(ad-unadvise #'server-execute)
+(ad-unadvise #'server-eval-and-print)
+    
+(global-set-key (kbd "C-S-g") 'keyboard-quit)
+(global-set-key (kbd "C-g") 'keyboard-quit)
+
 (defun mandimus-word-event (words)
   (setq mandimus-last-word-event words))
 
@@ -234,6 +276,12 @@
 
 
 ;(mapcar 'buffer-name (buffer-list))
+
+(defun md-create-temp-file (prefix)
+  (let ((temporary-file-directory "~/temp"))
+    (if (not (file-exists-p temporary-file-directory))
+	(make-directory temporary-file-directory))
+    (find-file (make-temp-file prefix))))
 
 (defun md-temp-file (prefix &optional window-id)
   (let ((temporary-file-directory "~/temp"))

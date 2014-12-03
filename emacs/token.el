@@ -5,14 +5,14 @@
 
 (defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
-      (max 0 (- (point) 10000))
+      (max 0 (- (point) 1000))
     (save-excursion
       (beginning-of-buffer)
       (point))))
 
 (defun md-safe-stop ()
   (if (< giant-buffer-size (buffer-size))
-      (min (buffer-size) (+ (point) 10000))
+      (min (buffer-size) (+ (point) 1000))
     (save-excursion
       (end-of-buffer)
       (point))))

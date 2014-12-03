@@ -6,5 +6,5 @@
 (require 'cc-mode)
 
 (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
-(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
+(local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
 (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)

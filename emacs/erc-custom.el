@@ -1,5 +1,3 @@
-;; store passwords in file outside git ;)
-(load "~/.ercpass")
 (require 'erc-services)
 (erc-services-mode 1)
 (setq erc-prompt-for-nickserv-password nil)
