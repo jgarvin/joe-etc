@@ -5,14 +5,14 @@
 
 (defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
-      (max 0 (- (point) 1000))
+      (max 0 (- (point) 10000))
     (save-excursion
       (beginning-of-buffer)
       (point))))
 
 (defun md-safe-stop ()
   (if (< giant-buffer-size (buffer-size))
-      (min (buffer-size) (+ (point) 1000))
+      (min (buffer-size) (+ (point) 10000))
     (save-excursion
       (end-of-buffer)
       (point))))
@@ -22,8 +22,8 @@
     (goto-char start)
     (beginning-of-line)
     (while (> end (point))
-      (funcall action (thing-at-point 'word t))
-      (forward-word))))
+      (funcall action (thing-at-point 'symbol t))
+      (forward-symbol 1))))
 
 (defun md-iter-buffer-words (action)
   (md-iter-words-impl action (md-safe-start) (md-safe-stop)))

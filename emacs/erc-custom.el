@@ -81,14 +81,21 @@
 The function is suitable for `erc-after-connect'."
   (when (string-match (format "\\(.*?\\)%s+$" erc-nick-uniquifier) nick)
     (let ((nick-orig (match-string 1 nick))
-          (password erc-session-password))
+          (password erc-session-password)
+          (channel-list (mapcar 'buffer-name (erc-channel-list nil))))
       (when (y-or-n-p (format "Current nick is '%s'. Do you want to ghost?"
                               nick))
+        ;; nowadays a lot of channels won't let you change your nick while in
+        ;; a channel, so we leave all channels and rejoin
+        (erc-with-all-buffers-of-server server 'erc-channel-p
+                                        (erc-part-from-channel "ghosting nick"))
         (erc-message "PRIVMSG" (format "NickServ GHOST %s %s"
                                        nick-orig password))
         (erc-cmd-NICK nick-orig)
         (erc-message "PRIVMSG" (format "NickServ identify %s %s"
-                                       nick-orig password))))))
+                                       nick-orig password))
+        (dolist (name channel-list)
+          (erc-join-channel name))))))
 (add-hook 'erc-after-connect 'erc-ghost-maybe)
 
 ;; ;; make nicknames nice colors

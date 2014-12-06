@@ -1,44 +1,10 @@
-(defvar md-inhibit-quit nil)
-(defvar md-quit-flag nil)
-
-(defun maybe-keyboard-quit ()
-  (message "calling my function")
-  (interactive)
-  (if (not md-inhibit-quit)
-      (progn
-        (message "no need to inhibit")
-        (setq md-quit-flag nil)
-        (keyboard-quit))
-    (progn
-      (message "setting flag, fake")
-      (setq md-quit-flag t))))
-
-(defadvice server-eval-and-print (around md-wrap activate)
-  ;(message "entering")
-  (setq md-quit-flag nil)
-  (setq md-inhibit-quit t)
-  (let ((result ad-do-it))
-      (setq ad-return-val result))
-  (when md-quit-flag
-    ;; have to set these manually despite let
-    ;; because keyboard-quit will signal
-    (message "sending real quit")
-    (setq md-inhibit-quit nil)
-    (setq md-quit-flag nil)
-    (call-interactively #'keyboard-quit))
-  ;(message "exiting")
-  (setq md-inhibit-quit nil)
-  (setq md-quit-flag nil)
-  )
-      
-;; (defadvice server-execute (around md-wrap (proc files nowait commands dontkill frame tty-name) activate)
-;;   (ad-do-it proc files nowait commands dontkill frame tty-name))
-    
-(ad-unadvise #'server-execute)
-(ad-unadvise #'server-eval-and-print)
-    
+;; we do this because C-g will break emacsclient eval
+;; requests. I tried rebinding C-g to a wrapper, but my
+;; wrapper wouldn't trigger when emacs was in the server
+;; code. Turns out C-g is special somehow, and just binding
+;; a different key to the same function doesn't have
+;; that behavior!
 (global-set-key (kbd "C-S-g") 'keyboard-quit)
-(global-set-key (kbd "C-g") 'keyboard-quit)
 
 (defun mandimus-word-event (words)
   (setq mandimus-last-word-event words))
@@ -73,12 +39,16 @@
 
 (defun md-previous-whitespace-separated-thing ()
   (interactive)
-  (re-search-backward "[[:blank:]]" (point-at-bol) t))
-
+  (if (re-search-backward "[^[:blank:]][[:blank:]]" (point-at-bol) t)
+      (goto-char (+ (point) 1))
+    (beginning-of-line)))
+      
 (defun md-next-whitespace-separated-thing ()
   (interactive)
-  (re-search-forward "[[:blank:]]" (point-at-eol) t))
-
+  (if (re-search-forward "[[:blank:]][^[:blank:]]" (point-at-eol) t)
+      (goto-char (- (point) 1))
+    (end-of-line)))
+  
 (defun md-select-minibuffer ()
   (select-window (minibuffer-window)))
 
@@ -154,6 +124,14 @@
   (find-file (md-get-most-recently-modified-file dir regex))
   ;;(message "and this?")
   (md-setup-most-recent-check dir regex))
+
+(defun md-open-most-recent-client-log ()
+  (interactive)
+  (md-open-most-recent-file "~/dragonshare/log" "client-[^.]*.log"))
+
+(defun md-open-most-recent-server-log ()
+  (interactive)
+  (md-open-most-recent-file "/tmp" "server-[^.]*.log"))
 
 ;; (md-open-most-recent-file "/tmp" "server-[^.]*.log")
 ;; (md-get-most-recently-modified-file "/tmp" "server-[^.]*.log")
@@ -307,5 +285,33 @@
   (interactive)
   (end-of-line)
   (backward-char))
+
+;; adapted from zap-up-to-char
+(defun md-copy-up-to-char (arg char)
+  "Copy up to, but not including ARGth occurrence of CHAR.
+Case is ignored if `case-fold-search' is non-nil in the current buffer.
+Goes backward if ARG is negative; error if CHAR not found.
+Ignores CHAR at point."
+  (interactive "p\ncCopy up to char: ")
+  (let ((direction (if (>= arg 0) 1 -1)))
+    (kill-ring-save (point)
+		 (progn
+		   (forward-char direction)
+		   (unwind-protect
+		       (search-forward (char-to-string char) nil nil arg)
+		     (backward-char direction))
+		   (point)))))
+
+(defun md-move-up-to-char (arg char)
+  (interactive "p\ncMove up to char: ")
+  (let ((direction (if (>= arg 0) 1 -1)))
+    (forward-char direction)
+    (unwind-protect
+        (search-forward (char-to-string char) nil nil arg)
+      (backward-char direction))
+    (point)))
+
+;; needed for zap-up-to-char
+(require 'misc)
 
 (load-file "~/etc/emacs/token.el")

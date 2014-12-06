@@ -1,60 +1,13 @@
-(if (file-directory-p "~/opt/share/gtags")
-    (add-to-list 'load-path "~/opt/share/gtags"))
-
-;; Function to generate tags with GNU Global
-;; from here: http://emacs-fu.blogspot.com/2009/01/navigating-through-source-code-using.html
-(require 'gtags)
-
 (defun gtags-select-tag-and-kill-buffer ()
   (interactive)
   (let ((buf (current-buffer)))
     (gtags-select-tag)
     (kill-buffer buf)))
 
-;; Rebind the normal find tag functions to use the GNU global versions
-(add-hook 'gtags-select-mode-hook
-	  (lambda()
-	    (define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer)))
+(defun etc-setup-gtags ()
+  (define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer))
 
-;; Rebind the normal find tag functions to use the GNU global versions
-(local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-(local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
-
-;; In later gtags versions these aren't set by default.
-(define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\^?" 'scroll-down)
-(define-key gtags-select-mode-map " " 'scroll-up)
-(define-key gtags-select-mode-map "\C-b" 'scroll-down)
-(define-key gtags-select-mode-map "\C-f" 'scroll-up)
-(define-key gtags-select-mode-map "k" 'previous-line)
-(define-key gtags-select-mode-map "j" 'next-line)
-(define-key gtags-select-mode-map "p" 'previous-line)
-(define-key gtags-select-mode-map "n" 'next-line)
-(define-key gtags-select-mode-map "q" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "u" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
-(define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
-
-(gtags-mode t)
-
-(setq require-final-newline t)
-
-(setq c-hungry-delete-key t)
-(local-set-key (kbd "C-d") 'c-hungry-delete-forward)
-(local-set-key (kbd "DEL") 'c-hungry-delete-forward)
-(local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-
-;; Prefer 4-space tabs
-(setq my-indent-size 4)
-(c-set-offset 'innamespace 0) ;; don't indent top level namespace
-(c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
-
-(setq c-default-style "bsd")
-(setq c-basic-offset my-indent-size)
-(setq indent-tabs-mode nil)
-(setq default-tab-width my-indent-size)
-(setq tab-width my-indent-size)
+(add-hook 'gtags-select-mode-hook 'etc-setup-gtags)          
 
 ;; Run makefile, or if there isn't one
 (defun smart-compile()
@@ -114,15 +67,66 @@
         (fname (file-name-sans-extension buffer-file-name)))
     (find-file (find-other-file fname ext))))
 
-;; Bind the toggle function to a global key
-(global-set-key "\M-t" 'toggle-header-buffer)
+(defun etc-setup-c-common ()
+  (local-set-key "\M-t" 'toggle-header-buffer)
+  
+  ;; Starting in emacs 23 there's some stupid default abbreviation
+  ;; for trying to correct mispellings of 'else', problem is it doesn't
+  ;; understand context, so a legit variable named elSE will always get
+  ;; changed to Else.
+  (abbrev-mode 0)
+  
+  (subword-mode 1)
+  (require 'whitespace)
+  (setq whitespace-style '(face lines))
+  (whitespace-mode t)
+  
+  ;; Rebind the normal find tag functions to use the GNU global versions
+  (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
+  (local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
 
-(require 'whitespace)
-(setq whitespace-style '(face lines))
-(whitespace-mode t)
+  ;; In later gtags versions these aren't set by default.
+  (define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
+  (define-key gtags-select-mode-map "\^?" 'scroll-down)
+  (define-key gtags-select-mode-map " " 'scroll-up)
+  (define-key gtags-select-mode-map "\C-b" 'scroll-down)
+  (define-key gtags-select-mode-map "\C-f" 'scroll-up)
+  (define-key gtags-select-mode-map "k" 'previous-line)
+  (define-key gtags-select-mode-map "j" 'next-line)
+  (define-key gtags-select-mode-map "p" 'previous-line)
+  (define-key gtags-select-mode-map "n" 'next-line)
+  (define-key gtags-select-mode-map "q" 'gtags-pop-stack)
+  (define-key gtags-select-mode-map "u" 'gtags-pop-stack)
+  (define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
+  (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
+  (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
 
-;; Starting in emacs 23 there's some stupid default abbreviation
-;; for trying to correct mispellings of 'else', problem is it doesn't
-;; understand context, so a legit variable named elSE will always get
-;; changed to Else.
-(abbrev-mode 0)
+  (if (file-directory-p "~/opt/share/gtags")
+    (add-to-list 'load-path "~/opt/share/gtags"))
+  (require 'gtags)
+  (gtags-mode t)
+
+  (setq require-final-newline t)
+  
+  (setq c-hungry-delete-key t)
+  (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
+  (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
+  (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
+
+  ;; Prefer 4-space tabs
+  (setq my-indent-size 4)
+  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
+  (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
+
+  (setq c-default-style "bsd")
+  (setq c-basic-offset my-indent-size)
+  (setq indent-tabs-mode nil)
+  (setq default-tab-width my-indent-size)
+  (setq tab-width my-indent-size)
+  )
+
+(add-hook 'c-mode-common-hook 'etc-setup-c-common)
+
+
+
+

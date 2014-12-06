@@ -44,6 +44,8 @@
 (load-file "~/etc/emacs/proced-custom.el")
 (load-file "~/etc/emacs/email-custom.el")
 (load-file "~/etc/emacs/w3m-custom.el")
+(load-file "~/etc/emacs/c-common.el")
+(load-file "~/etc/emacs/elisp-custom.el")
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
@@ -397,18 +399,6 @@
     (delete-whitespace-rectangle (point) end nil)))
 (global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
 
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (load "~/etc/emacs/c-common.el")))
-
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (load "~/etc/emacs/elisp-custom.el")))
-
-(add-hook 'java-mode-hook
-          (lambda ()
-            (load "~/etc/emacs/java.el")))
-
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 (autoload 'markdown-mode "markdown-mode.el"
@@ -643,3 +633,7 @@
 ;; never what I want, almost always a typo. Why would you put this
 ;; right next to the key for a new frame?
 (global-unset-key (kbd "C-x 5 1"))
+
+;; more useful than th default version
+(global-set-key (kbd "M-z") 'zap-up-to-char)
+
