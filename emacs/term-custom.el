@@ -37,7 +37,8 @@
   (let ((buf (get-buffer "*Proced*")))
     (if buf
 	(switch-to-buffer buf)
-      (proced))))
+    (proced)
+    (delete-other-windows))))
 
 ;; (defvar-local etc-last-point-read-only -1)
 

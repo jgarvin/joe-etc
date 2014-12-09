@@ -6,6 +6,36 @@
 ;; that behavior!
 (global-set-key (kbd "C-S-g") 'keyboard-quit)
 
+(defun md-line-is-blank ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (unless (re-search-forward "[^[:blank:]]" (point-at-eol) t) t)))
+
+(defun md-find-indentation-change (&optional dir compare)
+  (interactive)
+  (unless dir (setq dir 1))
+  (unless compare (setq compare '>))
+  (let ((found nil)
+        (target-to-exceed (if (md-line-is-blank) 0 (current-indentation))))
+    (catch 'outer
+      (save-excursion
+        (while t
+          (forward-line dir) ;; once unconditional otherwise <=,>= will match current line
+          (cond
+           ((and (not (md-line-is-blank))
+                 (funcall compare (current-indentation) target-to-exceed))
+            (setq found (point))
+            (throw 'outer nil))
+           ((bobp) (throw 'outer nil))
+           ((eobp) (throw 'outer nil))))))
+    (if found
+        (progn
+          (goto-char found)
+          (beginning-of-line)
+          (back-to-indentation))
+      (error "No line found"))))
+
 (defun mandimus-word-event (words)
   (setq mandimus-last-word-event words))
 
@@ -301,6 +331,58 @@ Ignores CHAR at point."
 		       (search-forward (char-to-string char) nil nil arg)
 		     (backward-char direction))
 		   (point)))))
+
+(defun md-get-column (p)
+  (save-excursion
+    (goto-char p)
+    (current-column)))
+
+(require 'cl)
+
+(defun md-get-relative-column (p)
+  (save-excursion
+    (goto-char p)
+    (back-to-indentation)
+    (let ((distance (- (md-get-column p) (md-get-column (point)))))
+      (assert (>= distance 0))
+      distance)))
+    
+(defun md-vertical-biased-distance (a b)
+  (sqrt (+ (expt (* 2 (md-get-relative-column b)) 2)
+           (expt (abs (- (line-number-at-pos a) (line-number-at-pos b))) 2))))
+
+(defun md-find-line-starting-with-char (arg char)
+  (interactive "p\ncGo to line starting with char: ")
+  (let* ((direction (if (>= arg 0) 1 -1))
+         (end (if (= direction 1) (point-max) (point-min)))
+         (compare (if (= direction 1) '< '>))
+         (origin (point))
+         (start-of-line)
+         (closest-distance most-positive-fixnum)
+         (closest-point))
+    (save-excursion
+      (while (funcall compare (point) end)
+        (forward-line direction)
+        (back-to-indentation)
+        (setq start-of-line (point))
+        (when (re-search-forward (char-to-string char) (point-at-eol) t)
+          (let ((distance (md-vertical-biased-distance origin (point))))
+            (when (< distance closest-distance)
+              (setq closest-point start-of-line)
+              (setq closest-distance distance))))
+        ;; without this it's possbile point never reaches point-min
+        (beginning-of-line)))
+    (when closest-point
+      (goto-char closest-point))))
+    
+(defun md-move-up-to-symbol-starting-with-char (arg char)
+  (interactive "p\ncMove up to symbol starting with char: ")
+  (let ((direction (if (>= arg 0) 1 -1)))
+    (forward-symbol direction)
+    (unwind-protect
+        (re-search-forward (concat "\\_<" (char-to-string char)) nil nil arg)
+      (forward-symbol (* -1 direction)))
+    (point)))
 
 (defun md-move-up-to-char (arg char)
   (interactive "p\ncMove up to char: ")

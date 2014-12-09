@@ -46,6 +46,7 @@
 (load-file "~/etc/emacs/w3m-custom.el")
 (load-file "~/etc/emacs/c-common.el")
 (load-file "~/etc/emacs/elisp-custom.el")
+(load-file "~/etc/emacs/ack-custom.el")
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
@@ -353,15 +354,6 @@
 (global-set-key "\C-s" 'isearch-forward-regexp)
 (global-set-key "\C-r" 'isearch-backward-regexp)
 (global-set-key "\M-%" 'query-replace-regexp)
-
-(require 'ack)
-(autoload 'ack-same "full-ack" nil t)
-(autoload 'ack "full-ack" nil t)
-(autoload 'ack-find-same-file "full-ack" nil t)
-(autoload 'ack-find-file "full-ack" nil t)
-(global-set-key "\M-k" 'ack)
-(setq-default ack-guess-type nil)
-(setq-default ack-command (concat (expand-file-name "etc/bin/ack" (getenv "HOME")) " --nocolor --nogroup "))
 
 ;; Threshold after which we consider the file to be large
 ;; and don't want to do anything too expensive.
