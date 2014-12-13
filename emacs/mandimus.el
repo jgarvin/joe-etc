@@ -50,11 +50,16 @@
 (defun md-new-mic-state-impl (state)
   (cond
    ((string= state "on") (md-update-cursor-color "green"))
-   ((string= state "off") (md-update-cursor-color "red"))
+   ((string= state "success") (md-update-cursor-color "green"))
+   ((string= state "off") (md-update-cursor-color "brown"))
    ((string= state "sleeping") (md-update-cursor-color "yellow"))
    ((string= state "disconnected") (md-update-cursor-color "orange"))
    ((string= state "server-disconnected") (md-update-cursor-color "purple"))
-   (t (md-update-cursor-color md-startup-cursor-color))))
+   ((string= state "thinking") (md-update-cursor-color "blue"))
+   ((string= state "failure") (md-update-cursor-color "red"))
+   (t
+    (message "Unknown mic state: %s" state)
+    (md-update-cursor-color md-startup-cursor-color))))
 
 (defun md-new-mic-state (state)
   (dolist (frame (frame-list))
@@ -396,4 +401,6 @@ Ignores CHAR at point."
 ;; needed for zap-up-to-char
 (require 'misc)
 
+
+(load-file "~/etc/emacs/md-network.el")
 (load-file "~/etc/emacs/token.el")

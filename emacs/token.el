@@ -17,20 +17,6 @@
       (end-of-buffer)
       (point))))
 
-(defun md-iter-words-impl (action start end)
-  (save-excursion
-    (goto-char start)
-    (beginning-of-line)
-    (while (> end (point))
-      (funcall action (thing-at-point 'symbol t))
-      (forward-symbol 1))))
-
-(defun md-iter-buffer-words (action)
-  (md-iter-words-impl action (md-safe-start) (md-safe-stop)))
-
-(defun md-iter-window-words (action)
-  (md-iter-words-impl action (window-start) (window-end)))
-
 ;; TODO
 ;; alright, now that we have this machinery...
 ;; have python call this stuff
@@ -48,25 +34,139 @@
 ;; 'post toke <tok>'
 ;; 'post line <tok>'
 
-(defun md-get-buffer-words ()
-  (save-window-excursion
-    (setq words '())
-    (md-iter-buffer-words
-     (lambda (word)
-       (setq words (cons word words))))
-    (delete-dups words)
-    words))
+(defun md-get-symbols (start end)
+  "Get all the symbols between start and end"
+  (save-excursion
+    (let ((words '())
+          (sym-start))
+      (goto-char start)
+      (beginning-of-line)
+      (condition-case nil
+        (while (> end (point))
+          (re-search-forward "\\_<" end)
+          (setq sym-start (point))
+          (re-search-forward "\\_>" end)
+          (setq words (nconc words (list (buffer-substring-no-properties sym-start (point))))))
+        (search-failed nil))
+      (delete-dups words)
+      words)))
 
-(defun md-get-window-words ()
-  (save-window-excursion
-    (setq words '())
-    (md-iter-window-words
-     (lambda (word)
-       (setq words (cons word words))))
-    (delete-dups words)
-    words))
+(require 'subr-x) ;; for hash-table-keys
 
-;; (search-forward "buffer" (safe-stop))
+(defun md-normalize (value lowest highest)
+  (/ (float (- value lowest)) (- highest lowest)))
+
+(defun md-score-token (frequency min-frequency max-frequency
+                                 distance min-distance max-distance)
+  (sqrt (+ (/ 1 (expt (md-normalize frequency min-frequency max-frequency) 2))
+           (expt (* 0.5 (md-normalize distance min-distance max-distance)) 2))))
+
+;; (md-normalize 50 0 100)
+;; (md-score-token 1 0 1 1 0 1)
+
+(defvar md-max-tokens 200)
+(setq md-max-tokens 200)
+
+(defun md-filter-symbol (sym)
+  (cond
+   ((< (length sym) 3) t)
+   (t nil)))
+
+;; do one regex search, then use match-string
+;; store data in array, and only store indexes
+;; in the hash table?
+;; build vector as we go, sort vector at the
+;; end
+
+(defun md-get-symbols-frequency (start end)
+  "Get all the symbols between start and end"
+  (save-excursion
+    (let ((sym-counts (make-hash-table :test 'equal))
+          (sym-start)
+          (current-sym)
+          (starting-point (point))
+          (min-distance most-positive-fixnum)
+          (max-distance 0)
+          (max-frequency 0)
+          (count-list '()))
+      (goto-char start)
+      (beginning-of-line)
+      (condition-case nil
+          (while (> end (point))
+            (re-search-forward "\\_<" end)
+            (setq sym-start (point))
+            (re-search-forward "\\_>" end)
+            (setq current-sym (buffer-substring-no-properties sym-start (point)))
+            (when (not (md-filter-symbol current-sym))
+              (let* ((entry (gethash current-sym sym-counts))
+                     (cur-distance (abs (- (point) starting-point)))
+                     (frequency (if entry (+ (car entry) 1) 1))
+                     (distance (if entry (min (cdr entry) cur-distance) cur-distance)))
+                (puthash current-sym `(,frequency . ,distance) sym-counts)
+                (setq max-frequency (max max-frequency frequency))
+                (setq min-distance (min min-distance distance))
+                (setq max-distance (max max-distance distance)))))
+        (search-failed nil))
+      (maphash (lambda (key value)
+                 (let ((frequency (car value))
+                       (distance (cdr value)))
+                   (setq count-list (cons `(,key . ,(md-score-token frequency
+                                                                           0
+                                                                           max-frequency
+                                                                           distance
+                                                                           min-distance
+                                                                           max-distance)) count-list))))
+               sym-counts)
+      (setq count-list (sort count-list (lambda (a b) (< (cdr a) (cdr b)))))
+;;      (message "count-list %S" count-list)
+      (let ((l (length count-list)))
+        (when (> l md-max-tokens)
+          (setq count-list (nbutlast count-list (- l md-max-tokens)))))
+      (mapcar 'car count-list))))
+
+(defvar md-safe-scan-limit 5000)
+(md-get-symbols-frequency (point-min) (point-max))
+
+(defun md-safe-get-symbols (start end)
+  (let ((distance (abs (- end start)))
+        (safe-start start)
+        (safe-end end))
+    (when (> distance md-safe-scan-limit)
+      (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
+      (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
+    (md-get-symbols safe-start safe-end)))
+
+(defun md-safe-get-symbols-frequency (start end)
+  (let ((distance (abs (- end start)))
+        (safe-start start)
+        (safe-end end))
+    (when (> distance md-safe-scan-limit)
+      ;; (message "Greater than scan limit")
+      (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
+      (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
+      ;; (message "Limits %d %d" safe-start safe-end))
+    (md-get-symbols-frequency safe-start safe-end)))
+
+(byte-compile 'md-get-symbols)
+(byte-compile 'md-safe-get-symbols)
+(byte-compile 'md-get-symbols-frequency)
+(byte-compile 'md-safe-get-symbols-frequency)
+
+;; (etc-profile-func
+;;  (lambda ()
+;;    (dotimes (n 10000)
+;;      (md-get-symbols-frequency (window-start) (window-end)))))
+;; (benchmark 10000 '(md-get-symbols-frequency (window-start) (window-end)))
+;; (benchmark 10000 '(md-safe-get-symbols (window-start) (window-end)))
+;; (benchmark 10000 '(md-get-symbols (point-min) (point-max)))
+;; (benchmark 1 '(md-get-window-words))
+;; (benchmark 1 '(md-get-symbols-frequency (window-start) (window-end)))
+;; (benchmark 1 '(md-get-symbols-frequency (point-min) (point-max)))
+
+;; (message "%S" (md-get-symbols (window-start) (window-end)))
+;; (message "%S" (md-get-symbols-frequency (window-start) (window-end)))
+;; (message "%S" (md-get-symbols-frequency (point-min) (point-max)))
+;; (message "%S" (md-safe-get-symbols (window-start) (window-end)))
 
 (defun md-find-nearest-word-impl (word start end)
   (setq sites '())

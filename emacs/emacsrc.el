@@ -1,6 +1,13 @@
 ;; for emacsclient
 (server-start)
 
+(defun etc-profile-func (func &rest args)
+  (call-interactively 'profiler-stop)
+  (call-interactively 'profiler-start)
+  (apply func args)
+  (call-interactively 'profiler-report)
+  (call-interactively 'profiler-stop))
+
 ;; Enable debugging
 (setq-default debug-on-error t)
 (setq message-log-max t)
