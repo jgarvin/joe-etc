@@ -4,10 +4,12 @@
     (goto-char (point-min))
     (re-search-forward "bin/ack")
     (re-search-forward "-- \\(.*\\)$" (point-at-eol))
-    (rename-buffer (concat "*ack " (buffer-substring (match-beginning 0) (point-at-eol)) "*"))))
+    (let ((new-name (concat "*ack " (buffer-substring (match-beginning 0) (point-at-eol)) "*")))
+      (when (get-buffer new-name)
+        (kill-buffer new-name))
+      (rename-buffer new-name))))
 
 (defun etc-ack-setup ()
   (set (make-local-variable 'compilation-finish-function) 'etc-rename-ack-buffer))
 
 (add-hook 'ack-and-a-half-mode-hook 'etc-ack-setup)
-(remove-hook 'ack-and-a-half-mode-hook 'etc-ack-setup)

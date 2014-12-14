@@ -401,6 +401,5 @@ Ignores CHAR at point."
 ;; needed for zap-up-to-char
 (require 'misc)
 
-
 (load-file "~/etc/emacs/md-network.el")
 (load-file "~/etc/emacs/token.el")

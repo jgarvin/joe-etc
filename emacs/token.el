@@ -34,13 +34,19 @@
            (expt (* 0.5 (md-normalize distance min-distance max-distance)) 2))))
 (byte-compile 'md-score-token)
 
+;; taken from: https://gist.github.com/Wilfred/f7d61b7cdf9fdbb1d11c
+(defun md-get-faces (text)
+  "Get the font faces at TEXT."
+  ;;(message "function actually ran")
+  (remq nil
+        (list
+         (get-char-property 0 'read-face-name text)
+         (get-char-property 0 'face text)
+         (plist-get (text-properties-at 0 text) 'face))))
+(byte-compile 'md-get-faces)
+
 ;; TODO: filter language keywords
 ;; TODO: in text modes filter most common words
-(defun md-filter-symbol (sym)
-  (cond
-   ((< (length sym) 3) t)
-   (t nil)))
-
 (defun md-quick-sort (vec p q pred)
   (let ((r))
     (when (< p q)
@@ -49,6 +55,18 @@
       (md-quick-sort vec (+ r 1) q pred)))
   vec)
 (byte-compile 'md-quick-sort)
+
+(defun md-filter-symbol (sym)
+  (cond
+   ((< (length sym) 3) t)
+   ((not (= (string-to-number sym) 0)) t)
+   ((let ((face-list (md-get-faces sym)))
+      (or
+       (memq 'font-lock-constant-face face-list)
+       (memq 'font-lock-builtin-face face-list)
+       (memq 'font-lock-keyword-face face-list))) t)
+   (t nil)))
+(byte-compile 'md-filter-symbol)
 
 (defun md-partition (vec p q pred)
   (let ((x (aref vec p))
@@ -73,6 +91,7 @@
 
 ;; TODO: This would be faster if it used a heap
 ;; TODO: only need one search and use match-beginning/end
+;; TODO: Return a reused vector to avoid more GC
 (defun md-get-symbols (start end)
   "Get all the symbols between start and end"
   (save-excursion
@@ -94,8 +113,10 @@
             (re-search-forward "\\_<" end)
             (setq sym-start (point))
             (re-search-forward "\\_>" end)
-            (setq current-sym (buffer-substring-no-properties sym-start (point)))
+            (setq current-sym (buffer-substring sym-start (point)))
+            ;;(message "hello %S" (text-properties-at 0 current-sym))
             (when (not (md-filter-symbol current-sym))
+              (set-text-properties 0 (length current-sym) nil current-sym)
               (let ((entry (gethash current-sym sym-counts))
                     (cur-distance (abs (- (point) starting-point))))
                 (if entry
@@ -176,6 +197,8 @@
 
 (defun md-find-nearest-word-window (word)
   (md-find-nearest-word-impl word (window-start) (window-end)))
+
+;;(defun md-)
 
 ;; (etc-profile-func
 ;;  (lambda ()
