@@ -1,6 +1,9 @@
 ;; for emacsclient
 (server-start)
 
+;; don't like losing things
+(setq kill-ring-max 10000)
+
 (require 'profiler)
 (setq profiler-max-stack-depth 64)
 (defun etc-profile-func (func &rest args)
@@ -372,13 +375,14 @@
 (setq default-major-mode 'text-mode)
 (setq text-mode-hook        ; Enable auto-fill-mode
       '(lambda ()
-         (let ((ext (file-name-extension (buffer-file-name))))
-           (when (and (not (or (string-equal ext "tc")
-                               (string-equal ext "in")
-                               (string-equal ext "tmp")
-                               (string-equal ext "log")))
-                      (< (buffer-size) uncomfortable-buffer-size))
-             (visual-line-mode 1)))))
+         (when (buffer-file-name)
+           (let ((ext (file-name-extension (buffer-file-name))))
+             (when (and (not (or (string-equal ext "tc")
+                                 (string-equal ext "in")
+                                 (string-equal ext "tmp")
+                                 (string-equal ext "log")))
+                        (< (buffer-size) uncomfortable-buffer-size))
+               (visual-line-mode 1))))))
 
 ;; Taken from Trey Jackson's answer on superuser.com
 ;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
@@ -637,4 +641,10 @@
 
 ;; more useful than th default version
 (global-set-key (kbd "M-z") 'zap-up-to-char)
+
+(defun macroexpand-point (sexp)
+  (interactive (list (sexp-at-point)))
+  (with-output-to-temp-buffer "*el-macroexpansion*"
+    (pp (macroexpand-all sexp)))
+  (with-current-buffer "*el-macroexpansion*" (emacs-lisp-mode)))
 

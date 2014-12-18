@@ -2,7 +2,7 @@
 
 (defvar md-initial-vec-size 500)
 (defvar md-max-tokens 200)
-(defvar giant-buffer-size (* 1 1024 1024)))
+(defvar giant-buffer-size (* 1 1024 1024))
 (defvar giant-line (* 4 4096))
 (defvar md-safe-scan-limit 5000)
 (defvar-local md-sym-tracking-vec (make-vector md-initial-vec-size 0))
@@ -34,19 +34,59 @@
            (expt (* 0.5 (md-normalize distance min-distance max-distance)) 2))))
 (byte-compile 'md-score-token)
 
-;; taken from: https://gist.github.com/Wilfred/f7d61b7cdf9fdbb1d11c
-(defun md-get-faces (text)
-  "Get the font faces at TEXT."
-  ;;(message "function actually ran")
-  (remq nil
-        (list
-         (get-char-property 0 'read-face-name text)
-         (get-char-property 0 'face text)
-         (plist-get (text-properties-at 0 text) 'face))))
-(byte-compile 'md-get-faces)
+(defvar md-symbol-filter-faces nil)
+(setq md-symbol-filter-faces
+      '(font-lock-constant-face
+        font-lock-comment-face
+        font-lock-doc-face
+        font-lock-string-face
+        font-lock-builtin-face
+        font-lock-keyword-face
+        erc-nick-default-face
+        erc-nick-my-face
+        erc-notice-face))
 
-;; TODO: filter language keywords
-;; TODO: in text modes filter most common words
+(defun md-get-faces-at-pos (text pos)
+  "Get the font faces at TEXT."
+  (get-char-property pos 'face text))
+(byte-compile 'md-get-faces-at-pos)
+
+(defun md-string-contains-faces (sym-start sym-end faces)
+  (let ((i sym-start)
+        (result))
+    (while (and (< i sym-end) (null result))
+      (when (memq (get-char-property i 'face) faces)
+        (setq result t))
+      (setq i (next-char-property-change i sym-end)))
+    result))
+(byte-compile 'md-string-contains-faces)
+
+;; (defun md-string-contains-faces (text faces)
+;;   (catch 'return
+;;     (dotimes (i (length text))
+;;       (let ((char-faces (md-get-faces-at-pos text i)))
+;;         (when (memq char-faces faces)
+;;             (throw 'return t))))
+;;     nil))
+;; (byte-compile 'md-string-contains-faces)
+
+
+(defun md-filter-symbol (sym sym-start sym-end)
+  (cond
+   ((< (length sym) 3) t)
+   ((not (= (string-to-number sym) 0)) t)
+   ((md-string-contains-faces sym-start sym-end md-symbol-filter-faces) t)
+   (t nil)))
+(byte-compile 'md-filter-symbol)
+
+;; (defun md-filter-symbol (sym)
+;;   (cond
+;;    ((< (length sym) 3) t)
+;;    ((not (= (string-to-number sym) 0)) t)
+;;    ((md-string-contains-faces sym md-symbol-filter-faces) t)
+;;    (t nil)))
+;; (byte-compile 'md-filter-symbol)
+
 (defun md-quick-sort (vec p q pred)
   (let ((r))
     (when (< p q)
@@ -55,18 +95,6 @@
       (md-quick-sort vec (+ r 1) q pred)))
   vec)
 (byte-compile 'md-quick-sort)
-
-(defun md-filter-symbol (sym)
-  (cond
-   ((< (length sym) 3) t)
-   ((not (= (string-to-number sym) 0)) t)
-   ((let ((face-list (md-get-faces sym)))
-      (or
-       (memq 'font-lock-constant-face face-list)
-       (memq 'font-lock-builtin-face face-list)
-       (memq 'font-lock-keyword-face face-list))) t)
-   (t nil)))
-(byte-compile 'md-filter-symbol)
 
 (defun md-partition (vec p q pred)
   (let ((x (aref vec p))
@@ -87,78 +115,88 @@
     (aset vec b temp)))
 (byte-compile 'md-swap)
 
-(setq gc-cons-threshold (* 1 800000))
-
 ;; TODO: This would be faster if it used a heap
 ;; TODO: only need one search and use match-beginning/end
 ;; TODO: Return a reused vector to avoid more GC
+;; TODO: get text. properties from buffer rather than string
+;; TODO: make hash w/o a string copy at all?
+;; TODO: only run on changed parts of buffer? hard to 'subtract out'
+;; the influence of whatever was there before...
+;; apparently before-change can be used to save it, then compare
+;; so 'subtract out' the frequency of things inside, and check
+;; if there is a new next closest distance, have to keep list around
+;; scoring is also done by distance from point, so ANY point movement
+;; technically requires recomputing that too, but only doing that
+;; is probably much faster that redoing everything
+;; prolly should be a full blown minor mode?
 (defun md-get-symbols (start end)
   "Get all the symbols between start and end"
-  (save-excursion
-    (let ((sym-counts (make-hash-table :test 'equal))
-          (sym-start)
-          (current-sym)
-          (starting-point (point))
-          (min-distance most-positive-fixnum)
-          (max-distance 0)
-          (max-frequency 0)
-          ;;(vec (make-vector md-initial-vec-size 0))
-          ;;(vec md-sym-tracking-vec)
-          (vec-size 0))
-          ;;(vec-capacity md-initial-vec-size))
-      (goto-char start)
-      (beginning-of-line)
-      (condition-case nil
-          (while (> end (point))
-            (re-search-forward "\\_<" end)
-            (setq sym-start (point))
-            (re-search-forward "\\_>" end)
-            (setq current-sym (buffer-substring sym-start (point)))
-            ;;(message "hello %S" (text-properties-at 0 current-sym))
-            (when (not (md-filter-symbol current-sym))
-              (set-text-properties 0 (length current-sym) nil current-sym)
-              (let ((entry (gethash current-sym sym-counts))
-                    (cur-distance (abs (- (point) starting-point))))
-                (if entry
+  (save-match-data
+    (save-excursion
+      (let ((sym-counts (make-hash-table :test 'equal))
+            (sym-start)
+            (current-sym)
+            (starting-point (point))
+            (min-distance most-positive-fixnum)
+            (max-distance 0)
+            (max-frequency 0)
+            ;;(vec (make-vector md-initial-vec-size 0))
+            ;;(vec md-sym-tracking-vec)
+            (vec-size 0))
+        ;;(vec-capacity md-initial-vec-size))
+        (goto-char start)
+        (beginning-of-line)
+        (condition-case nil
+            (while (> end (point))
+              (re-search-forward "\\_<" end)
+              (setq sym-start (point))
+              (re-search-forward "\\_>" end)
+              (setq current-sym (buffer-substring-no-properties sym-start (point)))
+              ;;(message "hello %S" (text-properties-at 0 current-sym))
+              (when (not (md-filter-symbol current-sym sym-start (point)))
+                (set-text-properties 0 (length current-sym) nil current-sym)
+                (let ((entry (gethash current-sym sym-counts))
+                      (cur-distance (abs (- (point) starting-point))))
+                  (if entry
+                      (progn
+                        (let ((inner-vec (aref md-sym-tracking-vec entry)))
+                          (aset inner-vec 1 (+ (aref inner-vec 1) 1))
+                          (aset inner-vec 2 (min (aref inner-vec 2) cur-distance))))
                     (progn
-                      (let ((inner-vec (aref md-sym-tracking-vec entry)))
-                        (aset inner-vec 1 (+ (aref inner-vec 1) 1))
-                        (aset inner-vec 2 (min (aref inner-vec 2) cur-distance))))
-                  (progn
-                    (when (>= vec-size md-sym-tracking-capacity)
-                      (let ((new-vec (make-vector (max (* md-sym-tracking-capacity 2) 1) 0))
-                            (i 0))
-                        (while (< i vec-size)
-                          (aset new-vec i (aref md-sym-tracking-vec i))
-                          (setq i (+ i 1)))
-                        (setq md-sym-tracking-vec new-vec)
-                        (setq md-sym-tracking-capacity (length md-sym-tracking-vec))))
-                    (aset md-sym-tracking-vec vec-size (vector current-sym 1 cur-distance 0))
-                    (puthash current-sym vec-size sym-counts)
-                    (setq entry vec-size)
-                    (setq vec-size (+ vec-size 1))))
-                (let* ((inner-vec (aref md-sym-tracking-vec entry))
-                       (frequency (aref inner-vec 1))
-                       (distance (aref inner-vec 2)))
-                  (setq max-frequency (max max-frequency frequency))
-                  (setq min-distance (min min-distance distance))
-                  (setq max-distance (max max-distance distance))))))
-        (search-failed nil))
-      (let ((i 0))
-        (while (< i vec-size)
-          (let* ((inner-vec (aref md-sym-tracking-vec i))
-                 (frequency (aref inner-vec 1))
-                 (distance (aref inner-vec 2)))
-            (aset inner-vec 3 (md-score-token frequency 0 max-frequency distance min-distance max-distance)))
-          (setq i (+ i 1))))
-      (md-quick-sort md-sym-tracking-vec 0 vec-size (lambda (a b) (< (aref a 3) (aref b 3))))
-      (let ((i 0)
-            (results '()))
-        (while (and (< i vec-size) (< i md-max-tokens))
-          (let ((inner-vec (aref md-sym-tracking-vec i)))
-            (setq results (nconc results `(,(aref inner-vec 0)))))
-          (setq i (+ i 1)))
-        results))))
+                      (when (>= vec-size md-sym-tracking-capacity)
+                        (let ((new-vec (make-vector (max (* md-sym-tracking-capacity 2) 1) 0))
+                              (i 0))
+                          (while (< i vec-size)
+                            (aset new-vec i (aref md-sym-tracking-vec i))
+                            (setq i (+ i 1)))
+                          (setq md-sym-tracking-vec new-vec)
+                          (setq md-sym-tracking-capacity (length md-sym-tracking-vec))))
+                      (aset md-sym-tracking-vec vec-size (vector current-sym 1 cur-distance 0))
+                      (puthash current-sym vec-size sym-counts)
+                      (setq entry vec-size)
+                      (setq vec-size (+ vec-size 1))))
+                  (let* ((inner-vec (aref md-sym-tracking-vec entry))
+                         (frequency (aref inner-vec 1))
+                         (distance (aref inner-vec 2)))
+                    (setq max-frequency (max max-frequency frequency))
+                    (setq min-distance (min min-distance distance))
+                    (setq max-distance (max max-distance distance))))))
+          (search-failed nil))
+        (let ((i 0))
+          (while (< i vec-size)
+            (let* ((inner-vec (aref md-sym-tracking-vec i))
+                   (frequency (aref inner-vec 1))
+                   (distance (aref inner-vec 2)))
+              (aset inner-vec 3 (md-score-token frequency 0 max-frequency distance min-distance max-distance)))
+            (setq i (+ i 1))))
+        (md-quick-sort md-sym-tracking-vec 0 vec-size (lambda (a b) (< (aref a 3) (aref b 3))))
+        (let ((i 0)
+              (results '()))
+          (while (and (< i vec-size) (< i md-max-tokens))
+            (let ((inner-vec (aref md-sym-tracking-vec i)))
+              (setq results (nconc results `(,(aref inner-vec 0)))))
+            (setq i (+ i 1)))
+          results)))))
 (byte-compile 'md-get-symbols)
 
 (defun md-safe-get-symbols (start end)
@@ -203,8 +241,8 @@
 ;; (etc-profile-func
 ;;  (lambda ()
 ;;    (dotimes (n 10000)
-;;      (md-get-symbols-frequency (window-start) (window-end)))))
-;; (etc-profile-func
+;;      (md-get-symbols (window-start) (window-end)))))
+;; (etc-profile-unc
 ;;  (lambda ()
 ;;    (dotimes (n 10000)
 ;;      (md-get-symbols-frequency-vec (window-start) (window-end)))))

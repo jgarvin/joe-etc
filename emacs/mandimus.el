@@ -398,6 +398,10 @@ Ignores CHAR at point."
       (backward-char direction))
     (point)))
 
+;; (defun md-wrap-sexp ()
+;;   (interactive)
+;;   (sp-rewrap-sexp))
+
 ;; needed for zap-up-to-char
 (require 'misc)
 

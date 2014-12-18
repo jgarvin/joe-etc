@@ -56,9 +56,10 @@ for root, dirs, files in os.walk(args.dir):
             continue
         filesize = os.stat(path).st_size
         relpath = op.relpath(path, args.dir)
-        if filesize > 102400*2: # 200KB
+        if filesize > 1024*800: # 800KB
             # PDFs are ok, they maybe big
-            if op.splitext(path)[-1] != ".pdf":
+            ext = op.splitext(path)[-1] 
+            if ext != ".pdf" and ext != ".pack":
                 tooLarge.add(relpath)
         fileinfo = sh.file(path)
         if "ELF" in fileinfo and "executable" in fileinfo:
@@ -68,10 +69,10 @@ if len(gitIgnorePath) < 1:
     print >> sys.stderr, "Couldn't find git repo."
     sys.exit(1)
 elif len(gitIgnorePath) > 1:
-    print >> sys.stderr, "Found more than one .gitignore, not sure which to use for filtering."
-    sys.exit(1)
-else:
-    print ".gitignore path: " + op.join(gitIgnorePath[0], ".gitignore")
+    print >> sys.stderr, "Found more than one .gitignore, using least nested for filtering."
+    gitIgnorePath = [min(gitIgnorePath, key=lambda x: op.normpath(x).count(os.sep))]
+
+print ".gitignore path: " + op.join(gitIgnorePath[0], ".gitignore")
 
 # Figure out which files git will ignore
 os.chdir(gitIgnorePath[0])

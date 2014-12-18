@@ -6,7 +6,7 @@
 (load-file "~/etc/emacs/cyberpunk-theme.el")
 
 (setq my-font-choice "Consolas-10")
-(set-face-attribute 'default nil :font my-font-choice :height 105)
+(set-face-attribute 'default nil :font my-font-choice)
 ;;(set-frame-font my-font-choice nil t)
 
 ;; Turn off GUI parts
