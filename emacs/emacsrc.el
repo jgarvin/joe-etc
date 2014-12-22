@@ -1,6 +1,10 @@
 ;; for emacsclient
 (server-start)
 
+(if (< emacs-major-version 24)
+    (load-file "~/etc/emacs/cl-lib-0.3.el")
+  (require 'cl))
+
 ;; don't like losing things
 (setq kill-ring-max 10000)
 
@@ -22,9 +26,6 @@
 (when (and (file-directory-p "/usr/share/emacs/site-lisp")
            (not (memq "/usr/share/emacs/site-lisp" load-path)))
   (add-to-list 'load-path "/usr/share/emacs/site-lisp"))
-
-(when (< emacs-major-version 24)
-  (load-file "~/etc/emacs/cl-lib-0.3.el"))
 
 (when (>= emacs-major-version 24)
   (require 'package)
@@ -130,17 +131,14 @@
   (interactive "P")
   (cond
    ((or (eolp) n)
-    (message "cond1")
     (forward-line (prefix-numeric-value (or n 1)))
     (end-of-line)
     (skip-chars-backward "[:space:]"))
    ((save-excursion
       (skip-chars-forward "[:space:]")
       (eolp)) ; At start of trailing whitespace
-    (message "cond2")
     (end-of-line))
    (t
-    (message "cond3")
     (end-of-line)
     (skip-chars-backward "[:space:]"))))
 
@@ -267,7 +265,7 @@
 
 (defun open-line-and-indent ()
   (interactive)
-  (message "how about this version")
+  ;;(message "how about this version")
   (indent-according-to-mode)
   (open-line 1)
   (save-excursion

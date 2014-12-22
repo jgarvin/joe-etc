@@ -59,4 +59,6 @@
         (or (bolp) (newline)))))
 
 ;; always run so mandimus can hook up
-(md-server-start)
+(condition-case nil
+    (md-server-start)
+  (file-error (message "ERROR: Mandimus server already running!")))

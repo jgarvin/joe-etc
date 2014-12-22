@@ -1,3 +1,8 @@
+(if (file-directory-p "~/opt/share/gtags")
+    (add-to-list 'load-path "~/opt/share/gtags"))
+(require 'gtags)
+(gtags-mode t)
+
 (defun gtags-select-tag-and-kill-buffer ()
   (interactive)
   (let ((buf (current-buffer)))
@@ -100,11 +105,6 @@
   (define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
   (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
   (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
-
-  (if (file-directory-p "~/opt/share/gtags")
-    (add-to-list 'load-path "~/opt/share/gtags"))
-  (require 'gtags)
-  (gtags-mode t)
 
   (setq require-final-newline t)
   

@@ -103,11 +103,12 @@
 
 (defun python-advice (old new)
   (advice-add old :before-until
-	      (lambda ()
-		(message "will at least the advice was given")
-		(if (equal major-mode 'python-mode)
-		    (or (funcall new) t)
-		  nil))))
+              (lambda ()
+                (if (equal major-mode 'python-mode)
+                    (or (funcall new) t)
+                  nil))))
+
+;;(advice-remove #'yank-and-indent)
 
 (python-advice #'yank-and-indent #'pycustom-yank-and-indent)
 (python-advice #'open-line-and-indent #'open-line-and-maybe-indent)

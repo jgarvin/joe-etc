@@ -293,7 +293,7 @@
 (defun md-create-temp-file (prefix)
   (let ((temporary-file-directory "~/temp"))
     (if (not (file-exists-p temporary-file-directory))
-	(make-directory temporary-file-directory))
+        (make-directory temporary-file-directory))
     (find-file (make-temp-file prefix))))
 
 (defun md-temp-file (prefix &optional window-id)
@@ -305,9 +305,9 @@
     (insert ";; " (if window-id window-id ""))
     (newline)
     (newline)))
-
+  
 ;(md-temp-file "test")
-
+;;(message "now testing agan")
 (defun md-filter (condp lst)
   (delq nil
 	(mapcar (lambda (x) (and (funcall condp x) x)) lst)))
