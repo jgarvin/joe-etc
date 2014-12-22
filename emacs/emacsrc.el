@@ -39,6 +39,7 @@
 (add-to-list 'load-path "~/etc/smartparens")
 (require 'smartparens-config)
 (smartparens-global-mode 1)
+(show-smartparens-global-mode t)
 
 ;; store passwords in file outside git ;)
 (load "~/.emacspass")
@@ -209,7 +210,7 @@
 (setq-default truncate-lines t)
 
 ;; Show matching parentheses
-(show-paren-mode 1)
+;;(show-paren-mode 0)
 
 ;; So I can delete it
 (setq show-trailing-whitespace t)

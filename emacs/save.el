@@ -62,41 +62,42 @@
 (defadvice other-frame (before other-frame-now activate)
   (when buffer-file-name (save-buffer) (message nil)))
 
-;; filter annoying messages
-(defvar message-filter-regexp-list '("^(No changes need to be saved)$"
-                                     "^Saving file .*$"
-                                     "^Wrote .*$")
-  "filter formatted message string to remove noisy messages")
+;; ;; filter annoying messages
+;; (defvar message-filter-regexp-list '("^(No changes need to be saved)$"
+;;                                      "^Saving file .*$"
+;;                                      "^Wrote .*$")
+;;   "filter formatted message string to remove noisy messages")
 
-(setq message-filter-regexp-list '("^(No changes need to be saved)$"
-                                   "^Saving file .*"
-                                   "^Wrote .*"
-                                   ;;"^End of buffer$"
-                                   ;;"^Beginning of buffer$"
-                                   "^Mark set$"))
+;; (setq message-filter-regexp-list '("^(No changes need to be saved)$"
+;;                                    "^Saving file .*"
+;;                                    "^Wrote .*"
+;;                                    ;;"^End of buffer$"
+;;                                    ;;"^Beginning of buffer$"
+;;                                    "^Mark set$"))
 
-(defvar etc-last-message "")
-(defvar etc-message-hook nil)
+;; (defvar etc-last-message "")
+;; (defvar etc-message-hook nil)
 
-;; TODO: filtering 'Mark set' prevents mark from appearing?!
-(defadvice message (around message-filter-by-regexp activate)
-  (if (not (ad-get-arg 0))
-      ad-do-it
-    (let ((formatted-string (apply 'format (ad-get-args 0)))
-          (deactivate-mark nil)
-          (inhibit-read-only t))
-      (if (and (stringp formatted-string)
-               (some (lambda (re) (string-match re formatted-string)) message-filter-regexp-list))
-          (save-excursion
-            (set-buffer "*Messages*")
-            (goto-char (point-max))
-            (insert formatted-string) "\n")
-        (progn
-          (setq etc-last-message formatted-string)
-          (run-hooks etc-message-hook)
-          (ad-set-args 0 `("%s" ,formatted-string))
-          ad-do-it)))))
-;;(message "test")
+;; ;; TODO: filtering 'Mark set' prevents mark from appearing?!
+;; (defadvice message (around message-filter-by-regexp activate)
+;;   (if (not (ad-get-arg 0))
+;;       ad-do-it
+;;     (let ((formatted-string (apply 'format (ad-get-args 0)))
+;;           (deactivate-mark nil)
+;;           (inhibit-read-only t))
+;;       (if (and (stringp formatted-string)
+;;                (some (lambda (re) (string-match re formatted-string)) message-filter-regexp-list))
+;;           (save-excursion
+;;             (set-buffer "*Messages*")
+;;             (goto-char (point-max))
+;;             (insert formatted-string "\n"))
+;;         (progn
+;;           (setq etc-last-message formatted-string)
+;;           (run-hooks etc-message-hook)
+;;           (ad-set-args 0 `("%s" ,formatted-string))
+;;           ad-do-it)))))
+;; ;;(message "test")
+;; (remove-function :around 'message)
 
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")
