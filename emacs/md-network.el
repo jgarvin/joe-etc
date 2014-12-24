@@ -1,4 +1,8 @@
+;; needed for with-timeout
+(require 'timer)
+
 (defvar md-server-clients '())
+(defvar md-server-eval-timeout 5)
 
 (defun md-server-start nil
   (interactive)
@@ -36,7 +40,11 @@
     (while (setq index (string-match "\n" message))
       (setq index (1+ index))
       (setq command (substring message 0 index))
-      (setq result (eval (car (read-from-string command))))
+      (setq result
+            (condition-case err
+                (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
+                  (eval (car (read-from-string command))))
+               (error (message "Malformed mandimus command: %s" command) nil)))
       (process-send-string proc (format "%S\n" result))
       (md-server-log  (substring message 0 index) proc)
       (setq message (substring message index)))
