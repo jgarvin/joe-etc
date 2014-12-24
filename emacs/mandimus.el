@@ -37,7 +37,8 @@
       (error "No line found"))))
 
 (defun mandimus-word-event (words)
-  (setq mandimus-last-word-event words))
+  (setq mandimus-last-word-event words)
+  (force-mode-line-update))
 
 (setq md-startup-cursor-color (face-attribute 'cursor :background))
 

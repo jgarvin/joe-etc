@@ -179,65 +179,104 @@
 
 (defvar md-debug-winend-overlay nil)
 (setq md-no-recurse nil)
+(setq md-original-scroll-margin scroll-margin)
 
 ;; TODO: not active in minibuffer
-(defun md-debug-setup-winend-overlay (&optional start)
+(defun md-debug-setup-winend-overlay (w &optional start)
   (unless md-no-recurse
-    (setq md-no-recurse t)
-    (unless start
-      (setq start (window-start)))
-    (save-excursion
-      (goto-char (md-get-real-window-end start))
-      (let ((start (point-at-bol))
-            (end (point-at-eol)))
-        (if md-debug-winend-overlay
-            ;; (when (or (not (= (overlay-start md-debug-winend-overlay) start))
-            ;;           (not (= (overlay-end md-debug-winend-overlay) end)))
-            (progn
-;;              (message "moving %s %s" (line-number-at-pos start) (line-number-at-pos end))
-              (move-overlay md-debug-winend-overlay start end))
-          (progn
-            ;;(message "%s %s" (line-number-at-pos start) (line-number-at-pos end))
-            (setq md-debug-winend-overlay (make-overlay start end))
-            (overlay-put md-debug-winend-overlay 'window (selected-window))
-            (overlay-put md-debug-winend-overlay 'face (list :background "red"))))))
-    (setq md-no-recurse nil)))
+    (unwind-protect
+        (progn
+          (setq md-no-recurse t)
+          (unless start
+            (setq start (window-start)))
+          (with-current-buffer (window-buffer w)
+            (save-excursion
+              (goto-char (- (md-get-real-window-end w start) 0))
+              (let ((start (point-at-bol))
+                    (end (point-max)))
+                (if md-debug-winend-overlay
+                    (progn
+                      ;;(message "moving %s %s" (line-number-at-pos start) (line-number-at-pos end))
+                      ;;(message "moving %s %s"  start  end)
+                      ;;(move-overlay md-debug-winend-overlay start end)
+                      (move-overlay md-debug-winend-overlay start end))
+                  (progn
+                    (message "creating")
+                    (setq scroll-margin (max scroll-margin 5))
+                    ;;(message "%s %s" (line-number-at-pos start) (line-number-at-pos end))
+                    (setq md-debug-winend-overlay (make-overlay start end nil t))
+                    (overlay-put md-debug-winend-overlay 'window w)
+                    (overlay-put md-debug-winend-overlay 'face (list :background "red"))
+                    (overlay-put md-debug-winend-overlay 'invisible t)
+                    (overlay-put md-debug-winend-overlay 'intangible t)
+                    ;;(setq belt-barrier-text (concat (make-string (- (window-body-width w) 2) ?-) "\n"))
+                    ;;(setq belt-barrier-text (concat (make-string (- (window-body-width w) 2) ?-)))
+                    (overlay-put md-debug-winend-overlay 'after-string belt-barrier-text)
+                    ))))))
+    (setq md-no-recurse nil))))
 
-(defun md-get-real-window-end (&optional start)
+;; (defun md-debug-setup-winend-overlay (&optional start)
+;;   (backtrace)
+;;   (remove-overlays))
+
+(defun md-get-real-window-end (w &optional start)
+  (when md-debug-winend-overlay
+    (overlay-put md-debug-winend-overlay 'invisible nil)
+    (overlay-put md-debug-winend-overlay 'intangible nil))
   (unless start
-    (setq start (window-start)))
-  (save-excursion
-    (goto-line (+ (line-number-at-pos start) (window-body-height)))
-    (while (and (not (bobp)) (not (pos-visible-in-window-p)))
-      ;; TODO: if you stay visible, return point-max
-      (forward-line -1))
-    (point-at-eol)))
-(md-get-real-window-end)
+    (setq start (window-start w)))
+  (with-current-buffer (window-buffer w)
+    (message "point at start: %d" (point))
+    (save-excursion
+      (goto-char (point-min))
+      (forward-line (+ (line-number-at-pos start) (window-body-height w)))
+      (if (eobp) nil
+        ;;(message "at the end")
+        (while (and (not (pos-visible-in-window-p nil w)) 
+                    (not (bobp)))
+          (forward-line -1)))
+      (message "parts %S %S" (line-number-at-pos start) (window-body-height w))
+      (message "point %S start %S %S end %S" (point) (pos-visible-in-window-p nil w) (bobp) (eobp))
+      (when md-debug-winend-overlay
+        (overlay-put md-debug-winend-overlay 'invisible t)
+        (overlay-put md-debug-winend-overlay 'intangible t))
+      (point))))
+  (md-get-real-window-end (selected-window))
 
 (defun md-scroll-hook (w new-start)
-  ;;(message "Scroll hook")
-  (md-debug-setup-winend-overlay new-start)
+  (when (or (null md-debug-winend-overlay)
+            (eq w (overlay-get md-debug-winend-overlay 'window)))
+    ;;(message "Scroll hook")
+    (md-debug-setup-winend-overlay w new-start))
   )
 
 (defun md-command-hook ()
-  ;;(message "command hook")
-  (md-debug-setup-winend-overlay))
+  (let ((w (selected-window)))
+    (when (or (null md-debug-winend-overlay)
+              (eq w (overlay-get md-debug-winend-overlay 'window)))
+      ;;(message "command hook")
+      (md-debug-setup-winend-overlay w))
+  ))
 
-;;(md-scroll-hook nil (window-start))
+;;(md-scroll-hook (selected-window) (window-start))
 
 (progn
-  (md-debug-setup-winend-overlay)
+  ;;(md-debug-setup-winend-overlay)
   (add-hook 'window-scroll-functions 'md-scroll-hook)
   (add-hook 'post-command-hook 'md-command-hook)
+  (add-hook 'pre-command-hook 'md-command-hook)
   )
-;;(add-hook 'post-command-hook 'md-debug-setup-winend-overlay)
-;;(remove-hook 'post-command-hook 'md-debug-setup-winend-overlay)
-;;(md-debug-setup-winend-overlay)
+
 (progn
-  (remove-overlays)
+  (remove-overlays) 
   (remove-hook 'window-scroll-functions 'md-scroll-hook)
   (remove-hook 'post-command-hook 'md-command-hook)
-  (setq md-debug-winend-overlay nil))
+  (remove-hook 'post-command-hook 'md-debug-setup-winend-overlay)
+  (remove-hook 'pre-command-hook 'md-command-hook)
+  (remove-hook 'pre-command-hook 'md-debug-setup-winend-overlay)
+  (setq md-debug-winend-overlay nil)
+  (setq scroll-margin md-original-scroll-margin)
+  (setq md-no-recurse nil))
 (message "testing*********")
 
 (let ((belt-start)
@@ -299,4 +338,5 @@
 
 ;; adding as hook breaks mark?!
 ;;(remove-hook 'etc-message-hook 'md-update-belts)
+(line-number-at-pos (point-max))
 
