@@ -43,7 +43,7 @@
        (run-hooks 'on-blur-hook))
      (setq on-blur--saved-window-id active-window-id)
      (run-with-timer 1 nil 'on-blur--refresh)))
- (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t)))
+ (add-hook 'on-blur-hook #'(lambda () (save-some-buffers t nil)))
  (on-blur--refresh))
 
 ;; make sure autosave calls after-save-hook, for some reason
@@ -75,7 +75,7 @@
 ;;                                    ;;"^Beginning of buffer$"
 ;;                                    "^Mark set$"))
 
-;; (defvar etc-last-message "")
+(defvar etc-last-message "")
 ;; (defvar etc-message-hook nil)
 
 ;; ;; TODO: filtering 'Mark set' prevents mark from appearing?!
@@ -98,6 +98,15 @@
 ;;           ad-do-it)))))
 ;; ;;(message "test")
 ;; (remove-function :around 'message)
+;; (ad-unadvise 'message)
+
+(defadvice message (around message-save-to-var activate)
+  (if (not (ad-get-arg 0))
+      ad-do-it
+    (let ((formatted-string (apply 'format (ad-get-args 0))))
+      (when (stringp formatted-string)
+        (setq etc-last-message formatted-string))
+      ad-do-it)))
 
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")

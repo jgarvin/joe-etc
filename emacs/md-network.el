@@ -44,7 +44,7 @@
             (condition-case err
                 (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
                   (eval (car (read-from-string command))))
-               (error (message "Malformed mandimus command: %s" command) nil)))
+              (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
       (process-send-string proc (format "%S\n" result))
       (md-server-log  (substring message 0 index) proc)
       (setq message (substring message index)))

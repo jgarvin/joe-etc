@@ -354,7 +354,7 @@ Ignores CHAR at point."
       distance)))
     
 (defun md-vertical-biased-distance (a b)
-  (sqrt (+ (expt (* 2 (md-get-relative-column b)) 2)
+  (sqrt (+ (expt (* 2 (md-get-relative-column b)) 4)
            (expt (abs (- (line-number-at-pos a) (line-number-at-pos b))) 2))))
 
 (defun md-find-line-starting-with-char (arg char)
@@ -398,6 +398,11 @@ Ignores CHAR at point."
         (search-forward (char-to-string char) nil nil arg)
       (backward-char direction))
     (point)))
+
+(defun md-current-path ()
+  (if (derived-mode-p 'dired-mode)
+      list-buffers-directory
+    buffer-file-name))
 
 ;; (defun md-wrap-sexp ()
 ;;   (interactive)
