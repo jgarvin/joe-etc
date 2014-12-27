@@ -75,7 +75,7 @@
 ;;                                    ;;"^Beginning of buffer$"
 ;;                                    "^Mark set$"))
 
-(defvar etc-last-message "")
+;; (defvar etc-last-message "")
 ;; (defvar etc-message-hook nil)
 
 ;; ;; TODO: filtering 'Mark set' prevents mark from appearing?!
@@ -100,13 +100,13 @@
 ;; (remove-function :around 'message)
 ;; (ad-unadvise 'message)
 
-(defadvice message (around message-save-to-var activate)
-  (if (not (ad-get-arg 0))
-      ad-do-it
-    (let ((formatted-string (apply 'format (ad-get-args 0))))
-      (when (stringp formatted-string)
-        (setq etc-last-message formatted-string))
-      ad-do-it)))
+;; (defadvice message (around message-save-to-var activate)
+;;   (if (not (ad-get-arg 0))
+;;       ad-do-it
+;;     (let ((formatted-string (apply 'format (ad-get-args 0))))
+;;       (when (stringp formatted-string)
+;;         (setq etc-last-message formatted-string))
+;;       ad-do-it)))
 
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")

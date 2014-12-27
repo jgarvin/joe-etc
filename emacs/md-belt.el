@@ -140,28 +140,35 @@
 (defvar md-current-message nil)
 
 (defun md-update-belts ()
-  (with-selected-window (minibuffer-window)
-    (when resize-mini-windows
-      (setq resize-mini-windows nil))
-    (erase-buffer)
-    (insert "one\ntwo\nthree\n")
-    ;;(insert etc-last-message)
-    (when md-current-message
-      (insert md-current-message))
-    (while (< (window-body-height) 4)
-      (enlarge-window 1))
-    (while (> (window-body-height) 4)
-      (shrink-window 1))
-    (goto-char (point-min))
-    (message nil)))
+  (dolist (frame (frame-list))
+    (let ((deactivate-mark nil)
+          (inhibit-read-only t))
+      (with-selected-window (minibuffer-window frame)
+        (if (eq (selected-frame) frame)
+            (progn
+              (when resize-mini-windows
+                (setq resize-mini-windows nil))
+              (erase-buffer)
+              (insert "one\ntwo\nthree\n")
+              ;;(insert etc-last-message)
+              (when md-current-message
+                (insert md-current-message))
+              (while (< (window-body-height) 4)
+                (enlarge-window 1))
+              (while (> (window-body-height) 4)
+                (shrink-window 1))
+              (goto-char (point-min))
+              (message nil))
+          (progn
+            (setq resize-mini-windows 'grow-only)))))))
 
 (defun md-save-message ()
   (let ((m (current-message)))
     (when m
       (setq md-current-message m)
-      (md-update-belts)
-      (message nil))))
-(add-hook 'post-command-hook #'md-save-message)
+      (md-update-belts))))
+;; (add-hook 'post-command-hook #'md-save-message)
+;; (remove-hook 'post-command-hook #'md-save-message)
 
 ;; (defun md-clear-message-area ()
 ;;   (unless (or (cursor-in-echo-area))))
