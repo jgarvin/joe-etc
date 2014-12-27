@@ -3,6 +3,12 @@
 ;disable auto save
 (setq auto-save-default nil)
 
+(defun etc-buffer-needs-saving (&optional b)
+  (unless b
+    (setq b (current-buffer)))
+  (and (buffer-modified-p b)
+       (not (null (buffer-file-name b)))))
+
 ;; builtin autosave randomly stops working for no reason,
 ;; so implement my own
 (setq etc-save-timer
@@ -10,11 +16,12 @@
                    (lambda ()
                      (when (reduce (lambda (a b) (or a b))
                                    (mapcar (lambda (b)
-                                             (and (buffer-modified-p b)
-                                                  (not (null (buffer-file-name b)))))
+                                             (etc-buffer-needs-saving b))
                                            (buffer-list)))
                        (save-some-buffers t nil)
                        (message nil)))))
+
+;; (cancel-timer etc-save-timer)
 
 ;; (dolist (timer timer-list)
 ;;   (when (string-match "mapcar" (format "%S" timer))
@@ -56,11 +63,11 @@
 ;; autosave under all these circumstances too, never want to save
 ;; manually
 (defadvice switch-to-buffer (before save-buffer-now activate)
-  (when buffer-file-name (save-buffer) (message nil)))
+  (when (etc-buffer-needs-saving) (save-buffer) (message nil)))
 (defadvice other-window (before other-window-now activate)
-  (when buffer-file-name (save-buffer) (message nil)))
+  (when (etc-buffer-needs-saving) (save-buffer) (message nil)))
 (defadvice other-frame (before other-frame-now activate)
-  (when buffer-file-name (save-buffer) (message nil)))
+  (when (etc-buffer-needs-saving) (save-buffer) (message nil)))
 
 ;; ;; filter annoying messages
 ;; (defvar message-filter-regexp-list '("^(No changes need to be saved)$"
