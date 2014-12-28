@@ -1,5 +1,7 @@
 (require 'md-belt-impl)
 
+(defvar md-nearest-belt-symbols nil)
+
 (defun md-get-next-symbol (dir)
   (let ((sym-start)
         (end (if dir (point-max) (point-min)))
@@ -41,21 +43,23 @@
       symbol-list)))
 
 (defun md-nearest-post-command-hook ()
-  ;; (message "nearest hook")
-  (setq md-nearest-belt-text (format "%S" (md-get-nearest-symbols))))
+  ;;(message "nearest hook")
+  (unless (window-minibuffer-p)
+    (setq md-nearest-belt-symbols (md-get-nearest-symbols))))
   
 (defun md-setup-nearest-belt ()
-  (add-hook 'post-command-hook #'md-nearest-post-command-hook))
-
-(defun md-destroy-nearest-belt ()
-  (setq md-nearest-belt-text nil)
-  (remove-hook 'post-command-hook #'md-nearest-post-command-hook))
-
-(setq nearest-belt
+  (add-hook 'post-command-hook #'md-nearest-post-command-hook)
+  (setq md-nearest-belt
       (make-md-belt :construct #'md-setup-nearest-belt
                     :destruct #'md-destroy-nearest-belt
-                    :text 'md-nearest-belt-text
+                    :contents 'md-nearest-belt-symbols
                     :color "red"))
+  (add-to-list 'md-belt-list md-nearest-belt))
 
-(add-to-list 'md-belt-list nearest-belt)
-;; (setq md-belt-list nil)
+(defun md-destroy-nearest-belt ()
+  (setq md-belt-list (remove md-nearest-belt md-belt-list))
+  (setq md-nearest-belt-symbols nil)
+  (remove-hook 'post-command-hook #'md-nearest-post-command-hook))
+
+;; (md-setup-nearest-belt)
+;; (md-destroy-nearest-belt)

@@ -1,6 +1,6 @@
 (require 'cl) ;; defstruct
 
-(defvar md-belt-item-max 10)
+(defvar md-belt-item-max 8)
 (defvar md-current-message nil)
 (defvar md-message-counter 0)
 (defvar md-num-belts 3)
@@ -11,9 +11,8 @@
 (cl-defstruct md-belt
   (construct nil :read-only t)
   (destruct nil :read-only t)
-  (text nil :read-only t)
-  (color nil :read-only t)
-  (last-rendered-text ""))
+  (contents nil :read-only t)
+  (color nil :read-only t))
 
 (defun md-insert-belt-text (text color)
   (put-text-property 0 (length text) 'face `(:underline t :foreground ,color) text)
@@ -30,15 +29,47 @@
       (md-insert-belt-text (concat text (make-string (- (window-total-width window) (length text) 2) ?-)) color)
       (goto-char (point-max)))))
 
+(defun md-truncate-string (x max-length)
+  (let ((trailing ".."))
+    (if (< (length x) max-length)
+        x
+      (concat (substring x 0 (- max-length (length trailing))) trailing))))
+;; (md-truncate-string "this is really long" 10)
+
+(defun md-build-belt-string (x)
+  (let* ((width (window-body-width (minibuffer-window)))
+         (items (subseq x 0 md-belt-item-max))
+         (max-length width)
+         ;; The form is:
+         ;; | foo | bar | buzz
+         ;; So 2 characters at start and end make 4, and then 3 characters
+         ;; for each separator between items.
+         (usable-length (- max-length 4 (* 3 (- md-belt-item-max 1))))
+         (length-per-item (/ usable-length md-belt-item-max))
+         (body-string (mapconcat (lambda (y)
+                         (format
+                          (format "%%-%ds" length-per-item)
+                          (md-truncate-string y length-per-item))) items " | "))
+         (space-left (- width (length body-string) 4)))
+    ;;(message "%d %d %d %d %d" space-left width max-length usable-length length-per-item)
+    (concat "| "
+            body-string
+            (make-string space-left ?\ )
+            " |")))
+;; (md-build-belt-string md-nearest-belt-symbols)
+;; (length (md-build-belt-string md-nearest-belt-symbols))
+
 (defun md-update-belts ()
-  (unless md-updating-belts
+  (unless (or md-updating-belts
+              (window-minibuffer-p))
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t))
       (with-selected-window (minibuffer-window)
         (erase-buffer)
         (dolist (belt md-belt-list)
-          (md-insert-belt-text (eval (md-belt-text belt)) (md-belt-color belt))
+          (md-insert-belt-text
+           (md-build-belt-string (eval (md-belt-contents belt))) (md-belt-color belt))
           (insert "\n"))
         (when md-current-message
           (insert md-current-message))
@@ -56,7 +87,7 @@
       (md-update-belts))))
 
 (defadvice message (around md-message-save-to-var disable)
-  (if (not (ad-get-arg 0))
+  (if (or md-updating-belts (not (ad-get-arg 0)))
       ad-do-it
     (let ((formatted-string (apply 'format (ad-get-args 0))))
       (when (stringp formatted-string)
@@ -65,29 +96,34 @@
       ad-do-it)))
 
 (defun md-setup-belt ()
-  (dolist (belt md-belt-list)
-    (funcall (md-belt-construct belt)))  
-  (setq resize-mini-windows nil)
-  (add-hook 'post-command-hook #'md-save-message t)
-  (add-hook 'post-command-hook #'md-update-belts t)
-  (add-hook 'window-configuration-change-hook #'md-update-belts t)
-  (add-hook 'focus-in-hook #'md-update-belts t)
-  (ad-enable-advice 'message 'around 'md-message-save-to-var))
+  (let ((md-updating-belts t))
+    (dolist (belt md-belt-list)
+      (funcall (md-belt-construct belt)))  
+    (setq resize-mini-windows nil)
+    (add-hook 'post-command-hook #'md-save-message t)
+    (add-hook 'post-command-hook #'md-update-belts t)
+    (add-hook 'window-configuration-change-hook #'md-update-belts t)
+    (add-hook 'focus-in-hook #'md-update-belts t)
+    (ad-enable-advice 'message 'around 'md-message-save-to-var)))
 
 (defun md-destroy-belt ()
-  (setq resize-mini-windows 'grow-only)
-  (remove-hook 'post-command-hook #'md-save-message)
-  (remove-hook 'post-command-hook #'md-update-belts)
-  (remove-hook 'window-configuration-change-hook #'md-update-belts)
-  (remove-hook 'focus-in-hook #'md-update-belts)
-  ;; TODO: disable doesn't work wtf?
-  (ad-disable-advice 'message 'around 'md-message-save-to-var)
-  (with-selected-window (minibuffer-window)
-    (erase-buffer))
-  (dolist (belt md-belt-list)
-    (funcall (md-belt-destruct belt))))
+  (let ((md-updating-belts t))
+    (setq resize-mini-windows 'grow-only)
+    (remove-hook 'post-command-hook #'md-save-message)
+    (remove-hook 'post-command-hook #'md-update-belts)
+    (remove-hook 'window-configuration-change-hook #'md-update-belts)
+    (remove-hook 'focus-in-hook #'md-update-belts)
+    ;; TODO: disable doesn't work wtf?
+    (ad-disable-advice 'message 'around 'md-message-save-to-var)
+    (with-selected-window (minibuffer-window)
+      (erase-buffer))
+    (dolist (belt md-belt-list)
+      (funcall (md-belt-destruct belt)))
+    (message "")))
 
-;; (md-setup-belt)
+(progn
+  (md-setup-nearest-belt)
+  (md-setup-belt))
 ;; (md-destroy-belt)
 
 (provide 'md-belt-impl)
