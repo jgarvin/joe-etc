@@ -1,5 +1,8 @@
 (require 'cl) ;; defstruct
-(require 'dash) ;; -map-indexed
+
+;; TODO: overwrite existing characters, don't erase the
+;; whole buffer everytime. And only update things that
+;; are actually different.
 
 (defvar md-belt-item-max 8)
 (defvar md-current-message nil)
@@ -10,9 +13,11 @@
 
 ;; TODO: font-lock-add-keywords
 (cl-defstruct md-belt
+  name
   (construct nil :read-only t)
   (destruct nil :read-only t)
   (contents nil :read-only t)
+  (old-contents nil)
   (color nil :read-only t))
 
 (defun md-insert-belt-text (text color)
@@ -59,12 +64,13 @@
          ;; | foo | bar | buzz
          ;; So 2 characters at start and end make 4, and then 3 characters
          ;; for each separator between items.
-         (usable-length (- max-length 4 (* 3 (- md-belt-item-max 1))))
+         (usable-length (- max-length 4 (* 3 md-belt-item-max)))
          (length-per-item (/ usable-length md-belt-item-max))
+         (cur-char (- ?A 1))
          (body-string (mapconcat (lambda (y)
                          (format
-                          (format "%%-%ds" length-per-item)
-                          (md-truncate-string y length-per-item))) items " | "))
+                          (format "%c %%-%ds" (incf cur-char) length-per-item)
+                          (md-truncate-string y length-per-item))) items " "))
          (space-left (- width (length body-string) 4)))
     ;;(message "%d %d %d %d %d" space-left width max-length usable-length length-per-item)
     (concat "| "
@@ -73,6 +79,15 @@
             " |")))
 ;; (md-build-belt-string md-nearest-belt-symbols)
 ;; (length (md-build-belt-string md-nearest-belt-symbols))
+
+(defun md-activate-belt-item (belt-name c)
+  (interactive)
+  (setq c (upcase c))
+  (let ((belt (car
+               (remove-if-not
+                (lambda (x)
+                  (string= belt-name (md-belt-name x))) md-belt-list))))
+    (md-insert-text (format "%s" (nth (- c ?A) (md-belt-old-contents belt))) t nil)))
 
 (defun md-update-belts ()
   (unless (or md-updating-belts
@@ -84,9 +99,13 @@
       (with-current-buffer (window-buffer w)
         (erase-buffer)
         (dolist (belt md-belt-list)
-          (md-insert-belt-text
-           (md-build-belt-string (eval (md-belt-contents belt))) (md-belt-color belt))
-          (insert "\n"))
+          (let* ((new (subseq (eval (md-belt-contents belt)) 0 md-belt-item-max))
+                 (old (md-belt-old-contents belt))
+                 (new-sorted (md-preserve-position old new)))
+            (md-insert-belt-text
+             (md-build-belt-string new-sorted) (md-belt-color belt))
+            (insert "\n")
+            (setf (md-belt-old-contents belt) new-sorted)))
         (when md-current-message
           (insert md-current-message))
         (while (< (window-body-height w) (+ (length md-belt-list) 1))
@@ -122,7 +141,7 @@
     (add-hook 'focus-in-hook #'md-update-belts t)
     (ad-enable-advice 'message 'around 'md-message-save-to-var)))
 
-(defun md-destroy-belt ()
+(defun md-destroy-all-belts ()
   (let ((md-updating-belts t))
     (setq resize-mini-windows 'grow-only)
     (remove-hook 'post-command-hook #'md-save-message)
@@ -135,12 +154,13 @@
       (erase-buffer))
     (dolist (belt md-belt-list)
       (funcall (md-belt-destruct belt)))
+    (setq md-belt-list nil)
     (message "")))
 
 (progn
   (md-setup-nearest-belt)
   (md-setup-belt))
-;; (md-destroy-belt)
+;; (md-destroy-all-belts)
 
 (provide 'md-belt-impl)
 

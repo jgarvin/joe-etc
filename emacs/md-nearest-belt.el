@@ -50,14 +50,16 @@
 (defun md-setup-nearest-belt ()
   (add-hook 'post-command-hook #'md-nearest-post-command-hook)
   (setq md-nearest-belt
-      (make-md-belt :construct #'md-setup-nearest-belt
-                    :destruct #'md-destroy-nearest-belt
-                    :contents 'md-nearest-belt-symbols
-                    :color "red"))
+        (make-md-belt
+         :name "nearest"
+         :construct #'md-setup-nearest-belt
+         :destruct #'md-destroy-nearest-belt
+         :contents 'md-nearest-belt-symbols
+         :color "red"))
   (add-to-list 'md-belt-list md-nearest-belt))
 
 (defun md-destroy-nearest-belt ()
-  (setq md-belt-list (remove md-nearest-belt md-belt-list))
+  (setq md-belt-list (remove-if (lambda (x) (string= (md-belt-name x) "nearest")) md-belt-list))
   (setq md-nearest-belt-symbols nil)
   (remove-hook 'post-command-hook #'md-nearest-post-command-hook))
 

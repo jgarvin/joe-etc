@@ -205,6 +205,16 @@
 	(re-search-backward space-inhibiting-before-characters (- (point) 1) t)) nil)
      (t t))))
 
+(defun md-insert-text (text check-spaces check-capitals)
+  (when (and check-capitals
+             (md-need-capitalization))
+    (setq text (concat (char-to-string (upcase (aref text 0)))
+                       (subseq text 1))))
+  (when (and check-spaces
+             (md-need-space text))
+    (setq text (concat " " text)))
+  (insert text))
+
 (defun md-backward-kill-word ()
   (interactive)
   (backward-word)
