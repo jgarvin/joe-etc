@@ -1,4 +1,5 @@
 (require 'cl) ;; defstruct
+(require 'dash) ;; -map-indexed
 
 (defvar md-belt-item-max 8)
 (defvar md-current-message nil)
@@ -36,6 +37,20 @@
       (concat (substring x 0 (- max-length (length trailing))) trailing))))
 ;; (md-truncate-string "this is really long" 10)
 
+(defun md-preserve-position (old new)
+  (if (null old)
+      new
+    (let* ((result
+            (mapcar
+             (lambda (x)
+               (if (member x new) x nil)) old))
+           (new-items (set-difference new old :test 'equal)))
+      (loop for x on result do
+            (when (null (car x))
+              (setcar x (pop new-items))))
+      result)))
+;;(md-preserve-position '(2 4 5 1) '(3 4 1 2))
+
 (defun md-build-belt-string (x)
   (let* ((width (window-body-width (minibuffer-window)))
          (items (subseq x 0 md-belt-item-max))
@@ -64,8 +79,9 @@
               (window-minibuffer-p))
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
-          (md-updating-belts t))
-      (with-selected-window (minibuffer-window)
+          (md-updating-belts t)
+          (w (minibuffer-window)))
+      (with-current-buffer (window-buffer w)
         (erase-buffer)
         (dolist (belt md-belt-list)
           (md-insert-belt-text
@@ -73,10 +89,10 @@
           (insert "\n"))
         (when md-current-message
           (insert md-current-message))
-        (while (< (window-body-height) (+ (length md-belt-list) 1))
-          (enlarge-window 1))
-        (while (> (window-body-height) (+ (length md-belt-list) 1))
-          (shrink-window 1))
+        (while (< (window-body-height w) (+ (length md-belt-list) 1))
+          (window-resize w 1))
+        (while (> (window-body-height w) (+ (length md-belt-list) 1))
+          (window-resize w -1))
         (goto-char (point-min))
         (message nil)))))
 
@@ -127,3 +143,4 @@
 ;; (md-destroy-belt)
 
 (provide 'md-belt-impl)
+
