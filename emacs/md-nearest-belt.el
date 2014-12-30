@@ -8,9 +8,9 @@
         (search-function (if dir 're-search-forward 're-search-backward))
         (open-regex (if dir "\\_<" "\\_>"))
         (close-regex (if dir "\\_>" "\\_<")))
-    (funcall search-function open-regex end t)
+    (funcall search-function open-regex end 1)
     (setq sym-start (point))
-    (funcall search-function close-regex end t)
+    (funcall search-function close-regex end 1)
     (cons sym-start (point))))
     
 (defun md-get-nearest-symbols ()

@@ -498,7 +498,7 @@
 ;; commands into other minibuffer commands, but I like it because it
 ;; just lets me use the damn thing without getting the error about
 ;; "Command attempted to use minibuffer while in minibuffer"
-(setq enable-recursive-minibuffers t)
+;;(setq enable-recursive-minibuffers t)
 
 ;; We always want a gigantic mark ring
 (setq-default mark-ring-max 65535)
@@ -647,3 +647,17 @@
     (pp (macroexpand-all sexp)))
   (with-current-buffer "*el-macroexpansion*" (emacs-lisp-mode)))
 
+(defun unkillable-scratch-buffer ()
+	(if (equal (buffer-name (current-buffer)) "*scratch*")
+	    (progn
+	      (delete-region (point-min) (point-max))
+	      nil)
+	  t))
+(add-hook 'kill-buffer-query-functions 'unkillable-scratch-buffer)
+
+;; cancel minibuffer prompts when I switch focus
+(defun etc-abort-minibuffer ()
+  (when (or (> (minibuffer-depth) 1)
+            (minibuffer-prompt))
+    (abort-recursive-edit)))
+(add-hook 'focus-out-hook #'etc-abort-minibuffer)

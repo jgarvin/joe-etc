@@ -18,11 +18,14 @@
   (destruct nil :read-only t)
   (contents nil :read-only t)
   (old-contents nil)
-  (color nil :read-only t))
+  (color nil :read-only t)
+  (context nil :read-only t))
 
 (defun md-insert-belt-text (text color)
   (put-text-property 0 (length text) 'face `(:underline t :foreground ,color) text)
   (put-text-property 0 (length text) 'font-lock-face `(:underline t :foreground ,color) text)
+  (put-text-property 0 (length text) 'read-only t text)
+  (put-text-property 0 (length text) 'intangible t text)
   (insert text))
 
 (defun md-refresh-belt (window)
@@ -36,10 +39,13 @@
       (goto-char (point-max)))))
 
 (defun md-truncate-string (x max-length)
-  (let ((trailing ".."))
-    (if (< (length x) max-length)
-        x
-      (concat (substring x 0 (- max-length (length trailing))) trailing))))
+  (if (null x)
+      "nil"
+    (setq x (replace-regexp-in-string "[[:space:]]+" " " x))
+    (let ((trailing ".."))
+      (if (< (length x) max-length)
+          x
+        (concat (substring x 0 (- max-length (length trailing))) trailing)))))
 ;; (md-truncate-string "this is really long" 10)
 
 (defun md-preserve-position (old new)
@@ -91,7 +97,9 @@
 
 (defun md-update-belts ()
   (unless (or md-updating-belts
-              (window-minibuffer-p))
+              (window-minibuffer-p)
+              (minibuffer-prompt)
+              (> (minibuffer-depth) 1))
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t)
@@ -151,7 +159,8 @@
     ;; TODO: disable doesn't work wtf?
     (ad-disable-advice 'message 'around 'md-message-save-to-var)
     (with-selected-window (minibuffer-window)
-      (erase-buffer))
+      (let ((inhibit-read-only t))
+        (erase-buffer)))
     (dolist (belt md-belt-list)
       (funcall (md-belt-destruct belt)))
     (setq md-belt-list nil)
@@ -159,7 +168,8 @@
 
 (progn
   (md-setup-nearest-belt)
-  (md-setup-belt))
+  (md-setup-kill-belt)
+  (md-setup-belt)) 
 ;; (md-destroy-all-belts)
 
 (provide 'md-belt-impl)
