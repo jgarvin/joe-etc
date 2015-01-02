@@ -10,6 +10,7 @@
 (defvar md-num-belts 3)
 (defvar md-updating-belts nil)
 (defvar md-belt-list nil "List of belts.")
+(defvar md-previous-belt-text nil)
 
 ;; TODO: font-lock-add-keywords
 (cl-defstruct md-belt
@@ -28,19 +29,14 @@
   (put-text-property 0 (length text) 'intangible t text)
   (insert text))
 
-(defun md-refresh-belt (window)
-  (save-window-excursion
-    (select-window window)
-    (let ((inhibit-read-only t)
-          (text "hello world")
-          (color (window-parameter window (quote md-belt-color))))
-      (erase-buffer)
-      (md-insert-belt-text (concat text (make-string (- (window-total-width window) (length text) 2) ?-)) color)
-      (goto-char (point-max)))))
-
 (defun md-truncate-string (x max-length)
   (if (null x)
       "nil"
+    ;; protect against arbitrarily long items
+    ;; we could shorten to max length here but then we may make
+    ;; some strings needlessly short that would have fit
+    ;; once spaces were squeezed
+    (setq x (substring x 0 (min (length x) 100))) 
     (setq x (replace-regexp-in-string "[[:space:]]+" " " x))
     (let ((trailing ".."))
       (if (< (length x) max-length)
@@ -49,18 +45,26 @@
 ;; (md-truncate-string "this is really long" 10)
 
 (defun md-preserve-position (old new)
-  (if (null old)
-      new
-    (let* ((result
-            (mapcar
-             (lambda (x)
-               (if (member x new) x nil)) old))
-           (new-items (set-difference new old :test 'equal)))
-      (loop for x on result do
-            (when (null (car x))
-              (setcar x (pop new-items))))
-      result)))
+  ;; (setq old (delete-if #'null old))
+  ;; (setq new (delete-if #'null new))
+  (let ((len (max (length old) (length new))))
+    (setq old (subseq old 0 len))
+    (setq new (subseq new 0 len))
+    (if (null old)
+        new
+      (let* ((result
+              (mapcar
+               (lambda (x)
+                 (if (member x new) x nil)) old))
+             (new-items (set-difference new old :test 'equal)))
+        (loop for x on result do
+              (when (null (car x))
+                (setcar x (pop new-items))))
+        ;; there may not be enough new items to fill the holes
+        (setq result (delete-if #'null result))
+        result))))
 ;;(md-preserve-position '(2 4 5 1) '(3 4 1 2))
+;;(md-preserve-position '(nil nil nil 2 4 5 1) '(3 4 1 2))
 
 (defun md-build-belt-string (x)
   (let* ((width (window-body-width (minibuffer-window)))
@@ -96,20 +100,30 @@
     (md-insert-text (format "%s" (nth (- c ?A) (md-belt-old-contents belt))) t nil)))
 
 (defun md-update-belts ()
+  ;; (message "maybe updating")
   (unless (or md-updating-belts
               (window-minibuffer-p)
               (minibuffer-prompt)
               (> (minibuffer-depth) 1))
+    ;; (message "updating or real")
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t)
-          (w (minibuffer-window)))
+          (w (minibuffer-window))
+          (buffer (current-buffer)))
       (with-current-buffer (window-buffer w)
         (erase-buffer)
         (dolist (belt md-belt-list)
-          (let* ((new (subseq (eval (md-belt-contents belt)) 0 md-belt-item-max))
+          (let* ((contents (with-current-buffer buffer (eval (md-belt-contents belt))))
+                 (new (subseq contents 0 (min (length contents) md-belt-item-max)))
                  (old (md-belt-old-contents belt))
                  (new-sorted (md-preserve-position old new)))
+            ;; (when (string= "frequency" (md-belt-name belt))
+            ;;   (message "-----------------------")
+            ;;   (message "contents -- %S" contents)
+            ;;   (message "new -- %S"  new)
+            ;;   (message "old -- %S"  old)
+            ;;   (message "new-sorted -- %S" new-sorted))
             (md-insert-belt-text
              (md-build-belt-string new-sorted) (md-belt-color belt))
             (insert "\n")
@@ -149,6 +163,7 @@
     (add-hook 'focus-in-hook #'md-update-belts t)
     (ad-enable-advice 'message 'around 'md-message-save-to-var)))
 
+;; TODO: use text properties to ensure we only delete text we inserted
 (defun md-destroy-all-belts ()
   (let ((md-updating-belts t))
     (setq resize-mini-windows 'grow-only)
@@ -158,19 +173,16 @@
     (remove-hook 'focus-in-hook #'md-update-belts)
     ;; TODO: disable doesn't work wtf?
     (ad-disable-advice 'message 'around 'md-message-save-to-var)
-    (with-selected-window (minibuffer-window)
-      (let ((inhibit-read-only t))
-        (erase-buffer)))
     (dolist (belt md-belt-list)
       (funcall (md-belt-destruct belt)))
+    (dolist (frame (frame-list))
+      (with-selected-frame frame
+        (with-selected-window (minibuffer-window frame)
+          (with-current-buffer (window-buffer)
+            (let ((inhibit-read-only t))
+              (erase-buffer))))))
     (setq md-belt-list nil)
     (message "")))
-
-(progn
-  (md-setup-nearest-belt)
-  (md-setup-kill-belt)
-  (md-setup-belt)) 
-;; (md-destroy-all-belts)
 
 (provide 'md-belt-impl)
 

@@ -12,3 +12,5 @@
 
 (defun md-destroy-kill-belt ()
   (setq md-belt-list (remove-if (lambda (x) (string= (md-belt-name x) "kill")) md-belt-list)))
+
+(provide 'md-kill-belt)

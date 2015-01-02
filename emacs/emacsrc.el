@@ -36,6 +36,7 @@
 
 (add-to-list 'load-path "~/etc/dash")
 (require 'dash)
+(eval-after-load "dash" '(dash-enable-font-lock))
 (add-to-list 'load-path "~/etc/smartparens")
 (require 'smartparens-config)
 (smartparens-global-mode 1)
@@ -61,6 +62,7 @@
 (load-file "~/etc/emacs/c-common.el")
 (load-file "~/etc/emacs/elisp-custom.el")
 (load-file "~/etc/emacs/ack-custom.el")
+(load-file "~/etc/emacs/md-belt-custom.el")
 
 ;; automagically tail log files
 (add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
@@ -487,12 +489,7 @@
                ;;minor-mode-alist  ;; list of minor modes
                " %-" ;; fill with '-'
                ))
-
-
-(defun compilation-buffer-name-jg (unused-mode-name)
-  (concat unused-mode-name ": " (with-project-root default-directory)))
-(setq-default compilation-buffer-name-function 'compilation-buffer-name-jg)
-(global-set-key [f9] 'compile)
+ 
 
 ;; Ostensibly this is for letting you insert the results of minibuffer
 ;; commands into other minibuffer commands, but I like it because it

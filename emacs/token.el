@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
+(require 'dash)
+
 (defvar md-initial-vec-size 500)
 (defvar md-max-tokens 200)
 (defvar giant-buffer-size (* 1 1024 1024))
@@ -7,6 +9,9 @@
 (defvar md-safe-scan-limit 5000)
 (defvar-local md-sym-tracking-vec (make-vector md-initial-vec-size 0))
 (defvar-local md-sym-tracking-capacity 0)
+(defvar-local md-refresh-timer nil)
+(defvar-local md-symbols-cache nil)
+(defvar md-symbols-cache-refresh-hook nil)
 
 (defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
@@ -55,21 +60,14 @@
   (let ((i sym-start)
         (result))
     (while (and (< i sym-end) (null result))
-      (when (memq (get-char-property i 'face) faces)
-        (setq result t))
+      (let ((face-or-faces (get-char-property i 'face)))
+        (unless (listp face-or-faces)
+          (setq face-or-faces (list face-or-faces)))
+        (when (-intersection face-or-faces faces)
+          (setq result t)))
       (setq i (next-char-property-change i sym-end)))
     result))
 (byte-compile 'md-string-contains-faces)
-
-;; (defun md-string-contains-faces (text faces)
-;;   (catch 'return
-;;     (dotimes (i (length text))
-;;       (let ((char-faces (md-get-faces-at-pos text i)))
-;;         (when (memq char-faces faces)
-;;             (throw 'return t))))
-;;     nil))
-;; (byte-compile 'md-string-contains-faces)
-
 
 (defun md-filter-symbol (sym sym-start sym-end)
   (cond
@@ -78,14 +76,6 @@
    ((md-string-contains-faces sym-start sym-end md-symbol-filter-faces) t)
    (t nil)))
 (byte-compile 'md-filter-symbol)
-
-;; (defun md-filter-symbol (sym)
-;;   (cond
-;;    ((< (length sym) 3) t)
-;;    ((not (= (string-to-number sym) 0)) t)
-;;    ((md-string-contains-faces sym md-symbol-filter-faces) t)
-;;    (t nil)))
-;; (byte-compile 'md-filter-symbol)
 
 (defun md-quick-sort (vec p q pred)
   (let ((r))
@@ -117,19 +107,8 @@
 
 ;; TODO: This would be faster if it used a heap
 ;; TODO: only need one search and use match-beginning/end
-;; TODO: Return a reused vector to avoid more GC
-;; TODO: get text. properties from buffer rather than string
-;; TODO: make hash w/o a string copy at all?
 ;; TODO: only run on changed parts of buffer? hard to 'subtract out'
-;; the influence of whatever was there before...
-;; apparently before-change can be used to save it, then compare
-;; so 'subtract out' the frequency of things inside, and check
-;; if there is a new next closest distance, have to keep list around
-;; scoring is also done by distance from point, so ANY point movement
-;; technically requires recomputing that too, but only doing that
-;; is probably much faster that redoing everything
-;; prolly should be a full blown minor mode?
-(defun md-get-symbols (start end)
+(defun md-get-symbols-impl (start end)
   "Get all the symbols between start and end"
   (save-match-data
     (save-excursion
@@ -140,10 +119,7 @@
             (min-distance most-positive-fixnum)
             (max-distance 0)
             (max-frequency 0)
-            ;;(vec (make-vector md-initial-vec-size 0))
-            ;;(vec md-sym-tracking-vec)
             (vec-size 0))
-        ;;(vec-capacity md-initial-vec-size))
         (goto-char start)
         (beginning-of-line)
         (condition-case nil
@@ -152,7 +128,6 @@
               (setq sym-start (point))
               (re-search-forward "\\_>" end)
               (setq current-sym (buffer-substring-no-properties sym-start (point)))
-              ;;(message "hello %S" (text-properties-at 0 current-sym))
               (when (not (md-filter-symbol current-sym sym-start (point)))
                 (set-text-properties 0 (length current-sym) nil current-sym)
                 (let ((entry (gethash current-sym sym-counts))
@@ -189,28 +164,58 @@
                    (distance (aref inner-vec 2)))
               (aset inner-vec 3 (md-score-token frequency 0 max-frequency distance min-distance max-distance)))
             (setq i (+ i 1))))
-        (md-quick-sort md-sym-tracking-vec 0 vec-size (lambda (a b) (< (aref a 3) (aref b 3))))
+        (md-quick-sort md-sym-tracking-vec 0 vec-size (lambda (a b) (> (aref a 3) (aref b 3))))
         (let ((i 0)
               (results '()))
           (while (and (< i vec-size) (< i md-max-tokens))
             (let ((inner-vec (aref md-sym-tracking-vec i)))
-              (setq results (nconc results `(,(aref inner-vec 0)))))
+              (setq results (cons (aref inner-vec 0) results)))
             (setq i (+ i 1)))
           results)))))
-(byte-compile 'md-get-symbols)
+(byte-compile 'md-get-symbols-impl)
 
-(defun md-safe-get-symbols (start end)
+(defun md-safe-get-symbols-impl (start end)
   (let ((distance (abs (- end start)))
         (safe-start start)
         (safe-end end))
     (when (> distance md-safe-scan-limit)
-      ;; (message "Greater than scan limit")
       (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
       (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
-      ;; (message "Limits %d %d" safe-start safe-end))
-    (md-get-symbols safe-start safe-end)))
-(byte-compile 'md-safe-get-symbols)
+    (md-get-symbols-impl safe-start safe-end)))
+(byte-compile 'md-safe-get-symbols-impl)
 
+(defun md-refresh-symbol-cache (buf)
+  (with-current-buffer buf
+    (setq md-symbols-cache (md-safe-get-symbols-impl (point-min) (point-max)))
+    (message "running hook")
+    (run-hooks 'md-symbols-cache-refresh-hook)
+    (when md-refresh-timer
+      (cancel-timer md-refresh-timer)
+      (setq md-refresh-timer nil))))
+(byte-compile 'md-refresh-symbol-cache)
+
+(defun md-refresh-symbols (&optional _start _end _old-length)
+  (unless (or md-refresh-timer
+              (window-minibuffer-p)
+              (minibufferp)
+              (not (eq (current-buffer) (window-buffer))))
+    ;; (message "** %S" (car (last (buffer-list))))
+    ;; (message "** %S" (with-current-buffer (car (last (buffer-list))) (buffer-string)))
+    (setq md-refresh-timer
+          (run-with-idle-timer 0.5 nil (lambda () (md-refresh-symbol-cache (current-buffer)))))))
+(byte-compile 'md-refresh-symbols)
+
+(add-hook 'after-change-functions 'md-refresh-symbols)
+(add-hook 'buffer-list-update-hook 'md-refresh-symbols)
+
+(defun md-get-symbols ()
+  (if (window-minibuffer-p)
+      nil
+    (if md-symbols-cache
+        md-symbols-cache
+      (progn
+        (md-refresh-symbol-cache (current-buffer))
+        md-symbols-cache))))
 
 (defun md-find-nearest-word-impl (word start end)
   (setq sites '())

@@ -36,9 +36,11 @@
           (setq forward-point next-end)
           (setq reverse-point previous-end)
           ;; (message "%s %s" next-symbol-str previous-symbol-str)
-          (setq symbol-list (nconc symbol-list (list (unless (md-filter-symbol next-symbol-str next-start next-end) next-symbol-str)
-                                                     (unless (md-filter-symbol previous-symbol-str previous-start previous-end) previous-symbol-str))))
-          (setq symbol-list (delete-if-not 'identity symbol-list))
+          (unless (md-filter-symbol next-symbol-str next-start next-end)
+            (setq symbol-list (cons next-symbol-str symbol-list)))
+          (unless (md-filter-symbol previous-symbol-str previous-start previous-end)
+            (setq symbol-list (cons previous-symbol-str symbol-list)))
+          (setq symbol-list (delete-if #'null symbol-list))
           (delete-dups symbol-list)))
       symbol-list)))
 
@@ -62,6 +64,8 @@
   (setq md-belt-list (remove-if (lambda (x) (string= (md-belt-name x) "nearest")) md-belt-list))
   (setq md-nearest-belt-symbols nil)
   (remove-hook 'post-command-hook #'md-nearest-post-command-hook))
+
+(provide 'md-nearest-belt)
 
 ;; (md-setup-nearest-belt)
 ;; (md-destroy-nearest-belt)
