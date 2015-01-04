@@ -12,6 +12,14 @@
 (defvar-local md-refresh-timer nil)
 (defvar-local md-symbols-cache nil)
 (defvar md-symbols-cache-refresh-hook nil)
+(defvar md-mode-keywords nil)
+(defvar md-min-symbol-length 3)
+
+(defun md-register-mode-keywords (mode keywords)
+  (let ((entry (assoc mode md-mode-keywords)))
+    (if entry
+        (setcdr entry keywords)
+      (push (cons mode keywords) md-mode-keywords))))
 
 (defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
@@ -51,6 +59,20 @@
         erc-nick-my-face
         erc-notice-face))
 
+(defun md-get-all-faces (sym-start sym-end)
+  (let ((i sym-start)
+        (result))
+    (when (< sym-end sym-start)
+      (setq sym-start sym-end)
+      (setq sym-end i))
+    (while (and (< i sym-end) (null result))
+      (let ((face-or-faces (get-char-property i 'face)))
+        (unless (listp face-or-faces)
+          (setq face-or-faces (list face-or-faces)))
+        (setq result (nconc result face-or-faces))
+        (setq i (next-char-property-change i sym-end))))
+    result))
+
 (defun md-get-faces-at-pos (text pos)
   "Get the font faces at TEXT."
   (get-char-property pos 'face text))
@@ -59,6 +81,9 @@
 (defun md-string-contains-faces (sym-start sym-end faces)
   (let ((i sym-start)
         (result))
+    (when (< sym-end sym-start)
+      (setq sym-start sym-end)
+      (setq sym-end i))
     (while (and (< i sym-end) (null result))
       (let ((face-or-faces (get-char-property i 'face)))
         (unless (listp face-or-faces)
@@ -69,13 +94,42 @@
     result))
 (byte-compile 'md-string-contains-faces)
 
+;; taken from: http://stackoverflow.com/a/11848341/50385
+(defun md-how-many-str (regexp str &optional max)
+  (save-match-data
+    (loop with start = 0
+          for count from 0
+          while (and (string-match regexp str start) (or (not max) (< count max)))
+          do (setq start (match-end 0))
+          finally return count)))
+(byte-compile 'md-how-many-str)
+
 (defun md-filter-symbol (sym sym-start sym-end)
-  (cond
-   ((< (length sym) 3) t)
-   ((not (= (string-to-number sym) 0)) t)
-   ((md-string-contains-faces sym-start sym-end md-symbol-filter-faces) t)
-   (t nil)))
+  (let ((entry))
+    (cond
+     ;; must have a minimum number of non-whitespace characters
+     ((< (md-how-many-str "[^\\\n[:space:]]" sym
+                          (+ 1 md-min-symbol-length)) md-min-symbol-length) t)
+     ((not (= (string-to-number sym) 0)) t)
+     ((and (setq entry (assoc major-mode md-mode-keywords))
+           (member sym (cdr entry))) t)
+     ((and sym-start
+           sym-end
+           (md-string-contains-faces sym-start sym-end md-symbol-filter-faces)) t)
+     (t nil))))
 (byte-compile 'md-filter-symbol)
+
+;; (with-current-buffer "#emacs"
+;;   (save-excursion
+;;     (setq temp (point))
+;;     (forward-symbol 1)
+;;     (md-string-contains-faces temp (point) md-symbol-filter-faces)))
+
+;; (with-current-buffer "#python"
+;;   (save-excursion
+;;     (setq temp (point))
+;;     (forward-symbol 1)
+;;     (md-filter-symbol (buffer-substring-no-properties temp (point)) temp (point))))
 
 (defun md-quick-sort (vec p q pred)
   (let ((r))
@@ -198,7 +252,9 @@
   (unless (or md-refresh-timer
               (window-minibuffer-p)
               (minibufferp)
-              (not (eq (current-buffer) (window-buffer))))
+              (not (eq (current-buffer) (window-buffer)))
+              ;; for some reason getting projectile files triggers buffer-list-update-hook
+              (and (boundp 'md-updating-projectile-files) md-updating-projectile-files))
     ;; (message "** %S" (car (last (buffer-list))))
     ;; (message "** %S" (with-current-buffer (car (last (buffer-list))) (buffer-string)))
     (setq md-refresh-timer
@@ -260,3 +316,4 @@
 ;; (message "%S" (md-get-symbols-frequency (window-start) (window-end)))
 ;; (message "%S" (md-get-symbols-frequency (point-min) (point-max)))
 ;; (message "%S" (md-safe-get-symbols (window-start) (window-end)))
+

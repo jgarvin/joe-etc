@@ -1,12 +1,15 @@
 (require 'md-belt-impl)
 
+(defun md-get-kill-ring ()
+  (remove-if (lambda (x) (md-filter-symbol x nil nil)) kill-ring))
+
 (defun md-setup-kill-belt ()
   (setq md-kill-belt
         (make-md-belt
          :name "kill"
          :construct #'md-setup-kill-belt
          :destruct #'md-destroy-kill-belt
-         :contents 'kill-ring
+         :contents '(md-get-kill-ring)
          :color "yellow"))
   (add-to-list 'md-belt-list md-kill-belt))
 

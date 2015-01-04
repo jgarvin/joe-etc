@@ -22,13 +22,22 @@
   (color nil :read-only t)
   (context nil :read-only t))
 
+;; (defun md-insert-belt-text (text color)
+;;   (put-text-property 0 (length text) 'face `(:underline t :foreground ,color) text)
+;;   (put-text-property 0 (length text) 'font-lock-face `(:underline t :foreground ,color) text)
+;;   ;; (put-text-property 0 (length text) 'face `(:foreground ,color) text)
+;;   ;; (put-text-property 0 (length text) 'font-lock-face `(:foreground ,color) text)
+;;   (put-text-property 0 (length text) 'read-only t text)
+;;   (put-text-property 0 (length text) 'intangible t text)
+;;   (insert text))
+
 (defun md-insert-belt-text (text color)
   (put-text-property 0 (length text) 'face `(:underline t :foreground ,color) text)
   (put-text-property 0 (length text) 'font-lock-face `(:underline t :foreground ,color) text)
-  (put-text-property 0 (length text) 'read-only t text)
-  (put-text-property 0 (length text) 'intangible t text)
-  (insert text))
-
+  (let ((o (make-overlay (point) (point))))
+    (overlay-put o 'after-string text)
+    (overlay-put o 'window (minibuffer-window))))
+  
 (defun md-truncate-string (x max-length)
   (if (null x)
       "nil"
@@ -37,7 +46,7 @@
     ;; some strings needlessly short that would have fit
     ;; once spaces were squeezed
     (setq x (substring x 0 (min (length x) 100))) 
-    (setq x (replace-regexp-in-string "[[:space:]]+" " " x))
+    (setq x (replace-regexp-in-string "[\\\n[:space:]]+" " " x))
     (let ((trailing ".."))
       (if (< (length x) max-length)
           x
@@ -99,13 +108,19 @@
                   (string= belt-name (md-belt-name x))) md-belt-list))))
     (md-insert-text (format "%s" (nth (- c ?A) (md-belt-old-contents belt))) t nil)))
 
+(defun md-resize-minibuf (w target-height)
+  (while (< (window-body-height w) (+ target-height 1))
+    (window-resize w 1))
+  (while (> (window-body-height w) (+ target-height 1))
+    (window-resize w -1)))
+
+;; TODO: mysteriously minibuffer in other frames can't be
+;; reduced to size 1, for no obvious reason
 (defun md-update-belts ()
-  ;; (message "maybe updating")
   (unless (or md-updating-belts
               (window-minibuffer-p)
               (minibuffer-prompt)
               (> (minibuffer-depth) 1))
-    ;; (message "updating or real")
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t)
@@ -113,27 +128,27 @@
           (buffer (current-buffer)))
       (with-current-buffer (window-buffer w)
         (erase-buffer)
+        (dolist (o (overlays-in (point-min) (point-max)))
+          (delete-overlay o))
         (dolist (belt md-belt-list)
           (let* ((contents (with-current-buffer buffer (eval (md-belt-contents belt))))
                  (new (subseq contents 0 (min (length contents) md-belt-item-max)))
                  (old (md-belt-old-contents belt))
                  (new-sorted (md-preserve-position old new)))
-            ;; (when (string= "frequency" (md-belt-name belt))
-            ;;   (message "-----------------------")
-            ;;   (message "contents -- %S" contents)
-            ;;   (message "new -- %S"  new)
-            ;;   (message "old -- %S"  old)
-            ;;   (message "new-sorted -- %S" new-sorted))
             (md-insert-belt-text
-             (md-build-belt-string new-sorted) (md-belt-color belt))
-            (insert "\n")
+             (concat (md-build-belt-string new-sorted) "\n") (md-belt-color belt))
             (setf (md-belt-old-contents belt) new-sorted)))
+        ;; (insert " ")
+        ;; (when md-current-message
+        ;;   (md-insert-belt-text md-current-message "white"))
         (when md-current-message
+          ;; Apparently at least one character must be in buffer for overlays to show,
+          ;; so may as well keep this as text in buffer
           (insert md-current-message))
-        (while (< (window-body-height w) (+ (length md-belt-list) 1))
-          (window-resize w 1))
-        (while (> (window-body-height w) (+ (length md-belt-list) 1))
-          (window-resize w -1))
+        (dolist (frame (frame-list))
+          (if (eq frame (selected-frame))
+              (md-resize-minibuf w (length md-belt-list))
+            (md-resize-minibuf (minibuffer-window frame) 1)))
         (goto-char (point-min))
         (message nil)))))
 
@@ -147,7 +162,8 @@
   (if (or md-updating-belts (not (ad-get-arg 0)))
       ad-do-it
     (let ((formatted-string (apply 'format (ad-get-args 0))))
-      (when (stringp formatted-string)
+      (when (or (not formatted-string)
+                (stringp formatted-string))
         (setq md-current-message formatted-string)
         (md-update-belts))
       ad-do-it)))

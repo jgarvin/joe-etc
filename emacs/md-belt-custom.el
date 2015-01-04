@@ -1,0 +1,16 @@
+;; (require 'md-belt-impl)
+;; (require 'md-nearest-belt)
+;; (require 'md-kill-belt)
+;; (require 'md-frequency-belt)
+
+(load-file "~/etc/emacs/md-belt-impl.el")
+(load-file "~/etc/emacs/md-nearest-belt.el")
+(load-file "~/etc/emacs/md-kill-belt.el")
+(load-file "~/etc/emacs/md-frequency-belt.el")
+
+(progn
+  (md-destroy-all-belts)
+  (md-setup-nearest-belt)
+  (md-setup-kill-belt)
+  (md-setup-frequency-belt)
+  (md-setup-belt)) 

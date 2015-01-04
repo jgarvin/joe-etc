@@ -10,16 +10,19 @@
        (not (null (buffer-file-name b)))))
 
 (defun etc-save-if-necessary ()
-  (when (reduce (lambda (a b) (or a b))
+  (with-demoted-errors
+    (when (reduce (lambda (a b) (or a b))
                 (mapcar (lambda (b)
                           (etc-buffer-needs-saving b))
                         (buffer-list)))
-    (save-some-buffers t nil)))
+    (save-some-buffers t nil))))
 
 ;; builtin autosave randomly stops working for no reason,
 ;; so implement my own
 (setq etc-save-timer
       (run-at-time "1 sec" 1 #'etc-save-if-necessary))
+
+;;(cancel-timer etc-save-timer)
 
 ;; autosave under all these circumstances too, never want to save
 ;; manually

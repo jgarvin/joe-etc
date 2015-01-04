@@ -138,7 +138,7 @@
   (unless (timerp md-most-recent-check-timer)
     (setq md-most-recent-check-timer
 	  (run-with-idle-timer 1 t 'md-open-if-not-most-recent (current-buffer) dir regex))))
-  
+
 (defun md-open-if-not-most-recent (buf dir regex)
   (interactive)
   ;; even though the timer *variable* is buffer local, the timer still
@@ -146,13 +146,12 @@
   ;; care of basing our checks on the window that's actually currently
   ;; displaying the buffer
   (let ((most-recent (md-get-most-recently-modified-file dir regex))
-	(window (get-buffer-window buf 'visible)))
+        (window (get-buffer-window buf 'visible)))
     (when (and window
-	       (not (string= (buffer-file-name buf) most-recent)))
-      (save-window-excursion
-	(select-window window)
-	(find-alternate-file most-recent)
-	(md-setup-most-recent-check dir regex)))))
+               (not (string= (buffer-file-name buf) most-recent)))
+      (with-selected-window window
+        (find-alternate-file most-recent)
+        (md-setup-most-recent-check dir regex)))))
 
 (defun md-open-most-recent-file (dir regex)
   (interactive)
