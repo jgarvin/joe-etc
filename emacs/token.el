@@ -293,33 +293,47 @@
 (defun md-find-nearest-word-window (word)
   (md-find-nearest-word-impl word (window-start) (window-end)))
 
-(defun md-get-active-erc-nicknames ()
+(defun md-get-active-erc-nicknames (&optional max-results)
   (when (equal major-mode 'erc-mode)
-    (let* ((candidates (erc-get-channel-nickname-list))
-           (regex (concat "\\(" (mapconcat #'regexp-quote candidates "\\|") "\\)"))
-           (scan-limit (max (point-min) (- (point-max) (max md-nick-scan-limit (- (window-end) (window-start))))))
-           (scan-start (point-max))
-           (presence (make-hash-table :test 'equal))
-           (results))
-      (save-excursion
-        (goto-char (point-max))
-        (while (> (point) scan-limit)
-          (re-search-backward regex scan-limit 1)
-          (when (md-string-contains-faces (match-beginning 0) (match-end 0) '(erc-nick-default-face))
-            (let* ((match (match-string-no-properties 0))
-                   (entry (gethash match presence))
-                   (cur-distance (- scan-start (point))))
-              (unless entry
-                (puthash match 1 presence)
-                (push match results))))))
-      (nreverse results))))
+    (let ((candidates (erc-get-channel-nickname-list)))
+      (when candidates
+        (let* ((regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
+               (scan-limit (max (point-min) (- (point-max) (max md-nick-scan-limit (- (window-end) (window-start))))))
+               (scan-start (point-max))
+               (presence (make-hash-table :test 'equal))
+               (results))
+          (save-excursion
+            (goto-char (point-max))
+            (while (and (not (bobp))
+                        (> (point) scan-limit)
+                        (or (not max-results) (< (length results) max-results))
+                        (re-search-backward regex scan-limit 1))
+              (when (md-string-contains-faces (match-beginning 0) (match-end 0) '(erc-nick-default-face))
+                (let* ((match (match-string-no-properties 0))
+                       (entry (gethash match presence))
+                       (cur-distance (- scan-start (point))))
+                  (unless entry
+                    (puthash match 1 presence)
+                    (push match results))))))
+          (nreverse results))))))
+
+(defun md-channel-buffer-p ()
+  (and (equal major-mode 'erc-mode)
+       ;; channels only, no server buffers
+       (equal 0 (string-match "#.*" (buffer-name)))))
 
 (defun md-update-active-nicks ()
-  (when (equal major-mode 'erc-mode)
+  (when (and (md-channel-buffer-p)
+             (erc-buffer-visible (current-buffer))
+             (< 1 (buffer-size)))
     (save-restriction
+      ;; erc-insert-post-hook runs in a narrowed buffer
       (widen)
-      (setq md-active-erc-nicknames (md-get-active-erc-nicknames)))))
+      (setq md-active-erc-nicknames (md-get-active-erc-nicknames 50)))))
 
 (add-hook 'erc-insert-post-hook #'md-update-active-nicks)
 (add-hook 'md-window-selection-hook #'md-update-active-nicks)
+;;(remove-hook 'erc-insert-post-hook #'md-update-active-nicks)
+;;(remove-hook 'md-window-selection-hook #'md-update-active-nicks)
+
 

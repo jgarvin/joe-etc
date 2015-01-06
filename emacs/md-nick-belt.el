@@ -7,7 +7,7 @@
          :construct #'md-setup-nick-belt
          :destruct #'md-destroy-nick-belt
          :contents 'md-active-erc-nicknames
-         :context '(equal major-mode 'erc-mode)
+         :context '(md-channel-buffer-p)
          :color "orange"))
   (add-to-list 'md-belt-list md-nick-belt))
 

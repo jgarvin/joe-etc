@@ -1,7 +1,8 @@
 (require 'md-belt-impl)
 
 (defun md-get-recent-ring ()
-  (remove-if (lambda (x) (or (not x) (md-filter-symbol x nil nil))) (ring-elements md-recent-ring)))
+  (when md-recent-ring
+    (remove-if (lambda (x) (or (not x) (md-filter-symbol x nil nil))) (ring-elements md-recent-ring))))
 
 (defun md-setup-recent-belt ()
   (setq md-recent-belt

@@ -1,4 +1,6 @@
+(require 'cl)
 (require 'ring)
+
 (defvar md-recent-ring nil)
 (defvar md-recent-ring-size 20)
 
@@ -60,7 +62,9 @@
    ((string= state "sleeping") (md-update-cursor-color "yellow"))
    ((string= state "disconnected") (md-update-cursor-color "orange"))
    ((string= state "server-disconnected") (md-update-cursor-color "purple"))
-   ((string= state "thinking") (md-update-cursor-color "blue"))
+   ((string= state "thinking")
+    (md-update-cursor-color "blue")
+    (undo-boundary))
    ((string= state "failure") (md-update-cursor-color "red"))
    (t
     (message "Unknown mic state: %s" state)
@@ -358,8 +362,6 @@ Ignores CHAR at point."
   (save-excursion
     (goto-char p)
     (current-column)))
-
-(require 'cl)
 
 (defun md-get-relative-column (p)
   (save-excursion
