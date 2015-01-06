@@ -1,3 +1,7 @@
+(require 'ring)
+(defvar md-recent-ring nil)
+(defvar md-recent-ring-size 20)
+
 ;; we do this because C-g will break emacsclient eval
 ;; requests. I tried rebinding C-g to a wrapper, but my
 ;; wrapper wouldn't trigger when emacs was in the server
@@ -183,6 +187,8 @@
     (not (not (string-match "[?!.]" (char-to-string (char-after)))))) t)
    (t nil)))
 
+;;(execute-kbd-macro [?\(])
+
 (defun md-need-space (str)
   (let
       ;; the presence of these before point mean we shouldn't include a space
@@ -209,6 +215,9 @@
              (md-need-capitalization))
     (setq text (concat (char-to-string (upcase (aref text 0)))
                        (subseq text 1))))
+  (when (or (not md-recent-ring) (/= md-recent-ring-size (ring-size md-recent-ring)))
+    (setq md-recent-ring (make-ring md-recent-ring-size)))
+  (ring-insert md-recent-ring text)
   (when (and check-spaces
              (md-need-space text))
     (setq text (concat " " text)))
@@ -322,8 +331,6 @@
   (delq nil
 	(mapcar (lambda (x) (and (funcall condp x) x)) lst)))
 
-(defun md-get-active-erc-nicknames ()
-  (md-filter (lambda (x) (not (erc-lurker-p x))) (erc-get-channel-nickname-list)))
 
 ;; TODO: should be no-op on blank lines
 (defun md-go-to-cliff ()
@@ -413,6 +420,24 @@ Ignores CHAR at point."
       list-buffers-directory
     buffer-file-name))
 
+;; make a selection hook that doesn't fire under circumstances we don't care about
+(defvar md-window-selection-hook nil)
+(defvar md-last-value-pair nil)
+(defvar md-inhibit-window-selection-hooks nil)
+
+(defun md-run-window-selection-hooks ()
+  (unless (or md-inhibit-window-selection-hooks
+              (not (eq (current-buffer) (window-buffer)))
+              (window-minibuffer-p)
+              (minibufferp)
+              (and md-last-value-pair (and (eq (current-buffer) (car md-last-value-pair))
+                                           (eq (selected-window) (cdr md-last-value-pair)))))
+    (let ((md-inhibit-window-selection-hooks t))
+      (run-hooks 'md-window-selection-hook)
+      (setq md-last-value-pair (cons (current-buffer) (selected-window))))))
+
+(add-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
+
 ;; (defun md-wrap-sexp ()
 ;;   (interactive)
 ;;   (sp-rewrap-sexp))
@@ -422,3 +447,5 @@ Ignores CHAR at point."
 
 (load-file "~/etc/emacs/md-network.el")
 (load-file "~/etc/emacs/token.el")
+(load-file "~/etc/emacs/md-projectile.el")
+(load-file "~/etc/emacs/md-belt-impl.el")

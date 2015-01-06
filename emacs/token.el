@@ -14,6 +14,8 @@
 (defvar md-symbols-cache-refresh-hook nil)
 (defvar md-mode-keywords nil)
 (defvar md-min-symbol-length 3)
+(defvar md-nick-scan-limit 5000)
+(defvar md-active-erc-nicknames nil)
 
 (defun md-register-mode-keywords (mode keywords)
   (let ((entry (assoc mode md-mode-keywords)))
@@ -248,6 +250,9 @@
       (setq md-refresh-timer nil))))
 (byte-compile 'md-refresh-symbol-cache)
 
+;; TODO: put back var for md-updating-projectile-files
+;; TODO: why is running hook constantly printing?
+
 (defun md-refresh-symbols (&optional _start _end _old-length)
   (unless (or md-refresh-timer
               (window-minibuffer-p)
@@ -262,16 +267,7 @@
 (byte-compile 'md-refresh-symbols)
 
 (add-hook 'after-change-functions 'md-refresh-symbols)
-(add-hook 'buffer-list-update-hook 'md-refresh-symbols)
-
-(defun md-get-symbols ()
-  (if (window-minibuffer-p)
-      nil
-    (if md-symbols-cache
-        md-symbols-cache
-      (progn
-        (md-refresh-symbol-cache (current-buffer))
-        md-symbols-cache))))
+(add-hook 'md-window-selection-hook 'md-refresh-symbols)
 
 (defun md-find-nearest-word-impl (word start end)
   (setq sites '())
@@ -297,23 +293,33 @@
 (defun md-find-nearest-word-window (word)
   (md-find-nearest-word-impl word (window-start) (window-end)))
 
-;;(defun md-)
+(defun md-get-active-erc-nicknames ()
+  (when (equal major-mode 'erc-mode)
+    (let* ((candidates (erc-get-channel-nickname-list))
+           (regex (concat "\\(" (mapconcat #'regexp-quote candidates "\\|") "\\)"))
+           (scan-limit (max (point-min) (- (point-max) (max md-nick-scan-limit (- (window-end) (window-start))))))
+           (scan-start (point-max))
+           (presence (make-hash-table :test 'equal))
+           (results))
+      (save-excursion
+        (goto-char (point-max))
+        (while (> (point) scan-limit)
+          (re-search-backward regex scan-limit 1)
+          (when (md-string-contains-faces (match-beginning 0) (match-end 0) '(erc-nick-default-face))
+            (let* ((match (match-string-no-properties 0))
+                   (entry (gethash match presence))
+                   (cur-distance (- scan-start (point))))
+              (unless entry
+                (puthash match 1 presence)
+                (push match results))))))
+      (nreverse results))))
 
-;; (etc-profile-func
-;;  (lambda ()
-;;    (dotimes (n 10000)
-;;      (md-get-symbols (window-start) (window-end)))))
-;; (etc-profile-unc
-;;  (lambda ()
-;;    (dotimes (n 10000)
-;;      (md-get-symbols-frequency-vec (window-start) (window-end)))))
-;; (benchmark 10000 '(md-safe-get-symbols (window-start) (window-end)))
-;; (benchmark 10000 '(md-get-symbols (point-min) (point-max)))
-;; (benchmark 1 '(md-get-symbols (window-start) (window-end)))
-;; (benchmark 1 '(md-get-symbols (point-min) (point-max)))
+(defun md-update-active-nicks ()
+  (when (equal major-mode 'erc-mode)
+    (save-restriction
+      (widen)
+      (setq md-active-erc-nicknames (md-get-active-erc-nicknames)))))
 
-;; (message "%S" (md-get-symbols (window-start) (window-end)))
-;; (message "%S" (md-get-symbols-frequency (window-start) (window-end)))
-;; (message "%S" (md-get-symbols-frequency (point-min) (point-max)))
-;; (message "%S" (md-safe-get-symbols (window-start) (window-end)))
+(add-hook 'erc-insert-post-hook #'md-update-active-nicks)
+(add-hook 'md-window-selection-hook #'md-update-active-nicks)
 
