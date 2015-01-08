@@ -1,7 +1,7 @@
 (require 'md-belt-impl)
 
 (defun md-get-kill-ring ()
-  (remove-if (lambda (x) (md-filter-symbol x nil nil)) kill-ring))
+  (remove-if (lambda (x) (md-filter-symbol x nil nil nil)) kill-ring))
 
 (defun md-setup-kill-belt ()
   (setq md-kill-belt

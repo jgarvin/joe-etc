@@ -48,7 +48,7 @@
     (setq x (substring x 0 (min (length x) 100))) 
     (setq x (replace-regexp-in-string "[\\\n[:space:]]+" " " x))
     (let ((trailing ".."))
-      (if (< (length x) max-length)
+      (if (< (string-width x) max-length)
           x
         (concat (substring x 0 (- max-length (length trailing))) trailing)))))
 ;; (md-truncate-string "this is really long" 10)
@@ -90,7 +90,7 @@
                          (format
                           (format "%c %%-%ds" (incf cur-char) length-per-item)
                           (md-truncate-string y length-per-item))) items " "))
-         (space-left (- width (length body-string) 4)))
+         (space-left (- width (string-width body-string) 4)))
     ;;(message "%d %d %d %d %d" space-left width max-length usable-length length-per-item)
     (concat "| "
             body-string

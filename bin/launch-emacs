@@ -4,4 +4,4 @@
 # we know we get the proper environment. With the
 # paths we actually want.
 
-emacsclient --alternate-editor='emacs' "$@"
+emacsclient --alternate-editor='' "$@"

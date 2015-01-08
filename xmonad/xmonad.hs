@@ -81,21 +81,12 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     [ ((modMask .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
-    , ((modMask,  xK_f), sendMessage ToggleStruts)
+    --, ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
-    , ((modMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
+    , ((modMask .|. shiftMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
 
-    , ((modMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
-
-    , ((modMask,  xK_g), runOrRaiseNext "" ((stringProperty "WM_WINDOW_ROLE") =? "conversation"))
-
-    -- launch pidgin
-    -- -- Need a bit more knowledge for this one, not sure how to give priorities for windows
-    -- , ((modMask,  xK_p), raiseNextMaybe (raiseNextMaybe (spawn "pidgin") ((stringProperty "WM_WINDOW_ROLE") =? "conversation")) (className =? "pidgin"))
-
-    -- -- launch xchat
-    -- , ((modMask,  xK_x), runOrRaiseNext "xchat" (className =? "Xchat"))
+    , ((modMask .|. shiftMask,  xK_b), runOrRaiseNext browser (className =? browser_name <||> className =? (capitalizeWord browser_name)))
 
     -- close focused window
     , ((modMask , xK_x     ), kill)
@@ -111,9 +102,6 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
 
     -- Resize viewed windows to the correct size
     --, ((modMask,               xK_n     ), refresh)
-
-    -- Move focus to the next window
-    --, ((modMask,               xK_Tab   ), windows W.focusDown)
 
     -- Move focus to the next window
     , ((modMask,               xK_e     ), windows W.focusDown)
@@ -156,10 +144,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- Move screens
-    , ((modMask              , xK_BackSpace     ), prevScreen)
-    , ((modMask              , xK_space     ), nextScreen)
-    , ((modMask              , xK_t     ), shiftNextScreen >> nextScreen)
-    , ((modMask              , xK_a     ), shiftPrevScreen >> prevScreen)
+    , ((modMask               , xK_BackSpace ), prevScreen)
+    , ((modMask .|. shiftMask , xK_BackSpace ), shiftPrevScreen >> prevScreen)
+    , ((modMask               , xK_space     ), nextScreen)
+    , ((modMask .|. shiftMask , xK_space     ), shiftNextScreen >> nextScreen)
     ]
     ++
 
@@ -233,7 +221,6 @@ myManageHook = composeAll
 
 main = do
   home_folder <- getEnv "HOME"
-  --editor  <- getEditor
   editor <- return (home_folder ++ "/etc/bin/launch-emacs")
   browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
