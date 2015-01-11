@@ -619,8 +619,8 @@
 
 
 (require 'expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "M-=") 'er/contract-region)
+(global-set-key (kbd "C-SPC") 'er/expand-region)
+(global-set-key (kbd "C-S-SPC") 'er/contract-region)
 
 (require 'change-inner)
 (global-set-key (kbd "M-i") 'change-inner)

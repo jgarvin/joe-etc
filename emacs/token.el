@@ -115,7 +115,7 @@
          (md-how-many-str "[^\\\n[:space:]]" sym
                           (+ 1 md-min-symbol-length))))
     (cond
-     ((< non-ws-char-count md-min-symbol-length) t)
+     ((< non-ws-char-count md-min-symbol-length)  t)
      ((and (not dont-check-max) (> non-ws-char-count md-max-symbol-length)) t)
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
@@ -248,7 +248,7 @@
 (defun md-refresh-symbol-cache (buf)
   (with-current-buffer buf
     (setq md-symbols-cache (md-safe-get-symbols-impl (point-min) (point-max)))
-    (message "running hook")
+    ;;(message "running hook")
     (run-hooks 'md-symbols-cache-refresh-hook)
     (when md-refresh-timer
       (cancel-timer md-refresh-timer)

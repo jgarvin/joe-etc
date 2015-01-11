@@ -451,3 +451,4 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/token.el")
 (load-file "~/etc/emacs/md-projectile.el")
 (load-file "~/etc/emacs/md-belt-impl.el")
+(load-file "~/etc/emacs/md-symbol-picker.el")
