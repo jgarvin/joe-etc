@@ -6,8 +6,19 @@
         "white"
         "purple"
         "yellow"
-        "orange"
-        "deep pink"))
+        "orange"))
+
+(defconst md-mark-list
+  '(#x030a ;; b̊
+    #x031a ;; b̚
+    ;; #x0338 ;; b̸
+    #x030f ;; b̏
+    ;; #x031f
+    nil
+    ))
+
+;; TODO: combining with double struck symbols would give us 1 more in effect...
+;; the other math alphabets aren't monospaced though....
 
 (defvar md-hl-overlays nil)
 (defvar md-hl-timer nil)
@@ -30,41 +41,9 @@
 (defun md-string-mods (s)
   (let* ((hash (md5 s))
          (char-choice (md-pick-unbiased-letter s (md-get-hash-byte hash 0)))
-         (color-choice (nth (mod (md-get-hash-byte hash 1) (length md-color-list)) md-color-list)))
-    (cons char-choice color-choice)))
-
-(defun randomly-underline (s)
-  (let* ((mods (md-string-mods s))
-         (char-choice (car mods))
-         (color-choice (cdr mods))
-         (new-s (copy-sequence s))
-         (prop-list (list :underline color-choice :weight 'ultra-bold)))
-    (add-text-properties char-choice (+ 1 char-choice) (list 'face prop-list 'font-lock-face prop-list) new-s)
-    new-s))
-
-(defun count-collisions (strings)
-  (let ((sym-table (make-hash-table :test 'equal))
-        (highest-collision-count 0)
-        (total-collision-count 0)
-        (filter-count 0))
-    (dolist (s strings)
-      (if (or (md-filter-symbol s nil nil)
-              (not (string-match "[a-z]\\|[A-Z]" s)))
-          (incf filter-count)
-        (let* ((mods (md-string-mods s))
-               (key (cons (downcase (substring s (car mods) (1+ (car mods)))) (cdr mods)))
-               (entry (gethash key sym-table)))
-          (if entry
-              (progn
-                (puthash key (1+ entry) sym-table)
-                (incf total-collision-count)
-                (setq highest-collision-count (max (1+ entry) highest-collision-count)))
-            (puthash key 0 sym-table)))))
-    (message "total collisions: %S" total-collision-count)
-    (message "filter count: %S" filter-count)
-    (message "num strings: %S" (length strings))
-    (message "final table:\n%S" sym-table)
-    highest-collision-count))
+         (color-choice (nth (mod (md-get-hash-byte hash 1) (length md-color-list)) md-color-list))
+         (mark-choice (nth (mod (md-get-hash-byte hash 2) (length md-mark-list)) md-mark-list)))
+    (list char-choice color-choice mark-choice)))
 
 (defun collision-test ()
     (let ((l))
@@ -78,13 +57,16 @@
       (setq c (+ c (funcall f))))
     (/ c times)))
 
-(defun md-highlight-symbols ()
+(defun md-hl-destroy-overlays ()
   (when md-hl-overlays
     (mapc #'delete-overlay md-hl-overlays)
     (setq md-hl-overlays nil))
   (when md-hl-timer
     (cancel-timer md-hl-timer)
-    (setq md-hl-timer nil))
+    (setq md-hl-timer nil)))
+
+(defun md-highlight-symbols ()
+  (md-hl-destroy-overlays)
   (let ((start (window-start))
         (end (window-end))
         (sym-start))
@@ -98,22 +80,33 @@
           (unless (or (md-filter-symbol sym sym-start (point))
                       (not (string-match "[a-z]\\|[A-Z]" sym)))
             (let* ((mods (md-string-mods sym))
-                   (char-choice (car mods))
-                   (color-choice (cdr mods))
+                   (char-choice (nth 0 mods))
+                   (color-choice (nth 1 mods))
+                   (mark-choice (nth 2 mods))
+                   (char (buffer-substring (+ sym-start char-choice) (+ sym-start char-choice 1)))
                    (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1))))
               (overlay-put o 'face (list :underline color-choice :weight 'ultra-bold))
+              (when mark-choice
+                (overlay-put o 'display (concat char (char-to-string mark-choice))))
               (push o md-hl-overlays))))))))
 
 (defun md-hl-closest-overlay (x y)
   (< (abs (- (overlay-start x) (point)))
      (abs (- (overlay-start y) (point)))))
 
-(defun md-hl-pick-symbol (letter color)
+(defun md-hl-pick-symbol (letter color mark)
   (interactive)
   (let ((candidates (-filter
-                     (lambda (x) (and (string= letter (buffer-substring (overlay-start x)
-                                                                        (1+ (overlay-start x))))
-                                      (string= color (plist-get (overlay-get x 'face) :underline))))
+                     (lambda (x)
+                       ;;(message "entry: %S" x)
+                       (and (string= letter (downcase
+                                             (buffer-substring (overlay-start x)
+                                                               (overlay-end x))))
+                            (string= color (plist-get (overlay-get x 'face) :underline))
+                            (let ((s (overlay-get x 'display)))
+                              (cond
+                               ((not mark) (not s))
+                               (s (string= (char-to-string mark) (substring s 1)))))))
                      md-hl-overlays)))
     (when candidates
       (setq candidates (sort candidates #'md-hl-closest-overlay))
@@ -123,7 +116,8 @@
                     (thing-at-point 'symbol))))
         (md-insert-text sym t nil)))))
 
-;;(md-hl-pick-symbol "t" "green")
+;;(md-hl-pick-symbol "r" "orange" #x31a)   
+
 
 (defun md-hl-schedule-update ()
   (unless md-hl-timer
@@ -136,6 +130,24 @@
 (defun md-hl-change (beg end len)
   (md-hl-schedule-update))
 
-(add-hook 'window-scroll-functions #'md-hl-scroll)
-(add-hook 'md-window-selection-hook #'md-hl-schedule-update)
-(add-hook 'after-change-functions #'md-hl-change)
+(defun md-hl-setup ()
+  (add-hook 'window-scroll-functions #'md-hl-scroll)
+  (add-hook 'md-window-selection-hook #'md-hl-schedule-update)
+  (add-hook 'after-change-functions #'md-hl-change))
+
+(defun md-hl-teardown ()
+  (remove-hook 'window-scroll-functions #'md-hl-scroll)
+  (remove-hook 'md-window-selection-hook #'md-hl-schedule-update)
+  (remove-hook 'after-change-functions #'md-hl-change)
+  (md-hl-destroy-overlays))
+
+;; Open questions:
+;; -Where do I put the marks?
+;; --I guess over whatever letter they would have gone over
+;; ---To calculate that just do the mod of the letter list
+;; ---again w/o the markers in it.
+;; -And we just make them alternative letters?
+;; -Can we combine markers?
+
+(md-hl-setup)
+;;(md-hl-teardown)

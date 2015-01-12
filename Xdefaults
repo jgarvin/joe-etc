@@ -1,2 +1,9 @@
 ! This makes it so screen will detect terminal resizes properly.
 XTerm*ptySttySize: true
+
+!-- Xft settings for matching gnome, which hard codes 96 dpi -- !
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintfull

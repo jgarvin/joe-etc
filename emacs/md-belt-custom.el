@@ -12,7 +12,7 @@
 
 (progn
   (md-destroy-all-belts)
-  (md-setup-nearest-belt)
+  ;;(md-setup-nearest-belt)
   (md-setup-kill-belt)
   (md-setup-frequency-belt)
   (md-setup-recent-belt)

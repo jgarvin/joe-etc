@@ -5,10 +5,12 @@
 (color-theme-initialize)
 (load-file "~/etc/emacs/cyberpunk-theme.el")
 
-(setq my-font-choice "DejaVu Sans Mono-13")
+(setq my-font-choice "DejaVu Sans Mono-14")
+;;(setq my-font-choice "Consolas-14")
 (set-face-attribute 'default nil :font my-font-choice)
 ;;(set-frame-font my-font-choice nil t)
-
+(frame-char-height)
+(frame-char-width)
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
   (tool-bar-mode -1))
