@@ -14,14 +14,13 @@
     ;; #x0338 ;; b̸
     #x030f ;; b̏
     ;; #x031f
+    ;;#x0309
     nil
     ))
 
-;; TODO: combining with double struck symbols would give us 1 more in effect...
-;; the other math alphabets aren't monospaced though....
-
 (defvar md-hl-overlays nil)
 (defvar md-hl-timer nil)
+(defvar md-symbol-picker-mode nil)
 
 (defun md-pick-unbiased-letter (s rand-byte)
   ;; this implementation is stupid slow
@@ -85,7 +84,8 @@
                    (mark-choice (nth 2 mods))
                    (char (buffer-substring (+ sym-start char-choice) (+ sym-start char-choice 1)))
                    (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1))))
-              (overlay-put o 'face (list :underline color-choice :weight 'ultra-bold))
+              ;;(overlay-put o 'face (list :underline color-choice :weight 'ultra-bold))
+              (overlay-put o 'face (list :underline color-choice))
               (when mark-choice
                 (overlay-put o 'display (concat char (char-to-string mark-choice))))
               (push o md-hl-overlays))))))))
@@ -118,7 +118,6 @@
 
 ;;(md-hl-pick-symbol "r" "orange" #x31a)   
 
-
 (defun md-hl-schedule-update ()
   (unless md-hl-timer
     (setq md-hl-timer (run-with-idle-timer 0.25 nil #'md-highlight-symbols))))
@@ -133,21 +132,21 @@
 (defun md-hl-setup ()
   (add-hook 'window-scroll-functions #'md-hl-scroll)
   (add-hook 'md-window-selection-hook #'md-hl-schedule-update)
-  (add-hook 'after-change-functions #'md-hl-change))
+  (add-hook 'after-change-functions #'md-hl-change)
+  (setq md-symbol-picker-mode t))
 
 (defun md-hl-teardown ()
   (remove-hook 'window-scroll-functions #'md-hl-scroll)
   (remove-hook 'md-window-selection-hook #'md-hl-schedule-update)
   (remove-hook 'after-change-functions #'md-hl-change)
-  (md-hl-destroy-overlays))
+  (md-hl-destroy-overlays)
+  (setq md-symbol-picker-mode nil))
 
-;; Open questions:
-;; -Where do I put the marks?
-;; --I guess over whatever letter they would have gone over
-;; ---To calculate that just do the mod of the letter list
-;; ---again w/o the markers in it.
-;; -And we just make them alternative letters?
-;; -Can we combine markers?
+(defun md-toggle-symbol-picker-mode (&optional arg)
+  (interactive)
+  (cond
+   ((and (not arg) md-symbol-picker-mode) (md-hl-teardown))
+   ((not md-symbol-picker-mode) (md-hl-setup))))
 
-(md-hl-setup)
-;;(md-hl-teardown)
+(md-toggle-symbol-picker-mode t)
+;; (md-toggle-symbol-picker-mode nil)

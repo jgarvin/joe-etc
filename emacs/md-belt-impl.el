@@ -11,6 +11,7 @@
 (defvar md-updating-belts nil)
 (defvar md-belt-list nil "List of belts.")
 (defvar md-previous-belt-text nil)
+(defvar md-belt-mode nil)
 
 ;; TODO: font-lock-add-keywords
 (cl-defstruct md-belt
@@ -171,19 +172,21 @@
         (md-update-belts))
       ad-do-it)))
 
-(defun md-setup-belt ()
+(defun md-setup-belts ()
   (let ((md-updating-belts t))
     (dolist (belt md-belt-list)
-      (funcall (md-belt-construct belt)))  
+      (when (md-belt-construct belt)
+        (funcall (md-belt-construct belt))))  
     (setq resize-mini-windows nil)
     (add-hook 'post-command-hook #'md-save-message t)
     (add-hook 'post-command-hook #'md-update-belts t)
     (add-hook 'window-configuration-change-hook #'md-update-belts t)
     (add-hook 'focus-in-hook #'md-update-belts t)
-    (ad-enable-advice 'message 'around 'md-message-save-to-var)))
+    (ad-enable-advice 'message 'around 'md-message-save-to-var)
+    (setq md-belt-mode t))
+  (md-update-belts))
 
-;; TODO: use text properties to ensure we only delete text we inserted
-(defun md-destroy-all-belts ()
+(defun md-hide-belts ()
   (let ((md-updating-belts t))
     (setq resize-mini-windows 'grow-only)
     (remove-hook 'post-command-hook #'md-save-message)
@@ -192,16 +195,32 @@
     (remove-hook 'focus-in-hook #'md-update-belts)
     ;; TODO: disable doesn't work wtf?
     (ad-disable-advice 'message 'around 'md-message-save-to-var)
-    (dolist (belt md-belt-list)
-      (funcall (md-belt-destruct belt)))
     (dolist (frame (frame-list))
       (with-selected-frame frame
         (with-selected-window (minibuffer-window frame)
           (with-current-buffer (window-buffer)
             (let ((inhibit-read-only t))
               (erase-buffer))))))
-    (setq md-belt-list nil)
-    (message "")))
+    (dolist (belt md-belt-list)
+      (when (md-belt-destruct belt)
+        (funcall (md-belt-destruct belt))))
+    (message "")
+    (setq md-belt-mode nil)))
+
+;; TODO: use text properties to ensure we only delete text we inserted
+(defun md-destroy-all-belts ()
+  (md-hide-belts)
+  (setq md-belt-list nil))
+;;(md-destroy-all-belts)
+
+(defun md-toggle-belt-mode (&optional arg)
+  (interactive)
+  (cond
+   ((and (not arg) md-belt-mode) (md-hide-belts))
+   ((not md-belt-mode) (md-setup-belts))))
+
+(md-toggle-belt-mode t)
+;; (md-toggle-belt-mode nil)
 
 (provide 'md-belt-impl)
 
