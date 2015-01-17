@@ -31,22 +31,25 @@
 (defun md-sn-destroy-overlays ()
   (when md-snippet-overlays
     (mapc #'delete-overlay md-snippet-overlays)
-    (setq md-snippet-overlays nil)))
+    (setq md-snippet-overlays nil))
+  (when md-sn-timer
+    (cancel-timer md-sn-timer)
+    (setq md-sn-timer nil)))
 ;; (md-del-snippet-overlays)
 ;;(remove-overlays)
 
-(defun md-pos-is-slot (pos)
-  (string= (buffer-substring-no-properties pos (1+ pos))
-           (char-to-string md-placeholder)))
+(defun md-pos-is-ours (pos o)
+  (eq (get-text-property pos 'md-glyph-overlay) o))
 
 (defun md-clear-slot (pos o)
   ;;(message "executing")
-  (when (md-pos-is-slot pos)
+  (when (md-pos-is-ours pos o)
     ;;(message "pass test")
     (save-excursion
       (goto-char pos)
       (delete-char 1)))
-  (delete-overlay o))
+  (delete-overlay o)
+  (setq md-snippet-overlays (delq o md-snippet-overlays)))
   
 (defun md-get-glyph ()
   (setq md-current-glyph (% (1+ md-current-glyph) (length md-glyphs)))
@@ -67,6 +70,9 @@
       (setq o (make-overlay start end nil t nil))
       (push o md-snippet-overlays)
       (put-text-property start end 'md-glyph-overlay o)
+      ;; we only make an overlay so we can detect insert-in-front-hooks.
+      ;; supposedly it's also a text property, but that doesn't seem to
+      ;; work at least in emacs 24.4.1.
       (overlay-put o 'insert-in-front-hooks
                    (list
                     (lambda (&rest unused) (md-clear-slot start o)))))
@@ -86,7 +92,9 @@
     (while (and (< (point) end)
                 (re-search-forward (char-to-string md-placeholder)
                                    end 1))
-      (md-setup-glyph (match-beginning 0)))))
+      (md-setup-glyph (match-beginning 0))))
+  (cancel-timer md-sn-timer)
+  (setq md-sn-timer nil))
 
 (defun md-sn-schedule-update ()
   (unless md-sn-timer
@@ -143,6 +151,3 @@
 
 (md-toggle-snippet-mode t)
 ;;(md-toggle-snippet-mode nil)
-
-;; make sure we only ever applied to radioactive symbols assert on that
-;; debug undue issues
