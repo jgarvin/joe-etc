@@ -116,6 +116,9 @@
 (python-advice #'reindent-then-newline-and-indent #'maybe-reindent-then-newline-and-indent)
 
 (defun etc-python-setup ()
-  (subword-mode 1))
+  (subword-mode 1)
+  (when (fboundp 'company-mode)
+    ;; requires an inferior python process, which I don't want to setup
+    (company-mode 0)))
 
 (add-hook 'python-mode-hook 'etc-python-setup)

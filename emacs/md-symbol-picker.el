@@ -11,9 +11,9 @@
 (defconst md-mark-list
   '(#x030a ;; b̊
     #x031a ;; b̚
-    ;; #x0338 ;; b̸
+    ;;#x0338 ;; b̸
     #x030f ;; b̏
-    ;; #x031f
+    ;; #x033d ;; b̽
     ;;#x0309
     nil
     ))
@@ -76,7 +76,7 @@
         (setq sym-start (point))
         (re-search-forward "\\_>" end 1)
         (let ((sym (buffer-substring-no-properties sym-start (point))))
-          (unless (or (md-filter-symbol sym sym-start (point))
+          (unless (or (md-filter-symbol sym sym-start (point) nil t)
                       (not (string-match "[a-z]\\|[A-Z]" sym)))
             (let* ((mods (md-string-mods sym))
                    (char-choice (nth 0 mods))

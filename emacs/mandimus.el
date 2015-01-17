@@ -225,7 +225,11 @@
   (when (and check-spaces
              (md-need-space text))
     (setq text (concat " " text)))
-  (insert text))
+  (insert text)
+  ;; experimental code to see if we can get inserts to close
+  ;; the company pop-up window
+  (when (fboundp #'company-cancel)
+    (company-cancel 'abort)))
 
 (defun md-backward-kill-word ()
   (interactive)

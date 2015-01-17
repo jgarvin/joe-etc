@@ -16,7 +16,7 @@
 (defvar md-min-symbol-length 3)
 (defvar md-max-symbol-length 50)
 (defvar md-nick-scan-limit 5000)
-(defvar md-active-erc-nicknames nil)
+(defvar-local md-active-erc-nicknames nil)
 
 (defun md-register-mode-keywords (mode keywords)
   (let ((entry (assoc mode md-mode-keywords)))
@@ -107,9 +107,7 @@
           finally return count)))
 (byte-compile 'md-how-many-str)
 
-(defun md-filter-symbol (sym sym-start sym-end &optional dont-check-max)
-  (unless dont-check-max
-    (setq dont-check-max t))
+(defun md-filter-symbol (sym sym-start sym-end &optional dont-check-max dont-check-faces)
   (let ((entry)
         (non-ws-char-count
          (md-how-many-str "[^\\\n[:space:]]" sym
@@ -120,7 +118,8 @@
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
-     ((and sym-start
+     ((and (not dont-check-faces)
+           sym-start
            sym-end
            (md-string-contains-faces sym-start sym-end md-symbol-filter-faces)) t)
      (t nil))))

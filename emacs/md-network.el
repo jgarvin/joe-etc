@@ -40,15 +40,18 @@
     (while (setq index (string-match "\n" message))
       (setq index (1+ index))
       (setq command (substring message 0 index))
-      (setq result
-            (condition-case err
-                (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
-                  (eval (car (read-from-string command))))
-              (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
-      (process-send-string proc (format "%S\n" result))
-      (md-server-log  (substring message 0 index) proc)
-      (setq message (substring message index)))
-    (setcdr pending message)))
+      (unwind-protect
+          (setq result
+                (condition-case err
+                    (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
+                      (eval (car (read-from-string command))))
+                  (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
+        ;; We always want to send the newline because the client will block until
+        ;; it receives it.
+        (process-send-string proc (format "%S\n" result))
+        (md-server-log  (substring message 0 index) proc)
+        (setq message (substring message index)))
+    (setcdr pending message))))
 
 (defun md-server-sentinel (proc msg)
   (when (string= msg "connection broken by remote peer\n")
