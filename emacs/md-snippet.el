@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t -*-
 
 (require 'cl)
+(require 'eldoc) ;; for getting documentation strings
 
 (defvar md-snippet-list nil)
 (defvar-local md-snippet-overlays nil)
@@ -35,16 +36,16 @@
   (when md-sn-timer
     (cancel-timer md-sn-timer)
     (setq md-sn-timer nil)))
-;; (md-del-snippet-overlays)
-;;(remove-overlays)
+;; (md-sn-destroy-overlays)
 
 (defun md-pos-is-ours (pos o)
   (eq (get-text-property pos 'md-glyph-overlay) o))
 
 (defun md-clear-slot (pos o)
-  ;;(message "executing")
+  ;; we have to verify we are dealing with the intended
+  ;; overlay because old overlays can get left in the
+  ;; buffer from undo and other actions.
   (when (md-pos-is-ours pos o)
-    ;;(message "pass test")
     (save-excursion
       (goto-char pos)
       (delete-char 1)))
@@ -128,7 +129,12 @@
 
 (cl-defun md-add-snippet (&key name contents context)
   (add-to-list 'md-snippet-list
-               (make-md-snippet :name name :contents contents :context context)))
+               (make-md-snippet :name name :contents contents :context context)
+               nil
+               (lambda (x y)
+                 (and
+                  (equal (md-snippet-name x) (md-snippet-name y))
+                  (equal (md-snippet-context x) (md-snippet-context y))))))
 
 (defun md-insert-snippet (name)
   (interactive)
@@ -143,11 +149,71 @@
                                    contents))
         (md-add-glyph-properties start (point))))))
 
+;; this is the most horrible code ever, forgive me sexp gods
+(defun md-gen-elisp-snippet-contents (sym)
+  (let ((doc (substring-no-properties
+              (eldoc-get-fnsym-args-string sym)))
+        (func-name (format "%s" sym))
+        (arg-doc))
+    (save-match-data
+      (string-match ": " doc)
+      ;; remove function name from args
+      (setq arg-doc (substring doc (match-end 0)))
+      ;; remove leading/trailing parens
+      (setq arg-doc (substring arg-doc 1 (1- (length arg-doc))))
+      ;; allow one rest argument
+      (setq arg-doc
+            (replace-regexp-in-string "&rest [A-Z]+" "REST" arg-doc))
+      ;; get rid of optional args
+      (when (string-match "&optional" arg-doc)
+        (setq arg-doc
+              (substring arg-doc 0 (match-beginning 0))))
+      ;; get rid of kw args
+      (when (string-match "&key" arg-doc)
+        (setq arg-doc
+              (substring arg-doc 0 (match-beginning 0))))
+        ;; (setq arg-doc (substring arg-doc 0
+        ;;                          (- (match-beginning 0) 1))))
+      (setq arg-doc
+            (replace-regexp-in-string "\\([A-Z0-9\\-]+\\)\\(\\.\\.\\.\\)?"
+                                      (char-to-string md-placeholder)
+                                      arg-doc))
+      (setq arg-doc
+            (replace-regexp-in-string "\\[[^]]*\\]"
+                                      ""
+                                      arg-doc))
+      ;; clean up stray spaces
+      (setq arg-doc
+            (replace-regexp-in-string "[[:space:]]+" " " arg-doc))
+      (setq arg-doc
+            (replace-regexp-in-string "( " "(" arg-doc))
+      (setq arg-doc
+            (replace-regexp-in-string " )" ")" arg-doc))
+      (setq arg-doc
+            (replace-regexp-in-string "\\` '" "" arg-doc))
+      (setq arg-doc
+            (replace-regexp-in-string " \\'" "" arg-doc))
+      (concat "(" func-name
+              (if (> (length arg-doc) 0) " " "")
+              arg-doc
+              ")"))))
+
+(defun md-gen-elisp-snippet (sym)
+  (md-add-snippet :name (format "%s" sym)
+                  :contents (md-gen-elisp-snippet-contents sym)
+                  :context '(derived-mode-p 'emacs-lisp-mode)))
+
+;; (md-gen-elisp-snippet 'dotimes)
+;; (md-gen-elisp-snippet 'string-match)
+;; (md-gen-elisp-snippet 'format)
+;; (md-gen-elisp-snippet 'make-md-snippet)
+;; (md-gen-elisp-snippet 'interactive)
+;; (format "%s" 'dotimes)
+
 (md-add-snippet :name "dotimes"
                 :contents "(dotimes ($1 $2) $3)"
                 :context '(derived-mode-p 'emacs-lisp-mode))
 
-;;(md-insert-snippet "dotimes")
-
+;;(md-insert-snippet "fboundp")
 (md-toggle-snippet-mode t)
 ;;(md-toggle-snippet-mode nil)

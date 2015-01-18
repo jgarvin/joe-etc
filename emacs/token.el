@@ -22,7 +22,12 @@
   (let ((entry (assoc mode md-mode-keywords)))
     (if entry
         (setcdr entry keywords)
-      (push (cons mode keywords) md-mode-keywords))))
+      (push (cons mode keywords) md-mode-keywords)))
+  (when (eq mode 'emacs-lisp-mode)
+    (mapc (lambda (x)
+            (when (fboundp (intern x))
+              (md-gen-elisp-snippet (intern x))))
+          (cdr (assoc 'emacs-lisp-mode md-mode-keywords)))))
 
 (defun md-safe-start ()
   (if (< giant-buffer-size (buffer-size))
