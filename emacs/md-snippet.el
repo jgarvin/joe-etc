@@ -31,7 +31,7 @@
 
 (defun md-sn-destroy-overlays ()
   (when md-snippet-overlays
-    (mapc #'delete-overlay md-snippet-overlays)
+    (mapc (lambda (x) (when (overlayp x) delete-overlay)) md-snippet-overlays)
     (setq md-snippet-overlays nil))
   (when md-sn-timer
     (cancel-timer md-sn-timer)
@@ -39,7 +39,9 @@
 ;; (md-sn-destroy-overlays)
 
 (defun md-pos-is-ours (pos o)
-  (eq (get-text-property pos 'md-glyph-overlay) o))
+  (condition-case nil
+      (eq (get-text-property pos 'md-glyph-overlay) o)
+    (args-out-of-range nil)))
 
 (defun md-clear-slot (pos o)
   ;; we have to verify we are dealing with the intended
@@ -74,6 +76,7 @@
       ;; we only make an overlay so we can detect insert-in-front-hooks.
       ;; supposedly it's also a text property, but that doesn't seem to
       ;; work at least in emacs 24.4.1.
+      ;; update: it doesn't work because font-lock clobbers this property, wtf?
       (overlay-put o 'insert-in-front-hooks
                    (list
                     (lambda (&rest unused) (md-clear-slot start o)))))
@@ -88,14 +91,18 @@
     (setq start (window-start)))
   (unless end
     (setq end (window-end)))
-  (save-excursion
-    (goto-char start)
-    (while (and (< (point) end)
-                (re-search-forward (char-to-string md-placeholder)
-                                   end 1))
-      (md-setup-glyph (match-beginning 0))))
-  (cancel-timer md-sn-timer)
-  (setq md-sn-timer nil))
+  (let ((first-glyph))
+    (save-excursion
+      (goto-char start)
+      (while (and (< (point) end)
+                  (re-search-forward (char-to-string md-placeholder)
+                                     end 1))
+        (md-setup-glyph (match-beginning 0))
+        (unless first-glyph
+          (setq first-glyph (match-beginning 0)))))
+    (cancel-timer md-sn-timer)
+    (setq md-sn-timer nil)
+    first-glyph))
 
 (defun md-sn-schedule-update ()
   (unless md-sn-timer
@@ -136,6 +143,9 @@
                   (equal (md-snippet-name x) (md-snippet-name y))
                   (equal (md-snippet-context x) (md-snippet-context y))))))
 
+;; TODO: we should always go to next letter, even if it's not
+;; part of most recent snippet, so that when we finish inner
+;; arguments we go back to doing outer ones
 (defun md-insert-snippet (name)
   (interactive)
   (let ((candidate (find name md-snippet-list
@@ -143,11 +153,14 @@
                          :test #'equal)))
     (when candidate
       (let ((contents (md-snippet-contents candidate))
-            (start (point)))
+            (start (point))
+            (jump-point))
         (insert
          (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
                                    contents))
-        (md-add-glyph-properties start (point))))))
+        (setq jump-point (md-add-glyph-properties start (point)))
+        (when jump-point
+          (goto-char jump-point))))))
 
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)
@@ -172,8 +185,6 @@
       (when (string-match "&key" arg-doc)
         (setq arg-doc
               (substring arg-doc 0 (match-beginning 0))))
-        ;; (setq arg-doc (substring arg-doc 0
-        ;;                          (- (match-beginning 0) 1))))
       (setq arg-doc
             (replace-regexp-in-string "\\([A-Z0-9\\-]+\\)\\(\\.\\.\\.\\)?"
                                       (char-to-string md-placeholder)
@@ -203,17 +214,13 @@
                   :contents (md-gen-elisp-snippet-contents sym)
                   :context '(derived-mode-p 'emacs-lisp-mode)))
 
-;; (md-gen-elisp-snippet 'dotimes)
-;; (md-gen-elisp-snippet 'string-match)
-;; (md-gen-elisp-snippet 'format)
-;; (md-gen-elisp-snippet 'make-md-snippet)
-;; (md-gen-elisp-snippet 'interactive)
-;; (format "%s" 'dotimes)
-
-(md-add-snippet :name "dotimes"
-                :contents "(dotimes ($1 $2) $3)"
+(md-add-snippet :name "call"
+                :contents "($1)"
                 :context '(derived-mode-p 'emacs-lisp-mode))
 
-;;(md-insert-snippet "fboundp")
+;; TODO: debug redoing still doesn't work right
+
+;;(md-insert-snippet "dotimes")
+
 (md-toggle-snippet-mode t)
 ;;(md-toggle-snippet-mode nil)
