@@ -39,17 +39,19 @@
 ;; (md-sn-destroy-overlays)
 
 (defun md-pos-is-ours (o)
-  (let ((pos (overlay-start o)))
-    (when pos
-      (string= (buffer-substring-no-properties pos (1+ pos))
-               (char-to-string md-placeholder)))))
+  (condition-case nil
+      (let ((pos (overlay-start o)))
+        (when pos
+          (string= (buffer-substring-no-properties pos (1+ pos))
+                   (char-to-string md-placeholder))))
+    (args-out-of-range nil)))
 
 (defun md-sn-destroy-overlay (o)
   (delete-overlay o)
   (setq md-snippet-overlays (delq o md-snippet-overlays)))
 
 (defun md-clear-slot (o)
-  ;;(message "clearing")
+  (message "clearing")
   ;; we have to verify we are dealing with the intended
   ;; overlay because old overlays can get left in the
   ;; buffer from undo and other actions.
@@ -178,9 +180,6 @@
                   (equal (md-snippet-name x) (md-snippet-name y))
                   (equal (md-snippet-context x) (md-snippet-context y))))))
 
-;; TODO: we should always go to next letter, even if it's not
-;; part of most recent snippet, so that when we finish inner
-;; arguments we go back to doing outer ones
 (defun md-insert-snippet (name)
   (interactive)
   (when md-snippet-mode
@@ -198,6 +197,18 @@
           (when jump-point
             (set-window-point nil jump-point))
           )))))
+
+(defun md-sn-find-slot (c)
+  (let ((candidates (-filter (lambda (x)
+                               (= (upcase c)
+                                  (nth (overlay-get x 'md-glyph-choice) md-glyphs)))
+                             md-snippet-overlays)))
+    (setq candidates (sort candidates
+                           (lambda (x y) (< (abs (- (point) (overlay-start x)))
+                                            (abs (- (point) (overlay-start y)))))))
+    (if candidates
+        (set-window-point nil (overlay-start (car candidates)))
+      (error "No slot for that letter"))))
 
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)
