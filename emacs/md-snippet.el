@@ -31,62 +31,86 @@
 
 (defun md-sn-destroy-overlays ()
   (when md-snippet-overlays
-    (mapc (lambda (x) (when (overlayp x) delete-overlay)) md-snippet-overlays)
+    (mapc (lambda (x) (when (overlayp x) (delete-overlay x))) md-snippet-overlays)
     (setq md-snippet-overlays nil))
   (when md-sn-timer
     (cancel-timer md-sn-timer)
     (setq md-sn-timer nil)))
 ;; (md-sn-destroy-overlays)
 
-(defun md-pos-is-ours (pos o)
-  (condition-case nil
-      (eq (get-text-property pos 'md-glyph-overlay) o)
-    (args-out-of-range nil)))
+(defun md-pos-is-ours (o)
+  (let ((pos (overlay-start o)))
+    (when pos
+      (string= (buffer-substring-no-properties pos (1+ pos))
+               (char-to-string md-placeholder)))))
 
-(defun md-clear-slot (pos o)
+(defun md-sn-destroy-overlay (o)
+  (delete-overlay o)
+  (setq md-snippet-overlays (delq o md-snippet-overlays)))
+
+(defun md-clear-slot (o)
+  ;;(message "clearing")
   ;; we have to verify we are dealing with the intended
   ;; overlay because old overlays can get left in the
   ;; buffer from undo and other actions.
-  (when (md-pos-is-ours pos o)
+  (when (md-pos-is-ours o)
     (save-excursion
-      (goto-char pos)
+      (goto-char (overlay-start o))
       (delete-char 1)))
-  (delete-overlay o)
-  (setq md-snippet-overlays (delq o md-snippet-overlays)))
-  
+  (md-sn-destroy-overlay o))
+
+(defun md-sn-destroyed-invalid-overlays ()
+  (let ((invalid))
+    (dolist (i md-snippet-overlays)
+      (when (not (md-pos-is-ours i))
+        (push i invalid)))
+    (mapc #'md-sn-destroy-overlay invalid)))
+
 (defun md-get-glyph ()
   (setq md-current-glyph (% (1+ md-current-glyph) (length md-glyphs)))
   md-current-glyph)
+
+(defun md-sn-get-overlay (location)
+  (let ((candidates (remove-if (lambda (x) (/= location (overlay-start x))) md-snippet-overlays)))
+    (assert (<= (length candidates) 1))
+    (when candidates
+      (car candidates))))
 
 (defun md-setup-glyph (location)
   (interactive)
   (let* ((start location)
          (end (1+ location))
-         (o (get-text-property location 'md-glyph-overlay))
-         (glyph-choice (get-text-property location 'md-glyph-choice))
+         (o (md-sn-get-overlay location))
+         (glyph-choice (when o (overlay-get o 'md-glyph-choice)))
          (glyph))
     (unless glyph-choice
-      (setq glyph-choice (md-get-glyph))
-      (put-text-property start end 'md-glyph-choice glyph-choice))
+        (setq glyph-choice (md-get-glyph)))
     (setq glyph (char-to-string (nth glyph-choice md-glyphs)))
-    (unless (and o (overlay-buffer o))
+    (unless (and o (overlay-buffer o)
+                 (string= glyph (overlay-get o 'display)))
+      (when o
+        (md-sn-destroy-overlay o))
       (setq o (make-overlay start end nil t nil))
       (push o md-snippet-overlays)
-      (put-text-property start end 'md-glyph-overlay o)
       ;; we only make an overlay so we can detect insert-in-front-hooks.
       ;; supposedly it's also a text property, but that doesn't seem to
       ;; work at least in emacs 24.4.1.
       ;; update: it doesn't work because font-lock clobbers this property, wtf?
+      (overlay-put o 'md-glyph-choice glyph-choice)
       (overlay-put o 'insert-in-front-hooks
                    (list
-                    (lambda (&rest unused) (md-clear-slot start o)))))
-    (unless (string= glyph (get-char-property location 'display))
-      (put-text-property start end
-                         'display
-                         (propertize glyph
-                                     'face md-glyph-face 'font-lock-face md-glyph-face)))))
+                    (lambda (&rest unused)
+                      (unless undo-in-progress
+                        (md-clear-slot o)))))
+      (overlay-put o
+                   'display
+                   (propertize glyph
+                               'face md-glyph-face 'font-lock-face md-glyph-face))
+      )))
 
 (defun md-add-glyph-properties (&optional start end)
+  ;;(message "Adding glyphs in window %S" (selected-window))
+  (md-sn-destroyed-invalid-overlays)
   (unless start
     (setq start (window-start)))
   (unless end
@@ -100,13 +124,22 @@
         (md-setup-glyph (match-beginning 0))
         (unless first-glyph
           (setq first-glyph (match-beginning 0)))))
-    (cancel-timer md-sn-timer)
-    (setq md-sn-timer nil)
+    (when md-sn-timer
+      (cancel-timer md-sn-timer)
+      (setq md-sn-timer nil))
     first-glyph))
 
 (defun md-sn-schedule-update ()
-  (unless md-sn-timer
-    (setq md-sn-timer (run-with-idle-timer 0.25 nil #'md-add-glyph-properties))))
+  (unless (or md-sn-timer
+              (not (= 0 (recursion-depth))))
+    (let ((w (selected-window)))
+      ;;(message "scheduling in %S" w)
+      (let ((win-check-closure
+             (lambda ()
+               (when (eq w (selected-window))
+                 ;;(message "window check passed in %S %S" w (selected-window))
+                 (md-add-glyph-properties)))))
+        (setq md-sn-timer (run-with-idle-timer 0.25 nil win-check-closure))))))
 
 (defun md-sn-scroll (w new-start)
   (when (eq w (selected-window))
@@ -116,24 +149,26 @@
   (md-sn-schedule-update))
 
 (defun md-sn-setup ()
+  (message "Starting md-snippet...")
   (add-hook 'window-scroll-functions #'md-sn-scroll)
   (add-hook 'md-window-selection-hook #'md-sn-schedule-update)
   (add-hook 'after-change-functions #'md-sn-change)
   (setq md-snippet-mode t))
 
 (defun md-sn-teardown ()
+  (message "Stopping md-snippet...")
   (remove-hook 'window-scroll-functions #'md-sn-scroll)
   (remove-hook 'md-window-selection-hook #'md-sn-schedule-update)
   (remove-hook 'after-change-functions #'md-sn-change)
   (md-sn-destroy-overlays)
   (setq md-snippet-mode nil))
 
-(defun md-toggle-snippet-mode (&optional arg)
+(defun md-snippet-mode-activate (arg)
   (interactive)
   (cond
-   ((and (not arg) md-snippet-mode) (md-sn-teardown))
-   ((not md-snippet-mode) (md-sn-setup))))
-
+   ((and md-snippet-mode (= 0 arg)) (md-sn-teardown))
+   ((and (not md-snippet-mode) (= 1 arg)) (md-sn-setup))))
+  
 (cl-defun md-add-snippet (&key name contents context)
   (add-to-list 'md-snippet-list
                (make-md-snippet :name name :contents contents :context context)
@@ -148,19 +183,21 @@
 ;; arguments we go back to doing outer ones
 (defun md-insert-snippet (name)
   (interactive)
-  (let ((candidate (find name md-snippet-list
-                         :key #'md-snippet-name
-                         :test #'equal)))
-    (when candidate
-      (let ((contents (md-snippet-contents candidate))
-            (start (point))
-            (jump-point))
-        (insert
-         (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
-                                   contents))
-        (setq jump-point (md-add-glyph-properties start (point)))
-        (when jump-point
-          (goto-char jump-point))))))
+  (when md-snippet-mode
+    (let ((candidate (find name md-snippet-list
+                           :key #'md-snippet-name
+                           :test #'equal)))
+      (when candidate
+        (let ((contents (md-snippet-contents candidate))
+              (start (point))
+              (jump-point))
+          (insert
+           (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
+                                     contents))
+          (setq jump-point (md-add-glyph-properties start (point)))
+          (when jump-point
+            (set-window-point nil jump-point))
+          )))))
 
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)
@@ -218,9 +255,7 @@
                 :contents "($1)"
                 :context '(derived-mode-p 'emacs-lisp-mode))
 
-;; TODO: debug redoing still doesn't work right
-
 ;;(md-insert-snippet "dotimes")
 
-(md-toggle-snippet-mode t)
-;;(md-toggle-snippet-mode nil)
+(md-snippet-mode-activate 1)
+;;(md-snippet-mode-activate 0)

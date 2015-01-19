@@ -91,7 +91,8 @@
                          (format
                           (format "%c %%-%ds" (incf cur-char) length-per-item)
                           (md-truncate-string y length-per-item))) items " "))
-         (space-left (- width (string-width body-string) 4)))
+         ;; the minimum call here shouldn't be necessary, some Unicode bug
+         (space-left (min 0 (- width (string-width body-string) 4))))
     ;;(message "%d %d %d %d %d" space-left width max-length usable-length length-per-item)
     (concat "| "
             body-string

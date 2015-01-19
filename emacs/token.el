@@ -25,7 +25,7 @@
       (push (cons mode keywords) md-mode-keywords)))
   (when (eq mode 'emacs-lisp-mode)
     (mapc (lambda (x)
-            (when (fboundp (intern x))
+            (when (and (fboundp 'md-gen-elisp-snippet) (fboundp (intern x)))
               (md-gen-elisp-snippet (intern x))))
           (cdr (assoc 'emacs-lisp-mode md-mode-keywords)))))
 
