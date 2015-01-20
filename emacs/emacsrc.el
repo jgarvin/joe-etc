@@ -73,6 +73,7 @@
 (load-file "~/etc/emacs/c-common.el")
 (load-file "~/etc/emacs/elisp-custom.el")
 (load-file "~/etc/emacs/ack-custom.el")
+(load-file "~/etc/emacs/org-custom.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-company-custom.el")

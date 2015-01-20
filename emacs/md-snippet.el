@@ -210,6 +210,9 @@
         (set-window-point nil (overlay-start (car candidates)))
       (error "No slot for that letter"))))
 
+;; (defun md-sn-next-slot ()
+;;   (setq md-snippet-overlays ))
+
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)
   (let ((doc (substring-no-properties

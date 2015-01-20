@@ -63,11 +63,14 @@
   "If a *mandimus-server* buffer exists, write STRING to it for logging purposes."
   (if (get-buffer "*mandimus-server*")
       (with-current-buffer "*mandimus-server*"
-        (goto-char (point-max))
-        (insert (current-time-string)
-                (if client (format " %s:" client) " ")
-                string)
-        (or (bolp) (newline)))))
+        (unless buffer-read-only
+          (read-only-mode t))
+        (let ((inhibit-read-only t))
+          (goto-char (point-max))
+          (insert (current-time-string)
+                  (if client (format " %s:" client) " ")
+                  string)
+          (or (bolp) (newline))))))
 
 ;; always run so mandimus can hook up
 (condition-case nil

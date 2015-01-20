@@ -84,10 +84,15 @@
                    (mark-choice (nth 2 mods))
                    (char (buffer-substring (+ sym-start char-choice) (+ sym-start char-choice 1)))
                    (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1))))
-              ;;(overlay-put o 'face (list :underline color-choice :weight 'ultra-bold))
-              (overlay-put o 'face (list :underline color-choice))
+              ;; Displaying propertized text works better than using the overlay face
+              ;; property. Org-mode had issues with it where it would make text with
+              ;; diacritical marks huge.
               (when mark-choice
-                (overlay-put o 'display (concat char (char-to-string mark-choice))))
+                (overlay-put o 'display
+                             (propertize
+                              (concat char (char-to-string mark-choice))
+                              'face (list :underline color-choice)
+                              'font-lock-face (list :underline color-choice))))
               (push o md-hl-overlays))))))))
 
 (defun md-hl-closest-overlay (x y)

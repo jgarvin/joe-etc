@@ -4,13 +4,10 @@
 (defvar md-recent-ring nil)
 (defvar md-recent-ring-size 20)
 
-;; we do this because C-g will break emacsclient eval
-;; requests. I tried rebinding C-g to a wrapper, but my
-;; wrapper wouldn't trigger when emacs was in the server
-;; code. Turns out C-g is special somehow, and just binding
-;; a different key to the same function doesn't have
-;; that behavior!
-(global-set-key (kbd "C-S-g") 'keyboard-quit)
+(defvar md-mic-state nil)
+(defvar md-in-utterance nil)
+(defvar md-start-utterance-hooks nil)
+(defvar md-end-utterance-hooks nil)
 
 (defun md-line-is-blank ()
   (interactive)
@@ -54,21 +51,47 @@
   (setq md-cursor-color color)
   (set-cursor-color color))
 
+(defun md-check-start-utterance ()
+  (unless md-in-utterance
+    (run-hooks 'md-start-utterance-hooks)
+    (setq md-in-utterance t)))
+
+(defun md-check-end-utterance ()
+  (when md-in-utterance
+    (run-hooks 'md-end-utterance-hooks)
+    (setq md-in-utterance nil)))
+
 (defun md-new-mic-state-impl (state)
   (cond
-   ((string= state "on") (md-update-cursor-color "green"))
-   ((string= state "success") (md-update-cursor-color "green"))
-   ((string= state "off") (md-update-cursor-color "brown"))
-   ((string= state "sleeping") (md-update-cursor-color "yellow"))
-   ((string= state "disconnected") (md-update-cursor-color "orange"))
-   ((string= state "server-disconnected") (md-update-cursor-color "purple"))
+   ((string= state "on")
+    (md-update-cursor-color "green")
+    (md-check-end-utterance))
+   ((string= state "success")
+    (md-update-cursor-color "green")
+    (md-check-end-utterance))
+   ((string= state "off")
+    (md-update-cursor-color "brown")
+    (md-check-end-utterance))
+   ((string= state "sleeping")
+    (md-update-cursor-color "yellow")
+    (md-check-end-utterance))
+   ((string= state "disconnected")
+    (md-update-cursor-color "orange")
+    (md-check-end-utterance))
+   ((string= state "server-disconnected")
+    (md-update-cursor-color "purple")
+    (md-check-end-utterance))
    ((string= state "thinking")
     (md-update-cursor-color "blue")
-    (undo-boundary))
-   ((string= state "failure") (md-update-cursor-color "red"))
+    (md-check-start-utterance))
+   ((string= state "failure")
+    (md-update-cursor-color "red")
+    (md-check-end-utterance))
    (t
     (message "Unknown mic state: %s" state)
-    (md-update-cursor-color md-startup-cursor-color))))
+    (md-update-cursor-color md-startup-cursor-color)
+    (md-check-end-utterance)))
+  (setq md-mic-state state))
 
 (defun md-new-mic-state (state)
   (dolist (frame (frame-list))
@@ -456,3 +479,4 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-projectile.el")
 (load-file "~/etc/emacs/md-belt-impl.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")
+(load-file "~/etc/emacs/md-undo.el")
