@@ -46,6 +46,7 @@ eq to this one."
               (memq (current-buffer) md-utterance-changed-buffers))
     (push (current-buffer) md-utterance-changed-buffers)
     (setq md-collapse-undo-marker (list 'apply 'identity nil))
+    (undo-boundary)
     (md-undo-collapse-begin md-collapse-undo-marker)))
 
 (defun md-pre-utterance-undo-setup ()

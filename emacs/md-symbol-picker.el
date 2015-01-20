@@ -86,33 +86,30 @@
                    (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1))))
               ;; Displaying propertized text works better than using the overlay face
               ;; property. Org-mode had issues with it where it would make text with
-              ;; diacritical marks huge.
-              (when mark-choice
-                (overlay-put o 'display
-                             (propertize
-                              (concat char (char-to-string mark-choice))
-                              'face (list :underline color-choice)
-                              'font-lock-face (list :underline color-choice))))
+              ;; diacritical marks huge
+              (overlay-put o 'display
+                           (md-hl-generate-text char mark-choice color-choice))
               (push o md-hl-overlays))))))))
 
 (defun md-hl-closest-overlay (x y)
   (< (abs (- (overlay-start x) (point)))
      (abs (- (overlay-start y) (point)))))
 
-(defun md-hl-pick-symbol (letter color mark)
+(defun md-hl-generate-text (letter mark color)
+    (propertize
+     (concat letter (if mark (char-to-string mark) ""))
+     'face (list :underline color)
+     'font-lock-face (list :underline color)))
+
+(defun md-hl-pick-symbol (letter mark color)
   (interactive)
-  (let ((candidates (-filter
-                     (lambda (x)
-                       ;;(message "entry: %S" x)
-                       (and (string= letter (downcase
-                                             (buffer-substring (overlay-start x)
-                                                               (overlay-end x))))
-                            (string= color (plist-get (overlay-get x 'face) :underline))
-                            (let ((s (overlay-get x 'display)))
-                              (cond
-                               ((not mark) (not s))
-                               (s (string= (char-to-string mark) (substring s 1)))))))
-                     md-hl-overlays)))
+  (let* ((choice (md-hl-generate-text letter mark color))
+         (candidates (-filter
+                      (lambda (x)
+                        (let ((s (overlay-get x 'display)))
+                          (and (string= color (plist-get (get-text-property 0 'face s) :underline))
+                               (string= choice s))))
+                      md-hl-overlays)))
     (when candidates
       (setq candidates (sort candidates #'md-hl-closest-overlay))
       (let* ((choice (car candidates))

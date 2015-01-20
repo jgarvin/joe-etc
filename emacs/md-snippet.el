@@ -260,10 +260,11 @@
               arg-doc
               ")"))))
 
-(defun md-gen-elisp-snippet (sym)
-  (md-add-snippet :name (format "%s" sym)
-                  :contents (md-gen-elisp-snippet-contents sym)
-                  :context '(derived-mode-p 'emacs-lisp-mode)))
+(defun md-gen-elisp-snippet (sym &optional replace)
+  (md-add-snippet 
+   :name (format "%s" sym)
+   :contents (md-gen-elisp-snippet-contents sym)
+   :context '(derived-mode-p 'emacs-lisp-mode)))
 
 (md-add-snippet :name "call"
                 :contents "($1)"
