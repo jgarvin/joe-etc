@@ -40,7 +40,7 @@ eq to this one."
          (with-current-buffer ,buffer-var
            (md-undo-collapse-end ',marker))))))
 
-(defun md-check-undo-before-change (beg end)
+(defun md-check-undo-before-change (beg end)  
   (unless (or (eq buffer-undo-list t) ;; undo tracking disabled
               buffer-read-only
               (memq (current-buffer) md-utterance-changed-buffers))
@@ -52,11 +52,15 @@ eq to this one."
   (setq md-utterance-changed-buffers nil))
 
 (defun md-post-utterance-collapse-undo ()
-  (dolist (i md-utterance-changed-buffers)
-    (with-current-buffer i
-      (md-undo-collapse-end md-collapse-undo-marker)))
-  (setq md-utterance-changed-buffers nil))
+  (unwind-protect
+      (dolist (i md-utterance-changed-buffers)
+        (with-current-buffer i
+          (condition-case nil
+              (md-undo-collapse-end md-collapse-undo-marker)
+            (error (message "Couldn't undo in buffer %S" i)))))
+    (setq md-utterance-changed-buffers nil)))
 
 (add-hook 'before-change-functions #'md-check-undo-before-change)
 (add-hook 'md-start-utterance-hooks #'md-pre-utterance-undo-setup)
 (add-hook 'md-end-utterance-hooks #'md-post-utterance-collapse-undo)
+

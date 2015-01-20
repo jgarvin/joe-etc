@@ -51,7 +51,7 @@
   (setq md-snippet-overlays (delq o md-snippet-overlays)))
 
 (defun md-clear-slot (o)
-  (message "clearing")
+  ;;(message "clearing")
   ;; we have to verify we are dealing with the intended
   ;; overlay because old overlays can get left in the
   ;; buffer from undo and other actions.

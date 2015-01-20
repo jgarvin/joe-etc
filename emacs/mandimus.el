@@ -53,13 +53,15 @@
 
 (defun md-check-start-utterance ()
   (unless md-in-utterance
-    (run-hooks 'md-start-utterance-hooks)
-    (setq md-in-utterance t)))
+    (unwind-protect
+        (run-hooks 'md-start-utterance-hooks)
+      (setq md-in-utterance t))))
 
 (defun md-check-end-utterance ()
   (when md-in-utterance
-    (run-hooks 'md-end-utterance-hooks)
-    (setq md-in-utterance nil)))
+    (unwind-protect
+        (run-hooks 'md-end-utterance-hooks)
+      (setq md-in-utterance nil))))
 
 (defun md-new-mic-state-impl (state)
   (cond
