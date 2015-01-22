@@ -4,6 +4,7 @@
 (require 'eldoc) ;; for getting documentation strings
 
 (defvar md-snippet-list nil)
+(defvar md-global-overlay-list nil)
 (defvar-local md-snippet-overlays nil)
 (defvar-local md-current-glyph -1)
 (defvar md-snippet-mode nil)
@@ -34,13 +35,19 @@
   (contents nil :read-only t)
   (context t :read-only t))
 
-(defun md-sn-destroy-overlays ()
-  (when md-snippet-overlays
-    (mapc (lambda (x) (when (overlayp x) (delete-overlay x))) md-snippet-overlays)
-    (setq md-snippet-overlays nil))
+(defun md-sn-cancel-timer ()
   (when md-sn-timer
     (cancel-timer md-sn-timer)
     (setq md-sn-timer nil)))
+
+(defun md-sn-destroy-overlays ()
+  (let ((temp (copy-sequence md-global-overlay-list)))
+    (when temp
+      (mapc #'md-sn-destroy-overlay temp)
+      (setq md-global-overlay-list nil)
+      (setq md-snippet-overlays nil))
+    (setq md-glyphs-in-use nil)
+    (md-sn-cancel-timer)))
 ;; (md-sn-destroy-overlays)
 
 (defun md-pos-is-ours (o)
@@ -51,12 +58,13 @@
                    (char-to-string md-placeholder))))
     (args-out-of-range nil)))
 
-(defun md-sn-destroy-overlay (o)
+(defun md-sn-destroy-overlay (o &optional keep-in-list)
   (setq md-glyphs-in-use
               (cl-remove (string-to-char (overlay-get o 'display))
                          md-glyphs-in-use :test 'equal :count 1))
   (delete-overlay o)
-  (setq md-snippet-overlays (delq o md-snippet-overlays)))
+  (unless keep-in-list
+    (setq md-snippet-overlays (delq o md-snippet-overlays))))
 
 (defun md-clear-slot (o)
   ;;(message "clearing")
@@ -110,6 +118,7 @@
       (when o
         (md-sn-destroy-overlay o))
       (setq o (make-overlay start end nil t nil))
+      (push o md-global-overlay-list)
       (push o md-snippet-overlays)
       ;; we only make an overlay so we can detect insert-in-front-hooks.
       ;; supposedly it's also a text property, but that doesn't seem to
@@ -124,8 +133,7 @@
       (overlay-put o
                    'display
                    (propertize glyph
-                               'face md-glyph-face 'font-lock-face md-glyph-face))
-      )))
+                               'face md-glyph-face 'font-lock-face md-glyph-face)))))
 
 (defun md-add-glyph-properties (&optional start end)
   ;;(message "Adding glyphs in window %S" (selected-window))
@@ -142,19 +150,22 @@
                                       start 1))
         (md-setup-glyph (match-beginning 0))
         (setq last-glyph (match-beginning 0))))
-    (when md-sn-timer
-      (cancel-timer md-sn-timer)
-      (setq md-sn-timer nil))
+    (md-sn-cancel-timer)
     last-glyph))
 
 (defun md-sn-schedule-update ()
   (unless (or md-sn-timer
-              (not (= 0 (recursion-depth))))
+              (not (= 0 (recursion-depth)))
+              (not (eq (current-buffer) (window-buffer)))
+              buffer-read-only
+              (minibufferp))
     (let ((w (selected-window)))
       (let ((win-check-closure
              (lambda ()
-               (when (eq w (selected-window))
-                 (md-add-glyph-properties)))))
+               (unwind-protect
+                   (when (eq w (selected-window))
+                     (md-add-glyph-properties))
+                 (md-sn-cancel-timer)))))
         ;; The idle timer has to be marked as repeating even though we cancel
         ;; it every time it actually executes. This is because of a race
         ;; condition not handled in the emacs API. If an error occurs triggering
@@ -198,15 +209,15 @@
    (equal (md-snippet-name x) (md-snippet-name y))
    (equal (md-snippet-context x) (md-snippet-context y))))
 
-(cl-defun md-add-snippet (&optional replace &key name contents context)
+(cl-defun md-add-snippet (&key name contents context)
   (let ((snippet (make-md-snippet :name name :contents contents :context context))) 
-       (when replace
-         (setq md-snippet-list
-               (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list)))
-       (add-to-list 'md-snippet-list
-                    snippet
-                    nil
-                    #'md-compare-snippets)))
+    (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
+
+(cl-defun md-replace-snippet (&key name contents context)
+  (let ((snippet (make-md-snippet :name name :contents contents :context context))) 
+    (setq md-snippet-list
+          (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list))
+    (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
 
 (defun md-insert-snippet (name)
   (interactive)
@@ -329,27 +340,27 @@ go to the highest slot (most recent)."
    :contents (md-gen-elisp-snippet-contents sym)
    :context '(derived-mode-p 'emacs-lisp-mode)))
 
-(md-add-snippet t
+(md-replace-snippet
  :name "defun"
  :contents "(defun $1 ($2) $3)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
-(md-add-snippet t
+(md-replace-snippet
  :name "let"
  :contents "(let (($1)) $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
-(md-add-snippet t
+(md-replace-snippet
  :name "call"
  :contents "($1)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
-(md-add-snippet t
+(md-replace-snippet
  :name "setq"
  :contents "(setq $1 $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
-(md-add-snippet t
+(md-replace-snippet
  :name "setq-default"
  :contents "(setq-default $1 $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))

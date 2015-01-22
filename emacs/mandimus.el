@@ -484,3 +484,4 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-belt-impl.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-undo.el")
+(load-file "~/etc/emacs/md-snippet.el")
