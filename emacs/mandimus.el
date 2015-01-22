@@ -53,17 +53,18 @@
 
 (defun md-check-start-utterance ()
   (unless md-in-utterance
-    (unwind-protect
-        (run-hooks 'md-start-utterance-hooks)
-      (setq md-in-utterance t))))
-
+    (message "Starting utterance")
+    (setq md-in-utterance t)
+    (run-hooks 'md-start-utterance-hooks)))
+    
 (defun md-check-end-utterance ()
   (when md-in-utterance
-    (unwind-protect
-        (run-hooks 'md-end-utterance-hooks)
-      (setq md-in-utterance nil))))
+    (message "Ending utterance")
+    (setq md-in-utterance nil)
+    (run-hooks 'md-end-utterance-hooks)))
 
 (defun md-new-mic-state-impl (state)
+  (message "Mic state: %s" state)
   (cond
    ((string= state "on")
     (md-update-cursor-color "green")
@@ -240,6 +241,7 @@
      (t t))))
 
 (defun md-insert-text (text check-spaces check-capitals)
+  (message "inserting text: %s" text)
   (when (and check-capitals
              (md-need-capitalization))
     (setq text (concat (char-to-string (upcase (aref text 0)))

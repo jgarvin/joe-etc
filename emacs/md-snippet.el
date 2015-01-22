@@ -55,11 +55,12 @@
   ;; we have to verify we are dealing with the intended
   ;; overlay because old overlays can get left in the
   ;; buffer from undo and other actions.
-  (when (md-pos-is-ours o)
-    (save-excursion
-      (goto-char (overlay-start o))
-      (delete-char 1)))
-  (md-sn-destroy-overlay o))
+  (let ((inhibit-modification-hooks t))
+    (when (md-pos-is-ours o)
+      (save-excursion
+        (goto-char (overlay-start o))
+        (delete-char 1)))
+    (md-sn-destroy-overlay o)))
 
 (defun md-sn-destroyed-invalid-overlays ()
   (let ((invalid))
@@ -171,14 +172,20 @@
    ((and md-snippet-mode (= 0 arg)) (md-sn-teardown))
    ((and (not md-snippet-mode) (= 1 arg)) (md-sn-setup))))
   
-(cl-defun md-add-snippet (&key name contents context)
-  (add-to-list 'md-snippet-list
-               (make-md-snippet :name name :contents contents :context context)
-               nil
-               (lambda (x y)
-                 (and
-                  (equal (md-snippet-name x) (md-snippet-name y))
-                  (equal (md-snippet-context x) (md-snippet-context y))))))
+(defun md-compare-snippets (x y)
+  (and
+   (equal (md-snippet-name x) (md-snippet-name y))
+   (equal (md-snippet-context x) (md-snippet-context y))))
+
+(cl-defun md-add-snippet (&optional replace &key name contents context)
+  (let ((snippet (make-md-snippet :name name :contents contents :context context))) 
+       (when replace
+         (setq md-snippet-list
+               (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list)))
+       (add-to-list 'md-snippet-list
+                    snippet
+                    nil
+                    #'md-compare-snippets)))
 
 (defun md-insert-snippet (name)
   (interactive)
@@ -260,15 +267,36 @@
               arg-doc
               ")"))))
 
-(defun md-gen-elisp-snippet (sym &optional replace)
+(defun md-gen-elisp-snippet (sym)
   (md-add-snippet 
    :name (format "%s" sym)
    :contents (md-gen-elisp-snippet-contents sym)
    :context '(derived-mode-p 'emacs-lisp-mode)))
 
-(md-add-snippet :name "call"
-                :contents "($1)"
-                :context '(derived-mode-p 'emacs-lisp-mode))
+(md-add-snippet t
+ :name "defun"
+ :contents "(defun $1 ($2) $3)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-add-snippet t
+ :name "let"
+ :contents "(let (($1)) $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-add-snippet t
+ :name "call"
+ :contents "($1)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-add-snippet t
+ :name "setq"
+ :contents "(setq $1 $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-add-snippet t
+ :name "setq-default"
+ :contents "(setq-default $1 $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
 
 ;;(md-insert-snippet "dotimes")
 
