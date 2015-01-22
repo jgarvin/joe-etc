@@ -80,9 +80,9 @@ onto a list of buffers modified this utterance."
         ;; in undoing those
         (when (buffer-name i)
           (with-current-buffer i
-            (condition-case nil
+            (condition-case data
                 (md-undo-collapse-end md-collapse-undo-marker)
-              (error (message "Couldn't undo in buffer %S" i))))))
+              (error (message "Couldn't collapse undo in buffer %S error: %S" i data))))))
     (setq md-utterance-changed-buffers nil)
     (setq md-collapse-undo-marker nil)))
 

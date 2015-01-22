@@ -21,6 +21,7 @@
 (defvar md-hl-overlays nil)
 (defvar md-hl-timer nil)
 (defvar md-symbol-picker-mode nil)
+;;(defvar md-lookup-table nil)
 
 (defun md-pick-unbiased-letter (s rand-byte)
   ;; this implementation is stupid slow
@@ -101,24 +102,36 @@
      'face (list :underline color)
      'font-lock-face (list :underline color)))
 
-(defun md-hl-pick-symbol (letter mark color)
+(defun md-hl-insert-symbol (letter mark color)
   (interactive)
-  (let* ((choice (md-hl-generate-text letter mark color))
+  (let ((choice (md-hl-pick-symbol letter mark color)))
+    (md-insert-text (buffer-substring (car choice) (cdr choice)) t nil)))
+
+(defun md-hl-jump-symbol (letter mark color)
+  (interactive)
+  (let ((choice (md-hl-pick-symbol letter mark color)))
+    (set-window-point nil (car choice))))
+
+(defun md-hl-pick-symbol (letter mark color)
+  "returns position of closest symbol matching targeting information"
+  (interactive)
+  (let* ((choice (md-hl-generate-text (downcase letter) mark color))
          (candidates (-filter
                       (lambda (x)
                         (let ((s (overlay-get x 'display)))
                           (and (string= color (plist-get (get-text-property 0 'face s) :underline))
-                               (string= choice s))))
+                               (string= choice (downcase s)))))
                       md-hl-overlays)))
     (when candidates
       (setq candidates (sort candidates #'md-hl-closest-overlay))
-      (let* ((choice (car candidates))
-             (sym (save-excursion
-                    (goto-char (overlay-start choice))
-                    (thing-at-point 'symbol))))
-        (md-insert-text sym t nil)))))
+      (let* ((choice (car candidates)))
+        (save-excursion
+          (goto-char (overlay-start choice))
+          (bounds-of-thing-at-point 'symbol))))))
 
-;;(md-hl-pick-symbol "r" "orange" #x31a)   
+
+;; (md-hl-pick-symbol "r" #x31a "orange")   
+;;(md-hl-insert-symbol "r" #x31a "orange") 
 
 (defun md-hl-schedule-update ()
   (unless md-hl-timer

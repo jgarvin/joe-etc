@@ -241,7 +241,6 @@
      (t t))))
 
 (defun md-insert-text (text check-spaces check-capitals)
-  (message "inserting text: %s" text)
   (when (and check-capitals
              (md-need-capitalization))
     (setq text (concat (char-to-string (upcase (aref text 0)))
