@@ -122,7 +122,15 @@
 
 (defun md-hl-schedule-update ()
   (unless md-hl-timer
-    (setq md-hl-timer (run-with-idle-timer 0.25 nil #'md-highlight-symbols))))
+    ;; The idle timer has to be marked as repeating even though we cancel
+    ;; it every time it actually executes. This is because of a race
+    ;; condition not handled in the emacs API. If an error occurs triggering
+    ;; the debugger then timers won't run. If the timer isn't marked repeating
+    ;; it then never runs. If it never runs then it never clears the md-sn-timer
+    ;; variable. If it never clears that variable then the check at the top
+    ;; of this function to avoid double timers never passes, and we never
+    ;; get to set the timer again.
+    (setq md-hl-timer (run-with-idle-timer 0.25 t #'md-highlight-symbols))))
 
 (defun md-hl-scroll (w new-start)
   (when (eq w (selected-window))

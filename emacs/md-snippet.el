@@ -151,13 +151,19 @@
   (unless (or md-sn-timer
               (not (= 0 (recursion-depth))))
     (let ((w (selected-window)))
-      ;;(message "scheduling in %S" w)
       (let ((win-check-closure
              (lambda ()
                (when (eq w (selected-window))
-                 ;;(message "window check passed in %S %S" w (selected-window))
                  (md-add-glyph-properties)))))
-        (setq md-sn-timer (run-with-idle-timer 0.25 nil win-check-closure))))))
+        ;; The idle timer has to be marked as repeating even though we cancel
+        ;; it every time it actually executes. This is because of a race
+        ;; condition not handled in the emacs API. If an error occurs triggering
+        ;; the debugger then timers won't run. If the timer isn't marked repeating
+        ;; it then never runs. If it never runs then it never clears the md-sn-timer
+        ;; variable. If it never clears that variable then the check at the top
+        ;; of this function to avoid double timers never passes, and we never
+        ;; get to set the timer again.
+        (setq md-sn-timer (run-with-idle-timer 0.25 t win-check-closure))))))
 
 (defun md-sn-scroll (w new-start)
   (when (eq w (selected-window))
@@ -232,8 +238,43 @@
         (set-window-point nil (overlay-start (car candidates)))
       (error "No slot for that letter"))))
 
-;; (defun md-sn-next-slot ()
-;;   (setq md-snippet-overlays ))
+(defun md-get-overlay-glyph-idx (o)
+  (position (string-to-char (overlay-get o 'display)) md-glyphs))
+
+(defun md-sn-next-slot ()
+  "If point is over a slot, go to the next highest slot, if not
+go to the highest slot (most recent)."
+  (md-sn-destroyed-invalid-overlays)
+  (setq md-snippet-overlays
+        (cl-sort md-snippet-overlays #'<
+                 :key #'md-get-overlay-glyph-idx))
+  (setq md-snippet-overlays (nreverse md-snippet-overlays))
+  (let ((on-overlay)
+        (next-attempt))
+    (setq on-overlay (-filter (lambda (x) (memq x md-snippet-overlays)) (overlays-at (point))))
+    (when on-overlay
+      ;; we cleaned invalid overlays at the start so each point should contain
+      ;; exactly 0 or 1 snippet overlays
+      (assert (= 1 (length on-overlay)))
+      (setq on-overlay (car on-overlay)))
+    (if on-overlay
+        (let ((idx (md-get-overlay-glyph-idx on-overlay)))
+          ;; if we're already on an overlay, find the next lowest glyph
+          (setq next-attempt (% (1- idx) (length md-glyphs)))
+          (while (/= next-attempt idx)
+            (condition-case nil
+                (progn
+                  (message "iteration")
+                  (md-sn-find-slot (nth next-attempt md-glyphs))
+                  (setq next-attempt idx))
+              (error (setq next-attempt (% (1- next-attempt) (length md-glyphs)))))))
+      ;; if we're not on an overlay find the highest glyph
+      (md-sn-find-slot (nth (md-get-overlay-glyph-idx
+                             (car md-snippet-overlays))
+                            md-glyphs)))))
+
+(defun md-sn-drop-slot ()
+  (insert-char md-placeholder))
 
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)

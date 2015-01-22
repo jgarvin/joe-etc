@@ -269,10 +269,16 @@
               (not (eq (current-buffer) (window-buffer)))
               ;; for some reason getting projectile files triggers buffer-list-update-hook
               (and (boundp 'md-updating-projectile-files) md-updating-projectile-files))
-    ;; (message "** %S" (car (last (buffer-list))))
-    ;; (message "** %S" (with-current-buffer (car (last (buffer-list))) (buffer-string)))
+    ;; The idle timer has to be marked as repeating even though we cancel
+    ;; it every time it actually executes. This is because of a race
+    ;; condition not handled in the emacs API. If an error occurs triggering
+    ;; the debugger then timers won't run. If the timer isn't marked repeating
+    ;; it then never runs. If it never runs then it never clears the md-sn-timer
+    ;; variable. If it never clears that variable then the check at the top
+    ;; of this function to avoid double timers never passes, and we never
+    ;; get to set the timer again.
     (setq md-refresh-timer
-          (run-with-idle-timer 0.5 nil (lambda () (md-refresh-symbol-cache (current-buffer)))))))
+          (run-with-idle-timer 0.5 t (lambda () (md-refresh-symbol-cache (current-buffer)))))))
 (byte-compile 'md-refresh-symbols)
 
 (add-hook 'after-change-functions 'md-refresh-symbols)
