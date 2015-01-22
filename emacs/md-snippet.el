@@ -10,7 +10,12 @@
 (defvar md-sn-timer nil)
 
 (defconst md-glyphs
-  '(?A ?B ?C ?D ?E ?F ?G ?H ?I ?J ?K ?L ?M ?N ?O ?P ?Q ?R ?S ?T ?U ?V ?X ?Y ?Z))
+  '(?A ?B ?C ?D ?E ?F ?G ?H ?I ?J ?K ?L ?M ?N ?O ?P ?Q ?R ?S ?T ?U ?V ?W ?X ?Y ?Z
+       ?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9
+       ?^ ?\# ?\ ?> ?\; ?\" ?* ?\' ?% ?\\ ?\` ?$ ?[ ?_ ?\, ?{ ?:
+       ?! ?- ?\( ?\| ?~ ?\. ?? ?= ?\) ?< ?} ?& ?/ ?@ ?+ ?]))
+
+(defvar-local md-glyphs-in-use nil)
 
 (defconst md-glyph-face
   (list :box (list :color "red" :line-width -3)
@@ -47,6 +52,9 @@
     (args-out-of-range nil)))
 
 (defun md-sn-destroy-overlay (o)
+  (setq md-glyphs-in-use
+              (cl-remove (string-to-char (overlay-get o 'display))
+                         md-glyphs-in-use :test 'equal :count 1))
   (delete-overlay o)
   (setq md-snippet-overlays (delq o md-snippet-overlays)))
 
@@ -70,8 +78,16 @@
     (mapc #'md-sn-destroy-overlay invalid)))
 
 (defun md-get-glyph ()
-  (setq md-current-glyph (% (1+ md-current-glyph) (length md-glyphs)))
-  md-current-glyph)
+  "Get an unused glyph if possible, otherwise just start cycling them."
+  (let ((candidates (cl-remove-if (lambda (x) (member x md-glyphs-in-use)) md-glyphs)))
+    (if candidates
+        (progn
+          ;; (message "candidates: %S" candidates)
+          ;; (message "checking positon of %S in %S" (car candidates) md-glyphs)
+          (push (car candidates) md-glyphs-in-use)
+          (position (car candidates) md-glyphs :test 'equal))
+      (setq md-current-glyph (% (1+ md-current-glyph) (length md-glyphs)))
+      md-current-glyph)))
 
 (defun md-sn-get-overlay (location)
   (let ((candidates (remove-if (lambda (x) (/= location (overlay-start x))) md-snippet-overlays)))
@@ -118,19 +134,18 @@
     (setq start (window-start)))
   (unless end
     (setq end (window-end)))
-  (let ((first-glyph))
+  (let ((last-glyph))
     (save-excursion
-      (goto-char start)
-      (while (and (< (point) end)
-                  (re-search-forward (char-to-string md-placeholder)
-                                     end 1))
+      (goto-char end)
+      (while (and (> (point) start)
+                  (re-search-backward (char-to-string md-placeholder)
+                                      start 1))
         (md-setup-glyph (match-beginning 0))
-        (unless first-glyph
-          (setq first-glyph (match-beginning 0)))))
+        (setq last-glyph (match-beginning 0))))
     (when md-sn-timer
       (cancel-timer md-sn-timer)
       (setq md-sn-timer nil))
-    first-glyph))
+    last-glyph))
 
 (defun md-sn-schedule-update ()
   (unless (or md-sn-timer

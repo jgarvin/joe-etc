@@ -53,18 +53,18 @@
 
 (defun md-check-start-utterance ()
   (unless md-in-utterance
-    (message "Starting utterance")
+    ;;(message "Starting utterance")
     (setq md-in-utterance t)
     (run-hooks 'md-start-utterance-hooks)))
     
 (defun md-check-end-utterance ()
   (when md-in-utterance
-    (message "Ending utterance")
+    ;;(message "Ending utterance")
     (setq md-in-utterance nil)
     (run-hooks 'md-end-utterance-hooks)))
 
 (defun md-new-mic-state-impl (state)
-  (message "Mic state: %s" state)
+  ;;(message "Mic state: %s" state)
   (cond
    ((string= state "on")
     (md-update-cursor-color "green")
