@@ -49,8 +49,8 @@
         ;; We always want to send the newline because the client will block until
         ;; it receives it.
         (process-send-string proc (format "%S\n" result))
-        (md-server-log  (substring message 0 index) proc)
-        (setq message (substring message index)))
+        (setq message (substring message index))
+        (md-server-log command proc))
     (setcdr pending message))))
 
 (defun md-server-sentinel (proc msg)

@@ -9,10 +9,10 @@
          :color "green"))
 
 (defun md-setup-frequency-belt ()
-  (add-hook 'md-symbols-cache-refresh-hook #'md-update-belts))
+  (add-hook 'md-symbols-cache-refresh-hook #'md-bt-schedule-update))
 
 (defun md-destroy-frequency-belt ()
-  (remove-hook 'md-symbols-cache-refresh-hook #'md-update-belts))
+  (remove-hook 'md-symbols-cache-refresh-hook #'md-bt-schedule-update))
 
 (add-to-list 'md-belt-list md-frequency-belt)
 

@@ -5,6 +5,8 @@
     (load-file "~/etc/emacs/cl-lib-0.3.el")
   (require 'cl))
 
+;;(setq require-final-newline nil)
+
 ;; don't like losing things
 (setq kill-ring-max 10000)
 
@@ -37,25 +39,11 @@
 (add-to-list 'load-path "~/etc/dash")
 (require 'dash)
 (eval-after-load "dash" '(dash-enable-font-lock))
-(add-to-list 'load-path "~/etc/smartparens")
-(require 'smartparens-config)
-(smartparens-global-mode 1)
-(show-smartparens-global-mode t)
-(define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
-(define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
-(define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-a") 'sp-backward-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-e") 'sp-up-sexp)
-(define-key smartparens-mode-map (kbd "C-M-u") 'sp-backward-up-sexp)
-(define-key smartparens-mode-map (kbd "C-M-n") 'sp-next-sexp)
-(define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)
-(define-key smartparens-mode-map (kbd "C-S-a") 'sp-beginning-of-sexp)
-(define-key smartparens-mode-map (kbd "C-S-e") 'sp-end-of-sexp)
-(define-key smartparens-mode-map (kbd "C-M-t") 'sp-transpose-sexp)
 
 ;; store passwords in file outside git ;)
 (load "~/.emacspass")
 
+(load-file "~/etc/emacs/smartparens-custom.el")
 (load-file "~/etc/emacs/ido-custom.el")
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
@@ -75,7 +63,6 @@
 (load-file "~/etc/emacs/ack-custom.el")
 (load-file "~/etc/emacs/org-custom.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
-(load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 
 ;; automagically tail log files
@@ -678,3 +665,9 @@
             (minibuffer-prompt))
     (abort-recursive-edit)))
 (add-hook 'focus-out-hook #'etc-abort-minibuffer)
+
+(defun etc-shrink-help ()
+  (shrink-window-if-larger-than-buffer (get-buffer-window "*Help*")))
+
+(add-hook 'window-configuration-change-hook #'etc-shrink-help)
+

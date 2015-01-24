@@ -52,9 +52,10 @@
 
 (defun md-pos-is-ours (o)
   (condition-case nil
-      (let ((pos (overlay-start o)))
-        (when pos
-          (string= (buffer-substring-no-properties pos (1+ pos))
+      (let ((start (overlay-start o))
+            (end (overlay-end o)))
+        (when (and start end)
+          (string= (buffer-substring-no-properties start end)
                    (char-to-string md-placeholder))))
     (args-out-of-range nil)))
 
@@ -84,6 +85,15 @@
       (when (not (md-pos-is-ours i))
         (push i invalid)))
     (mapc #'md-sn-destroy-overlay invalid)))
+
+(defun md-sn-report-overlays ()
+  (interactive)
+  (message "---------------------")
+  (dolist (i md-snippet-overlays)
+    (message "Overlay: %S" i)
+    (message "Ours: %S" (md-pos-is-ours i))
+    (message "Snippet: %S" (buffer-substring-no-properties (overlay-start i) (overlay-end i))))
+  (message "---------------------"))
 
 (defun md-get-glyph ()
   "Get an unused glyph if possible, otherwise just start cycling them."
@@ -275,7 +285,6 @@ go to the highest slot (most recent)."
           (while (/= next-attempt idx)
             (condition-case nil
                 (progn
-                  (message "iteration")
                   (md-sn-find-slot (nth next-attempt md-glyphs))
                   (setq next-attempt idx))
               (error (setq next-attempt (% (1- next-attempt) (length md-glyphs)))))))
@@ -283,7 +292,6 @@ go to the highest slot (most recent)."
       (md-sn-find-slot (nth (md-get-overlay-glyph-idx
                              (car md-snippet-overlays))
                             md-glyphs)))))
-
 (defun md-sn-drop-slot ()
   (insert-char md-placeholder))
 
@@ -341,6 +349,16 @@ go to the highest slot (most recent)."
    :context '(derived-mode-p 'emacs-lisp-mode)))
 
 (md-replace-snippet
+ :name "call"
+ :contents "($1)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
+ :name "cond"
+ :contents "(cond\n($1)\n($2))"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
  :name "defun"
  :contents "(defun $1 ($2) $3)"
  :context '(derived-mode-p 'emacs-lisp-mode))
@@ -351,11 +369,6 @@ go to the highest slot (most recent)."
  :context '(derived-mode-p 'emacs-lisp-mode))
 
 (md-replace-snippet
- :name "call"
- :contents "($1)"
- :context '(derived-mode-p 'emacs-lisp-mode))
-
-(md-replace-snippet
  :name "setq"
  :contents "(setq $1 $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
@@ -363,6 +376,11 @@ go to the highest slot (most recent)."
 (md-replace-snippet
  :name "setq-default"
  :contents "(setq-default $1 $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
+ :name "message"
+ :contents "(message \"$1\" $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
 ;;(md-insert-snippet "dotimes")

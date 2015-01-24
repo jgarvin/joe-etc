@@ -80,9 +80,12 @@ onto a list of buffers modified this utterance."
         ;; in undoing those
         (when (buffer-name i)
           (with-current-buffer i
-            (condition-case data
-                (md-undo-collapse-end md-collapse-undo-marker)
-              (error (message "Couldn't collapse undo in buffer %S error: %S" i data))))))
+            ;; some moves clear the undo list, like ERC
+            ;; when you hit enter
+            (when buffer-undo-list 
+                  (condition-case data
+                      (md-undo-collapse-end md-collapse-undo-marker)
+                    (error (message "Couldn't collapse undo in buffer %S: %S" i data)))))))
     (setq md-utterance-changed-buffers nil)
     (setq md-collapse-undo-marker nil)))
 
@@ -115,12 +118,12 @@ collapse anything that comes after."
 (defun md-disable-utterance-undo ()
   ;;(md-force-collapse-undo)
   (when (featurep 'undo-tree)
-    (advice-remove #'md-force-collapse-undo :before #'undo-tree-undo)
-    (advice-remove #'md-resume-collapse-after-undo :after #'undo-tree-undo)
-    (advice-remove #'md-force-collapse-undo :before #'undo-tree-redo)
-    (advice-remove #'md-resume-collapse-after-undo :after #'undo-tree-redo))
-  (advice-remove #'md-force-collapse-undo :before #'undo)
-  (advice-remove #'md-resume-collapse-after-undo :after #'undo)
+    (advice-remove #'md-force-collapse-undo #'undo-tree-undo)
+    (advice-remove #'md-resume-collapse-after-undo #'undo-tree-undo)
+    (advice-remove #'md-force-collapse-undo #'undo-tree-redo)
+    (advice-remove #'md-resume-collapse-after-undo #'undo-tree-redo))
+  (advice-remove #'md-force-collapse-undo #'undo)
+  (advice-remove #'md-resume-collapse-after-undo #'undo)
   (remove-hook 'before-change-functions #'md-check-undo-before-change)
   (remove-hook 'md-start-utterance-hooks #'md-pre-utterance-undo-setup)
   (remove-hook 'md-end-utterance-hooks #'md-post-utterance-collapse-undo))

@@ -250,10 +250,15 @@
 (byte-compile 'md-safe-get-symbols-impl)
 
 (defun md-refresh-symbol-cache (buf)
-  (with-current-buffer buf
-    (setq md-symbols-cache (md-safe-get-symbols-impl (point-min) (point-max)))
-    ;;(message "running hook")
-    (run-hooks 'md-symbols-cache-refresh-hook)
+  ;;(setq md-debug-temp mark-active)
+  ;;(message "refreshing symbol cache %S" md-debug-temp)
+  (unwind-protect 
+      (with-current-buffer buf
+        (let ((old md-symbols-cache)) 
+          (setq md-symbols-cache (md-safe-get-symbols-impl (point-min) (point-max)))
+          (when (not (equal old md-symbols-cache)) 
+            ;;(message "running hook")
+            (run-hooks 'md-symbols-cache-refresh-hook))))
     (when md-refresh-timer
       (cancel-timer md-refresh-timer)
       (setq md-refresh-timer nil))))
@@ -277,12 +282,23 @@
     ;; variable. If it never clears that variable then the check at the top
     ;; of this function to avoid double timers never passes, and we never
     ;; get to set the timer again.
+    ;;(message "setting up refresh handler")
     (setq md-refresh-timer
           (run-with-idle-timer 0.5 t (lambda () (md-refresh-symbol-cache (current-buffer)))))))
 (byte-compile 'md-refresh-symbols)
 
-(add-hook 'after-change-functions 'md-refresh-symbols)
-(add-hook 'md-window-selection-hook 'md-refresh-symbols)
+(defun md-refresh-after-change (&optional _start _end _old-length)
+  (message "after change")
+  (md-refresh-symbols))
+
+(defun md-refresh-after-select (&optional _start _end _old-length)
+  (message "after select")
+  (md-refresh-symbols))
+
+(add-hook 'after-change-functions #'md-refresh-symbols)
+;; (remove-hook 'after-change-functions #'md-refresh-symbols)
+(add-hook 'md-window-selection-hook #'md-refresh-symbols)
+;; (remove-hook 'md-window-selection-hook #'md-refresh-symbols)
 
 (defun md-find-nearest-word-impl (word start end)
   (setq sites '())

@@ -129,7 +129,6 @@
           (goto-char (overlay-start choice))
           (bounds-of-thing-at-point 'symbol))))))
 
-
 ;; (md-hl-pick-symbol "r" #x31a "orange")   
 ;;(md-hl-insert-symbol "r" #x31a "orange") 
 

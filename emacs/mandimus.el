@@ -219,26 +219,60 @@
 
 ;;(execute-kbd-macro [?\(])
 
+;; (defun md-need-space2 (str)
+;;   (let ((space-inhibiting-before-characters
+;;          (if (derived-mode-p prog-mode)
+;;              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
+;;            (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?.)))
+;;         (space-inhibiting-characters
+;;          (if (derived-mode-p prog-mode)
+;;              nil
+;;            (list ?? ?! ?.)))
+;;         (first-char (char-to-string (aref str 0)))
+;;         (previous-char (- (point) 1)))
+;;     (when (derived-mode-p emacs-lisp-mode)
+;;       (push space-inhibiting-before-characters ?'))
+;;     (setq space-inhibiting-before-characters
+;;           (regexp-opt-charset space-inhibiting-before-characters))
+;;     (setq space-inhibiting-characters
+;;           (regexp-opt-charset space-inhibiting-characters))
+;;     (cond
+;;      ((bobp) nil)
+;;      ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
+;;      (isearch-mode nil)
+;;      ((> (- (point) 2) ))
+;;      ((string-match space-inhibiting-characters first-char) nil)
+;;      ((save-excursion
+;;         (re-search-backward space-inhibiting-before-characters previous-char t)) nil)
+;;      (t t))))
+
+;; TODO: no space after colons in emacs-lisp-mode
 (defun md-need-space (str)
   (let
       ;; the presence of these before point mean we shouldn't include a space
       ((space-inhibiting-before-characters
-	(if (member major-mode '(text-mode fundamental-mode erc-mode))
-	    "[[:blank:]\n\"_@[{(/\\-]"
-	  "[[:blank:]\n\"'_@[{(/\\.!-]"))
+        (if (member major-mode '(text-mode fundamental-mode erc-mode))
+            "[[:blank:]\n\"_@[{(/\\-]"
+          "[[:blank:]\n\"'_@[{(/\\.!-]"))
        ;; these being the first character we're going to insert shouldn't include a space
        (space-inhibiting-characters
-	(if (member major-mode '(text-mode fundamental-mode erc-mode))
-	    "[?!.]"
-	  "[)\]}]")))
+        (if (member major-mode '(text-mode fundamental-mode erc-mode))
+            "[?!.]"
+          "[)\]}]")))
     (cond
      ((bobp) nil)
      (isearch-mode nil)
      ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)
      ((save-excursion
-	(re-search-backward space-inhibiting-before-characters (- (point) 1) t)) nil)
+        (re-search-backward space-inhibiting-before-characters (- (point) 1) t)) nil)
      (t t))))
+
+(defun md-insert-char (text check-spaces)
+  (when (and check-spaces
+             (md-need-space text))
+    (insert " "))
+  )
 
 (defun md-insert-text (text check-spaces check-capitals)
   (when (and check-capitals
@@ -465,8 +499,9 @@ Ignores CHAR at point."
               (and md-last-value-pair (and (eq (current-buffer) (car md-last-value-pair))
                                            (eq (selected-window) (cdr md-last-value-pair)))))
     (let ((md-inhibit-window-selection-hooks t))
-      (run-hooks 'md-window-selection-hook)
-      (setq md-last-value-pair (cons (current-buffer) (selected-window))))))
+      (unwind-protect
+          (run-hooks 'md-window-selection-hook)
+        (setq md-last-value-pair (cons (current-buffer) (selected-window)))))))
 
 (add-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
 

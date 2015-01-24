@@ -12,6 +12,7 @@
 (defvar md-belt-list nil "List of belts.")
 (defvar md-previous-belt-text nil)
 (defvar md-belt-mode nil)
+(defvar md-bt-timer nil)
 
 ;; TODO: font-lock-add-keywords
 (cl-defstruct md-belt
@@ -116,13 +117,18 @@
   (while (> (window-body-height w) (+ target-height 1))
     (window-resize w -1)))
 
+(defun md-bt-inhibit-belt-update ()
+  (or md-updating-belts
+      (window-minibuffer-p)
+      (minibuffer-prompt)
+      (> (minibuffer-depth) 1)))
+
 ;; TODO: mysteriously minibuffer in other frames can't be
 ;; reduced to size 1, for no obvious reason
 (defun md-update-belts ()
-  (unless (or md-updating-belts
-              (window-minibuffer-p)
-              (minibuffer-prompt)
-              (> (minibuffer-depth) 1))
+  (md-bt-cancel-timer)
+  (unless (md-bt-inhibit-belt-update)
+    (message "md-updating-belts")
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t)
@@ -162,38 +168,66 @@
   (let ((m (current-message)))
     (when m
       (setq md-current-message m)
-      (md-update-belts))))
+      (md-bt-schedule-update))))
 
 (defadvice message (around md-message-save-to-var disable)
   (if (or md-updating-belts (not (ad-get-arg 0)))
       ad-do-it
     (let ((formatted-string (apply 'format (ad-get-args 0))))
-      (when (or (stringp formatted-string))
-        (setq md-current-message formatted-string)
-        (md-update-belts))
-      ad-do-it)))
+      (if (or (stringp formatted-string))
+          (progn 
+            (setq md-current-message formatted-string)
+            (md-bt-schedule-update))
+        ad-do-it))))
+
+(defun md-bt-update-post-command (&rest args)
+  (message "md-bt-update-post-command")
+  (md-bt-schedule-update)
+  ;;(message nil)
+  )
+
+(defun md-bt-update-focus (&rest args)
+  (message "md-bt-update-focus")
+  (md-bt-schedule-update))
+
+(defun md-bt-update-window (&rest args)
+  (message "md-bt-update-window")
+  (md-bt-schedule-update))
+
+(defun md-bt-schedule-update (&rest unused)
+  (unless (or md-bt-timer
+              (md-bt-inhibit-belt-update))
+    ;;(message "scheduling")
+    (setq md-bt-timer (run-with-idle-timer 0.25 t #'md-update-belts))))
+
+(defun md-bt-cancel-timer ()
+  (when md-bt-timer
+    (cancel-timer md-bt-timer)
+    (setq md-bt-timer nil)))
 
 (defun md-setup-belts ()
+  (md-bt-cancel-timer)
   (let ((md-updating-belts t))
     (dolist (belt md-belt-list)
       (when (md-belt-construct belt)
         (funcall (md-belt-construct belt))))  
     (setq resize-mini-windows nil)
     (add-hook 'post-command-hook #'md-save-message t)
-    (add-hook 'post-command-hook #'md-update-belts t)
-    (add-hook 'window-configuration-change-hook #'md-update-belts t)
-    (add-hook 'focus-in-hook #'md-update-belts t)
+    (add-hook 'post-command-hook #'md-bt-update-post-command t)
+    (add-hook 'window-configuration-change-hook #'md-bt-update-window t)
+    (add-hook 'focus-in-hook #'md-bt-update-focus t)
     (ad-enable-advice 'message 'around 'md-message-save-to-var)
     (setq md-belt-mode t))
   (md-update-belts))
 
 (defun md-hide-belts ()
+  (md-bt-cancel-timer)
   (let ((md-updating-belts t))
     (setq resize-mini-windows 'grow-only)
     (remove-hook 'post-command-hook #'md-save-message)
-    (remove-hook 'post-command-hook #'md-update-belts)
-    (remove-hook 'window-configuration-change-hook #'md-update-belts)
-    (remove-hook 'focus-in-hook #'md-update-belts)
+    (remove-hook 'post-command-hook #'md-bt-update-post-command)
+    (remove-hook 'window-configuration-change-hook #'md-bt-update-window)
+    (remove-hook 'focus-in-hook #'md-bt-update-focus)
     ;; TODO: disable doesn't work wtf?
     (ad-disable-advice 'message 'around 'md-message-save-to-var)
     (dolist (frame (frame-list))
@@ -218,9 +252,9 @@
   (interactive)
   (cond
    ((and (not arg) md-belt-mode) (md-hide-belts))
-   ((not md-belt-mode) (md-setup-belts))))
+   ((and arg (not md-belt-mode)) (md-setup-belts))))
 
-(md-toggle-belt-mode t)
+;; (md-toggle-belt-mode t)
 ;; (md-toggle-belt-mode nil)
 
 (provide 'md-belt-impl)
