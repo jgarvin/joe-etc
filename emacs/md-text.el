@@ -110,14 +110,14 @@ If the string preceeding pos isn't part of any pair, then returns nil."
 
 (defun md-space-inhibiting-before-chars ()
   (let ((l (if (derived-mode-p 'prog-mode)
-             (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
+               (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?.))))
     (when (derived-mode-p 'emacs-lisp-mode)
       (push ?\' l))
     (md-char-regex l)))
 
 (defun md-space-inhibiting-after-chars ()
-  (md-char-regex (list ? ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?!)))
+  (md-char-regex (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?!)))
 
 (defun md-need-space (str)
   (let ((space-inhibiting-before-characters (md-space-inhibiting-before-chars))
@@ -144,12 +144,6 @@ If the string preceeding pos isn't part of any pair, then returns nil."
         (re-search-forward space-inhibiting-after-characters (1+ (point)) t)) nil)
      (t t))))
 
-(defun md-insert-char (text check-spaces)
-  (when (and check-spaces
-             (md-need-space text))
-    (insert " "))
-  )
-
 (defun md-insert-text (text check-spaces check-capitals)
   (when (and check-capitals
              (md-need-capitalization))
@@ -167,10 +161,12 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (let ((p (point)))
     (insert text)
     (save-excursion
-      (just-one-space)
+      (unless (eolp)
+        (just-one-space))
       (goto-char p)
-      (just-one-space)))
-  ;; experimental code to see if we can get inserts to close
-  ;; the company pop-up window
+      (unless (bolp)
+        (just-one-space))))
+  ;; close the company pop-up window
   (when (fboundp #'company-cancel)
     (company-cancel 'abort)))
+
