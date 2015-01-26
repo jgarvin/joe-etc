@@ -219,53 +219,104 @@
 
 ;;(execute-kbd-macro [?\(])
 
-;; (defun md-need-space2 (str)
-;;   (let ((space-inhibiting-before-characters
-;;          (if (derived-mode-p prog-mode)
-;;              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
-;;            (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?.)))
-;;         (space-inhibiting-characters
-;;          (if (derived-mode-p prog-mode)
-;;              nil
-;;            (list ?? ?! ?.)))
-;;         (first-char (char-to-string (aref str 0)))
-;;         (previous-char (- (point) 1)))
-;;     (when (derived-mode-p emacs-lisp-mode)
-;;       (push space-inhibiting-before-characters ?'))
-;;     (setq space-inhibiting-before-characters
-;;           (regexp-opt-charset space-inhibiting-before-characters))
-;;     (setq space-inhibiting-characters
-;;           (regexp-opt-charset space-inhibiting-characters))
-;;     (cond
-;;      ((bobp) nil)
-;;      ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
-;;      (isearch-mode nil)
-;;      ((> (- (point) 2) ))
-;;      ((string-match space-inhibiting-characters first-char) nil)
-;;      ((save-excursion
-;;         (re-search-backward space-inhibiting-before-characters previous-char t)) nil)
-;;      (t t))))
+(defun md-matching-pairs ()
+  (let ((result))
+    (if (and (boundp 'sp-local-pairs)
+             sp-local-pairs)
+        (dolist (i sp-local-pairs)
+          (when (equal (plist-get i :close) (plist-get i :open))
+            (push (plist-get i :close) result)))
+      (setq result (list "\"")))
+    result))
 
-;; TODO: no space after colons in emacs-lisp-mode
+;; (defun md-pair-openers ()
+;;   (if (and (boundp 'sp-local-pairs)
+;;            sp-local-pairs)
+;;       (mapcar (lambda (x) (plist-get x :open)) sp-local-pairs)
+;;     (list "(" "[" "{")))
+
+;; (defun md-pair-closers ()
+;;   (if (and (boundp 'sp-local-pairs)
+;;            sp-local-pairs)
+;;       (mapcar (lambda (x) (plist-get x :close)) sp-local-pairs)
+;;     (list ")" "]" "}")))
+
+(defun md-char-regex (l)
+  (regexp-opt-group (sort (mapcar #'char-to-string l) 'string=)))
+  
+(defun md-get-matching-opening-regexp ()
+  (regexp-opt (md-matching-pairs)))
+
+(defun md-likely-preceded-by-opener (pos)
+  "If the characters preceding pos form a delimeter in a pair
+where the opening and closing delimeters differ, then we can know
+with certainty that the character is an opener and return t.
+
+When the delimeter is part of a pair where the opening and closing
+strings are the same, like quotes, We use a heuristic to decide 
+if a delimeter is an opener or a closer. If the character prior is
+whitespace, then it's probably an opener. If the string prior
+is an opener, then we're likely an opener too.
+
+If the string preceeding pos isn't part of any pair, then returns nil."
+  (save-excursion
+    (goto-char pos)
+    (let ((preceding-unmatching-opener)
+          (preceding-matching-opener))
+      (if (setq preceding-unmatching-opener
+                (sp--looking-back (sp--get-opening-regexp)))
+          (goto-char (match-beginning 0))
+        (when (setq preceding-matching-opener
+                    (sp--looking-back (md-get-matching-opening-regexp)))
+          (goto-char (match-beginning 0))))
+      (cond
+       ;; We have a distinct opener, return t
+       (preceding-unmatching-opener t)
+       ;; We have neither kind of opener, return nil
+       ((not preceding-matching-opener) nil)
+       ;; We have a matching opener with nothing in front,
+       ;; must be an opener, return t
+       ((bobp) t)
+       ;; We have a matching opener preceeded by whitespace,
+       ;; probably an opener, return t
+       ((looking-back "[[:space:]\n]" 1) t)
+       ;; We have a matching opener preceeded by an identical
+       ;; matching opener, so this is actually the closer,
+       ;; return nil
+       ((looking-back (regexp-quote (buffer-substring (match-beginning 0) (match-end 0)))) nil)
+       ;; We have a matching opener preceeded by another,
+       ;; probably this is one too, return t
+       ((md-likely-preceded-by-opener (point)) t)))))
+
 (defun md-need-space (str)
-  (let
-      ;; the presence of these before point mean we shouldn't include a space
-      ((space-inhibiting-before-characters
-        (if (member major-mode '(text-mode fundamental-mode erc-mode))
-            "[[:blank:]\n\"_@[{(/\\-]"
-          "[[:blank:]\n\"'_@[{(/\\.!-]"))
-       ;; these being the first character we're going to insert shouldn't include a space
-       (space-inhibiting-characters
-        (if (member major-mode '(text-mode fundamental-mode erc-mode))
-            "[?!.]"
-          "[)\]}]")))
+  (let ((space-inhibiting-before-characters
+         (if (derived-mode-p 'prog-mode)
+             (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
+           (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?.)))
+        (space-inhibiting-characters
+         (if (derived-mode-p 'prog-mode)
+             nil
+           (list ?? ?! ?.)))
+        (first-char (char-to-string (aref str 0)))
+        (previous-char (char-before)))
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (push ?\' space-inhibiting-before-characters))
+    (setq space-inhibiting-before-characters
+          (md-char-regex space-inhibiting-before-characters))
+    (setq space-inhibiting-characters
+          (md-char-regex space-inhibiting-characters))
+    (message "space-inhibiting-before-characters: %S" space-inhibiting-before-characters)
+    (message "space-inhibiting-characters: %S" space-inhibiting-characters)
+    (message "with the help: %S" (string-match "\\sw" (char-to-string (char-before (1- (point))))))
     (cond
      ((bobp) nil)
-     (isearch-mode nil)
      ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
-     ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)
+     (isearch-mode nil)
+     ((md-likely-preceded-by-opener (point)) nil)
+     ((and (> (length space-inhibiting-characters) 0)
+           (string-match space-inhibiting-characters first-char)) nil)
      ((save-excursion
-        (re-search-backward space-inhibiting-before-characters (- (point) 1) t)) nil)
+        (re-search-backward space-inhibiting-before-characters (1- (point)) t)) nil)
      (t t))))
 
 (defun md-insert-char (text check-spaces)

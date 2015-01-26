@@ -9,7 +9,7 @@
 (defvar md-safe-scan-limit 5000)
 (defvar-local md-sym-tracking-vec (make-vector md-initial-vec-size 0))
 (defvar-local md-sym-tracking-capacity 0)
-(defvar-local md-refresh-timer nil)
+(defvar md-refresh-timer nil)
 (defvar-local md-symbols-cache nil)
 (defvar md-symbols-cache-refresh-hook nil)
 (defvar md-mode-keywords nil)

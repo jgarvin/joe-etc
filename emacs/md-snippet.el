@@ -239,9 +239,9 @@
         (let ((contents (md-snippet-contents candidate))
               (start (point))
               (jump-point))
-          (insert
+          (md-insert-text
            (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
-                                     contents))
+                                     contents) t nil)
           (setq jump-point (md-add-glyph-properties start (point)))
           (when jump-point
             (set-window-point nil jump-point))
@@ -381,6 +381,21 @@ go to the highest slot (most recent)."
 (md-replace-snippet
  :name "message"
  :contents "(message \"$1\" $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
+ :name "and"
+ :contents "(and $1 $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
+ :name "or"
+ :contents "(or $1 $2)"
+ :context '(derived-mode-p 'emacs-lisp-mode))
+
+(md-replace-snippet
+ :name "lambda"
+ :contents "(lambda ($1) $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
 ;;(md-insert-snippet "dotimes")

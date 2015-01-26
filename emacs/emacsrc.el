@@ -667,7 +667,9 @@
 (add-hook 'focus-out-hook #'etc-abort-minibuffer)
 
 (defun etc-shrink-help ()
-  (shrink-window-if-larger-than-buffer (get-buffer-window "*Help*")))
+  (let ((help-window (get-buffer-window "*Help*")))
+    (when help-window
+      (shrink-window-if-larger-than-buffer help-window))))
 
 (add-hook 'window-configuration-change-hook #'etc-shrink-help)
 

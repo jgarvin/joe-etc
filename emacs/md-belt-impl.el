@@ -128,7 +128,7 @@
 (defun md-update-belts ()
   (md-bt-cancel-timer)
   (unless (md-bt-inhibit-belt-update)
-    (message "md-updating-belts")
+    ;;(message "md-updating-belts")
     (let ((deactivate-mark nil)
           (inhibit-read-only t)
           (md-updating-belts t)
@@ -181,17 +181,17 @@
         ad-do-it))))
 
 (defun md-bt-update-post-command (&rest args)
-  (message "md-bt-update-post-command")
+  ;;(message "md-bt-update-post-command")
   (md-bt-schedule-update)
   ;;(message nil)
   )
 
 (defun md-bt-update-focus (&rest args)
-  (message "md-bt-update-focus")
+  ;;(message "md-bt-update-focus")
   (md-bt-schedule-update))
 
 (defun md-bt-update-window (&rest args)
-  (message "md-bt-update-window")
+  ;;(message "md-bt-update-window")
   (md-bt-schedule-update))
 
 (defun md-bt-schedule-update (&rest unused)
@@ -254,7 +254,7 @@
    ((and (not arg) md-belt-mode) (md-hide-belts))
    ((and arg (not md-belt-mode)) (md-setup-belts))))
 
-;; (md-toggle-belt-mode t)
+(md-toggle-belt-mode t)
 ;; (md-toggle-belt-mode nil)
 
 (provide 'md-belt-impl)
