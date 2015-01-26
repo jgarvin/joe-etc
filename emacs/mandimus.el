@@ -9,8 +9,41 @@
 (defvar md-start-utterance-hooks nil)
 (defvar md-end-utterance-hooks nil)
 
-(defun md-line-is-blank ()
+(defun md-go-to-next (str)
+  (when (re-search-forward (concat "\\_<" str "\\_>"))
+    (beginning-of-thing 'symbol)))
+
+(defun md-go-to-previous (str)
+  (when (re-search-backward (concat "\\_<" str "\\_>"))
+    (beginning-of-thing 'symbol)))
+
+(defun md-get-next-instance-of-symbol ()
   (interactive)
+  (let ((sym (thing-at-point 'symbol)))
+    (if sym
+        (progn
+          (message "sym")
+          (end-of-thing 'symbol)
+          (unless (re-search-forward sym nil t)
+            (user-error "No further instance of symbol: %s" sym))
+          (beginning-of-thing 'symbol)
+          (point))
+      (user-error "No symbol under point."))))
+
+(defun md-get-previous-instance-of-symbol ()
+  (interactive)
+  (let ((sym (thing-at-point 'symbol)))
+    (if sym
+        (progn
+          (message "sym")
+          (beginning-of-thing 'symbol)
+          (unless (re-search-backward sym nil t)
+            (user-error "No preceding instance of symbol: %s" sym))
+          (beginning-of-thing 'symbol)
+          (point))
+      (user-error "No symbol under point."))))
+
+(defun md-line-is-blank ()
   (save-excursion
     (beginning-of-line)
     (unless (re-search-forward "[^[:blank:]]" (point-at-eol) t) t)))
@@ -120,6 +153,7 @@
     (end-of-line)))
   
 (defun md-select-minibuffer ()
+  (interactive)
   (select-window (minibuffer-window)))
 
 (defun md-new-line-anywhere ()

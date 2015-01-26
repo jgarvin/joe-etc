@@ -263,6 +263,7 @@
   (position (string-to-char (overlay-get o 'display)) md-glyphs))
 
 (defun md-sn-next-slot ()
+  (interactive)
   "If point is over a slot, go to the next highest slot, if not
 go to the highest slot (most recent)."
   (md-sn-destroyed-invalid-overlays)
@@ -292,8 +293,10 @@ go to the highest slot (most recent)."
       (md-sn-find-slot (nth (md-get-overlay-glyph-idx
                              (car md-snippet-overlays))
                             md-glyphs)))))
+
 (defun md-sn-drop-slot ()
-  (insert-char md-placeholder))
+  (interactive)
+  (md-insert-text (char-to-string md-placeholder) t nil))
 
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)

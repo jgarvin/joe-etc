@@ -145,6 +145,8 @@ If the string preceeding pos isn't part of any pair, then returns nil."
      (t t))))
 
 (defun md-insert-text (text check-spaces check-capitals)
+  (interactive)
+  (assert (stringp text))
   (when (and check-capitals
              (md-need-capitalization))
     (setq text (concat (char-to-string (upcase (aref text 0)))
@@ -169,4 +171,3 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   ;; close the company pop-up window
   (when (fboundp #'company-cancel)
     (company-cancel 'abort)))
-
