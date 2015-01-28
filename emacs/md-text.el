@@ -110,14 +110,21 @@ If the string preceeding pos isn't part of any pair, then returns nil."
 
 (defun md-space-inhibiting-before-chars ()
   (let ((l (if (derived-mode-p 'prog-mode)
-               (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?!)
-             (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?.))))
+               (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?! ?\# ?\$)
+             (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?\# ?\$))))
     (when (derived-mode-p 'emacs-lisp-mode)
-      (push ?\' l))
+      (push ?\' l)
+      (push ?\, l)
+      (push ?: l))
+    (when (derived-mode-p 'python-mode)
+      (setq l (delq ?\# l)))      
     (md-char-regex l)))
 
 (defun md-space-inhibiting-after-chars ()
-  (md-char-regex (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?!)))
+  (let ((l (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?! ?\,)))  
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (setq l (delq ?\, l)))
+    (md-char-regex l)))
 
 (defun md-need-space (str)
   (let ((space-inhibiting-before-characters (md-space-inhibiting-before-chars))
@@ -138,6 +145,8 @@ If the string preceeding pos isn't part of any pair, then returns nil."
     (cond
      ((eobp) nil)
      (isearch-mode nil)
+     ;; we don't need to insert a space in front of the snippet character 
+     ((and (boundp 'md-placeholder) (equal (char-after) md-placeholder)) nil)
      ((md-likely-followed-by-closer (point)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str (1- (length str))))) nil)
      ((save-excursion
@@ -159,15 +168,22 @@ If the string preceeding pos isn't part of any pair, then returns nil."
     (setq text (concat " " text)))
   (when (and check-spaces
              (md-need-space-after text))
+    ;;(message "appending space") 
     (setq text (concat text " ")))
   (let ((p (point)))
     (insert text)
     (save-excursion
-      (unless (eolp)
+      (when (and (save-excursion
+                   (re-search-forward "[[:space:]\n]" (1+ (point)) t)))
         (just-one-space))
       (goto-char p)
-      (unless (bolp)
+      (when (and (save-excursion
+                   (re-search-backward "[[:space:]]" (1- (point)) t))
+                 (not (md-at-start-of-erc-input-line))
+                 (not (bolp))
+                 (md-causes-move #'back-to-indentation))
         (just-one-space))))
   ;; close the company pop-up window
   (when (fboundp #'company-cancel)
     (company-cancel 'abort)))
+ 

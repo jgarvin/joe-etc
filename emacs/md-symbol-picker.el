@@ -84,12 +84,13 @@
                    (color-choice (nth 1 mods))
                    (mark-choice (nth 2 mods))
                    (char (buffer-substring (+ sym-start char-choice) (+ sym-start char-choice 1)))
-                   (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1))))
+                   (o (make-overlay (+ sym-start char-choice) (+ sym-start char-choice 1) nil t)))
               ;; Displaying propertized text works better than using the overlay face
               ;; property. Org-mode had issues with it where it would make text with
               ;; diacritical marks huge
               (overlay-put o 'display
                            (md-hl-generate-text char mark-choice color-choice))
+              (overlay-put o 'priority most-positive-fixnum)
               (push o md-hl-overlays))))))))
 
 (defun md-hl-closest-overlay (x y)

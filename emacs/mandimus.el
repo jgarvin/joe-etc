@@ -10,37 +10,42 @@
 (defvar md-end-utterance-hooks nil)
 
 (defun md-go-to-next (str)
-  (when (re-search-forward (concat "\\_<" str "\\_>"))
-    (beginning-of-thing 'symbol)))
+  (interactive) 
+  (let ((p))
+    (save-excursion
+      (ignore-errors (end-of-thing 'symbol))
+      (if (re-search-forward (concat "\\_<" (regexp-quote str) "\\_>"))
+          (setq p (point))
+        (user-error "No further instance of string: %s" str)))
+    (when p
+      (goto-char p)
+      (beginning-of-thing 'symbol))))
 
 (defun md-go-to-previous (str)
-  (when (re-search-backward (concat "\\_<" str "\\_>"))
-    (beginning-of-thing 'symbol)))
+  (interactive)
+  (let ((p))
+    (save-excursion
+      (ignore-errors (beginning-of-thing 'symbol))
+      (if (re-search-backward (concat "\\_<" (regexp-quote str) "\\_>"))
+          (setq p (point))
+        (user-error "No proceeding instance of string: %s" str)))
+    (when p
+      (goto-char p))))
 
 (defun md-get-next-instance-of-symbol ()
   (interactive)
   (let ((sym (thing-at-point 'symbol)))
     (if sym
-        (progn
-          (message "sym")
-          (end-of-thing 'symbol)
-          (unless (re-search-forward sym nil t)
-            (user-error "No further instance of symbol: %s" sym))
-          (beginning-of-thing 'symbol)
-          (point))
+        (md-go-to-next sym)
       (user-error "No symbol under point."))))
 
 (defun md-get-previous-instance-of-symbol ()
   (interactive)
   (let ((sym (thing-at-point 'symbol)))
     (if sym
-        (progn
-          (message "sym")
-          (beginning-of-thing 'symbol)
-          (unless (re-search-backward sym nil t)
-            (user-error "No preceding instance of symbol: %s" sym))
-          (beginning-of-thing 'symbol)
-          (point))
+        (progn  
+          (message "looking for symbol:%s" sym) 
+          (md-go-to-previous sym))
       (user-error "No symbol under point."))))
 
 (defun md-line-is-blank ()

@@ -232,20 +232,37 @@
 (defun md-insert-snippet (name)
   (interactive)
   (when md-snippet-mode
-    (let ((candidate (find name md-snippet-list
-                           :key #'md-snippet-name
-                           :test #'equal)))
-      (when candidate
-        (let ((contents (md-snippet-contents candidate))
-              (start (point))
-              (jump-point))
-          (md-insert-text
-           (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
-                                     contents) t nil)
-          (setq jump-point (md-add-glyph-properties start (point)))
-          (when jump-point
-            (set-window-point nil jump-point))
-          )))))
+    (let ((candidate (remove-if (lambda (x)
+                                  (or (not (string= (md-snippet-name x) name))
+                                      (not (eval (md-snippet-context x)))))
+                                md-snippet-list)))
+      (if candidate
+          (md--insert-snippet-impl (car candidate))
+        (user-error "Can't find snippet with name \"%s\" in current context" name)))))
+
+(defun md--insert-snippet-impl (snippet)
+  (let ((contents (md-snippet-contents snippet))
+        (start (point))
+        (jump-point)
+        (end)
+        (arg-text))
+    (when (use-region-p)
+      (setq arg-text (buffer-substring (region-beginning) (region-end)))
+      (delete-region (region-beginning) (region-end)))
+    (md-insert-text
+     (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
+                               contents) t nil)
+    (setq end (make-marker))
+    (set-marker end (point))
+    (setq jump-point (md-add-glyph-properties start (point)))
+    (when jump-point
+      (set-window-point nil jump-point))
+    (when (use-region-p)
+      (deactivate-mark)
+      (md-insert-text arg-text t nil)
+      (goto-char start)
+      (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
+        (goto-char (1- (point)))))))
 
 (defun md-sn-find-slot (c)
   (let ((candidates (-filter (lambda (x)
@@ -351,10 +368,19 @@ go to the highest slot (most recent)."
    :contents (md-gen-elisp-snippet-contents sym)
    :context '(derived-mode-p 'emacs-lisp-mode)))
 
-(md-replace-snippet
- :name "call"
- :contents "($1)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+(defun md-insert-call-snippet (n)
+  (interactive) 
+  (let* ((separator (if (derived-mode-p 'emacs-lisp-mode) " " ", "))
+         (c (concat "(" (mapconcat (lambda (x) (format "$%d" x)) (number-sequence 1 n) separator)
+                    ")")))
+    (when (not (derived-mode-p 'emacs-lisp-mode))
+      ;; most non- lisps have function calls of the format f(x, y) 
+      (setq c (concat "$0" c)))
+    (md--insert-snippet-impl
+     (make-md-snippet
+      :name "call"
+      :contents c
+      :context nil))))
 
 (md-replace-snippet
  :name "cond"

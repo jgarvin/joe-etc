@@ -62,22 +62,11 @@
 (load-file "~/etc/emacs/elisp-custom.el")
 (load-file "~/etc/emacs/ack-custom.el")
 (load-file "~/etc/emacs/org-custom.el")
+(load-file "~/etc/emacs/persist-custom.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 
-;; automagically tail log files
-(add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-tail-mode))
-
-(defun etc-log-tail-handler ()
-  (end-of-buffer)
-  (make-variable-buffer-local 'auto-revert-interval)
-  (setq auto-revert-interval 1)
-  (auto-revert-set-timer)
-  (make-variable-buffer-local 'auto-revert-verbose)
-  (setq auto-revert-verbose nil)
-  (read-only-mode t))
-
-(add-hook 'auto-revert-tail-mode-hook 'etc-log-tail-handler)
+(delete-selection-mode 1)
 
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)

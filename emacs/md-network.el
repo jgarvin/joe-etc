@@ -19,11 +19,8 @@
 (defun md-server-stop nil
   (interactive)
   (while md-server-clients
-    (message "test1")
     (delete-process (car (car md-server-clients)))
-    (message "test2")
     (setq md-server-clients (cdr md-server-clients)))
-  (message "test3")
   (delete-process "mandimus-eval-server"))
 
 (defun md-server-filter (proc string)   
@@ -45,6 +42,7 @@
                 (condition-case err
                     (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
                       (eval (car (read-from-string command))))
+                  (user-error (message "Error: %s" (error-message-string err)))
                   (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
         ;; We always want to send the newline because the client will block until
         ;; it receives it.
