@@ -245,13 +245,15 @@
         (start (point))
         (jump-point)
         (end)
-        (arg-text))
+        (arg-text)
+        (indentation (concat "\n    " (make-string (current-indentation) ? ))))
     (when (use-region-p)
       (setq arg-text (buffer-substring (region-beginning) (region-end)))
       (delete-region (region-beginning) (region-end)))
-    (md-insert-text
-     (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
-                               contents) t nil)
+    (setq contents (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
+                                         contents))
+    (setq contents (replace-regexp-in-string "\n    " indentation contents))
+    (md-insert-text contents t nil)
     (setq end (make-marker))
     (set-marker end (point))
     (setq jump-point (md-add-glyph-properties start (point)))
@@ -426,6 +428,65 @@ go to the highest slot (most recent)."
  :name "lambda"
  :contents "(lambda ($1) $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
+
+;; most non-lisp languages share a lot of tiny snippets 
+(defun generic-programming-context ()
+  (unless (derived-mode-p 'emacs-lisp-mode) t))
+
+(md-replace-snippet
+ :name "+"
+ :contents "$1 + $2"
+ :context '(generic-programming-context))
+
+(md-replace-snippet
+ :name "-"
+ :contents "$1 - $2"
+ :context '(generic-programming-context))
+
+(md-replace-snippet
+ :name "*"
+ :contents "$1 * $2"
+ :context '(generic-programming-context)) 
+
+(md-replace-snippet
+ :name "%"
+ :contents "$1 % $2"
+ :context '(generic-programming-context)) 
+
+(md-replace-snippet
+ :name "/"
+ :contents "$1 / $2"
+ :context '(generic-programming-context)) 
+
+(md-replace-snippet
+ :name "flat for"
+ :contents "$1 for $2 in $3"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "flat if"
+ :contents "$1 if $2"
+ :context '(derived-mode-p 'python-mode)) 
+
+(md-replace-snippet
+ :name "flat else"
+ :contents "else $2"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "flat if else"
+ :contents "$1 if $2 else $3"
+ :context '(derived-mode-p 'python-mode)) 
+
+(md-replace-snippet
+ :name "if"
+ :contents "if $1:\n    $2"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "if else"
+ :contents "if $1:\n    $2\nelse:\n    $3"
+ :context '(derived-mode-p 'python-mode))
 
 ;;(md-insert-snippet "dotimes")
 
