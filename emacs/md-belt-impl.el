@@ -121,7 +121,7 @@
   (or md-updating-belts
       (window-minibuffer-p)
       (minibuffer-prompt)
-      (> (minibuffer-depth) 1)))
+      (> (minibuffer-depth) 0)))
 
 ;; TODO: mysteriously minibuffer in other frames can't be
 ;; reduced to size 1, for no obvious reason
@@ -135,6 +135,7 @@
           (w (minibuffer-window))
           (buffer (current-buffer))
           (active-belt-count 0))
+      (md-server-log (format "prompt: %S" (minibuffer-prompt)))
       (with-current-buffer (window-buffer w)
         (erase-buffer)
         (dolist (o (overlays-in (point-min) (point-max)))

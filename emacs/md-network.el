@@ -74,3 +74,6 @@
 (condition-case nil
     (md-server-start)
   (file-error (message "ERROR: Mandimus server already running!")))
+
+(require 'buffer-tail)
+(toggle-buffer-tail "*mandimus-server*" "on")

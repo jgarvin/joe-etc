@@ -40,16 +40,22 @@
     (proced)
     (delete-other-windows))))
 
-;; (defvar-local etc-last-point-read-only -1)
+(defvar-local etc-last-read-only 0)
 
-;; (setq-default etc-last-point-read-only -1)
+;; (setq-default etc-last-read-only -1)
 
-;; (defun etc-make-term-output-read-only ()
-;;   (interactive)
-;;   (let ((start-point (+ 1 etc-last-point-read-only)))
-;;     (add-text-properties start-point (process-mark (get-buffer-process (current-buffer))) '(read-only t))
-;;     (setq etc-last-point-read-only end-prompt)))
-    
+(defun etc-make-term-output-read-only ()
+  (interactive)
+  (let ((start-point (+ 1 etc-last-read-only))
+        (end-prompt (process-mark (get-buffer-process (current-buffer)))))
+    (add-text-properties start-point end-prompt '(read-only t))
+    (setq etc-last-read-only end-prompt)))
+
+(defvar-local etc-original-process-filter
+  (process-filter (get-buffer-process (current-buffer))))
+
+;; setup process filter to make things read-only and call originalrewrite 
+
 ;; (defadvice term-line-mode (after etc-term-line-mode-advice activate)
 ;;   (when (process-live-p)
 ;;     (read-only-mode t)))

@@ -156,6 +156,9 @@ If the string preceeding pos isn't part of any pair, then returns nil."
 (defun md-insert-text (text check-spaces check-capitals)
   (interactive)
   (assert (stringp text))
+  ;; we may be inserting text that originally came from a read
+  ;; only portion of the buffer,for example using the symbol picker 
+  (remove-text-properties 0 (length text) (list 'read-only nil) text)
   (when (and check-capitals
              (md-need-capitalization))
     (setq text (concat (char-to-string (upcase (aref text 0)))

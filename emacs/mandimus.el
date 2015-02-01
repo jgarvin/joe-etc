@@ -247,13 +247,15 @@
 (defun md-backward-kill-word ()
   (interactive)
   (backward-word)
-  (kill-word 1))
+  (kill-word 1)
+  (save-excursion (just-one-space)))
 
 (defun md-forward-kill-word ()
   (interactive)
   (forward-word)
   (backward-word)
-  (kill-word 1))
+  (kill-word 1)
+  (save-excursion (just-one-space)))
 
 (defun md-copy-word ()
   (interactive)
