@@ -144,6 +144,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
         (space-inhibiting-characters (md-space-inhibiting-before-chars)))
     (cond
      ((eobp) nil)
+     ((eolp) nil)
      (isearch-mode nil)
      ;; we don't need to insert a space in front of the snippet character 
      ((and (boundp 'md-placeholder) (equal (char-after) md-placeholder)) nil)
@@ -171,13 +172,13 @@ If the string preceeding pos isn't part of any pair, then returns nil."
     (setq text (concat " " text)))
   (when (and check-spaces
              (md-need-space-after text))
-    ;;(message "appending space") 
+    ;; (message "appending space")
     (setq text (concat text " ")))
   (let ((p (point)))
     (insert text)
     (save-excursion
       (when (and (save-excursion
-                   (re-search-forward "[[:space:]\n]" (1+ (point)) t)))
+                   (re-search-forward "[[:space:]]" (1+ (point)) t)))
         (just-one-space))
       (goto-char p)
       (when (and (save-excursion

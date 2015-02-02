@@ -9,6 +9,46 @@
 (defvar md-start-utterance-hooks nil)
 (defvar md-end-utterance-hooks nil)
 
+(defun md-safe-cancel-timer (v)
+  (when (symbol-value v)
+      (when (timerp (symbol-value v))
+        (cancel-timer (symbol-value v)))
+      (set v nil)))
+
+(defun md--run-timer-func (v f args)
+  (unwind-protect
+      (apply f args)
+    (md-safe-cancel-timer v)))
+
+(defun md-cancel-timer-after-executing (v f local args)
+  (if local
+      (with-current-buffer local
+        (md--run-timer-func v f args))
+    (md--run-timer-func v f args)))    
+
+(defun md-run-when-idle-once (v f seconds &optional local &rest args)
+  "Setup an idle timer to run F after SECONDS of idle time, passing
+it ARGS. Store the timer in V. Additional calls with the same V will
+reset the timer, pushing the event further into the future. This is
+the behavior you want if you want a function to only execute once
+emacs has \"settled.\" Also workaround an issue with emacs entering
+debug mode causing timers to die."
+  (md-safe-cancel-timer v)
+  ;; The idle timer has to be marked as repeating even though we cancel
+  ;; it every time it actually executes. This is because of a race
+  ;; condition not handled in the emacs API. If an error occurs triggering
+  ;; the debugger then timers won't run. If the timer isn't marked repeating
+  ;; it then never runs. If it never runs then it never clears the timer
+  ;; variable. If it never clears that variable then the check at the top
+  ;; of this function to avoid double timers never passes, and we never
+  ;; get to set the timer again.
+  (when local
+    (setq local (current-buffer)))
+  (set v (run-with-idle-timer (time-add (seconds-to-time seconds)
+                                        (or (current-idle-time)
+                                            '(0 0 0 0))) t
+                                            #'md-cancel-timer-after-executing v f local args)))
+
 (defun md-go-to-next (str)
   (interactive) 
   (let ((p))

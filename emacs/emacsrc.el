@@ -51,7 +51,6 @@
 (load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
-(load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
@@ -64,6 +63,9 @@
 (load-file "~/etc/emacs/ack-custom.el")
 (load-file "~/etc/emacs/org-custom.el")
 (load-file "~/etc/emacs/persist-custom.el")
+(load-file "~/etc/emacs/buffer-tail.el")
+
+(load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 
@@ -663,3 +665,5 @@
 
 (add-hook 'window-configuration-change-hook #'etc-shrink-help)
 
+;; affects performance of blitzing shells
+(setq jit-lock-defer-time 0.25)

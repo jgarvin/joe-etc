@@ -196,10 +196,8 @@
   (md-bt-schedule-update))
 
 (defun md-bt-schedule-update (&rest unused)
-  (unless (or md-bt-timer
-              (md-bt-inhibit-belt-update))
-    ;;(message "scheduling")
-    (setq md-bt-timer (run-with-idle-timer 0.25 t #'md-update-belts))))
+  (unless (md-bt-inhibit-belt-update)
+    (md-run-when-idle-once 'md-bt-timer #'md-update-belts 0.25 nil)))
 
 (defun md-bt-cancel-timer ()
   (when md-bt-timer

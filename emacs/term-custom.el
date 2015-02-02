@@ -51,8 +51,8 @@
     (add-text-properties start-point end-prompt '(read-only t))
     (setq etc-last-read-only end-prompt)))
 
-(defvar-local etc-original-process-filter
-  (process-filter (get-buffer-process (current-buffer))))
+;; (defvar-local etc-original-process-filter
+;;   (process-filter (get-buffer-process (current-buffer))))
 
 ;; setup process filter to make things read-only and call originalrewrite 
 
