@@ -17,16 +17,52 @@
 ;; things like 'less' only work in real terminals
 (setenv "PAGER" "cat")
 
+;;(setq process-adaptive-read-buffering t)
 (defun etc-shell-mode-hook ()
-  ;; make it so I can hit enter on error messages from gcc
+  (toggle-truncate-lines 1)
+  ;; Scrolling performance is heavily adversely affected without
+  ;; a defer time. We want tailing logs to be fast.
+  (make-local-variable 'jit-lock-defer-timer)
+  (set (make-local-variable 'jit-lock-defer-time) 0.25)
+    ;; make it so I can hit enter on error messages from gcc
   ;; to open the file at that location
-  (compilation-shell-minor-mode 1)
-  (toggle-truncate-lines 1))
+  (compilation-shell-minor-mode 1))
 
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 
 ;; truncate buffers continuously
-(add-hook 'comint-output-filter-functions 'comint-truncate-buffer)
+;;(add-hook 'comint-output-filter-functions 'comint-truncate-buffer)
+
+(defvar-local etc-next-truncate-allowed-timer nil)
+
+;;(setq comint-buffer-maximum-size 20000)
+(defun etc-comint-truncate ()
+  (when (and comint-buffer-maximum-size
+             (> (buffer-size) comint-buffer-maximum-size))
+    (comint-truncate-buffer)
+    (setq etc-next-truncate-allowed-timer
+          (run-at-time 1 1 #'etc-clear-truncate-timer (current-buffer)))))
+
+(defun etc-cancel-truncate-timer ()
+  (when (timerp etc-next-truncate-allowed-timer)
+    (cancel-timer etc-next-truncate-allowed-timer)
+    (setq etc-next-truncate-allowed-timer nil)))
+
+(add-hook 'kill-buffer-hook #'etc-cancel-truncate-timer)
+
+(defun etc-clear-truncate-timer (buffer)
+  (with-current-buffer buffer
+    (etc-cancel-truncate-timer)
+    (etc-comint-truncate)))
+
+(defun etc-setup-delayed-truncate (&optional unused)
+  (unless etc-next-truncate-allowed-timer
+    (etc-comint-truncate)))
+
+;; If you truncate continously it causes too much performance trouble,
+;; the truncation starves I/O to all other processes, so mandimus gets
+;; disconnected.
+(add-hook 'comint-output-filter-functions #'etc-setup-delayed-truncate)
 
 (defun make-my-shell-output-read-only (text)
   "Add to comint-output-filter-functions to make stdout read only in my shells."

@@ -665,5 +665,4 @@
 
 (add-hook 'window-configuration-change-hook #'etc-shrink-help)
 
-;; affects performance of blitzing shells
-(setq jit-lock-defer-time 0.25)
+;;(global-font-lock-mode 1)
