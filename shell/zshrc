@@ -28,7 +28,7 @@ select-word-style bash
 
 # Prefer emacs bindings! I've found boxes where they default to vi bindings.
 # Apparently the default changes based on your $EDITOR, but even if my EDITOR
-# is set to emacs the london boxes default me to vi bindings without this.
+# is set to emacs the some boxes default me to vi bindings without this.
 bindkey -e
 
 source $ZDOTDIR/etc/shell/prefs
@@ -217,13 +217,17 @@ zstyle ':completion:*' menu select
 
 # To help emacs tramp mode and global desktop,
 # turn off the fancy stuff.
-if [[ "$TERM" = "dumb" || "$TERM" = "" ]]
+if [[ "$TERM" = "dumb" || "$TERM" = "" || "$EMACS " = "t" ]]
 then
   unsetopt zle
   unsetopt prompt_cr
   unsetopt prompt_subst
-  unfunction precmd
-  unfunction preexec
+  if type precmd &> /dev/null; then
+      unfunction precmd
+  fi
+  if type preexec &> /dev/null; then
+      unfunction preexec
+  fi
   PS1='$ '
   PS2='$ '
   PROMPT='$ '
@@ -251,6 +255,10 @@ else
  	fi
 	. $ZDOTDIR/etc/shell/fancy-prompt
 	setprompt
+fi
+
+if [[ "$EMACS" = "t" ]]; then
+    PS1='[%n@%m:%~]$ '
 fi
 
 HIST_DIR=$HOME
@@ -324,3 +332,4 @@ watch-build() {
         clear
     done
 }
+

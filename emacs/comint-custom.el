@@ -7,7 +7,7 @@
  '(comint-input-ignoredups t)           ; no duplicates in command history
  '(comint-completion-addsuffix t)       ; insert space/slash after file completion
  '(comint-buffer-maximum-size 20000)    ; max length of the buffer in lines
- '(comint-prompt-read-only nil)         ; if this is t, it breaks shell-command
+ '(comint-prompt-read-only t)         ; if this is t, it breaks shell-command
  '(comint-get-old-input (lambda () "")) ; what to run when i press enter on a
                                         ; line above the current prompt
  '(comint-input-ring-size 5000)         ; max shell history size
@@ -26,16 +26,15 @@
   (set (make-local-variable 'jit-lock-defer-time) 0.25)
     ;; make it so I can hit enter on error messages from gcc
   ;; to open the file at that location
-  (compilation-shell-minor-mode 1))
+  (compilation-shell-minor-mode 1)
+  (shell-dirtrack-mode -1)
+  (dirtrack-mode 1)
+  (setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1)))
 
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 
-;; truncate buffers continuously
-;;(add-hook 'comint-output-filter-functions 'comint-truncate-buffer)
-
 (defvar-local etc-next-truncate-allowed-timer nil)
 
-;;(setq comint-buffer-maximum-size 20000)
 (defun etc-comint-truncate ()
   (when (and comint-buffer-maximum-size
              (> (buffer-size) comint-buffer-maximum-size))
@@ -64,23 +63,14 @@
 ;; disconnected.
 (add-hook 'comint-output-filter-functions #'etc-setup-delayed-truncate)
 
-(defun make-my-shell-output-read-only (text)
-  "Add to comint-output-filter-functions to make stdout read only in my shells."
-  ;; (if (member (buffer-name) my-shells)
-      (let ((inhibit-read-only t)
-            (output-end (process-mark (get-buffer-process (current-buffer)))))
-        (put-text-property comint-last-output-start output-end 'read-only t)))
-;; )
-(add-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
-
-(defun my-dirtrack-mode ()
-  "Add to shell-mode-hook to use dirtrack mode in my shell buffers."
-  ;;(when (member (buffer-name) my-shells)
-    (shell-dirtrack-mode 0)
-    (set-variable 'dirtrack-list '("^.*[^ ]+:\\(.*\\)>" 1 nil))
-    (dirtrack-mode 1))
-;;)
-(add-hook 'shell-mode-hook 'my-dirtrack-mode)
+;; (defun make-my-shell-output-read-only (text)
+;;   "Add to comint-output-filter-functions to make stdout read only in my shells."
+;;   ;; (if (member (buffer-name) my-shells)
+;;       (let ((inhibit-read-only t)
+;;             (output-end (process-mark (get-buffer-process (current-buffer)))))
+;;         (put-text-property comint-last-output-start output-end 'read-only t)))
+;; ;; )
+;; (add-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
 
 ; interpret and use ansi color codes in shell output windows
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
