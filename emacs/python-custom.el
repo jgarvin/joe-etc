@@ -34,7 +34,6 @@
 
 (defun open-line-and-maybe-indent ()
   (interactive)
-  (message "rammed a special version")
   (let ((indent-level (current-indentation))
         (needed-indenting (line-needs-indenting)))
     (when needed-indenting

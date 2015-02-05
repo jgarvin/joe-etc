@@ -54,6 +54,7 @@
 (load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
+(load-file "~/etc/emacs/shell-custom.el")
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
 (load-file "~/etc/emacs/email-custom.el")

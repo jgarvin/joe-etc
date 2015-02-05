@@ -20,7 +20,7 @@
 ;; builtin autosave randomly stops working for no reason,
 ;; so implement my own
 (setq etc-save-timer
-      (run-with-idle-timer 1 t #'etc-save-if-necessary))
+      (run-at-time t 1 #'etc-save-if-necessary))
 
 ;;(cancel-timer etc-save-timer)
 

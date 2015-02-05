@@ -14,25 +14,6 @@
  '(protect-buffer-bury-p nil)
 )
 
-;; things like 'less' only work in real terminals
-(setenv "PAGER" "cat")
-
-;;(setq process-adaptive-read-buffering t)
-(defun etc-shell-mode-hook ()
-  (toggle-truncate-lines 1)
-  ;; Scrolling performance is heavily adversely affected without
-  ;; a defer time. We want tailing logs to be fast.
-  (make-local-variable 'jit-lock-defer-timer)
-  (set (make-local-variable 'jit-lock-defer-time) 0.25)
-    ;; make it so I can hit enter on error messages from gcc
-  ;; to open the file at that location
-  (compilation-shell-minor-mode 1)
-  (shell-dirtrack-mode -1)
-  (dirtrack-mode 1)
-  (setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1)))
-
-(add-hook 'shell-mode-hook #'etc-shell-mode-hook)
-
 (defvar-local etc-next-truncate-allowed-timer nil)
 
 (defun etc-comint-truncate ()
@@ -63,6 +44,15 @@
 ;; disconnected.
 (add-hook 'comint-output-filter-functions #'etc-setup-delayed-truncate)
 
+(defun etc-comint-mode-hook ()
+  (toggle-truncate-lines 1)
+  ;; Scrolling performance is heavily adversely affected without
+  ;; a defer time. We want tailing logs to be fast.
+  (make-local-variable 'jit-lock-defer-timer)
+  (set (make-local-variable 'jit-lock-defer-time) 0.25))
+
+(add-hook 'comint-mode-hook #'etc-comint-mode-hook)
+
 ;; (defun make-my-shell-output-read-only (text)
 ;;   "Add to comint-output-filter-functions to make stdout read only in my shells."
 ;;   ;; (if (member (buffer-name) my-shells)
@@ -71,13 +61,6 @@
 ;;         (put-text-property comint-last-output-start output-end 'read-only t)))
 ;; ;; )
 ;; (add-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
-
-; interpret and use ansi color codes in shell output windows
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
-;; make it harder to kill my shell buffers
-;;(require 'protbuf)
-;;(add-hook 'shell-mode-hook 'protect-process-buffer-from-kill-mode)
 
 (defun enter-again-if-enter ()
   "Make the return key select the current item in minibuf and shell history isearch.
@@ -105,7 +88,44 @@ the line, to capture multiline input. (This only has effect if
 `comint-eol-on-send' is non-nil."
   (flet ((end-of-line () (end-of-buffer)))
     ad-do-it))
-
 ;; not sure why, but comint needs to be reloaded from the source (*not*
 ;; compiled) elisp to make the above advise stick.
 (load "comint.el.gz")
+
+;; comint history code taken from
+;; https://oleksandrmanzyuk.wordpress.com/2011/10/23/a-persistent-command-history-in-emacs/
+
+(defun comint-write-history-on-exit (process event)
+  (comint-write-input-ring)
+  (let ((buf (process-buffer process)))
+    (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (insert (format "\nProcess %s %s" process event))))))
+
+(defun turn-on-comint-history ()
+  ;; shell already has its own history and handling
+  (unless (derived-mode-p 'shell-mode)
+    (let ((process (get-buffer-process (current-buffer))))
+      (when process
+        (setq comint-input-ring-file-name
+              (format "~/.emacs.d/%s-history" major-mode))
+        (comint-read-input-ring)
+        (set-process-sentinel process
+                              #'comint-write-history-on-exit)))))
+
+(defun mapc-buffers (fn)
+  (mapc (lambda (buffer)
+          (with-current-buffer buffer
+            (funcall fn)))
+        (buffer-list)))
+
+(defun comint-write-input-ring-all-buffers ()
+  (mapc-buffers 'comint-write-input-ring))
+
+(setq etc-save-comint-hist-timer
+      (run-with-idle-timer 1 t #'comint-write-input-ring-all-buffers))
+;; (cancel-timer etc-save-comint-hist-timer)
+
+(add-hook 'comint-mode-hook #'turn-on-comint-history)
+(add-hook 'kill-buffer-hook #'comint-write-input-ring)
+(add-hook 'kill-emacs-hook #'comint-write-input-ring-all-buffers)
