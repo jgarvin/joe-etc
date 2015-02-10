@@ -473,7 +473,7 @@ Ignores CHAR at point."
     (forward-char direction)
     (unwind-protect
         (search-forward (char-to-string char) nil nil arg)
-      (backward-char direction))
+      (when (= direction 1) (backward-char direction)))
     (point)))
 
 (defun md-current-path ()
@@ -500,6 +500,20 @@ Ignores CHAR at point."
 
 (add-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
 
+(defun md-down-screenful ()
+  (interactive)
+  (let ((p (point)))
+    (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
+                (not (eobp)))
+      (forward-line 1))))
+
+(defun md-up-screenful ()
+  (interactive)
+  (let ((p (point)))
+    (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
+                (not (bobp)))
+      (forward-line -1))))
+
 ;; (defun md-wrap-sexp ()
 ;;   (interactive)
 ;;   (sp-rewrap-sexp))
@@ -515,3 +529,4 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-undo.el")
 (load-file "~/etc/emacs/md-snippet.el")
+(load-file "~/etc/emacs/md-homophones.el")

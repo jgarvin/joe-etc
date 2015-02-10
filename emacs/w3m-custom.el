@@ -1,8 +1,8 @@
+
 (setq w3m-key-binding 'info)
 
 (setq w3m-use-cookies t)
 
-;; make it easy to use mandimus to jump to chat window
 (make-variable-buffer-local 'frame-title-format)
 (add-hook 'w3m-mode-hook
           (lambda ()

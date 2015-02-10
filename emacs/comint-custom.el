@@ -49,7 +49,9 @@
   ;; Scrolling performance is heavily adversely affected without
   ;; a defer time. We want tailing logs to be fast.
   (make-local-variable 'jit-lock-defer-timer)
-  (set (make-local-variable 'jit-lock-defer-time) 0.25))
+  (set (make-local-variable 'jit-lock-defer-time) 0.25)
+  ;; prevent jump scrolling on new lines
+  (set (make-local-variable 'scroll-conservatively) 10))
 
 (add-hook 'comint-mode-hook #'etc-comint-mode-hook)
 
@@ -129,3 +131,9 @@ the line, to capture multiline input. (This only has effect if
 (add-hook 'comint-mode-hook #'turn-on-comint-history)
 (add-hook 'kill-buffer-hook #'comint-write-input-ring)
 (add-hook 'kill-emacs-hook #'comint-write-input-ring-all-buffers)
+
+; make completion buffers disappear after 3 seconds.
+;; (add-hook 'completion-setup-hook
+;;           (lambda () (run-at-time 3 nil
+;;                                   (lambda () (delete-windows-on "*Completions*")))))
+

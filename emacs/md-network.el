@@ -23,33 +23,45 @@
     (setq md-server-clients (cdr md-server-clients)))
   (delete-process "mandimus-eval-server"))
 
+(defun md-server-restart ()
+  (message "restarting mandimus server")
+  (when (process-status "mandimus-eval-server")
+    (md-server-stop))
+  (md-server-start))
+
 (defun md-server-filter (proc string)   
-  (let ((pending (assoc proc md-server-clients))
-        message
-        index
-        command
-        result)
-    ;;create entry if required
-    (unless pending
-      (setq md-server-clients (cons (cons proc "") md-server-clients))
-      (setq pending  (assoc proc md-server-clients)))
-    (setq message (concat (cdr pending) string))
-    (while (setq index (string-match "\n" message))
-      (setq index (1+ index))
-      (setq command (substring message 0 index))
-      (unwind-protect
-          (setq result
-                (condition-case err
-                    (with-timeout (md-server-eval-timeout (message "Timeout exceeded"))
-                      (eval (car (read-from-string command))))
-                  (user-error (message "Error: %s" (error-message-string err)))
-                  (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
-        ;; We always want to send the newline because the client will block until
-        ;; it receives it.
-        (process-send-string proc (format "%S\n" result))
-        (setq message (substring message index))
-        (md-server-log command proc))
-    (setcdr pending message))))
+  (or (catch 'restart
+        (let ((pending (assoc proc md-server-clients))
+              message
+              index
+              command
+              result)
+          ;;create entry if required
+          (unless pending
+            (setq md-server-clients (cons (cons proc "") md-server-clients))
+            (setq pending  (assoc proc md-server-clients)))
+          (setq message (concat (cdr pending) string))
+          (while (setq index (string-match "\n" message))
+            (setq index (1+ index))
+            (setq command (substring message 0 index))
+            (unwind-protect
+                (setq result
+                      (condition-case err
+                          (with-timeout (md-server-eval-timeout
+                                         (progn
+                                           (message "Timeout exceeded while running: [%S]" command)
+                                           (throw 'restart nil)))
+                            (eval (car (read-from-string command))))
+                        (user-error (message "Error: %s" (error-message-string err)))
+                        (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
+              ;; We always want to send the newline because the client will block until
+              ;; it receives it.
+              (process-send-string proc (format "%S\n" result))
+              (setq message (substring message index))
+              (md-server-log command proc)
+              (setcdr pending message)))
+          t))
+      (md-server-restart)))
 
 (defun md-server-sentinel (proc msg)
   (when (string= msg "connection broken by remote peer\n")

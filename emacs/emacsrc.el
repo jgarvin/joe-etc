@@ -72,9 +72,18 @@
 
 (delete-selection-mode 1)
 
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-(setq auto-window-vscroll nil)
+;; I prefer scrolling to always move point
+(global-set-key (kbd "<next>") #'md-down-screenful)
+(global-set-key (kbd "<prior>") #'md-up-screenful)
+
+;; with speech recognition we don't want to have to
+;; constantly recenter the window around point, so
+;; we actually *want* jumpy scrolling rather than
+;; smooth
+(setq scroll-step 0)
+(setq scroll-conservatively 0)
+(setq scroll-margin 6)
+(setq auto-w1indow-vscroll nil)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -166,7 +175,7 @@
 
 (global-set-key (kbd "S-SPC") 'dabbrev-expand)
 (global-set-key (kbd "M-SPC") 'dabbrev-expand)
-(setq dabbrev-case-fold-search t)
+(setq dabbrev-case-fold-search nil)
 (global-unset-key (kbd "M-/"))
 
 ;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
@@ -666,4 +675,21 @@
 
 (add-hook 'window-configuration-change-hook #'etc-shrink-help)
 
+(global-set-key "\C-xg" #'magit-status)
+
 ;;(global-font-lock-mode 1)
+;; (cancel-timer jit-lock-defer-timer)
+;; (setq jit-lock-defer-timer nil)
+
+(defun etc-shell-command ()
+  (interactive)
+  (if (use-region-p)
+      (call-interactively #'shell-command-on-region)
+    (call-interactively #'shell-command)))
+
+(defun etc-delete-other-windows ()
+  (interactive)
+  (delete-other-windows)
+  (recenter-top-bottom))
+
+(global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
