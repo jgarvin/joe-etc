@@ -17,16 +17,20 @@
 ;; ask encyption password once
 ;;(setq epa-file-cache-passphrase-for-symmetric-encryption t)
 
+(require 'smtpmail)
 (setq smtpmail-auth-credentials "~/.authinfo")
+
+(setq gnus-ignored-newsgroups "")
 
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
-      smtpmail-auth-credentials '(("smtp.gmail.com" 587
-                                   user-mail-address nil))
+      ;; smtpmail-auth-credentials '(("smtp.gmail.com" 587
+      ;;                              user-mail-address nil))
       smtpmail-default-smtp-server "smtp.gmail.com"
       smtpmail-smtp-server "smtp.gmail.com"
       smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+      ;; gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]"
+      )
 
 ;; ;;@see http://gnus.org/manual/gnus_397.html
 ;; (add-to-list 'gnus-secondary-select-methods
@@ -78,7 +82,7 @@
 (setq gnus-thread-ignore-subject t)
 
 ;; You need install the command line brower 'w3m' and Emacs plugin 'w3m'
-(setq mm-text-html-renderer 'w3m)
+(setq mm-text-html-renderer 'shr)
 
 ;; http://www.gnu.org/software/emacs/manual/html_node/gnus/_005b9_002e2_005d.html
 (setq gnus-use-correct-string-widths nil)
@@ -108,3 +112,5 @@
 ;;              (flyspell-mode t)
 ;;              (local-set-key "<TAB>" 'bbdb-complete-name)))
 
+;; I never seem to exit emacs cleanly, just always use the autosave file
+(setq gnus-always-read-dribble-file t)

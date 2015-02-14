@@ -65,6 +65,7 @@
 (load-file "~/etc/emacs/org-custom.el")
 (load-file "~/etc/emacs/persist-custom.el")
 (load-file "~/etc/emacs/buffer-tail.el")
+(load-file "~/etc/emacs/log-custom.el")
 
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
@@ -693,3 +694,5 @@
   (recenter-top-bottom))
 
 (global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
+
+(global-set-key (kbd "C-<return>") #'find-file-at-point)
