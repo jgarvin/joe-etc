@@ -1,13 +1,13 @@
 (defun md-need-capitalization ()
   (interactive)
   (cond
-   ((derived-mode-p 'prog-mode) nil)
+   ((derived-mode-p 'prog-mode 'comint-mode) nil)
    ((md-beginning-of-input) t)
    ((save-excursion
-    (re-search-backward "[^[:blank:]]" (max (- (point) 10000) (point-min)) t)
-    ;; string-match when it matches can return 0, which we still want to be true,
-    ;; so yeah double negation
-    (not (not (string-match "[?!.]" (char-to-string (char-after)))))) t)
+      (re-search-backward "[^[:blank:]]" (max (- (point) 10000) (point-min)) t)
+      ;; string-match when it matches can return 0, which we still want to be true,
+      ;; so yeah double negation
+      (not (not (string-match "[?!.]" (char-to-string (char-after)))))) t)
    (t nil)))
 
 (defun md-matching-pairs ()
@@ -109,14 +109,14 @@ If the string preceeding pos isn't part of any pair, then returns nil."
        ((md-likely-followed-by-closer (point)) t)))))
 
 (defun md-space-inhibiting-before-chars ()
-  (let ((l (if (derived-mode-p 'prog-mode)
+  (let ((l (if (derived-mode-p 'prog-mode 'comint-mode)
                (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?! ?\# ?\$)
              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?\# ?\$))))
     (when (derived-mode-p 'emacs-lisp-mode)
       (push ?\' l)
       (push ?\, l)
       (push ?: l))
-    (when (derived-mode-p 'python-mode)
+    (when (derived-mode-p 'python-mode 'inferior-python-mode)
       (setq l (delq ?\# l)))
     ;; (when (derived-mode-p 'sh-mode 'shell-mode)
       ;; (push ?\> l))

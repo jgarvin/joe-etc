@@ -50,17 +50,18 @@ but it doesn't need to, just the ones that show up in the homophones file."
     ;; lazy loading
     (md-setup-homophone-table))
   (let* ((word (thing-at-point 'word))
+         (lowercase-word (downcase word))
          (bounds (bounds-of-thing-at-point 'word))
-         (entry (gethash word md-homophone-table)))
+         (entry (gethash lowercase-word md-homophone-table)))
     (if entry
         (progn
           (message "%S "entry)
-          (let ((next-homophone (nth (% (1+ (position word entry :test #'equal)) (length entry)) entry)))
+          (let ((next-homophone (nth (% (1+ (position lowercase-word entry :test #'equal)) (length entry)) entry)))
             (save-excursion
               (goto-char (car bounds))
+              ;; (query-replace word next-homophone nil (car bounds) (cdr bounds))
               (re-search-forward ".*" (cdr bounds))
-              (replace-match next-homophone))))
+              (replace-match next-homophone)
+              )))
       (user-error "No homophones of [%s]" word))))
-
-
 
