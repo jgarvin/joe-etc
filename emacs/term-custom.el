@@ -19,7 +19,7 @@
 (add-hook 'term-mode-hook 'etc-term-mode-setup)
 
 (defun etc-terminal-name ()
-  (concat "@" (file-name-directory (buffer-file-name (current-buffer)))))
+  (concat "$" (file-name-directory (buffer-file-name (current-buffer)))))
 
 (defun etc-start-terminal ()
   (interactive)

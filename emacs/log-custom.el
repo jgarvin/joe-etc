@@ -8,6 +8,8 @@
   (auto-revert-set-timer)
   (make-variable-buffer-local 'auto-revert-verbose)
   (setq auto-revert-verbose nil)
-  (read-only-mode t))
+  (read-only-mode t)
+  (when (fboundp 'show-smartparens-mode)
+    (show-smartparens-mode 0)))
 
 (add-hook 'auto-revert-tail-mode-hook 'etc-log-tail-handler)
