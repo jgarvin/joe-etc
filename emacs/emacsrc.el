@@ -696,3 +696,8 @@
 (global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
 
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
+
+;; enables focus follows mouse, needed for head tracking
+(setq mouse-autoselect-window t)
+;; makes emacs aware of my window manager behavior, not sure what this gets me
+(setq focus-follows-mouse t)

@@ -123,6 +123,7 @@
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
+     ((string-match "[^\t\n\r\f -~]" sym) t) ;; filter syms with unprintable chars
      ((and (not dont-check-faces)
            sym-start
            sym-end
@@ -173,12 +174,13 @@
 ;; TODO: This would be faster if it used a heap
 ;; TODO: only need one search and use match-beginning/end
 ;; TODO: only run on changed parts of buffer? hard to 'subtract out'
-(defun md-get-symbols-impl (start end)
-  "Get all the symbols between start and end"
+(defun md-get-unit-impl (start end unit)
+  "Get all the units (symbols or words) between start and end"
   (save-match-data
     (save-excursion
-      (let ((sym-counts (make-hash-table :test 'equal))
-            (sym-start)
+      (let ((search-opener (if (equal unit 'symbol) "\\_<" "\\<"))
+            (search-closer (if (equal unit 'symbol) "\\_>" "\\>"))
+            (sym-counts (make-hash-table :test 'equal))
             (current-sym)
             (starting-point (point))
             (min-distance most-positive-fixnum)
@@ -189,12 +191,9 @@
         (beginning-of-line)
         (condition-case nil
             (while (> end (point))
-              (re-search-forward "\\_<" end)
-              (setq sym-start (point))
-              (re-search-forward "\\_>" end)
-              (setq current-sym (buffer-substring-no-properties sym-start (point)))
-              (when (not (md-filter-symbol current-sym sym-start (point)))
-                (set-text-properties 0 (length current-sym) nil current-sym)
+              (re-search-forward (concat search-opener "\\(.+?\\)" search-closer) end)
+              (setq current-sym (match-string-no-properties 1))
+              (when (not (md-filter-symbol current-sym (match-beginning 1) (match-end 1)))
                 (let ((entry (gethash current-sym sym-counts))
                       (cur-distance (abs (- (point) starting-point))))
                   (if entry
@@ -237,7 +236,7 @@
               (setq results (cons (aref inner-vec 0) results)))
             (setq i (+ i 1)))
           results)))))
-(byte-compile 'md-get-symbols-impl)
+(byte-compile 'md-get-unit-impl)
 
 (defun md-safe-get-symbols-impl (start end)
   (let ((distance (abs (- end start)))
@@ -246,7 +245,7 @@
     (when (> distance md-safe-scan-limit)
       (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
       (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
-    (md-get-symbols-impl safe-start safe-end)))
+    (md-get-unit-impl safe-start safe-end 'symbol)))
 (byte-compile 'md-safe-get-symbols-impl)
 
 (defun md-refresh-symbol-cache (buf)
@@ -263,9 +262,6 @@
       (cancel-timer md-refresh-timer)
       (setq md-refresh-timer nil))))
 (byte-compile 'md-refresh-symbol-cache)
-
-;; TODO: put back var for md-updating-projectile-files
-;; TODO: why is running hook constantly printing?
 
 (defun md-refresh-symbols (&optional _start _end _old-length)
   (unless (or (window-minibuffer-p)

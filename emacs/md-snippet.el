@@ -499,6 +499,11 @@ go to the highest slot (most recent)."
  :contents "from $1 import $2"
  :context '(derived-mode-p 'python-mode))
 
+(md-replace-snippet
+ :name "for"
+ :contents "for $1 in $2:\n    $3"
+ :context '(derived-mode-p 'python-mode))
+
 ;;(md-insert-snippet "dotimes")
 
 (md-snippet-mode-activate 1)
