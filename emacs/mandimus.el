@@ -9,6 +9,12 @@
 (defvar md-start-utterance-hooks nil)
 (defvar md-end-utterance-hooks nil)
 
+;; make a selection hook that doesn't fire under circumstances we don't care about
+(defvar md-window-selection-hook nil)
+(defvar md-last-value-pair nil)
+(defvar md-inhibit-window-selection-hooks nil)
+(defvar md-last-selected-window nil)
+
 (defun md-safe-cancel-timer (v)
   (when (symbol-value v)
       (when (timerp (symbol-value v))
@@ -481,22 +487,20 @@ Ignores CHAR at point."
       list-buffers-directory
     buffer-file-name))
 
-;; make a selection hook that doesn't fire under circumstances we don't care about
-(defvar md-window-selection-hook nil)
-(defvar md-last-value-pair nil)
-(defvar md-inhibit-window-selection-hooks nil)
-
 (defun md-run-window-selection-hooks ()
   (unless (or md-inhibit-window-selection-hooks
-              (not (eq (current-buffer) (window-buffer)))
-              (window-minibuffer-p)
-              (minibufferp)
-              (and md-last-value-pair (and (eq (current-buffer) (car md-last-value-pair))
+              ;; for some reason getting projectile files triggers buffer-list-update-hook
+              (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
+              ;; opening any old temporary buffer in the background fires buffer-update-list hook,
+              ;; when what we're really after is when we select a new window or the buffer in the
+              ;; current window changes. note you can't rely on (current-buffer) to be the currently
+              ;; displayed window inside buffer-list-update hook, thus so we use the circumlocution:
+              ;; (window-buffer (selected-window))
+              (and md-last-value-pair (and (eq (window-buffer (selected-window)) (car md-last-value-pair))
                                            (eq (selected-window) (cdr md-last-value-pair)))))
     (let ((md-inhibit-window-selection-hooks t))
-      (unwind-protect
-          (run-hooks 'md-window-selection-hook)
-        (setq md-last-value-pair (cons (current-buffer) (selected-window)))))))
+      (setq md-last-value-pair (cons (window-buffer (selected-window)) (selected-window)))
+      (run-hooks 'md-window-selection-hook))))
 
 (add-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
 

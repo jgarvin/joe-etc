@@ -11,6 +11,7 @@
 (defvar-local md-sym-tracking-capacity 0)
 (defvar md-refresh-timer nil)
 (defvar-local md-symbols-cache nil)
+(defvar-local md-word-cache nil)
 (defvar md-symbols-cache-refresh-hook nil)
 (defvar md-mode-keywords nil)
 (defvar md-min-symbol-length 3)
@@ -238,76 +239,45 @@
           results)))))
 (byte-compile 'md-get-unit-impl)
 
-(defun md-safe-get-symbols-impl (start end)
+(defun md-safe-get-unit-impl (start end unit)
   (let ((distance (abs (- end start)))
         (safe-start start)
         (safe-end end))
     (when (> distance md-safe-scan-limit)
       (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
       (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
-    (md-get-unit-impl safe-start safe-end 'symbol)))
-(byte-compile 'md-safe-get-symbols-impl)
+    (md-get-unit-impl safe-start safe-end unit)))
+(byte-compile 'md-safe-get-unit-impl)
 
-(defun md-refresh-symbol-cache (buf)
+(defun md-refresh-unit-cache (buf v unit)
   ;;(setq md-debug-temp mark-active)
   ;;(message "refreshing symbol cache %S" md-debug-temp)
   (unwind-protect 
       (with-current-buffer buf
-        (let ((old md-symbols-cache)) 
-          (setq md-symbols-cache (md-safe-get-symbols-impl (point-min) (point-max)))
-          (when (not (equal old md-symbols-cache)) 
+        (let ((old (symbol-value v))) 
+          (set v (md-safe-get-unit-impl (point-min) (point-max) unit))
+          (when (not (equal old (symbol-value v))) 
             ;;(message "running hook")
             (run-hooks 'md-symbols-cache-refresh-hook))))
     (when md-refresh-timer
       (cancel-timer md-refresh-timer)
       (setq md-refresh-timer nil))))
-(byte-compile 'md-refresh-symbol-cache)
+(byte-compile 'md-refresh-unit-cache)
 
 (defun md-refresh-symbols (&optional _start _end _old-length)
   (unless (or (window-minibuffer-p)
               (minibufferp)
-              (not (eq (current-buffer) (window-buffer)))
-              ;; for some reason getting projectile files triggers buffer-list-update-hook
-              (and (boundp 'md-updating-projectile-files) md-updating-projectile-files))
-    (md-run-when-idle-once 'md-refresh-timer (lambda () (md-refresh-symbol-cache (current-buffer))) 0.5 nil)))
+              (not (get-buffer-window (current-buffer) 'visible)))
+    (md-run-when-idle-once 'md-refresh-timer
+                           (lambda ()
+                             (md-refresh-unit-cache (current-buffer) 'md-symbols-cache 'symbol)
+                             (md-refresh-unit-cache (current-buffer) 'md-word-cache 'word)) 0.5 nil)))
 (byte-compile 'md-refresh-symbols)
-
-(defun md-refresh-after-change (&optional _start _end _old-length)
-  (message "after change")
-  (md-refresh-symbols))
-
-(defun md-refresh-after-select (&optional _start _end _old-length)
-  (message "after select")
-  (md-refresh-symbols))
 
 (add-hook 'after-change-functions #'md-refresh-symbols)
 ;; (remove-hook 'after-change-functions #'md-refresh-symbols)
 (add-hook 'md-window-selection-hook #'md-refresh-symbols)
 ;; (remove-hook 'md-window-selection-hook #'md-refresh-symbols)
-
-(defun md-find-nearest-word-impl (word start end)
-  (setq sites '())
-  (save-excursion
-    (goto-char start)
-    (catch 'break
-      (while (> end (point))
-	(setq result (search-forward word end t))
-	(when (not result)
-	    (throw 'break nil))
-	(setq sites (cons result sites)))))
-  (setq sites
-	(sort sites
-	      (lambda (x y)
-		(< (abs (- (point) x)) (abs (- (point) y))))))
-  (if sites
-      (goto-char (nth 0 sites))
-    (error "No instance of word.")))
-
-(defun md-find-nearest-word-buffer (word)
-  (md-find-nearest-word-impl word (md-safe-start) (md-safe-stop)))
-
-(defun md-find-nearest-word-window (word)
-  (md-find-nearest-word-impl word (window-start) (window-end)))
 
 (defun md-get-active-erc-nicknames (&optional max-results)
   (when (equal major-mode 'erc-mode)
@@ -351,5 +321,4 @@
 (add-hook 'md-window-selection-hook #'md-update-active-nicks)
 ;;(remove-hook 'erc-insert-post-hook #'md-update-active-nicks)
 ;;(remove-hook 'md-window-selection-hook #'md-update-active-nicks)
-
 

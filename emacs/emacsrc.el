@@ -701,3 +701,7 @@
 (setq mouse-autoselect-window t)
 ;; makes emacs aware of my window manager behavior, not sure what this gets me
 (setq focus-follows-mouse t)
+
+;; accidentally suspending emacs is super annoying
+(when (getenv "DISPLAY")
+  (global-unset-key (kbd "C-z")))
