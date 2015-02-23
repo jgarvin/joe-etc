@@ -19,6 +19,11 @@
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
 
+(defconst md-max-global-cache-size 500)
+(defvar md-global-word-cache nil)
+(defvar md-global-symbol-cache nil)
+(defvar md-global-refresh-timer nil)
+
 (defun md-register-mode-keywords (mode keywords)
   (let ((entry (assoc mode md-mode-keywords)))
     (if entry
@@ -192,7 +197,10 @@
         (beginning-of-line)
         (condition-case nil
             (while (> end (point))
-              (re-search-forward (concat search-opener "\\(.+?\\)" search-closer) end)
+              (if (and subword-mode (equal unit 'word))
+                  (let ((case-fold-search nil))
+                    (re-search-forward subword-forward-regexp end))
+                (re-search-forward (concat search-opener "\\(.+?\\)" search-closer) end))
               (setq current-sym (match-string-no-properties 1))
               (when (not (md-filter-symbol current-sym (match-beginning 1) (match-end 1)))
                 (let ((entry (gethash current-sym sym-counts))
@@ -278,6 +286,129 @@
 ;; (remove-hook 'after-change-functions #'md-refresh-symbols)
 (add-hook 'md-window-selection-hook #'md-refresh-symbols)
 ;; (remove-hook 'md-window-selection-hook #'md-refresh-symbols)
+
+(defun md-get-all-modes ()
+  (remq nil
+        (cons major-mode
+              (loop as m = major-mode then p while m as p = (get m 'derived-mode-parent) collect p))))
+
+(defun md-modes-in-common (a b)
+  (-intersection (with-current-buffer a (md-get-all-modes))
+                 (with-current-buffer b (md-get-all-modes))))
+
+;; (md-modes-in-common (current-buffer) "*Messages*")
+
+(defun md-get-visible-buffers ()
+  (let ((result))
+    (dolist (b (buffer-list))
+      (when (get-buffer-window b 'visible)
+        (push b result)))
+    result))
+
+(defun md-sort-buffers-by-priority (a b)
+  (let ((w (window-buffer (selected-window))))
+    (>= (length (md-modes-in-common a w)) (length (md-modes-in-common b w)))))
+
+;; 0. match on current-window
+;; 1. match on project, mode, visibility
+;; 2. match on project, mode
+;; 3. match on project
+;; 4. match on visiblity
+;; 5. everything else
+
+;; (f-common-parent '("/home/prophet/foo" "/bar"))
+
+(defun md-file-inside-folder (f dir)
+  (string= (f-common-parent (list f dir)) dir))
+
+(defun md-get-real-projectile-buffers ()
+  "(projectile-project-buffers) appears to be bugged, it thinks lots
+of buffers are part of the project that are not..."
+  (-filter (lambda (x) (or (and (buffer-file-name x)
+                                (md-file-inside-folder (buffer-file-name x) (projectile-project-root)))
+                           (get-buffer-process x))) (projectile-project-buffers)))
+  
+;; (message "[%S]" (md-get-real-projectile-buffers))
+
+;; (-intersection (md-get-visible-buffers)
+;;                (projectile-project-buffers))
+
+;; (-filter (lambda (x) (with-current-buffer x
+;;                        (not (derived-mode-p 'ack-and-a-half-mode 'magit-mode 'message-mode 'special-mode))))
+;;          (projectile-project-buffers))
+
+;; (message "project bufs: [%s]" (-filter (lambda (x) (with-current-buffer x
+;;                                                      (not (derived-mode-p 'ack-and-a-half-mode 'magit-mode 'message-mode
+;;                                                                           'special-mode))))
+;;                                        (projectile-project-buffers)))
+
+(defun md-get-prioritized-buffer-list ()
+  (let ((visible-buffers (md-get-visible-buffers))
+        (current-window (window-buffer (selected-window)))
+        (new-list)
+        (buftemp)
+        (debug-log nil))
+    ;; current window comes first
+    (push current-window new-list)
+    (setq visible-buffers (remq current-window visible-buffers))
+    (when debug-log (message "List1: [%s]" new-list))
+    (when (projectile-project-p)
+      (let ((proj-buffers (with-current-buffer current-window
+                           (md-get-real-projectile-buffers))))
+        ;; (message "visible: [%s]" visible-buffers)
+        ;; (message "proj: [%s]" proj-buffers)
+        ;; then visible buffers in the same project sorted by mode
+        (setq buftemp (sort (-intersection visible-buffers
+                                           proj-buffers)
+                            #'md-sort-buffers-by-priority))
+        (setq new-list (nconc new-list buftemp))
+        (when debug-log (message "List2: [%s]" new-list))
+        ;; then buffers we can't see in the same project sorted by mode
+        (setq buftemp (sort (-difference proj-buffers new-list)
+                            #'md-sort-buffers-by-priority))
+        (setq new-list (nconc new-list buftemp))
+        (when debug-log (message "List3: [%s]" new-list))))
+    ;; then other visible buffers
+    (setq buftemp (sort (-difference visible-buffers new-list)
+                        #'md-sort-buffers-by-priority))
+    (setq new-list (nconc new-list buftemp))
+    (when debug-log (message "List4: [%s]" new-list))
+    ;; then everything else
+    (setq buftemp (sort (-difference (buffer-list) new-list)
+                        #'md-sort-buffers-by-priority))
+    (setq new-list (nconc new-list buftemp))
+    (when debug-log (message "List5: [%s]" new-list))
+    ;; (message "New list: [%s]" new-list)
+    new-list))
+
+(defun md-refresh-global-cache-unit (cache buffers presence-map)
+  (let ((count 0)
+        (new-unit-cache))
+    (catch 'max-hit
+      (dolist (b buffers)
+        (with-current-buffer b
+          (dolist (w (symbol-value cache))
+            (unless (gethash w presence-map)
+              (puthash w 1 presence-map)
+              (when (> (incf count) md-max-global-cache-size)
+                (throw 'max-hit nil))
+              (push w new-unit-cache))))))
+    (setq new-unit-cache (nreverse new-unit-cache))
+    new-unit-cache))
+  
+(defun md-refresh-global-caches-impl ()
+  (let ((buffers (md-get-prioritized-buffer-list))
+        ;; by sharing the presence map and doing words first, we keep redundancy out
+        ;; of the cache
+        (presence-map (make-hash-table :test 'equal)))
+    (setq md-global-word-cache (md-refresh-global-cache-unit 'md-word-cache buffers presence-map))
+    (setq md-global-symbol-cache (md-refresh-global-cache-unit 'md-symbols-cache buffers presence-map))))
+
+(defun md-refresh-global-caches ()
+  (md-run-when-idle-once 'md-global-refresh-timer #'md-refresh-global-caches-impl 0.5 nil))
+
+(add-hook 'md-symbols-cache-refresh-hook #'md-refresh-global-caches)
+(add-hook 'md-window-selection-hook #'md-refresh-global-caches)
 
 (defun md-get-active-erc-nicknames (&optional max-results)
   (when (equal major-mode 'erc-mode)

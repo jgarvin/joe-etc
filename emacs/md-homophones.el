@@ -1,3 +1,5 @@
+(require 'subr-x) 
+
 (defvar md-homophone-table nil)
 
 (defun read-lines (filePath)
@@ -20,25 +22,41 @@ but it doesn't need to, just the ones that show up in the homophones file."
 ;; (md-pluralize "food" "s")
 ;; (md-pluralize "party" "ies")
 
+;; TODO: there are two problems with this implementation
+;; because it isn't stateful, it can't handle multiple word homophones
+;; "I see" -> "I sea" rather than "icy"
+;; also because it isn't stateful, it doesn't handle homophonic abbreviations correctly
+;; "IC" -> "ICY" rather than "icy"
+;; the capitalization should obey the capitalization you started with when you began cycling
+
 (defun md-setup-homophone-table ()
   (let ((main-list))
     (setq md-homophone-table (make-hash-table :test #'equal))
     (dolist (i (read-lines "~/etc/emacs/homophones"))
-      (let ((homophones (split-string i "," t))
-            core-list
-            plural-list)
-        (dolist (h homophones)
-          (let ((plural-split (split-string h " " t)))
-            ;;(message "%S" plural-split)
-            (assert (<= (length plural-split) 2))
-            (push (car plural-split) core-list)
-            (when (= (length plural-split) 2)
-              ;; strip off surrounding parens and dash from plural ending, (-es) -> es
-              (let*((plural-ending (replace-regexp-in-string "(-\\([^)]+\\))" "\\1" (cadr plural-split))))
-                (push (md-pluralize (car plural-split) plural-ending) plural-list)))))
-        (push core-list main-list)
-        (when plural-list
-          (push plural-list main-list))))
+      (unless (equal (aref i 0) ?\#)
+        (let ((homophones (split-string i "," t))
+              core-list
+              plural-list)
+          (dolist (h homophones)
+            (string-match "\\([^(]+\\)\\((-\\([^)]+\\))\\)?" h)
+            (let ((base-word (string-trim (match-string 1 h)))
+                  (plural-ending (match-string 3 h)))
+              (push base-word core-list)
+              (when plural-ending
+                (setq plural-ending (string-trim plural-ending))
+                (push (md-pluralize base-word plural-ending) plural-list)))
+            ;; (let ((plural-split (split-string h " " t)))
+            ;;   ;;(message "%S" plural-split)
+            ;;   (assert (<= (length plural-split) 2))
+            ;;   (push (car plural-split) core-list)
+            ;;   (when (= (length plural-split) 2)
+            ;;     ;; strip off surrounding parens and dash from plural ending, (-es) -> es
+            ;;     (let*((plural-ending (replace-regexp-in-string "(-\\([^)]+\\))" "\\1" (cadr plural-split))))
+            ;;       (push (md-pluralize (car plural-split) plural-ending) plural-list))))
+            )
+          (push core-list main-list)
+          (when plural-list
+            (push plural-list main-list)))))
     (dolist (group main-list)
       (dolist (word group)
         (puthash word group md-homophone-table)))
@@ -52,11 +70,14 @@ but it doesn't need to, just the ones that show up in the homophones file."
   (let* ((word (thing-at-point 'word))
          (lowercase-word (downcase word))
          (bounds (bounds-of-thing-at-point 'word))
-         (entry (gethash lowercase-word md-homophone-table)))
+         (entry (or (gethash word md-homophone-table)
+                    (gethash lowercase-word md-homophone-table))))
     (if entry
         (progn
           (message "%S "entry)
-          (let ((next-homophone (nth (% (1+ (position lowercase-word entry :test #'equal)) (length entry)) entry)))
+          (let ((next-homophone (nth (% (1+ (or (position word entry :test #'equal)
+                                                (position lowercase-word entry :test #'equal)))
+                                        (length entry)) entry)))
             (save-excursion
               (goto-char (car bounds))
               ;; (query-replace word next-homophone nil (car bounds) (cdr bounds))
@@ -64,4 +85,3 @@ but it doesn't need to, just the ones that show up in the homophones file."
               (replace-match next-homophone)
               )))
       (user-error "No homophones of [%s]" word))))
-
