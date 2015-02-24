@@ -19,7 +19,7 @@
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
 
-(defconst md-max-global-cache-size 500)
+(defconst md-max-global-cache-size 200)
 (defvar md-global-word-cache nil)
 (defvar md-global-symbol-cache nil)
 (defvar md-global-refresh-timer nil)
@@ -129,6 +129,7 @@
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
+     ;; TODO: this is wrong, it excludes unicode
      ((string-match "[^\t\n\r\f -~]" sym) t) ;; filter syms with unprintable chars
      ((and (not dont-check-faces)
            sym-start
@@ -136,18 +137,6 @@
            (md-string-contains-faces sym-start sym-end md-symbol-filter-faces)) t)
      (t nil))))
 (byte-compile 'md-filter-symbol)
-
-;; (with-current-buffer "#emacs"
-;;   (save-excursion
-;;     (setq temp (point))
-;;     (forward-symbol 1)
-;;     (md-string-contains-faces temp (point) md-symbol-filter-faces)))
-
-;; (with-current-buffer "#python"
-;;   (save-excursion
-;;     (setq temp (point))
-;;     (forward-symbol 1)
-;;     (md-filter-symbol (buffer-substring-no-properties temp (point)) temp (point))))
 
 (defun md-quick-sort (vec p q pred)
   (let ((r))
@@ -309,18 +298,6 @@
   (let ((w (window-buffer (selected-window))))
     (>= (length (md-modes-in-common a w)) (length (md-modes-in-common b w)))))
 
-;; 0. match on current-window
-;; 1. match on project, mode, visibility
-;; 2. match on project, mode
-;; 3. match on project
-;; 4. match on visiblity
-;; 5. everything else
-
-;; (f-common-parent '("/home/prophet/foo" "/bar"))
-
-(defun md-file-inside-folder (f dir)
-  (string= (f-common-parent (list f dir)) dir))
-
 (defun md-get-real-projectile-buffers ()
   "(projectile-project-buffers) appears to be bugged, it thinks lots
 of buffers are part of the project that are not..."
@@ -328,21 +305,14 @@ of buffers are part of the project that are not..."
                                 (md-file-inside-folder (buffer-file-name x) (projectile-project-root)))
                            (get-buffer-process x))) (projectile-project-buffers)))
   
-;; (message "[%S]" (md-get-real-projectile-buffers))
-
-;; (-intersection (md-get-visible-buffers)
-;;                (projectile-project-buffers))
-
-;; (-filter (lambda (x) (with-current-buffer x
-;;                        (not (derived-mode-p 'ack-and-a-half-mode 'magit-mode 'message-mode 'special-mode))))
-;;          (projectile-project-buffers))
-
-;; (message "project bufs: [%s]" (-filter (lambda (x) (with-current-buffer x
-;;                                                      (not (derived-mode-p 'ack-and-a-half-mode 'magit-mode 'message-mode
-;;                                                                           'special-mode))))
-;;                                        (projectile-project-buffers)))
-
+;; TODO: sort buffers within project by how recently visited
 (defun md-get-prioritized-buffer-list ()
+  ;; 0. match on current-window
+  ;; 1. match on project, mode, visibility
+  ;; 2. match on project, mode
+  ;; 3. match on project
+  ;; 4. match on visiblity
+  ;; 5. everything else
   (let ((visible-buffers (md-get-visible-buffers))
         (current-window (window-buffer (selected-window)))
         (new-list)
@@ -381,28 +351,41 @@ of buffers are part of the project that are not..."
     ;; (message "New list: [%s]" new-list)
     new-list))
 
-(defun md-refresh-global-cache-unit (cache buffers presence-map)
+(defun md-normalize-words (word)
+  "Cleanup words because in some modes punctuation gets stuck
+on the ends. Also we want to store as lowercase."
+  (save-match-data
+    (when (string-match "\\([a-zA-z]+\\)" word)
+      (downcase (match-string 1 word)))))
+
+(defun md-refresh-global-cache-unit (cache buffers presence-map &optional normalize)
   (let ((count 0)
-        (new-unit-cache))
+        (new-unit-cache)
+        (word))
     (catch 'max-hit
       (dolist (b buffers)
         (with-current-buffer b
           (dolist (w (symbol-value cache))
-            (unless (gethash w presence-map)
-              (puthash w 1 presence-map)
-              (when (> (incf count) md-max-global-cache-size)
-                (throw 'max-hit nil))
-              (push w new-unit-cache))))))
+            (when normalize
+              (setq w (funcall normalize w)))
+            (when w
+              (unless (gethash w presence-map)
+                (puthash w 1 presence-map)
+                (when (> (incf count) md-max-global-cache-size)
+                  (throw 'max-hit nil))
+                (push w new-unit-cache)))))))
     (setq new-unit-cache (nreverse new-unit-cache))
     new-unit-cache))
   
 (defun md-refresh-global-caches-impl ()
-  (let ((buffers (md-get-prioritized-buffer-list))
-        ;; by sharing the presence map and doing words first, we keep redundancy out
-        ;; of the cache
-        (presence-map (make-hash-table :test 'equal)))
-    (setq md-global-word-cache (md-refresh-global-cache-unit 'md-word-cache buffers presence-map))
-    (setq md-global-symbol-cache (md-refresh-global-cache-unit 'md-symbols-cache buffers presence-map))))
+  (let ((buffers (md-get-prioritized-buffer-list)))
+    (setq md-global-word-cache (md-refresh-global-cache-unit
+                                'md-word-cache buffers
+                                (make-hash-table :test 'equal)
+                                #'md-normalize-words))
+    (setq md-global-symbol-cache (md-refresh-global-cache-unit
+                                  'md-symbols-cache buffers
+                                  (make-hash-table :test 'equal)))))
 
 (defun md-refresh-global-caches ()
   (md-run-when-idle-once 'md-global-refresh-timer #'md-refresh-global-caches-impl 0.5 nil))

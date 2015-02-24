@@ -80,7 +80,7 @@ onto a list of buffers modified this utterance."
         ;; in undoing those
         (when (buffer-name i)
           (with-current-buffer i
-            ;; some moves clear the undo list, like ERC
+            ;; some modes clear the undo list, like ERC
             ;; when you hit enter
             (when buffer-undo-list 
                   (condition-case data

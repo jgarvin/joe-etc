@@ -4,7 +4,8 @@
   (concat "!" (buffer-name (current-buffer))))
 
 (defun etc-dired-hook ()
-  (rename-buffer (etc-dired-name)))
+  ;; (rename-buffer (etc-dired-name))
+  )
 
 (add-hook 'dired-mode-hook #'etc-dired-hook)
 

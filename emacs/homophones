@@ -22,7 +22,6 @@ allusive, elusive, illusive
 altar (-s), alter (-s)
 amend (-s), emend (-s)
 analyst (-s), annalist (-s)
-and, end
 ant (-s), aunt (-s)
 ante, anti, aunty
 apatite (-s), appetite (-s)
@@ -864,4 +863,6 @@ worst, wurst
 yoke, yolk
 yore, your, you're 
 you'll, yule
+# BEGIN CUSTOM
+and, end, in
 zero (-oes), 0 (-s)

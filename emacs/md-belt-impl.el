@@ -253,8 +253,8 @@
    ((and (or (not arg) (= arg 0)) md-belt-mode) (md-hide-belts))
    ((and (or (not arg) (= arg 1)) (not md-belt-mode)) (md-setup-belts))))
 
-(md-toggle-belt-mode 1)
-;; (md-toggle-belt-mode 0)
+;;(md-toggle-belt-mode 1)
+ (md-toggle-belt-mode 0)
 
 (provide 'md-belt-impl)
 

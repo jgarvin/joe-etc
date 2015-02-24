@@ -74,7 +74,7 @@ debug mode causing timers to die."
       (ignore-errors (beginning-of-thing 'symbol))
       (if (re-search-backward (concat "\\_<" (regexp-quote str) "\\_>"))
           (setq p (point))
-        (user-error "No proceeding instance of string: %s" str)))
+        (user-error "No preceding instance of string: %s" str)))
     (when p
       (goto-char p))))
 
