@@ -469,7 +469,7 @@ Ignores CHAR at point."
   (let ((direction (if (>= arg 0) 1 -1)))
     (forward-symbol direction)
     (unwind-protect
-        (re-search-forward (concat "\\_<" (char-to-string char)) nil nil arg)
+        (re-search-forward (concat "\\_<" (regexp-quote (char-to-string char))) nil nil arg)
       (forward-symbol (* -1 direction)))
     (point)))
 
