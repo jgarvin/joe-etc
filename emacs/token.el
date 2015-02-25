@@ -119,18 +119,21 @@
 (byte-compile 'md-how-many-str)
 
 (defun md-filter-symbol (sym sym-start sym-end &optional dont-check-max dont-check-faces)
-  (let ((entry)
-        (non-ws-char-count
-         (md-how-many-str "[^\\\n[:space:]]" sym
-                          (+ 1 md-min-symbol-length))))
+  (let ((entry))
     (cond
-     ((< non-ws-char-count md-min-symbol-length)  t)
-     ((and (not dont-check-max) (> non-ws-char-count md-max-symbol-length)) t)
-     ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
+     ;; filter snippet placeholder
+     ((string-match-p (regexp-opt (list (char-to-string md-placeholder))) sym) t)
+     ;; filter syms with unprintable chars
+     ;; TODO: this is wrong, it excludes unicode
+     ((string-match "[^\t\n\r\f -~]" sym) t)
+     ((let ((non-ws-char-count
+             (md-how-many-str "[^\\\n[:space:]]" sym
+                              (+ 1 md-min-symbol-length))))
+        (or (< non-ws-char-count md-min-symbol-length)
+            (and (not dont-check-max) (> non-ws-char-count md-max-symbol-length)))) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
-     ;; TODO: this is wrong, it excludes unicode
-     ((string-match "[^\t\n\r\f -~]" sym) t) ;; filter syms with unprintable chars
+     ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
      ((and (not dont-check-faces)
            sym-start
            sym-end
@@ -181,11 +184,16 @@
             (min-distance most-positive-fixnum)
             (max-distance 0)
             (max-frequency 0)
-            (vec-size 0))
+            (vec-size 0)
+            (last-point))
         (goto-char start)
         (beginning-of-line)
         (condition-case nil
             (while (> end (point))
+              ;; guarantee forward progress even if subword regex doesn't
+              (when (and last-point (>= last-point (point)))
+                (goto-char (1+ last-point)))
+              (setq last-point (point))
               (if (and subword-mode (equal unit 'word))
                   (let ((case-fold-search nil))
                     (re-search-forward subword-forward-regexp end))
@@ -268,7 +276,8 @@
     (md-run-when-idle-once 'md-refresh-timer
                            (lambda ()
                              (md-refresh-unit-cache (current-buffer) 'md-symbols-cache 'symbol)
-                             (md-refresh-unit-cache (current-buffer) 'md-word-cache 'word)) 0.5 nil)))
+                             (md-refresh-unit-cache (current-buffer) 'md-word-cache 'word)
+                             ) 0.5 nil)))
 (byte-compile 'md-refresh-symbols)
 
 (add-hook 'after-change-functions #'md-refresh-symbols)
