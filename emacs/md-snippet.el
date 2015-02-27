@@ -229,6 +229,12 @@
           (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list))
     (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
 
+(defun md-get-snippet-names (&optional mode)
+  (unless mode
+    (setq mode major-mode))
+  (mapcar #'md-snippet-name
+          (-filter (lambda (x) (eval (md-snippet-context x))) md-snippet-list)))
+
 (defun md-insert-snippet (name)
   (interactive)
   (when md-snippet-mode
@@ -435,32 +441,34 @@ go to the highest slot (most recent)."
  :contents "(lambda ($1) $2)"
  :context '(derived-mode-p 'emacs-lisp-mode))
 
-;; most non-lisp languages share a lot of tiny snippets 
+;; most non-lisp languages share a lot of tiny snippets,
+;; like infix operators
 (defun generic-programming-context ()
-  (unless (derived-mode-p 'emacs-lisp-mode) t))
+  (when (and (derived-mode-p 'prog-mode)
+             (not (derived-mode-p 'emacs-lisp-mode))) t))
 
 (md-replace-snippet
- :name "+"
+ :name "plus"
  :contents "$1 + $2"
  :context '(generic-programming-context))
 
 (md-replace-snippet
- :name "-"
+ :name "minus"
  :contents "$1 - $2"
  :context '(generic-programming-context))
 
 (md-replace-snippet
- :name "*"
+ :name "multiply"
  :contents "$1 * $2"
  :context '(generic-programming-context)) 
 
 (md-replace-snippet
- :name "%"
+ :name "mod"
  :contents "$1 % $2"
  :context '(generic-programming-context)) 
 
 (md-replace-snippet
- :name "/"
+ :name "divide"
  :contents "$1 / $2"
  :context '(generic-programming-context)) 
 

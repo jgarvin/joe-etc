@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t -*-
+h;; -*- lexical-binding: t -*-
 
 (require 'dash)
 
@@ -19,7 +19,7 @@
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
 
-(defconst md-max-global-cache-size 200)
+(defconst md-max-global-cache-size 500)
 (defvar md-global-word-cache nil)
 (defvar md-global-symbol-cache nil)
 (defvar md-global-refresh-timer nil)
@@ -35,22 +35,6 @@
               (md-gen-elisp-snippet (intern x))))
           (cdr (assoc 'emacs-lisp-mode md-mode-keywords)))))
 
-(defun md-safe-start ()
-  (if (< giant-buffer-size (buffer-size))
-      (max 0 (- (point) 10000))
-    (save-excursion
-      (goto-char (point-min))
-      (point))))
-(byte-compile 'md-safe-start)
-
-(defun md-safe-stop ()
-  (if (< giant-buffer-size (buffer-size))
-      (min (buffer-size) (+ (point) 10000))
-    (save-excursion
-      (goto-char (point-max))
-      (point))))
-(byte-compile 'md-safe-stop)
-
 (defun md-normalize (value lowest highest)
   (/ (float (- value lowest)) (- highest lowest)))
 (byte-compile 'md-normalize)
@@ -61,17 +45,15 @@
            (expt (* 0.5 (md-normalize distance min-distance max-distance)) 2))))
 (byte-compile 'md-score-token)
 
-(defvar md-symbol-filter-faces nil)
-(setq md-symbol-filter-faces
-      '(font-lock-constant-face
-        font-lock-comment-face
-        font-lock-doc-face
-        font-lock-string-face
-        font-lock-builtin-face
-        font-lock-keyword-face
-        erc-nick-default-face
-        erc-nick-my-face
-        erc-notice-face))
+(defvar md-symbol-filter-faces '(font-lock-constant-face
+                                 font-lock-comment-face
+                                 font-lock-doc-face
+                                 font-lock-string-face
+                                 font-lock-builtin-face
+                                 font-lock-keyword-face
+                                 erc-nick-default-face
+                                 erc-nick-my-face
+                                 erc-notice-face))
 
 (defun md-get-all-faces (sym-start sym-end)
   (let ((i sym-start)
@@ -170,7 +152,6 @@
 (byte-compile 'md-swap)
 
 ;; TODO: This would be faster if it used a heap
-;; TODO: only need one search and use match-beginning/end
 ;; TODO: only run on changed parts of buffer? hard to 'subtract out'
 (defun md-get-unit-impl (start end unit)
   "Get all the units (symbols or words) between start and end"
@@ -294,11 +275,9 @@
   (-intersection (with-current-buffer a (md-get-all-modes))
                  (with-current-buffer b (md-get-all-modes))))
 
-;; (md-modes-in-common (current-buffer) "*Messages*")
-
 (defun md-get-visible-buffers ()
   (let ((result))
-    (dolist (b (buffer-list))
+    (dolist (b (buffer-list (selected-frame)))
       (when (get-buffer-window b 'visible)
         (push b result)))
     result))
@@ -307,6 +286,13 @@
   (let ((w (window-buffer (selected-window))))
     (>= (length (md-modes-in-common a w)) (length (md-modes-in-common b w)))))
 
+(defun md-buffer-key-predicate (a b)
+  (every '> a b))
+
+(defun md-buffer-priority-key (x)
+  (let ((w (window-buffer (selected-window))))
+    (append (list (length (md-modes-in-common x w))) (with-current-buffer x buffer-display-time))))
+
 (defun md-get-real-projectile-buffers ()
   "(projectile-project-buffers) appears to be bugged, it thinks lots
 of buffers are part of the project that are not..."
@@ -314,7 +300,6 @@ of buffers are part of the project that are not..."
                                 (md-file-inside-folder (buffer-file-name x) (projectile-project-root)))
                            (get-buffer-process x))) (projectile-project-buffers)))
   
-;; TODO: sort buffers within project by how recently visited
 (defun md-get-prioritized-buffer-list ()
   ;; 0. match on current-window
   ;; 1. match on project, mode, visibility
@@ -327,37 +312,43 @@ of buffers are part of the project that are not..."
         (new-list)
         (buftemp)
         (debug-log nil))
-    ;; current window comes first
-    (push current-window new-list)
-    (setq visible-buffers (remq current-window visible-buffers))
-    (when debug-log (message "List1: [%s]" new-list))
-    (when (projectile-project-p)
-      (let ((proj-buffers (with-current-buffer current-window
-                           (md-get-real-projectile-buffers))))
-        ;; (message "visible: [%s]" visible-buffers)
-        ;; (message "proj: [%s]" proj-buffers)
-        ;; then visible buffers in the same project sorted by mode
-        (setq buftemp (sort (-intersection visible-buffers
-                                           proj-buffers)
-                            #'md-sort-buffers-by-priority))
-        (setq new-list (nconc new-list buftemp))
-        (when debug-log (message "List2: [%s]" new-list))
-        ;; then buffers we can't see in the same project sorted by mode
-        (setq buftemp (sort (-difference proj-buffers new-list)
-                            #'md-sort-buffers-by-priority))
-        (setq new-list (nconc new-list buftemp))
-        (when debug-log (message "List3: [%s]" new-list))))
-    ;; then other visible buffers
-    (setq buftemp (sort (-difference visible-buffers new-list)
-                        #'md-sort-buffers-by-priority))
-    (setq new-list (nconc new-list buftemp))
-    (when debug-log (message "List4: [%s]" new-list))
-    ;; then everything else
-    (setq buftemp (sort (-difference (buffer-list) new-list)
-                        #'md-sort-buffers-by-priority))
-    (setq new-list (nconc new-list buftemp))
+    (with-current-buffer (window-buffer (selected-window)) 
+      ;; current window comes first
+      (push current-window new-list)
+      (setq visible-buffers (remq current-window visible-buffers))
+      (when debug-log (message "List1: [%s]" new-list))
+      (when (projectile-project-p)
+        (let ((proj-buffers (with-current-buffer current-window
+                              (md-get-real-projectile-buffers))))
+          ;; (message "visible: [%s]" visible-buffers)
+          ;; (message "proj: [%s]" proj-buffers)
+          ;; then visible buffers in the same project sorted by mode
+          (setq buftemp (cl-sort (-intersection visible-buffers
+                                                proj-buffers)
+                                 #'md-buffer-key-predicate
+                                 :key #'md-buffer-priority-key))
+          (setq new-list (nconc new-list buftemp))
+          (when debug-log (message "List2: [%s]" new-list))
+          ;; then buffers we can't see in the same project sorted by mode
+          (setq buftemp (cl-sort (-difference proj-buffers new-list)
+                                 #'md-buffer-key-predicate
+                                 :key #'md-buffer-priority-key))
+          (setq new-list (nconc new-list buftemp))
+          (when debug-log (message "List3: [%s]" new-list))))
+      ;; then other visible buffers
+      (setq buftemp (cl-sort (-difference visible-buffers new-list)
+                             #'md-buffer-key-predicate
+                             :key #'md-buffer-priority-key))
+      (setq new-list (nconc new-list buftemp))
+      (when debug-log (message "List4: [%s]" new-list))
+      ;; then everything else
+      (setq buftemp (cl-sort (-difference (buffer-list) new-list)
+                             #'md-buffer-key-predicate
+                             :key #'md-buffer-priority-key))
+      (setq new-list (nconc new-list buftemp)))
     (when debug-log (message "List5: [%s]" new-list))
     ;; (message "New list: [%s]" new-list)
+    ;;(setq new-list (nreverse new-list))
     new-list))
 
 (defun md-normalize-words (word)
@@ -370,14 +361,19 @@ on the ends. Also we want to store as lowercase."
 (defun md-refresh-global-cache-unit (cache buffers presence-map &optional normalize)
   (let ((count 0)
         (new-unit-cache)
-        (word))
+        (word)
+        ;; Even though the per buffer symbol filtering filters language keywords we
+        ;; have to do it again here because words that are keywords in our language may
+        ;; appear in buffers where those words are not considered keywords. This happens
+        ;; between python and elisp when working on mandimus a lot ;)
+        (kwlist (cdr (assoc major-mode md-mode-keywords))))
     (catch 'max-hit
       (dolist (b buffers)
         (with-current-buffer b
           (dolist (w (symbol-value cache))
             (when normalize
               (setq w (funcall normalize w)))
-            (when w
+            (when (and w (length w) (not (member w kwlist)))
               (unless (gethash w presence-map)
                 (puthash w 1 presence-map)
                 (when (> (incf count) md-max-global-cache-size)
@@ -385,16 +381,17 @@ on the ends. Also we want to store as lowercase."
                 (push w new-unit-cache)))))))
     (setq new-unit-cache (nreverse new-unit-cache))
     new-unit-cache))
-  
+
 (defun md-refresh-global-caches-impl ()
   (let ((buffers (md-get-prioritized-buffer-list)))
-    (setq md-global-word-cache (md-refresh-global-cache-unit
-                                'md-word-cache buffers
-                                (make-hash-table :test 'equal)
-                                #'md-normalize-words))
-    (setq md-global-symbol-cache (md-refresh-global-cache-unit
-                                  'md-symbols-cache buffers
-                                  (make-hash-table :test 'equal)))))
+    (with-current-buffer (window-buffer (selected-window)) 
+      (setq md-global-word-cache (md-refresh-global-cache-unit
+                                  'md-word-cache buffers
+                                  (make-hash-table :test 'equal)
+                                  #'md-normalize-words))
+      (setq md-global-symbol-cache (md-refresh-global-cache-unit
+                                    'md-symbols-cache buffers
+                                    (make-hash-table :test 'equal))))))
 
 (defun md-refresh-global-caches ()
   (md-run-when-idle-once 'md-global-refresh-timer #'md-refresh-global-caches-impl 0.5 nil))
@@ -439,6 +436,27 @@ on the ends. Also we want to store as lowercase."
       ;; erc-insert-post-hook runs in a narrowed buffer
       (widen)
       (setq md-active-erc-nicknames (md-get-active-erc-nicknames 50)))))
+
+(defun md-normalize-token (a)
+  (downcase (replace-regexp-in-string "[^A-Za-z]" "" a)))
+
+(defun md-cycle-token (unit)
+  (let* ((token (thing-at-point unit))
+         (bounds (bounds-of-thing-at-point unit))
+         (normal-token (md-normalize-token token))
+         (cache (if (equal unit 'word) md-global-word-cache md-global-symbol-cache))
+         (candidates (sort (-filter (lambda (x)
+                                      ;; (message "Comparing [%s] [%s]" x normal-token)
+                                      (string= (md-normalize-token x) normal-token))
+                                    cache) #'string<))
+         (token-pos (position token candidates :test #'equal)))
+    (unless (and candidates token-pos)
+      (user-error "No alternative candidates for: [%s]" token))
+    (save-excursion
+      (goto-char (car bounds))
+      (save-match-data
+        (re-search-forward ".*" (cdr bounds))
+        (replace-match (nth (% (1+ token-pos) (length candidates)) candidates) t)))))
 
 (add-hook 'erc-insert-post-hook #'md-update-active-nicks)
 (add-hook 'md-window-selection-hook #'md-update-active-nicks)

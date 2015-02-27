@@ -15,6 +15,19 @@
 (defvar md-inhibit-window-selection-hooks nil)
 (defvar md-last-selected-window nil)
 
+(global-set-key '[md-dummy-event] 'md-ignore)
+
+(defun md-ignore ()
+  (interactive)
+  (setq this-command last-command))
+
+(defun md-generate-noop-input-event ()
+  "Create an input event that does nothing. We use this after inserting text so
+that elisp that normally detects input events to determine that the user has
+inserted text will fire, e.g. company-mode putting the pop-up away."
+  ;; trick taken from company-mode ;)
+  (push 'md-dummy-event unread-command-events))
+
 (defun md-safe-cancel-timer (v)
   (when (symbol-value v)
       (when (timerp (symbol-value v))
@@ -23,7 +36,11 @@
 
 (defun md--run-timer-func (v f args)
   (unwind-protect
-      (apply f args)
+      ;; as far as I can tell (current-buffer)
+      ;; is not reliable from an idle timer, you never know
+      ;; what you will get, this is a better default
+      (with-current-buffer (window-buffer (selected-window)) 
+        (apply f args))
     (md-safe-cancel-timer v)))
 
 (defun md-cancel-timer-after-executing (v f local args)

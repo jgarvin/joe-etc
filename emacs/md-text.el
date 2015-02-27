@@ -191,7 +191,24 @@ If the string preceeding pos isn't part of any pair, then returns nil."
                  (not (bolp))
                  (md-causes-move #'back-to-indentation))
         (just-one-space))))
-  ;; close the company pop-up window
-  (when (fboundp #'company-cancel)
-    (company-cancel 'abort)))
- 
+  (md-generate-noop-input-event)
+  (setq this-command #'self-insert-command)
+  )
+
+;; setting this-command to self-insert-command works when triggering by key, but not md-network
+;; setting the company-begin property or putting the command in company-begin-commands has no effect either way
+;; difference is call-interactively? Could have md-insert-text insert a global rather than an arg, and then can use call-interactively...
+
+;; (defun md-test ()
+;;   (interactive)
+;;   (md-insert-text "insert" nil nil))
+
+;; (global-set-key (kbd "C-c q") #'md-test)
+
+;; (when (boundp 'company-begin-commands)
+;;   (push #'md-insert-text company-begin-commands))
+
+;; (put #'md-insert-text 'company-begin t)
+
+
+;;(characterp (event-basic-type (listify-key-sequence (kbd "<XF86WakeUp>"))))
