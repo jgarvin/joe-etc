@@ -266,10 +266,12 @@ h;; -*- lexical-binding: t -*-
 (add-hook 'md-window-selection-hook #'md-refresh-symbols)
 ;; (remove-hook 'md-window-selection-hook #'md-refresh-symbols)
 
-(defun md-get-all-modes ()
+(defun md-get-all-modes (&optional mode)
+  (unless mode
+    (setq mode major-mode))
   (remq nil
-        (cons major-mode
-              (loop as m = major-mode then p while m as p = (get m 'derived-mode-parent) collect p))))
+        (cons mode
+              (loop as m = mode then p while m as p = (get m 'derived-mode-parent) collect p))))
 
 (defun md-modes-in-common (a b)
   (-intersection (with-current-buffer a (md-get-all-modes))
@@ -286,70 +288,91 @@ h;; -*- lexical-binding: t -*-
   (let ((w (window-buffer (selected-window))))
     (>= (length (md-modes-in-common a w)) (length (md-modes-in-common b w)))))
 
-(defun md-buffer-key-predicate (a b)
-  (every '> a b))
+(defun md-list-less-p (a b &optional reverse)
+  ;; (message "comparing [%s] [%s]" a b)
+  (assert (= (length a) (length b)))
+  (let ((a-item (car a))
+        (b-item (car b))
+        (a-rest (cdr a))
+        (b-rest (cdr b))
+        (lesser (if reverse #'> #'<))
+        (greater (if reverse #'< #'>)))
+    (cond
+     ((funcall lesser a-item b-item) t)
+     ((funcall greater a-item b-item) nil)
+     ((= a-item b-item)
+      (if (and a-rest b-rest)
+          (md-list-less-p a-rest b-rest reverse)
+        ;; equal all the way through, so not less
+        nil)))))
+  
+(defun md-buffer-priority-key (x proj-buffers)
+  (let* ((w (window-buffer (selected-window)))
+         (modes-in-common (length (md-modes-in-common x w)))
+         (disp-time)
+         (read-only-temp)
+         (special-temp)
+         (result))
+    (with-current-buffer x
+      (setq disp-time (with-current-buffer x buffer-display-time))
+      (unless disp-time
+        ;; some buffers have never been displayed and return nil
+        (setq disp-time '(0 0 0 0)))
+      (setq read-only-temp (with-current-buffer x buffer-read-only))
+      (setq special-temp (with-current-buffer x (derived-mode-p 'special-mode))))
+    (setq result (append
+                  ;; selected buffer is top priority
+                  (list (if (eq w x) 1 0))
+                  ;; visible buffers in the same project in the same mode
+                  (list (if (and (memq x proj-buffers)
+                                 (get-buffer-window x)
+                                 (> modes-in-common 0)) modes-in-common 0))
+                  ;; buffers in the same project in the same mode
+                  (list (if (and (memq x proj-buffers)
+                                 (> modes-in-common 0)) modes-in-common 0))
+                  ;; buffers in the same project
+                  (list (if (memq x proj-buffers) modes-in-common 0))
+                  ;; visible buffers
+                  (list (if (get-buffer-window x) modes-in-common 0))
+                  (list modes-in-common)
+                  disp-time
+                  (list (if (or (buffer-file-name x) (get-buffer-process x)) 1 0))
+                  disp-time
+                  ;; more likely to want tokens from editable buffers
+                  (list (if read-only-temp 0 1))
+                  disp-time
+                  ;; special mode buffers considered last
+                  (list (if special-temp 0 1))
+                  disp-time))
+    ;; (message "name: [%s] length: [%s] result: [%s]" x (length result) result)
+    result))
 
-(defun md-buffer-priority-key (x)
-  (let ((w (window-buffer (selected-window))))
-    (append (list (length (md-modes-in-common x w))) (with-current-buffer x buffer-display-time))))
+(defun md-token-elidgible-buffers ()
+  (-filter (lambda (x)
+             (with-current-buffer x
+               (and (not (minibufferp x))
+                    (not (derived-mode-p 'special-mode))
+                    (or (buffer-file-name x)
+                        (get-buffer-process x))))) (buffer-list)))
 
 (defun md-get-real-projectile-buffers ()
   "(projectile-project-buffers) appears to be bugged, it thinks lots
 of buffers are part of the project that are not..."
-  (-filter (lambda (x) (or (and (buffer-file-name x)
-                                (md-file-inside-folder (buffer-file-name x) (projectile-project-root)))
-                           (get-buffer-process x))) (projectile-project-buffers)))
+  (let ((proot (projectile-project-root)))
+    (-filter (lambda (x) (or (and (buffer-file-name x)
+                                  (md-file-inside-folder (buffer-file-name x) proot))
+                             (get-buffer-process x))) (projectile-project-buffers))))
   
+
 (defun md-get-prioritized-buffer-list ()
-  ;; 0. match on current-window
-  ;; 1. match on project, mode, visibility
-  ;; 2. match on project, mode
-  ;; 3. match on project
-  ;; 4. match on visiblity
-  ;; 5. everything else
-  (let ((visible-buffers (md-get-visible-buffers))
-        (current-window (window-buffer (selected-window)))
-        (new-list)
-        (buftemp)
-        (debug-log nil))
-    (with-current-buffer (window-buffer (selected-window)) 
-      ;; current window comes first
-      (push current-window new-list)
-      (setq visible-buffers (remq current-window visible-buffers))
-      (when debug-log (message "List1: [%s]" new-list))
-      (when (projectile-project-p)
-        (let ((proj-buffers (with-current-buffer current-window
-                              (md-get-real-projectile-buffers))))
-          ;; (message "visible: [%s]" visible-buffers)
-          ;; (message "proj: [%s]" proj-buffers)
-          ;; then visible buffers in the same project sorted by mode
-          (setq buftemp (cl-sort (-intersection visible-buffers
-                                                proj-buffers)
-                                 #'md-buffer-key-predicate
-                                 :key #'md-buffer-priority-key))
-          (setq new-list (nconc new-list buftemp))
-          (when debug-log (message "List2: [%s]" new-list))
-          ;; then buffers we can't see in the same project sorted by mode
-          (setq buftemp (cl-sort (-difference proj-buffers new-list)
-                                 #'md-buffer-key-predicate
-                                 :key #'md-buffer-priority-key))
-          (setq new-list (nconc new-list buftemp))
-          (when debug-log (message "List3: [%s]" new-list))))
-      ;; then other visible buffers
-      (setq buftemp (cl-sort (-difference visible-buffers new-list)
-                             #'md-buffer-key-predicate
-                             :key #'md-buffer-priority-key))
-      (setq new-list (nconc new-list buftemp))
-      (when debug-log (message "List4: [%s]" new-list))
-      ;; then everything else
-      (setq buftemp (cl-sort (-difference (buffer-list) new-list)
-                             #'md-buffer-key-predicate
-                             :key #'md-buffer-priority-key))
-      (setq new-list (nconc new-list buftemp)))
-    (when debug-log (message "List5: [%s]" new-list))
-    ;; (message "New list: [%s]" new-list)
-    ;;(setq new-list (nreverse new-list))
-    new-list))
+  (let ((proj-buffers (if (projectile-project-p)
+                          (md-get-real-projectile-buffers)
+                        (buffer-list))))
+    (cl-sort (md-token-elidgible-buffers)
+             (lambda (a b)
+               (md-list-less-p a b t))
+             :key (lambda (x)
+                    (md-buffer-priority-key x proj-buffers)))))
 
 (defun md-normalize-words (word)
   "Cleanup words because in some modes punctuation gets stuck
@@ -446,7 +469,7 @@ on the ends. Also we want to store as lowercase."
          (normal-token (md-normalize-token token))
          (cache (if (equal unit 'word) md-global-word-cache md-global-symbol-cache))
          (candidates (sort (-filter (lambda (x)
-                                      ;; (message "Comparing [%s] [%s]" x normal-token)
+                                      (message "Comparing [%s] [%s]" x normal-token)
                                       (string= (md-normalize-token x) normal-token))
                                     cache) #'string<))
          (token-pos (position token candidates :test #'equal)))
