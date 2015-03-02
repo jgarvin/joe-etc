@@ -86,7 +86,7 @@
 (setq scroll-step 0)
 (setq scroll-conservatively 0)
 (setq scroll-margin 6)
-(setq auto-w1indow-vscroll nil)
+(setq auto-window-vscroll nil)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -686,7 +686,9 @@
 (defun etc-delete-other-windows ()
   (interactive)
   (delete-other-windows)
-  (recenter-top-bottom))
+  (unless (derived-mode-p 'erc-mode)
+    ;; don't interfere with erc scroll-to-bottom
+    (recenter-top-bottom)))
 
 (global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
 

@@ -32,6 +32,8 @@
       ;; gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]"
       )
 
+(setq send-mail-function 'smtpmail-send-it)
+
 ;; ;;@see http://gnus.org/manual/gnus_397.html
 ;; (add-to-list 'gnus-secondary-select-methods
 ;;              '(nnimap "gmail"

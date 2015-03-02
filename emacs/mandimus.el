@@ -15,6 +15,32 @@
 (defvar md-inhibit-window-selection-hooks nil)
 (defvar md-last-selected-window nil)
 
+(defun md-get-buffers-in-modes (modes)
+  (unless (listp modes)
+    (setq modes (list modes)))
+  (-filter (lambda (x)
+             (with-current-buffer x
+               (apply #'derived-mode-p modes))) (buffer-list)))
+
+(defun md-get-buffers-not-in-modes (modes)
+  (unless (listp modes)
+    (setq modes (list modes)))
+  (-filter (lambda (x)
+             (with-current-buffer x
+               (not (apply #'derived-mode-p modes)))) (buffer-list)))
+
+(defun md-get-special-buffers ()
+  (-filter
+   (lambda (x) (string-match-p " ?\\*[^*]+\\*" (buffer-name x))) (buffer-list)))
+  
+(defun md-get-buffer-names (lst)
+  (mapcar #'buffer-name lst))
+
+(defun md-all-buffers-except (bufs)
+  (-filter (lambda (x) (not (memq x bufs))) (buffer-list)))
+
+;;(md-all-buffers-except (md-get-special-buffers))
+
 (global-set-key '[md-dummy-event] 'md-ignore)
 
 (defun md-ignore ()
