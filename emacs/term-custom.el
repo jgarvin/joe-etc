@@ -51,6 +51,20 @@
     (add-text-properties start-point end-prompt '(read-only t))
     (setq etc-last-read-only end-prompt)))
 
+;; (with-current-buffer "*ansi-term*"
+;;   (goto-char (point-max))
+;;   (term-previous-prompt 1)
+;;   (let ((start (point))
+;;         (change))
+;;     (put-text-property (1- start) start 'read-only t)
+;;     (while (not (bobp))
+;;       (setq change (previous-single-property-change (point) 'read-only))
+;;       (if change
+;;           (progn
+;;             (put-text-property change start 'read-only t)
+;;             (goto-char change))
+;;         (goto-char (point-min))))))
+
 ;; (defvar-local etc-original-process-filter
 ;;   (process-filter (get-buffer-process (current-buffer))))
 

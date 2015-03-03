@@ -159,7 +159,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
      (t t))))
 
 (defun md-insert-text (text check-spaces check-capitals)
-  (interactive)
+  (interactive "*")
   (assert (stringp text))
   ;; we may be inserting text that originally came from a read
   ;; only portion of the buffer,for example using the symbol picker 
@@ -191,19 +191,30 @@ If the string preceeding pos isn't part of any pair, then returns nil."
                  (not (bolp))
                  (md-causes-move #'back-to-indentation))
         (just-one-space))))
+  ;; some modes wait for an input event
   (md-generate-noop-input-event)
-  (setq this-command #'self-insert-command)
+  ;; some modes inspect this from the post command handler.
+  ;; it would be set automagically except we don't use call-interactively,
+  ;; which we probably should but requires rewriting stuff
+  (setq last-command #'self-insert-command)
+  ;; this is more correct, but doesn't automagically work with existing modes
+  ;;(setq last-command #'md-insert-text)
   )
+
+;; (defun md-text-wrapper (arg)
+;;   (interactive "*sEnter text: ")
+;;   (message arg))
 
 ;; setting this-command to self-insert-command works when triggering by key, but not md-network
 ;; setting the company-begin property or putting the command in company-begin-commands has no effect either way
 ;; difference is call-interactively? Could have md-insert-text insert a global rather than an arg, and then can use call-interactively...
+;; difference is definitely call-interactively
 
 ;; (defun md-test ()
 ;;   (interactive)
 ;;   (md-insert-text "insert" nil nil))
 
-;; (global-set-key (kbd "C-c q") #'md-test)
+;; (global-set-key (kbd "C-c q") #'md-text-wrapper)
 
 ;; (when (boundp 'company-begin-commands)
 ;;   (push #'md-insert-text company-begin-commands))

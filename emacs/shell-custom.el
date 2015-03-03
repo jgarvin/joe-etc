@@ -26,6 +26,8 @@
   (interactive)
   (shell (generate-new-buffer-name "$shell")))
 
+(global-set-key (kbd "C-z") #'etc-open-shell)
+
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 
 

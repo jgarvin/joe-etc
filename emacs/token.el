@@ -1,6 +1,8 @@
-h;; -*- lexical-binding: t -*-
+;; -*- lexical-binding: t -*-
 
 (require 'dash)
+(require 'cl)
+(require 'subword)
 
 (defvar md-initial-vec-size 500)
 (defvar md-max-tokens 200)
@@ -365,14 +367,16 @@ of buffers are part of the project that are not..."
   
 
 (defun md-get-prioritized-buffer-list ()
-  (let ((proj-buffers (if (projectile-project-p)
-                          (md-get-real-projectile-buffers)
-                        (buffer-list))))
-    (cl-sort (md-token-elidgible-buffers)
-             (lambda (a b)
-               (md-list-less-p a b t))
-             :key (lambda (x)
-                    (md-buffer-priority-key x proj-buffers)))))
+  ;; (let ((proj-buffers (if (projectile-project-p)
+  ;;                         (md-token-elidgible-buffers)
+  ;;                       ;;(md-get-real-projectile-buffers)
+  ;;                       (buffer-list))))
+    (let ((proj-buffers (md-token-elidgible-buffers)))
+      (cl-sort (md-token-elidgible-buffers)
+               (lambda (a b)
+                 (md-list-less-p a b t))
+               :key (lambda (x)
+                      (md-buffer-priority-key x proj-buffers)))))
 
 (defun md-normalize-words (word)
   "Cleanup words because in some modes punctuation gets stuck
