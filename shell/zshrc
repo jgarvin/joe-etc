@@ -1,17 +1,19 @@
 #!/usr/bin/env zsh
 
-typeset -ga chpwd_functions
-typeset -ga preexec_functions
-typeset -ga precmd_functions
-
 if [[ "$ZDOTDIR" = "" ]]; then
     export ZDOTDIR=~
 fi
 
+typeset -ga chpwd_functions
+typeset -ga preexec_functions
+typeset -ga precmd_functions
+
+source $HOME/etc/shell/setup_prompt 
+
 if [[ "$(basename $ZDOTDIR)" = "$LOGNAME" ]];
 then
     $HOME/etc/shell/setup_symlinks
-		$HOME/etc/shell/setup_xmonad
+    $HOME/etc/shell/setup_xmonad
 fi
 
 fpath=($ZDOTDIR/etc/shell/completion $fpath)
@@ -48,6 +50,8 @@ ulimit -c 8000000
 # "core.%e.%p.%u.%t"
 
 echo "DATE=$(date) HOST=$(hostname) USER=$LOGNAME TERM=$TERM" >> ~/.shell_log
+
+
 
 cdr()
 {
@@ -214,52 +218,6 @@ zstyle ':completion:*' group-name ''
 
 # Highlight current choice
 zstyle ':completion:*' menu select
-
-# To help emacs tramp mode and global desktop,
-# turn off the fancy stuff.
-if [[ "$TERM" = "dumb" || "$TERM" = "" || "$EMACS " = "t" ]]
-then
-  unsetopt zle
-  unsetopt prompt_cr
-  unsetopt prompt_subst
-  if type precmd &> /dev/null; then
-      unfunction precmd
-  fi
-  if type preexec &> /dev/null; then
-      unfunction preexec
-  fi
-  PS1='$ '
-  PS2='$ '
-  PROMPT='$ '
-  RPROMPT='$ '
-else
-	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
-	if which stty &> /dev/null
-	then
-		stty sane
-
-		# This disable Ctrl+s sending the STOP signal. This allows forward search in
-		# zsh to work, and it prevents me from accidentally freezing all of my screen
-		# instances (sending STOP to one sends it to all of them).
-		stty -ixon
-	fi
-
-	# And this
-	if which resize &> /dev/null
-	then
-		resize &> /dev/null
-	fi
-
- 	if [[ -s /etc/motd ]]; then
- 		cat /etc/motd
- 	fi
-	. $ZDOTDIR/etc/shell/fancy-prompt
-	setprompt
-fi
-
-if [[ "$EMACS" = "t" ]]; then
-    PS1='[%n@%m:%~]$ '
-fi
 
 HIST_DIR=$HOME
 HIST_BACKUP_DIR=$HIST_DIR/.zhistory.backup
