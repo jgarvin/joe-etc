@@ -4,7 +4,7 @@
 
 (defun md-get-projectile-files-impl ()
   (condition-case nil
-      (if (or (equal major-mode 'dired-mode)
+      (if (or (derived-mode-p 'dired-mode)
               buffer-file-name)
           (projectile-current-project-files) nil)
     (error nil)))

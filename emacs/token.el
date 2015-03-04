@@ -366,12 +366,13 @@ of buffers are part of the project that are not..."
                              (get-buffer-process x))) (projectile-project-buffers))))
   
 
+(defun md-file-inside-folder (f dir)
+  (string= (f-common-parent (list f dir)) dir))
+
 (defun md-get-prioritized-buffer-list ()
-  ;; (let ((proj-buffers (if (projectile-project-p)
-  ;;                         (md-token-elidgible-buffers)
-  ;;                       ;;(md-get-real-projectile-buffers)
-  ;;                       (buffer-list))))
-    (let ((proj-buffers (md-token-elidgible-buffers)))
+  (let ((proj-buffers (if (projectile-project-p)
+                          (md-get-real-projectile-buffers)
+                        (md-token-elidgible-buffers))))
       (cl-sort (md-token-elidgible-buffers)
                (lambda (a b)
                  (md-list-less-p a b t))
@@ -427,7 +428,7 @@ on the ends. Also we want to store as lowercase."
 (add-hook 'md-window-selection-hook #'md-refresh-global-caches)
 
 (defun md-get-active-erc-nicknames (&optional max-results)
-  (when (equal major-mode 'erc-mode)
+  (when (derived-mode-p 'erc-mode)
     (let ((candidates (erc-get-channel-nickname-list)))
       (when candidates
         (let* ((regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
@@ -451,7 +452,7 @@ on the ends. Also we want to store as lowercase."
           (nreverse results))))))
 
 (defun md-channel-buffer-p ()
-  (and (equal major-mode 'erc-mode)
+  (and (derived-mode-p 'erc-mode)
        ;; channels only, no server buffers
        (equal 0 (string-match "#.*" (buffer-name)))))
 

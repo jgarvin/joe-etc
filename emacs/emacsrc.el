@@ -452,7 +452,7 @@
 
                '(:eval (propertize "%m" 'face 'font-lock-string-face
                                    'help-echo buffer-file-coding-system))
-               '(:eval (when (equal major-mode 'term-mode)
+               '(:eval (when (derived-mode-p 'term-mode)
                          (if (term-in-line-mode)
                                           (propertize " - Line"
                                                   'face 'font-lock-string-face

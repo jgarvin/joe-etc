@@ -135,7 +135,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
         (space-inhibiting-characters (md-space-inhibiting-after-chars)))
     (cond
      ((bobp) nil)
-     ((and (equal major-mode 'erc-mode) (md-at-start-of-erc-input-line)) nil)
+     ((and (derived-mode-p 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      (isearch-mode nil)
      ((md-likely-preceded-by-opener (point)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)

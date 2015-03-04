@@ -78,7 +78,7 @@
 ;;   (read-only-mode nil))
 
 ;; (defun send-sigwinch ()
-;;   (when (equal major-mode 'term-mode)
+;;   (when (derived-mode-p 'term-mode)
 ;;     ))
 
 ;; (add-hook 'window-size-change-functions 'send-sigwinch)

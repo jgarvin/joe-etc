@@ -16,7 +16,7 @@
                 (lambda (w)
                   (let ((buffer (window-buffer w)))
                     (set-buffer buffer)
-                    (when (eq major-mode 'erc-mode)
+                    (when (derived-mode-p 'erc-mode)
                       (setq erc-fill-column (- (window-width w) 2)))))))))
 
 ;; when wrapping use a little indent to make things clear
@@ -192,7 +192,7 @@ If STRING is nil, the function does nothing."
 (add-hook 'erc-send-post-hook 'damd-erc-send-post-hook)
 
 (defun damd-window-configuration-change-hook ()
-  (when (and (eq major-mode 'erc-mode)
+  (when (and (derived-mode-p 'erc-mode)
              (and erc-input-marker (>= (point) erc-input-marker)))
     (recenter -1)))
 (add-hook 'window-configuration-change-hook 'damd-window-configuration-change-hook)

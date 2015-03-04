@@ -270,7 +270,7 @@ debug mode causing timers to die."
   (not (md-causes-move 'erc-bol)))
 
 (defun md-beginning-of-input ()
-  (if (equal major-mode 'erc-mode)
+  (if (derived-mode-p 'erc-mode)
       (not (md-causes-move 'erc-bol))
     (bobp)))
 
