@@ -84,7 +84,11 @@
       (setq sym-end i))
     (while (and (< i sym-end) (null result))
       (let ((face-or-faces (get-char-property i 'face)))
-        (unless (listp face-or-faces)
+        (if (listp face-or-faces)
+            ;; Sometimes you get a cons cell of face . "color"
+            (when (stringp (cdr face-or-faces))
+              (setq face-or-faces (list (car face-or-faces))))
+          ;; Sometimes you get a single symbol not in a list
           (setq face-or-faces (list face-or-faces)))
         (when (-intersection face-or-faces faces)
           (setq result t)))

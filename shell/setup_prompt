@@ -1,0 +1,72 @@
+#!/usr/bin/env zsh
+
+# This is a a hack to help emacs shell-mode.
+#
+# shell-mode needs a way to track the current host and directory
+# so that it can give good completions in concert with tramp mode.
+# So when we detect that emacs is running we set a PS1 that displays
+# that info so that shell-mode can have it. That isn't the stupid
+# part. The stupid part is that in the name of 'security' ssh has
+# decided that only white listed environment variables are allowed
+# to carry over when you ssh into a remote machine, so to get $EMACS
+# set and detect that we need to set the special PS1, we have to
+# hide the setting inside $TERM which is always white listed. Never
+# mind that you must already have privileges to set a given var on
+# the remote machine in order to set it, and that on the local machine
+# the attacker must already have the ability to set an env variable.
+# Allegedly they are worried about LD_PRELOAD, which somehow being
+# manipulated on a remote machine will magically hose you more than
+# it being manipulated locally and being allowed to do anything like
+# remoting into another machine and setting environment variables.
+# Likewise we alias ssh so that this trick will propogate to other
+# machines.
+if [[ "$TERM" = "dumb-emacs" ]]; then
+    export TERM="dumb"
+    export EMACS="t"
+fi
+
+# To help emacs tramp mode and global desktop,
+# turn off the fancy stuff.
+if [[ "$TERM" = "dumb" || "$TERM" = "" || "$EMACS " = "t" ]]; then
+  unsetopt zle
+  unsetopt prompt_cr
+  unsetopt prompt_subst
+  if type precmd &> /dev/null; then
+      unfunction precmd
+  fi
+  if type preexec &> /dev/null; then
+      unfunction preexec
+  fi
+  PS1='$ '
+  PS2='$ '
+  PROMPT='$ '
+  RPROMPT='$ '
+else
+	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
+	if which stty &> /dev/null
+	then
+		stty sane
+
+		# This disable Ctrl+s sending the STOP signal. This allows forward search in
+		# zsh to work, and it prevents me from accidentally freezing all of my screen
+		# instances (sending STOP to one sends it to all of them).
+		stty -ixon
+	fi
+
+	# And this
+	if which resize &> /dev/null
+	then
+		resize &> /dev/null
+	fi
+
+ 	if [[ -s /etc/motd ]]; then
+ 		cat /etc/motd
+ 	fi
+	. $ZDOTDIR/etc/shell/fancy-prompt
+	setprompt
+fi
+
+if [[ "$EMACS" = "t" ]]; then
+    PS1='[%n@%m:%~]$ '
+    alias ssh="TERM=dumb-emacs ${aliases[ssh]-ssh}"
+fi
