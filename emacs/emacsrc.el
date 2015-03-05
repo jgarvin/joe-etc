@@ -68,6 +68,7 @@
 (load-file "~/etc/emacs/log-custom.el")
 (load-file "~/etc/emacs/unicode-custom.el")
 (load-file "~/etc/emacs/help-custom.el")
+(load-file "~/etc/emacs/tramp-custom.el")
 
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")

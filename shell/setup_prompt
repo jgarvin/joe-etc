@@ -21,6 +21,7 @@
 # Likewise we alias ssh so that this trick will propogate to other
 # machines.
 if [[ "$TERM" = "dumb-emacs" ]]; then
+    # this should be nicely idempotent as regards exec zsh
     export TERM="dumb"
     export EMACS="t"
 fi
@@ -67,6 +68,12 @@ else
 fi
 
 if [[ "$EMACS" = "t" ]]; then
-    PS1='[%n@%m:%~]$ '
+    if [ -z $SSH_CLIENT ]; then
+#        PS1='[/ssh:%n@%m:%d]$ '
+        PS1='[%n@%m:<%~>]$ '
+    else
+        PS1='[</ssh:%n@%m:%d>]$ '
+    fi
+    
     alias ssh="TERM=dumb-emacs ${aliases[ssh]-ssh}"
 fi

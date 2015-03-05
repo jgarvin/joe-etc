@@ -19,8 +19,14 @@
   (compilation-shell-minor-mode 1)
   (shell-dirtrack-mode -1)
   (dirtrack-mode 1)
-  (setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
+  ;;(setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
+  (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
   (ansi-color-for-comint-mode-on))
+
+;;(let ((s "[</ssh:prophet@panopticon:/home/prophet>]$ "))
+;; (let ((s "[prophet@panopticon:<~/etc/shell>]$ "))  
+;;   (string-match "^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" s)
+;;   (match-string-no-properties 1 s))
 
 (defun etc-open-shell ()
   (interactive)
@@ -31,3 +37,11 @@
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 
 
+;; (defun etc-setup-delayed-truncate (&optional unused)
+;;   (unless etc-next-truncate-allowed-timer
+;;     (etc-comint-truncate)))
+
+;; ;; If you truncate continously it causes too much performance trouble,
+;; ;; the truncation starves I/O to all other processes, so mandimus gets
+;; ;; disconnected.
+;; (add-hook 'comint-output-filter-functions #'etc-setup-delayed-truncate)
