@@ -39,6 +39,9 @@
 (add-to-list 'load-path "~/etc/dash")
 (require 'dash)
 (eval-after-load "dash" '(dash-enable-font-lock))
+;; accidentally suspending emacs is super annoying
+(when (getenv "DISPLAY")
+  (global-unset-key (kbd "C-z")))
 
 ;; store passwords in file outside git ;)
 (load "~/.emacspass")
@@ -700,6 +703,3 @@
 ;; makes emacs aware of my window manager behavior, not sure what this gets me
 (setq focus-follows-mouse t)
 
-;; accidentally suspending emacs is super annoying
-(when (getenv "DISPLAY")
-  (global-unset-key (kbd "C-z")))

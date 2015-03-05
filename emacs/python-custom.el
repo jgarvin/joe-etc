@@ -103,7 +103,7 @@
 (defun python-advice (old new)
   (advice-add old :before-until
               (lambda ()
-                (if (derived-mode-p major-mode 'python-mode)
+                (if (derived-mode-p 'python-mode)
                     (or (funcall new) t)
                   nil))))
 

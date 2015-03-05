@@ -163,4 +163,4 @@
    ((not md-symbol-picker-mode) (md-hl-setup))))
 
 ;;(md-toggle-symbol-picker-mode t)
- (md-toggle-symbol-picker-mode nil)
+ ;;(md-toggle-symbol-picker-mode nil)
