@@ -133,6 +133,7 @@ the line, to capture multiline input. (This only has effect if
 (defun etc-clear-comint-undo ()
   (setq buffer-undo-list nil))
 
+;; output from the underlying process shouldn't be undoable
 (defun etc-prevent-undo-recording-comint (original-function &rest args)
   (let ((buffer-undo-list t))
     (apply original-function args)))
