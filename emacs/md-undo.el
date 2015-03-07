@@ -80,12 +80,14 @@ onto a list of buffers modified this utterance."
         ;; in undoing those
         (when (buffer-name i)
           (with-current-buffer i
-            ;; some modes clear the undo list, like ERC
-            ;; when you hit enter
-            (when buffer-undo-list 
-                  (condition-case data
-                      (md-undo-collapse-end md-collapse-undo-marker)
-                    (error (message "Couldn't collapse undo in buffer %S: %S" i data)))))))
+            ;; Some modes clear the undo list, like ERC
+            ;; when you hit enter. Also if the buffer undo list
+            ;; has meanwhile been disabled (by being set to t)
+            ;; we don't want to change it either.
+            (when (and buffer-undo-list (not (eq buffer-undo-list t))) 
+              (condition-case data
+                  (md-undo-collapse-end md-collapse-undo-marker)
+                (error (message "Couldn't collapse undo in buffer %S: %S" i data)))))))
     (setq md-utterance-changed-buffers nil)
     (setq md-collapse-undo-marker nil)))
 

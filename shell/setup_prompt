@@ -73,7 +73,7 @@ if [[ "$EMACS" = "t" ]]; then
         PS1='[%n@%m:<%~>]$ '
     else
         # TODO: need ip here, not host!
-        REMOTE_IP=$(echo $SSH_CONNECTION | cut -d' ' -f 3)
+        #REMOTE_IP=$(echo $SSH_CONNECTION | cut -d' ' -f 3)
         #PS1='[</ssh:%n@%m:%d>]$ '
         PS1='[</ssh:%n@'"$(echo $SSH_CONNECTION | cut -d' ' -f 3)"':%d>]$ '
     fi

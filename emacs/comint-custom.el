@@ -55,15 +55,6 @@
 
 (add-hook 'comint-mode-hook #'etc-comint-mode-hook)
 
-;; (defun make-my-shell-output-read-only (text)
-;;   "Add to comint-output-filter-functions to make stdout read only in my shells."
-;;   ;; (if (member (buffer-name) my-shells)
-;;       (let ((inhibit-read-only t)
-;;             (output-end (process-mark (get-buffer-process (current-buffer)))))
-;;         (put-text-property comint-last-output-start output-end 'read-only t)))
-;; ;; )
-;; (add-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
-
 (defun enter-again-if-enter ()
   "Make the return key select the current item in minibuf and shell history isearch.
 An alternate approach would be after-advice on isearch-other-meta-char."
@@ -137,3 +128,14 @@ the line, to capture multiline input. (This only has effect if
 ;;           (lambda () (run-at-time 3 nil
 ;;                                   (lambda () (delete-windows-on "*Completions*")))))
 
+;; The undo history should be cleared when we send input. We shouldn't be able
+;; to undo things that were inserted by the process, only things we typed.
+(defun etc-clear-comint-undo ()
+  (setq buffer-undo-list nil))
+
+(defun etc-prevent-undo-recording-comint (original-function &rest args)
+  (let ((buffer-undo-list t))
+    (apply original-function args)))
+
+(advice-add #'comint-send-input :after #'etc-clear-comint-undo)
+(advice-add #'comint-output-filter :around #'etc-prevent-undo-recording-comint)
