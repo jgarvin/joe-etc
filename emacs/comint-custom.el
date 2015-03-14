@@ -1,18 +1,18 @@
-(custom-set-variables
- ;;'(tramp-default-method "ssh")          ; uses ControlMaster
- '(comint-scroll-to-bottom-on-input t)  ; always insert at the bottom
- '(comint-scroll-to-bottom-on-output nil) ; always add output at the bottom
- '(comint-scroll-show-maximum-output t) ; scroll to show max possible output
- '(comint-completion-autolist t)     ; show completion list when ambiguous
- '(comint-input-ignoredups t)           ; no duplicates in command history
- '(comint-completion-addsuffix t)       ; insert space/slash after file completion
- '(comint-buffer-maximum-size 20000)    ; max length of the buffer in lines
- '(comint-prompt-read-only t)         ; if this is t, it breaks shell-command
- '(comint-get-old-input (lambda () "")) ; what to run when i press enter on a
+(setq-default
+ ;;tramp-default-method "ssh"          ; uses ControlMaster
+ comint-scroll-to-bottom-on-input t  ; always insert at the bottom
+ comint-scroll-to-bottom-on-output nil ; always add output at the bottom
+ comint-scroll-show-maximum-output t ; scroll to show max possible output
+ comint-completion-autolist t     ; show completion list when ambiguous
+ comint-input-ignoredups t           ; no duplicates in command history
+ comint-completion-addsuffix t       ; insert space/slash after file completion
+ comint-buffer-maximum-size 20000    ; max length of the buffer in lines
+ comint-prompt-read-only t         ; if this is t, it breaks shell-command
+ comint-get-old-input (lambda () "") ; what to run when i press enter on a
                                         ; line above the current prompt
- '(comint-input-ring-size 5000)         ; max shell history size
- '(protect-buffer-bury-p nil)
-)
+ comint-input-ring-size 5000         ; max shell history size
+ protect-buffer-bury-p nil
+ )
 
 (defvar-local etc-next-truncate-allowed-timer nil)
 
@@ -130,7 +130,7 @@ the line, to capture multiline input. (This only has effect if
 
 ;; The undo history should be cleared when we send input. We shouldn't be able
 ;; to undo things that were inserted by the process, only things we typed.
-(defun etc-clear-comint-undo ()
+(defun etc-clear-comint-undo (&rest args)
   (setq buffer-undo-list nil))
 
 ;; output from the underlying process shouldn't be undoable

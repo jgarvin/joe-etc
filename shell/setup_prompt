@@ -26,23 +26,32 @@ if [[ "$TERM" = "dumb-emacs" ]]; then
     export EMACS="t"
 fi
 
+# Both ansi-term and shell-mode need these
+if [[ -n "$EMACS" ]]; then
+    unsetopt zle
+    unsetopt prompt_cr
+    RPROMPT=''
+fi
+
 # To help emacs tramp mode and global desktop,
 # turn off the fancy stuff.
-if [[ "$TERM" = "dumb" || "$TERM" = "" || "$EMACS " = "t" ]]; then
-  unsetopt zle
-  unsetopt prompt_cr
-  unsetopt prompt_subst
-  if type precmd &> /dev/null; then
-      unfunction precmd
-  fi
-  if type preexec &> /dev/null; then
-      unfunction preexec
-  fi
-  PS1='$ '
-  PS2='$ '
-  PROMPT='$ '
-  RPROMPT='$ '
-else
+# Note the emacs comparsion against t specifically identifies
+# shell-mode as opposed to ansi-term
+if [[ "$TERM" = "dumb" || "$TERM" = "" || "$EMACS" = "t" ]]; then
+    unsetopt prompt_subst
+    if type precmd &> /dev/null; then
+        unfunction precmd
+    fi
+    if type preexec &> /dev/null; then
+        unfunction preexec
+    fi
+    PS1='$ '
+    PS2='$ '
+    PROMPT='$ '
+fi
+
+# TODO: also check that term is not dumb
+if [[ -z "$EMACS" ]]; then
 	# Creating new shells in GNU screen is jacked up on Solaris until you do this.
 	if which stty &> /dev/null
 	then
@@ -67,7 +76,7 @@ else
 	setprompt
 fi
 
-if [[ "$EMACS" = "t" ]]; then
+if [[ -n "$EMACS" ]]; then
     if [ -z $SSH_CLIENT ]; then
 #        PS1='[/ssh:%n@%m:%d]$ '
         PS1='[%n@%m:<%~>]$ '

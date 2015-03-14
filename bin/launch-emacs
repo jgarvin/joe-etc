@@ -1,7 +1,17 @@
 #!/usr/bin/env zsh
 
-# By launching emacs through an interactive zsh,
-# we know we get the proper environment. With the
-# paths we actually want.
+if [ -n "$DISPLAY" ]; then
+    arg="-c"
+fi
 
-emacsclient --alternate-editor='' "$@"
+if [ -z "$@" ]; then
+    # emacsclient requires you to run on something, can't just
+    # pop open a window.
+    arg="$arg $HOME"
+else
+    arg="$arg $@"
+fi
+
+# By launching emacsclient through an interactive zsh,
+# we know we get the emacsclient from the $PATH we want.
+zsh -i -c "emacsclient $arg"

@@ -56,7 +56,8 @@
                         (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
               ;; We always want to send the newline because the client will block until
               ;; it receives it.
-              (setq result (format "%S" result))
+              (let ((print-length nil))
+                (setq result (format "%S" result)))
               ;; because newline is the protocol delimeter we have to nuke it
               (setq result (replace-regexp-in-string "\n" "" result))
               (setq result (concat result "\n"))

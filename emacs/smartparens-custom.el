@@ -2,11 +2,39 @@
 (require 'smartparens-config)
 (smartparens-global-mode 1)
 (show-smartparens-global-mode t)
+
+;; Commented out hotkeys need free keyboard shortcuts not taken
+;; by XMonad.
+
+;; Related problem is figuring out how to make pedals useful when using voice
+
+;; my homerow
+;; a
+;; s
+;; h
+;; t
+;; g*
+;; y*
+;; n
+;; e
+;; o
+;; i
+
+;; available keys:
+;; C-M-pageup
+;; C-M-pagedown
+;; C-M-tab
+;; C-M-]
+;; C-M-left
+;; C-M-right
+;; C-M-up
+;; C-M-down
+
 (define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
 (define-key smartparens-mode-map (kbd "C-M-a") 'sp-backward-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-e") 'sp-up-sexp)
+(define-key smartparens-mode-map (kbd "C-M-o") 'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u") 'sp-backward-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-n") 'sp-next-sexp)
 (define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)

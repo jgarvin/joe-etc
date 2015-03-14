@@ -1,5 +1,64 @@
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(TeX-view-program-selection
+   (quote
+    (((output-dvi style-pstricks)
+      "Evince")
+     (output-dvi "Evince")
+     (output-pdf "Evince")
+     (output-html "Evince"))))
+ '(custom-safe-themes
+   (quote
+    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
+ '(ediff-split-window-function (quote split-window-horizontally))
+ '(haskell-mode-hook (quote (turn-on-haskell-indent)))
+ '(safe-local-variable-values
+   (quote
+    ((eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
+                      (buffer-file-name)
+                      (getenv "HOME"))))
+           nil t)
+     (eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
+                      (getenv "HOME"))))
+           nil t)
+     (eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name))))
+           nil t)
+     (eval add-hook
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name)))))))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
 ;; for emacsclient
-(server-start)
+;; (server-start)
 
 (if (< emacs-major-version 24)
     (load-file "~/etc/emacs/cl-lib-0.3.el")
@@ -51,6 +110,7 @@
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
+
 (load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
@@ -58,6 +118,7 @@
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
 (load-file "~/etc/emacs/shell-custom.el")
+
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
 (load-file "~/etc/emacs/email-custom.el")
@@ -66,6 +127,7 @@
 (load-file "~/etc/emacs/elisp-custom.el")
 (load-file "~/etc/emacs/ack-custom.el")
 (load-file "~/etc/emacs/org-custom.el")
+
 (load-file "~/etc/emacs/persist-custom.el")
 (load-file "~/etc/emacs/buffer-tail.el")
 (load-file "~/etc/emacs/log-custom.el")
@@ -270,11 +332,13 @@
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
-(defun yank-and-indent ()
-  "Yank and then indent the newly formed region according to mode."
-  (interactive)
-  (yank)
-  (indent-according-to-mode))
+;; In programming modes indent when yanking
+(dolist (command '(yank yank-pop))
+   (eval `(defadvice ,command (after indent-region activate)
+            (and (not current-prefix-arg)
+                 (derived-mode-p 'prog-mode)
+                 (let ((mark-even-if-inactive transient-mark-mode))
+                   (indent-region (region-beginning) (region-end) nil))))))
 
 (defun open-line-and-indent ()
   (interactive)
@@ -290,17 +354,9 @@
   (kill-line ARG)
   (indent-according-to-mode))
 
-(defun yank-and-indent-safe (&optional ARG)
-  (interactive)
-  (yank)
-  (save-excursion
-    (when (re-search-backward "[^[:blank:]]" (point-at-bol) t)
-      (indent-according-to-mode))))
-
-(global-set-key (kbd "RET") 'reindent-then-newline-and-indent)
-(global-set-key (kbd "C-o") 'open-line-and-indent)
-(global-set-key (kbd "C-y") 'yank-and-indent)
-(global-set-key (kbd "C-k") 'kill-and-indent)
+(global-set-key (kbd "RET") #'reindent-then-newline-and-indent)
+(global-set-key (kbd "C-o") #'open-line-and-indent)
+(global-set-key (kbd "C-k") #'kill-and-indent)
 
 (setq auto-mode-alist
       (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
@@ -437,7 +493,7 @@
                ;; the buffer name; the file name as a tool tip
                '(:eval (propertize "%b " 'face 'font-lock-warning-face
                                    'help-echo (buffer-file-name)))
-
+               
                ;; line and column
                "(" ;; '%02' to set to 2 chars at least; prevents flickering
                (propertize "%02l" 'face 'font-lock-type-face) ","
@@ -458,12 +514,12 @@
                                    'help-echo buffer-file-coding-system))
                '(:eval (when (derived-mode-p 'term-mode)
                          (if (term-in-line-mode)
-                                          (propertize " - Line"
-                                                  'face 'font-lock-string-face
-                                                  'help-echo "Terminal is in line mode")
-                                        (propertize " - Char"
-                                                  'face 'font-lock-string-face
-                                                  'help-echo "Terminal is in char mode"))))
+                             (propertize " - Line"
+                                         'face 'font-lock-string-face
+                                         'help-echo "Terminal is in line mode")
+                           (propertize " - Char"
+                                       'face 'font-lock-string-face
+                                       'help-echo "Terminal is in char mode"))))
                "] "
                
                "[" ;; insert vs overwrite mode, input-method in a tooltip
@@ -512,54 +568,7 @@
 
 (put 'upcase-region 'disabled nil)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(TeX-view-program-selection
-   (quote
-    (((output-dvi style-pstricks)
-      "Evince")
-     (output-dvi "Evince")
-     (output-pdf "Evince")
-     (output-html "Evince"))))
- '(ediff-split-window-function (quote split-window-horizontally))
- '(haskell-mode-hook (quote (turn-on-haskell-indent)))
- '(safe-local-variable-values
-   (quote
-    ((eval add-hook
-           (quote after-save-hook)
-           (lambda nil
-             (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
-                      (buffer-file-name)
-                      (getenv "HOME"))))
-           nil t)
-     (eval add-hook
-           (quote after-save-hook)
-           (lambda nil
-             (shell-command
-              (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
-                      (getenv "HOME"))))
-           nil t)
-     (eval add-hook
-           (quote after-save-hook)
-           (lambda nil
-             (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-                      (buffer-file-name)
-                      (getenv "HOME")
-                      (buffer-name))))
-           nil t)
-     (eval add-hook
-           (quote after-save-hook)
-           (lambda nil
-             (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-                      (buffer-file-name)
-                      (getenv "HOME")
-                      (buffer-name)))))))))
+
 
 
 
@@ -703,3 +712,18 @@
 ;; makes emacs aware of my window manager behavior, not sure what this gets me
 (setq focus-follows-mouse t)
 
+;; the default of ten is annoying for debugging
+(setq print-length 100)
+
+
+;; couldn't get this to work with existing theme....
+;; (require 'smart-mode-line)
+;; (sml/setup)
+;; (sml/apply-theme 'powerline)
+
+;; (let ((cyberpunk-blue-5 "#4c83ff")
+;;       (cyberpunk-gray-5 "#333333"))
+;;   (set-face-attribute 'mode-line nil
+;;                       :foreground cyberpunk-blue-5
+;;                       :background cyberpunk-gray-5
+;;                       :box '(:line-width -1)))

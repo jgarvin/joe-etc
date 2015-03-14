@@ -1,3 +1,4 @@
+
 ! This makes it so screen will detect terminal resizes properly.
 XTerm*ptySttySize: true
 

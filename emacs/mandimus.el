@@ -15,6 +15,13 @@
 (defvar md-inhibit-window-selection-hooks nil)
 (defvar md-last-selected-window nil)
 
+(defun md-strip-text-properties (txt)
+  (set-text-properties 0 (length txt) nil txt)
+  txt)
+
+(defun md-buffer-name (&optional buffer)
+  (md-strip-text-properties (buffer-name buffer)))
+
 (defun md-get-buffers-in-modes (modes)
   (unless (listp modes)
     (setq modes (list modes)))
@@ -31,7 +38,8 @@
 
 (defun md-get-special-buffers ()
   (-filter
-   (lambda (x) (string-match-p " ?\\*[^*]+\\*" (buffer-name x))) (buffer-list)))
+   (lambda (x) (and (not (minibufferp x))
+                    (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x)))) (buffer-list)))
   
 (defun md-get-buffer-names (lst)
   (mapcar #'buffer-name lst))
@@ -170,9 +178,7 @@ debug mode causing timers to die."
   (setq mandimus-last-word-event words)
   (force-mode-line-update))
 
-(setq md-startup-cursor-color (face-attribute 'cursor :background))
-
-(defvar md-cursor-color md-startup-cursor-color)
+(defvar md-cursor-color nil)
 
 (defun md-update-cursor-color (color)
   (setq md-cursor-color color)
@@ -229,8 +235,10 @@ debug mode causing timers to die."
       (md-new-mic-state-impl state))))
 
 (defun md-give-new-frame-color (frame)
-  (with-selected-frame frame
-    (md-update-cursor-color md-cursor-color)))
+  (when frame
+    (with-selected-frame frame
+      (md-update-cursor-color (or md-cursor-color
+                                  (face-attribute 'cursor :background))))))
 
 (add-hook 'after-make-frame-functions 'md-give-new-frame-color)
 
@@ -570,7 +578,7 @@ Ignores CHAR at point."
 
 (load-file "~/etc/emacs/md-text.el")
 (load-file "~/etc/emacs/md-network.el")
-(load-file "~/etc/emacs/token.el")
+(load-file "~/etc/emacs/md-token.el")
 (load-file "~/etc/emacs/md-projectile.el")
 (load-file "~/etc/emacs/md-belt-impl.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")

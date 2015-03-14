@@ -92,7 +92,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask , xK_x     ), kill)
 
     -- Rotate through the available layout algorithms
-    , ((modMask,               xK_y ), sendMessage NextLayout)
+    , ((modMask,               xK_bracketright ), sendMessage NextLayout)
 
     -- Toggle decorations
     -- , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
@@ -107,7 +107,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_e     ), windows W.focusDown)
 
     -- Move focus to the previous window
-    , ((modMask,               xK_o     ), windows W.focusUp  )
+    , ((modMask,               xK_h     ), windows W.focusUp  )
 
     -- Move focus to the master window
     , ((modMask,               xK_m     ), windows W.focusMaster  )
@@ -119,7 +119,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask .|. shiftMask, xK_e     ), windows W.swapDown  )
 
     -- Swap the focused window with the previous window
-    , ((modMask .|. shiftMask, xK_o     ), windows W.swapUp    )
+    , ((modMask .|. shiftMask, xK_h     ), windows W.swapUp    )
 
     -- Shrink the master area
     , ((modMask,               xK_n    ), sendMessage Shrink)
@@ -140,7 +140,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
 
     -- Restart xmonad
-    , ((modMask              , xK_q     ),
+    , ((modMask .|. shiftMask, xK_q     ),
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- Move screens
@@ -165,7 +165,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     -- --
     [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_f, xK_u, xK_p] [0..]
+        | (key, sc) <- zip [xK_Left, xK_Right, xK_Up] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 ------------------------------------------------------------------------

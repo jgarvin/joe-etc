@@ -110,7 +110,8 @@
   (let ((entry))
     (cond
      ;; filter snippet placeholder
-     ((string-match-p (regexp-opt (list (char-to-string md-placeholder))) sym) t)
+     ((and (boundp 'md-placeholder)
+           (string-match-p (regexp-opt (list (char-to-string md-placeholder))) sym)) t)
      ;; filter syms with unprintable chars
      ;; TODO: this is wrong, it excludes unicode
      ((string-match "[^\t\n\r\f -~]" sym) t)

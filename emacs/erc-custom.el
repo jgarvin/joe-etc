@@ -56,7 +56,7 @@
 
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
-      '(("freenode.net" "#emacs" "#python" "##c++" "##linux")))
+      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux")))
 
 (defun irc-maybe ()
   "Connect to IRC."

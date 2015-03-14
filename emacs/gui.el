@@ -1,16 +1,32 @@
 ;; Color theme
-(add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
-(require 'color-theme)
-(setq color-theme-is-global t)
-(color-theme-initialize)
+;; (add-to-list 'load-path "~/etc/emacs/color-theme-6.6.0")
+;; (require 'color-theme)
+;; (setq color-theme-is-global t)
+;; (color-theme-initialize)
 (load-file "~/etc/emacs/cyberpunk-theme.el")
 
-(setq my-font-choice "DejaVu Sans Mono-12")
-;;(setq my-font-choice "Consolas-14")
-(set-face-attribute 'default nil :font my-font-choice)
-;;(set-frame-font my-font-choice nil t)
-(frame-char-height)
-(frame-char-width)
+;; starting up in daemon mode without frames will
+;; crash if we try to set this... maybe set on
+;; creation of first frame?
+
+(defvar etc-font-choice nil)
+
+(require 'faces)
+(require 'frame)
+
+;; have to do this as a frame functon or daemon doesn't work
+(defun etc-customize-frame (new-frame)
+  (when (getenv "DISPLAY")
+    (setq etc-font-choice "DejaVu Sans Mono-12")
+    ;;(setq my-font-choice "Consolas-14")
+    
+    ;; and can't call this or emacsclient -c crashes, wtf
+    ;;(set-face-attribute 'default t :font etc-font-choice)
+    
+    (set-frame-font etc-font-choice t t)))
+
+(add-hook 'after-make-frame-functions #'etc-customize-frame)
+
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
   (tool-bar-mode -1))
@@ -35,4 +51,4 @@
 (global-hl-line-mode)
 (set-face-background hl-line-face "grey13")
 
-
+(setq-default auto-revert-verbose nil)
