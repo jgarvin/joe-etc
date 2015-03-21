@@ -1,3 +1,5 @@
+(defvar-local run-command nil)
+
 (if (file-directory-p "~/opt/share/gtags")
     (add-to-list 'load-path "~/opt/share/gtags"))
 (require 'gtags)
@@ -72,6 +74,9 @@
         (fname (file-name-sans-extension buffer-file-name)))
     (find-file (find-other-file fname ext))))
 
+(defun etc-compilation-finished (buffer finished-status)
+  (message "Result: [%S] [%S]" buffer finished-status))
+
 (defun etc-setup-c-common ()
   (local-set-key "\M-t" 'toggle-header-buffer)
   
@@ -123,10 +128,38 @@
   (setq indent-tabs-mode nil)
   (setq default-tab-width my-indent-size)
   (setq tab-width my-indent-size)
+
+  (require 'compile)
+  (unless (file-exists-p "Makefile")
+    (set (make-local-variable 'compile-command)
+         ;; emulate make's .c.o implicit pattern rule, but with
+         ;; different defaults for the CC, CPPFLAGS, and CFLAGS
+         ;; variables:
+         ;; $(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
+         (let ((file (file-name-nondirectory buffer-file-name)))
+           (format "%s -c -o %s.o %s %s %s"
+                   (or (getenv "CC") "g++")
+                   (file-name-sans-extension file)
+                   (or (getenv "CPPFLAGS") "-DDEBUG=9")
+                   (or (getenv "CFLAGS") "-ansi -pedantic -Wall -g")
+                   file))))
+
+  ;; (add-to-list (make-local-variable 'compilation-finish-functions)
+  ;;              #'etc-compilation-finished)
   )
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
 
+(defun etc-compile-and-run (&optional arg)
+  (interactive "P")
+  (compile compile-command arg)
+  (let ((run (or run-command
+                 (file-name-sans-extension (buffer-file-name)))))
+    (async-shell-command run)))
 
+(defun etc-c-init ()
+  (define-key c-mode-base-map (kbd "C-c C-c") #'etc-compile-and-run))
+
+(add-hook 'c-initialization-hook #'etc-c-init)
 
 

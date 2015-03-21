@@ -78,6 +78,14 @@
   (call-interactively #'profiler-report)
   (call-interactively #'profiler-stop))
 
+(defmacro etc-profile (&rest body)
+  `(progn
+     (call-interactively #'profiler-stop)
+     (call-interactively #'profiler-start)
+     ,@body
+     (call-interactively #'profiler-report)
+     (call-interactively #'profiler-stop)))
+
 ;; Enable debugging
 (setq-default debug-on-error t)
 (setq message-log-max t)

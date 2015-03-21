@@ -18,7 +18,8 @@
 
 (defun etc-comint-truncate ()
   (when (and comint-buffer-maximum-size
-             (> (buffer-size) comint-buffer-maximum-size))
+             (> (buffer-size) comint-buffer-maximum-size)
+             (get-buffer-process (current-buffer)))
     (comint-truncate-buffer)
     (setq etc-next-truncate-allowed-timer
           (run-at-time 1 1 #'etc-clear-truncate-timer (current-buffer)))))

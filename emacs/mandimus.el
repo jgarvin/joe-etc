@@ -28,6 +28,7 @@
   (-filter (lambda (x)
              (with-current-buffer x
                (apply #'derived-mode-p modes))) (buffer-list)))
+(byte-compile #'md-get-buffers-in-modes)
 
 (defun md-get-buffers-not-in-modes (modes)
   (unless (listp modes)
@@ -35,6 +36,7 @@
   (-filter (lambda (x)
              (with-current-buffer x
                (not (apply #'derived-mode-p modes)))) (buffer-list)))
+(byte-compile #'md-get-buffers-not-in-modes)
 
 (defun md-get-special-buffers ()
   (-filter
@@ -43,9 +45,11 @@
   
 (defun md-get-buffer-names (lst)
   (mapcar #'buffer-name lst))
+(byte-compile #'md-get-buffer-names)
 
 (defun md-all-buffers-except (bufs)
   (-filter (lambda (x) (not (memq x bufs))) (buffer-list)))
+(byte-compile #'md-all-buffers-except)
 
 ;;(md-all-buffers-except (md-get-special-buffers))
 
@@ -73,15 +77,16 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
       ;; as far as I can tell (current-buffer)
       ;; is not reliable from an idle timer, you never know
       ;; what you will get, this is a better default
-      (with-current-buffer (window-buffer (selected-window)) 
-        (apply f args))
+      (apply f args)
     (md-safe-cancel-timer v)))
 
 (defun md-cancel-timer-after-executing (v f local args)
-  (if local
-      (with-current-buffer local
-        (md--run-timer-func v f args))
-    (md--run-timer-func v f args)))    
+  ;; as far as I can tell (current-buffer)
+  ;; is not reliable from an idle timer, you never know
+  ;; what you will get, window-buffer is a better default
+  (let ((local (or local (window-buffer (selected-window)))))
+    (with-current-buffer local
+      (md--run-timer-func v f args))))
 
 (defun md-run-when-idle-once (v f seconds &optional local &rest args)
   "Setup an idle timer to run F after SECONDS of idle time, passing
@@ -533,6 +538,33 @@ Ignores CHAR at point."
       (when (= direction 1) (backward-char direction)))
     (point)))
 
+(defun md-move-up-to-char-same-line (arg char)
+  (interactive "p\ncMove up to char: ")
+  (let ((direction (if (>= arg 0) 1 -1))
+        (eol (if (>= arg 0) (point-at-eol) (point-at-bol))))
+    (when (= (point) eol)
+      (user-error "%s of line, no characters follow." (if (>= arg 0) "End" "Start")))
+    (forward-char direction)
+    (unwind-protect
+        (condition-case err
+            (search-forward (char-to-string char) eol nil arg)
+          (search-failed (user-error "No instance of [%s] %s point on current line." (char-to-string char)
+                                     (if (>= arg 0) "after" "before"))))
+      (when (= direction 1) (backward-char direction)))
+    (point)))
+
+(defun md-move-up-to-char-after-line (arg char)
+  (interactive "p\ncMove up to char: ")
+  (let ((direction (if (>= arg 0) 1 -1)))
+    (forward-line direction)
+    (unwind-protect
+        (condition-case err
+            (search-forward (char-to-string char) nil nil arg)
+          (search-failed (user-error "No instance of [%s] %s current line." (char-to-string char)
+                                     (if (>= arg 0) "after" "before"))))
+      (when (= direction 1) (backward-char direction)))
+    (point)))
+
 (defun md-current-path ()
   (if (derived-mode-p 'dired-mode)
       list-buffers-directory
@@ -545,8 +577,9 @@ Ignores CHAR at point."
               ;; opening any old temporary buffer in the background fires buffer-update-list hook,
               ;; when what we're really after is when we select a new window or the buffer in the
               ;; current window changes. note you can't rely on (current-buffer) to be the currently
-              ;; displayed window inside buffer-list-update hook, thus so we use the circumlocution:
-              ;; (window-buffer (selected-window))
+              ;; displayed window inside buffer-list-update hook, so we use the circumlocution:
+              ;; (window-buffer (selected-window)). Also we avoid redundant events by saving the
+              ;; last buffer/window pair.
               (and md-last-value-pair (and (eq (window-buffer (selected-window)) (car md-last-value-pair))
                                            (eq (selected-window) (cdr md-last-value-pair)))))
     (let ((md-inhibit-window-selection-hooks t))
