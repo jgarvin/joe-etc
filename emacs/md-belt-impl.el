@@ -181,6 +181,9 @@
             (md-bt-schedule-update))
         ad-do-it))))
 
+;;(advice-remove #'message #'md-message-save-to-var)
+;;(advice-remove #'md-message-save-to-var #'message)
+
 (defun md-bt-update-post-command (&rest args)
   ;;(message "md-bt-update-post-command")
   (md-bt-schedule-update)

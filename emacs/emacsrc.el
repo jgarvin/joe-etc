@@ -163,6 +163,8 @@
 (setq auto-window-vscroll nil)
 
 (when (getenv "DISPLAY")
+  ;; Set the keyboard repeat rate to be a lot faster
+  (shell-command "xset r rate 200 60")
   ;; Make emacs use the normal clipboard
   (setq x-select-enable-clipboard t)
   (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
@@ -438,9 +440,11 @@
     (let ((save-mark (mark)))
       (indent-rigidly region-start region-finish numcols))))
 
-(global-set-key "\C-s" 'isearch-forward-regexp)
-(global-set-key "\C-r" 'isearch-backward-regexp)
-(global-set-key "\M-%" 'query-replace-regexp)
+;; can use M-r to toggle instead
+;; (global-set-key "\C-s" 'isearch-forward)
+;; (global-set-key "\C-r" 'isearch-backward)
+
+(global-set-key "\M-%" 'query-replace)
 
 ;; Threshold after which we consider the file to be large
 ;; and don't want to do anything too expensive.
@@ -735,3 +739,4 @@
 ;;                       :foreground cyberpunk-blue-5
 ;;                       :background cyberpunk-gray-5
 ;;                       :box '(:line-width -1)))
+

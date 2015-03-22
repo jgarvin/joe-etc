@@ -7,7 +7,7 @@
   (unless b
     (setq b (current-buffer)))
   (and (buffer-modified-p b)
-       (not (null (buffer-file-name b)))))
+       (buffer-file-name b)))
 
 (defun etc-save-if-necessary ()
   (with-demoted-errors

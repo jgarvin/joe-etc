@@ -1,4 +1,5 @@
 (require 'cl)
+(require 'dash)
 (require 'ring)
 
 (defvar md-recent-ring nil)
@@ -14,44 +15,6 @@
 (defvar md-last-value-pair nil)
 (defvar md-inhibit-window-selection-hooks nil)
 (defvar md-last-selected-window nil)
-
-(defun md-strip-text-properties (txt)
-  (set-text-properties 0 (length txt) nil txt)
-  txt)
-
-(defun md-buffer-name (&optional buffer)
-  (md-strip-text-properties (buffer-name buffer)))
-
-(defun md-get-buffers-in-modes (modes)
-  (unless (listp modes)
-    (setq modes (list modes)))
-  (-filter (lambda (x)
-             (with-current-buffer x
-               (apply #'derived-mode-p modes))) (buffer-list)))
-(byte-compile #'md-get-buffers-in-modes)
-
-(defun md-get-buffers-not-in-modes (modes)
-  (unless (listp modes)
-    (setq modes (list modes)))
-  (-filter (lambda (x)
-             (with-current-buffer x
-               (not (apply #'derived-mode-p modes)))) (buffer-list)))
-(byte-compile #'md-get-buffers-not-in-modes)
-
-(defun md-get-special-buffers ()
-  (-filter
-   (lambda (x) (and (not (minibufferp x))
-                    (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x)))) (buffer-list)))
-  
-(defun md-get-buffer-names (lst)
-  (mapcar #'buffer-name lst))
-(byte-compile #'md-get-buffer-names)
-
-(defun md-all-buffers-except (bufs)
-  (-filter (lambda (x) (not (memq x bufs))) (buffer-list)))
-(byte-compile #'md-all-buffers-except)
-
-;;(md-all-buffers-except (md-get-special-buffers))
 
 (global-set-key '[md-dummy-event] 'md-ignore)
 
@@ -609,11 +572,12 @@ Ignores CHAR at point."
 ;; needed for zap-up-to-char
 (require 'misc)
 
+(load-file "~/etc/emacs/md-buffer-picking.el")
 (load-file "~/etc/emacs/md-text.el")
 (load-file "~/etc/emacs/md-network.el")
 (load-file "~/etc/emacs/md-token.el")
 (load-file "~/etc/emacs/md-projectile.el")
-(load-file "~/etc/emacs/md-belt-impl.el")
+;; (load-file "~/etc/emacs/md-belt-impl.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-undo.el")
 (load-file "~/etc/emacs/md-snippet.el")
