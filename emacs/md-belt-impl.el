@@ -112,10 +112,14 @@
     (md-insert-text (format "%s" (nth (- c ?A) (md-belt-old-contents belt))) t nil)))
 
 (defun md-resize-minibuf (w target-height)
-  (while (< (window-body-height w) (+ target-height 1))
-    (window-resize w 1))
-  (while (> (window-body-height w) (+ target-height 1))
-    (window-resize w -1)))
+  (condition-case nil
+      (while (< (window-body-height w) (+ target-height 1))
+        (window-resize w 1))
+    (args-out-of-range nil))
+  (condition-case nil
+      (while (> (window-body-height w) (+ target-height 1))
+        (window-resize w -1))
+    (args-out-of-range nil)))
 
 (defun md-bt-inhibit-belt-update ()
   (or md-updating-belts
@@ -171,18 +175,15 @@
       (setq md-current-message m)
       (md-bt-schedule-update))))
 
-(defadvice message (around md-message-save-to-var disable)
-  (if (or md-updating-belts (not (ad-get-arg 0)))
-      ad-do-it
-    (let ((formatted-string (apply 'format (ad-get-args 0))))
+(defun md-belt-message-advice (original-function &rest args)
+  (if (or md-updating-belts (not (car args)))
+      (apply original-function args)
+    (let ((formatted-string (apply #'format args)))
       (if (or (stringp formatted-string))
           (progn 
             (setq md-current-message formatted-string)
             (md-bt-schedule-update))
-        ad-do-it))))
-
-;;(advice-remove #'message #'md-message-save-to-var)
-;;(advice-remove #'md-message-save-to-var #'message)
+        (apply original-function args)))))
 
 (defun md-bt-update-post-command (&rest args)
   ;;(message "md-bt-update-post-command")
@@ -218,6 +219,7 @@
     (add-hook 'post-command-hook #'md-bt-update-post-command t)
     (add-hook 'window-configuration-change-hook #'md-bt-update-window t)
     (add-hook 'focus-in-hook #'md-bt-update-focus t)
+    (advice-add #'message :around #'md-belt-message-advice)
     (ad-enable-advice 'message 'around 'md-message-save-to-var)
     (setq md-belt-mode t))
   (md-update-belts))
@@ -226,6 +228,7 @@
   (md-bt-cancel-timer)
   (let ((md-updating-belts t))
     (setq resize-mini-windows 'grow-only)
+    (advice-remove #'message #'md-belt-message-advice)
     (remove-hook 'post-command-hook #'md-save-message)
     (remove-hook 'post-command-hook #'md-bt-update-post-command)
     (remove-hook 'window-configuration-change-hook #'md-bt-update-window)
