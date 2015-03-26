@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 (defvar-local run-command nil)
 
 (if (file-directory-p "~/opt/share/gtags")
@@ -150,12 +152,52 @@
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
 
+(defvar-local etc-compilation-run-command nil)
+(defvar-local etc-compilation-project nil)
+(defvar-local etc-compilation-compile-command nil)
+(defvar-local etc-compilation-invoking-buffer nil)
+
+;; we only get the compilation buffer, so we either have to store data
+;; on it ahead of time in a buffer-local, or we can store it in the
+;; buffer name somehow
+(defun etc-run (comp-buf finish-status)
+  (setq finish-status (string-trim finish-status)) ;; trailing newline
+  (message "Finish status: %S" finish-status)
+  (when (with-current-buffer comp-buf (equal major-mode 'compilation-mode))
+    (with-current-buffer etc-compilation-invoking-buffer
+      (let ((run (or run-command
+                     (file-name-sans-extension (buffer-file-name))))
+            (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf))))
+        (async-shell-command run (get-buffer-create buff-name))))))
+
+(add-hook 'compilation-finish-functions #'etc-run)
+
+(defun etc-get-project ()
+  (if (projectile-project-p)
+      (projectile-project-name)
+    (if (buffer-file-name)
+        (file-name-directory (buffer-file-name))
+      (default-directory))))
+
 (defun etc-compile-and-run (&optional arg)
   (interactive "P")
-  (compile compile-command arg)
-  (let ((run (or run-command
-                 (file-name-sans-extension (buffer-file-name)))))
-    (async-shell-command run)))
+  (let* (;; make the compilaton buffer depend on the command name and the project,
+         ;; this makes sure we can have multiple compiles going
+         (buf-name (format "compile|%s|%s" (etc-get-project) compile-command))
+         (compilation-buffer-name-function (lambda (mode) buf-name))
+         ;; Pass info on for how to run things from the buffer we invoke in, which
+         ;; in turn could be getting from project or elsewhere. Probably should
+         ;; make compile-command and run-command functions...
+         (runc run-command)
+         (comc compile-command)
+         (proj (etc-get-project))
+         (invoking (current-buffer))
+         (compilation-mode-hook (cons (lambda (&rest unused)
+                                        (setq etc-compilation-compile-command comc)
+                                        (setq etc-compilation-project proj)
+                                        (setq etc-compilation-run-command runc)
+                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook)))
+    (compile compile-command arg)))
 
 (defun etc-c-init ()
   (define-key c-mode-base-map (kbd "C-c C-c") #'etc-compile-and-run))

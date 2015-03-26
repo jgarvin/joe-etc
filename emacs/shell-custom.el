@@ -28,11 +28,27 @@
 ;;   (string-match "^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" s)
 ;;   (match-string-no-properties 1 s))
 
-(defun etc-open-shell ()
-  (interactive)
-  ;; (let ((dir default-directory))
-  ;;   (-filter (lambda (x))))
-  (shell (generate-new-buffer-name "$shell")))
+(defun etc-open-shell (arg)
+  "Switch to shell in same folder as current buffer. If one doesn't already
+exist, make one. If we're already in a shell, switch to the next shell in the
+same folder. If given prefix argument always make a new shell."
+  (interactive "P")
+  (let* ((dir (file-truename default-directory))
+         (existing (sort (-filter (lambda (x)
+                              (with-current-buffer x
+                                (and (equal dir (file-truename default-directory))
+                                     (derived-mode-p 'shell-mode))))
+                                  (buffer-list))
+                         (lambda (x y)
+                           (string< (buffer-name x)
+                                    (buffer-name y))))))
+    (message "%S" existing)  
+    (if (and existing (not arg))
+        (let ((pos (position (current-buffer) existing)))
+          (if pos
+              (switch-to-buffer (nth (% (1+ pos) (length existing)) existing))
+            (switch-to-buffer (car existing))))
+      (shell (generate-new-buffer-name "$shell")))))
 
 (global-set-key (kbd "C-z") #'etc-open-shell)
 
