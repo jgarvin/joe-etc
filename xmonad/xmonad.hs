@@ -92,7 +92,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask , xK_x     ), kill)
 
     -- Rotate through the available layout algorithms
-    , ((modMask,               xK_bracketright ), sendMessage NextLayout)
+    , ((modMask .|. shiftMask,               xK_bracketright ), sendMessage NextLayout)
 
     -- Toggle decorations
     -- , ((modMask,               xK_d ), sendMessage (MultiToggle.Toggle DECORATIONS) )
@@ -122,13 +122,13 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask .|. shiftMask, xK_h     ), windows W.swapUp    )
 
     -- Shrink the master area
-    , ((modMask,               xK_n    ), sendMessage Shrink)
+    , ((modMask,               xK_minus    ), sendMessage Shrink)
 
     -- Expand the master area
-    , ((modMask,               xK_i     ), sendMessage Expand)
+    , ((modMask,               xK_equal     ), sendMessage Expand)
 
     -- Push window back into tiling
-    , ((modMask .|. shiftMask,               xK_h     ), withFocused $ windows . W.sink)
+    , ((modMask .|. shiftMask, xK_h     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     , ((modMask              , xK_comma ), sendMessage (IncMasterN 1))

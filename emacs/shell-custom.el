@@ -30,6 +30,8 @@
 
 (defun etc-open-shell ()
   (interactive)
+  ;; (let ((dir default-directory))
+  ;;   (-filter (lambda (x))))
   (shell (generate-new-buffer-name "$shell")))
 
 (global-set-key (kbd "C-z") #'etc-open-shell)

@@ -164,6 +164,8 @@
 
 (when (getenv "DISPLAY")
   ;; Set the keyboard repeat rate to be a lot faster
+  ;; technically this should be triggered by some sort of udev
+  ;; event because this resets if you unplug and replug in the kbd
   (shell-command "xset r rate 200 60")
   ;; Make emacs use the normal clipboard
   (setq x-select-enable-clipboard t)
@@ -715,7 +717,9 @@
     ;; don't interfere with erc scroll-to-bottom
     (recenter-top-bottom)))
 
-(global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
+;; much more convenient to reach
+(global-set-key (kbd "C-M-]") #'etc-delete-other-windows)
+(global-unset-key (kbd "C-x 1"))
 
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
 

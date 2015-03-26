@@ -30,6 +30,10 @@
 ;; C-M-up
 ;; C-M-down
 
+;; TODO: figure out what to change xmonad binds to for next/prev window
+;; freeing up e and i
+;; TODO: add split, rewrap
+
 (define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
@@ -42,6 +46,7 @@
 (define-key smartparens-mode-map (kbd "C-S-e") 'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-t") 'sp-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") 'sp-forward-slurp-sexp)
+(define-key smartparens-mode-map (kbd "C-M-g") 'sp-splice-sexp)
 
 ;; (defun etc-space-inserter (arg)
 ;;   )
