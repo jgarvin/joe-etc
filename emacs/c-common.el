@@ -113,7 +113,7 @@
   (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
   (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
 
-  (setq require-final-newline t)
+  ;;(setq require-final-newline t)
   
   (setq c-hungry-delete-key t)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
@@ -157,19 +157,33 @@
 (defvar-local etc-compilation-compile-command nil)
 (defvar-local etc-compilation-invoking-buffer nil)
 
+(defun etc-quit-run (&optional kill-buffer)
+  (interactive "P")
+  (quit-window kill-buffer (selected-window)))
+
 ;; we only get the compilation buffer, so we either have to store data
 ;; on it ahead of time in a buffer-local, or we can store it in the
 ;; buffer name somehow
 (defun etc-run (comp-buf finish-status)
   (setq finish-status (string-trim finish-status)) ;; trailing newline
-  (message "Finish status: %S" finish-status)
-  (when (with-current-buffer comp-buf (equal major-mode 'compilation-mode))
-    (with-current-buffer etc-compilation-invoking-buffer
-      (let ((run (or run-command
-                     (file-name-sans-extension (buffer-file-name))))
-            (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf))))
-        (async-shell-command run (get-buffer-create buff-name))))))
-
+  (if (string= "finished" finish-status)
+      (when (with-current-buffer comp-buf (equal major-mode 'compilation-mode))
+        (with-current-buffer etc-compilation-invoking-buffer
+          (let* ((run (or run-command
+                          (file-name-sans-extension (buffer-file-name))))
+                 (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf)))
+                 ;; We temporarily customize display-buffer-alist to not pop up
+                 ;; a new window if the buffer is already displayed in one.
+                 (display-buffer-alist
+                  (if (get-buffer-window buff-name t)
+                      (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
+                    display-buffer-alist))
+                 (buff (get-buffer-create buff-name)))
+            (async-shell-command run buff)
+            (with-current-buffer buff
+              (setq buffer-read-only t)
+              (local-set-key (kbd "q") #'etc-quit-run)))))))
+  
 (add-hook 'compilation-finish-functions #'etc-run)
 
 (defun etc-get-project ()

@@ -74,7 +74,7 @@
 ;;     (select-window (selected-window))))
 ;; (byte-compile #'md-push-buffer-into-list)
 
-(add-hook 'after-change-functions #'md-push-buffer-into-list t)
+;;(add-hook 'after-change-functions #'md-push-buffer-into-list t)
 
 (defun md-folder-switch ()
   (interactive)

@@ -21,7 +21,7 @@
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
 
-(defconst md-max-global-cache-size 500)
+(defconst md-max-global-cache-size 400)
 (defvar md-global-word-cache nil)
 (defvar md-global-symbol-cache nil)
 (defvar md-global-refresh-timer nil)

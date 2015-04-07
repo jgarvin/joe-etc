@@ -512,6 +512,26 @@ go to the highest slot (most recent)."
  :contents "for $1 in $2:\n    $3"
  :context '(derived-mode-p 'python-mode))
 
+(md-replace-snippet
+ :name "log info"
+ :contents "log.info(\"$1\")"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "log debug"
+ :contents "log.debug(\"$1\")"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "log warning"
+ :contents "log.warning(\"$1\")"
+ :context '(derived-mode-p 'python-mode))
+
+(md-replace-snippet
+ :name "log error"
+ :contents "log.error(\"$1\")"
+ :context '(derived-mode-p 'python-mode))
+
 ;;(md-insert-snippet "dotimes")
 
 (md-snippet-mode-activate 1)

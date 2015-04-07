@@ -58,10 +58,13 @@
 (setq erc-autojoin-channels-alist
       '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux")))
 
+;; don't automatically switch to joined channels, that's just annoying
+(setq erc-join-buffer 'bury)
+
 (defun irc-maybe ()
   "Connect to IRC."
   (interactive)
-  (when (y-or-n-p "IRC? ")
+  (when t ;; (y-or-n-p "IRC? ")
     (erc :server "irc.freenode.net" :port 6667 :nick freenode-nick)))
 
 (defun filter-server-buffers ()
@@ -78,16 +81,17 @@
     (with-current-buffer buffer
       (erc-quit-server "Asta la vista"))))
 
-;; automagic ghosting
+;; automagic ghosting, assume my nick, and assume I do want to ghost
 (defun erc-ghost-maybe (server nick)
   "Send GHOST message to NickServ if NICK ends with `erc-nick-uniquifier'.
 The function is suitable for `erc-after-connect'."
   (when (string-match (format "\\(.*?\\)%s+$" erc-nick-uniquifier) nick)
-    (let ((nick-orig (match-string 1 nick))
+    (let ((nick-orig freenode-nick)
           (password erc-session-password)
           (channel-list (mapcar 'buffer-name (erc-channel-list nil))))
-      (when (y-or-n-p (format "Current nick is '%s'. Do you want to ghost?"
-                              nick))
+      (when ;; (y-or-n-p (format "Current nick is '%s'. Do you want to ghost?"
+            ;;                   nick)
+          t
         ;; nowadays a lot of channels won't let you change your nick while in
         ;; a channel, so we leave all channels and rejoin
         (erc-with-all-buffers-of-server server 'erc-channel-p

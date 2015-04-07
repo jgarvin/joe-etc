@@ -139,5 +139,17 @@ the line, to capture multiline input. (This only has effect if
   (let ((buffer-undo-list t))
     (apply original-function args)))
 
+;; had this originally then got rid of, does it cause issues?
+;; TODO: change which shells it applies to...
+;; maybe need a new buffer category for these output shells?
+(defun make-my-shell-output-read-only (text)
+  "Add to comint-output-filter-functions to make stdout read only in my shells."
+  ;;(if (member (buffer-name) my-shells)
+      (let ((inhibit-read-only t)
+            (output-end (process-mark (get-buffer-process (current-buffer)))))
+        (put-text-property comint-last-output-start output-end 'read-only t)))
+  ;;)
+;;(remove-hook 'comint-output-filter-functions 'make-my-shell-output-read-only)
+
 (advice-add #'comint-send-input :after #'etc-clear-comint-undo)
 (advice-add #'comint-output-filter :around #'etc-prevent-undo-recording-comint)

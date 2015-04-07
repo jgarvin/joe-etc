@@ -64,7 +64,8 @@
     (load-file "~/etc/emacs/cl-lib-0.3.el")
   (require 'cl))
 
-;;(setq require-final-newline nil)
+(setq require-final-newline nil)
+(setq mode-require-final-newline nil)
 
 ;; don't like losing things
 (setq kill-ring-max 10000)

@@ -164,6 +164,9 @@ debug mode causing timers to die."
     (setq md-in-utterance nil)
     (run-hooks 'md-end-utterance-hooks)))
 
+(add-hook 'md-server-connect-hook #'md-check-end-utterance)
+(add-hook 'md-server-disconnect-hook #'md-check-end-utterance)
+
 (defun md-new-mic-state-impl (state)
   ;;(message "Mic state: %s" state)
   (cond
@@ -577,7 +580,7 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-network.el")
 (load-file "~/etc/emacs/md-token.el")
 (load-file "~/etc/emacs/md-projectile.el")
-;; (load-file "~/etc/emacs/md-belt-impl.el")
+(load-file "~/etc/emacs/md-belt-impl.el")
 (load-file "~/etc/emacs/md-symbol-picker.el")
 (load-file "~/etc/emacs/md-undo.el")
 (load-file "~/etc/emacs/md-snippet.el")

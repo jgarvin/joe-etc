@@ -17,7 +17,7 @@
 ;; have to do this as a frame functon or daemon doesn't work
 (defun etc-customize-frame (new-frame)
   (when (getenv "DISPLAY")
-    (setq etc-font-choice "DejaVu Sans Mono-12")
+;;    (setq etc-font-choice "DejaVu Sans Mono-12")
     ;;(setq my-font-choice "Consolas-14")
     
     ;; and can't call this or emacsclient -c crashes, wtf

@@ -1,8 +1,10 @@
 ;; needed for with-timeout
 (require 'timer)
 
-(defvar md-server-clients '())
+(defvar md-server-clients nil)
 (defvar md-server-eval-timeout 5)
+(defvar md-server-connect-hook nil)
+(defvar md-server-disconnect-hook nil)
 
 (defun md-server-start nil
   (interactive)
@@ -69,9 +71,13 @@
       (md-server-restart)))
 
 (defun md-server-sentinel (proc msg)
-  (when (string= msg "connection broken by remote peer\n")
+  (cond
+   ((string= msg "connection broken by remote peer\n")
     (setq md-servers-clients (assq-delete-all proc md-server-clients))
-    (md-server-log (format "client %s has quit" proc))))
+    (md-server-log (format "client %s has quit" proc))
+    (run-hooks 'md-server-disconnect-hook))
+   ((string-match-p "open from .*\n" msg)
+    (run-hooks 'md-server-connect-hook))))
 
 ;;from server.el
 (defun md-server-log (string &optional client)
