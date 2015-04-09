@@ -112,7 +112,9 @@
   (global-unset-key (kbd "C-z")))
 
 ;; store passwords in file outside git ;)
-(load "~/.emacspass")
+(if (file-exists-p "~/.emacspass")
+    (load "~/.emacspass")
+  (message "No ~/.emacspass file found!"))
 
 (load-file "~/etc/emacs/smartparens-custom.el")
 (load-file "~/etc/emacs/ido-custom.el")
@@ -123,7 +125,7 @@
 (load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
-(load-file "~/etc/emacs/erc-custom.el")
+;;(load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
 (load-file "~/etc/emacs/shell-custom.el")
