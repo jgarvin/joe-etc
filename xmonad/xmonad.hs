@@ -128,7 +128,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask,               xK_equal     ), sendMessage Expand)
 
     -- Push window back into tiling
-    , ((modMask .|. shiftMask, xK_h     ), withFocused $ windows . W.sink)
+    , ((modMask .|. shiftMask, xK_z     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     , ((modMask              , xK_comma ), sendMessage (IncMasterN 1))

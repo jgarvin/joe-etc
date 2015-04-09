@@ -6,6 +6,21 @@
 (defvar md-server-connect-hook nil)
 (defvar md-server-disconnect-hook nil)
 
+;; hacked around this for now
+;; ;; You are rightly wondering why this is here. The reason
+;; ;; is that both emacs and mandimus are single threaded,
+;; ;; and they use blocking communication because.. I'm lazy
+;; ;; and haven't fixed that yet. When you have the visual bell
+;; ;; enabled and scroll to the end of a buffer using a foot
+;; ;; pedal, without this you will get an infinite loop. Mandimus
+;; ;; sends a down arrow keydown event, then you hit the end of
+;; ;; the buffer, then emacs showing the visual bell prevents it
+;; ;; from ever taking data off the socket, then mandimus blocks
+;; ;; waiting for a reply from emacs, so then the pedal up event
+;; ;; is never received, so then the down arrow continues to be
+;; ;; held, which triggers the visual bell AGAIN..
+;; (setq ring-bell-function #'ignore)
+
 (defun md-server-start nil
   (interactive)
   (unless (process-status "mandimus-eval-server")

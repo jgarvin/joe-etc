@@ -150,19 +150,6 @@
 
 (delete-selection-mode 1)
 
-;; I prefer scrolling to always move point
-(global-set-key (kbd "<next>") #'md-down-screenful)
-(global-set-key (kbd "<prior>") #'md-up-screenful)
-
-;; with speech recognition we don't want to have to
-;; constantly recenter the window around point, so
-;; we actually *want* jumpy scrolling rather than
-;; smooth
-(setq scroll-step 0)
-(setq scroll-conservatively 0)
-(setq scroll-margin 6)
-(setq auto-window-vscroll nil)
-
 (when (getenv "DISPLAY")
   ;; Set the keyboard repeat rate to be a lot faster
   ;; technically this should be triggered by some sort of udev
@@ -732,6 +719,18 @@
 ;; the default of ten is annoying for debugging
 (setq print-length 100)
 
+;; I prefer scrolling to always move point
+(global-set-key (kbd "<next>") #'md-down-screenful)
+(global-set-key (kbd "<prior>") #'md-up-screenful)
+
+;; with speech recognition we don't want to have to
+;; constantly recenter the window around point, so
+;; we actually *want* jumpy scrolling rather than
+;; smooth
+(setq scroll-step 0)
+(setq scroll-conservatively 0)
+(setq scroll-margin 6)
+(setq auto-window-vscroll nil)
 
 ;; couldn't get this to work with existing theme....
 ;; (require 'smart-mode-line)
@@ -744,4 +743,3 @@
 ;;                       :foreground cyberpunk-blue-5
 ;;                       :background cyberpunk-gray-5
 ;;                       :box '(:line-width -1)))
-

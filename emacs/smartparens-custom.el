@@ -47,6 +47,7 @@
 (define-key smartparens-mode-map (kbd "C-M-t") 'sp-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") 'sp-forward-slurp-sexp)
 (define-key smartparens-mode-map (kbd "C-M-g") 'sp-splice-sexp)
+;;(define-key smartparens-mode-map (kbd "C-M-i") 'none)
 
 ;; (defun etc-space-inserter (arg)
 ;;   )
