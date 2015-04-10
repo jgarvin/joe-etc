@@ -31,4 +31,6 @@ from boost.v1_40.printers import register_boost_printers
 register_boost_printers(None)
 end
 
-set scheduler-locking on
+# to prevent other threads from being able to run
+# when you are stepping 
+#set scheduler-locking on

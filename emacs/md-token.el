@@ -371,8 +371,10 @@ of buffers are part of the project that are not..."
                              (get-buffer-process x))) (projectile-project-buffers))))
   
 
+(require 'f)
 (defun md-file-inside-folder (f dir)
   (string= (f-common-parent (list f dir)) dir))
+;;(defun md-file-inside-folder (f dir )nil)
 
 (defun md-get-prioritized-buffer-list ()
   (let ((proj-buffers (if (projectile-project-p)

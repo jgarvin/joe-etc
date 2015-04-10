@@ -125,7 +125,7 @@
 (load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
-;;(load-file "~/etc/emacs/erc-custom.el")
+(load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
 (load-file "~/etc/emacs/shell-custom.el")

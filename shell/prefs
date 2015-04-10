@@ -18,6 +18,10 @@ if [[ -d "$HOME/opt/bin" ]]; then
         export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
+if [[ -d "$HOME/opt/lib" ]]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$HOME/opt/lib"
+fi
+
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
     export PYTHONPATH=$HOME/opt/lib/python2.6/site-packages:$PYTHONPATH
 fi
@@ -172,6 +176,7 @@ if [ -f $ZDOTDIR/etc/jsh/init.zsh ]; then
 fi
 
 export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
+#export MAKEFLAGS="$MAKEFLAGS -l10"
 
 export PATH
 

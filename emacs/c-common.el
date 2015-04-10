@@ -168,21 +168,24 @@
   (setq finish-status (string-trim finish-status)) ;; trailing newline
   (if (string= "finished" finish-status)
       (when (with-current-buffer comp-buf (equal major-mode 'compilation-mode))
-        (with-current-buffer etc-compilation-invoking-buffer
-          (let* ((run (or run-command
-                          (file-name-sans-extension (buffer-file-name))))
-                 (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf)))
-                 ;; We temporarily customize display-buffer-alist to not pop up
-                 ;; a new window if the buffer is already displayed in one.
-                 (display-buffer-alist
-                  (if (get-buffer-window buff-name t)
-                      (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
-                    display-buffer-alist))
-                 (buff (get-buffer-create buff-name)))
-            (async-shell-command run buff)
-            (with-current-buffer buff
-              (setq buffer-read-only t)
-              (local-set-key (kbd "q") #'etc-quit-run)))))))
+        ;; the variable will only be set if compile is invoked by our custom command
+        ;; we don't want to do any of this if the user does M-x compile
+        (when etc-compilation-invoking-buffer 
+              (with-current-buffer etc-compilation-invoking-buffer
+                (let* ((run (or run-command
+                                (file-name-sans-extension (buffer-file-name))))
+                       (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf)))
+                       ;; We temporarily customize display-buffer-alist to not pop up
+                       ;; a new window if the buffer is already displayed in one.
+                       (display-buffer-alist
+                        (if (get-buffer-window buff-name t)
+                            (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
+                          display-buffer-alist))
+                       (buff (get-buffer-create buff-name)))
+                  (async-shell-command run buff)
+                  (with-current-buffer buff
+                    (setq buffer-read-only t)
+                    (local-set-key (kbd "q") #'etc-quit-run))))))))
   
 (add-hook 'compilation-finish-functions #'etc-run)
 
