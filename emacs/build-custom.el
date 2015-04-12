@@ -140,6 +140,24 @@
 
 (add-hook 'after-save-hook #'etc-make-build-scripts-executable)
 
+(require 'subr-x)
+
+(defun etc-new-script-impl (type letter script-name)
+  (let ((folder (string-trim-right (shell-command-to-string "find-builds -d"))))
+    (find-file (concat (file-name-as-directory folder) (char-to-string letter) "-" script-name "."
+                       (if (eq type 'build) "bld" "run")
+                       ".sh"))))
+
+(defun etc-new-build-script (letter script-name)
+  (interactive "cScript trigger letter: \nMScript name: ")
+  (etc-new-script-impl 'build letter script-name))
+
+(defun etc-new-run-script (letter script-name)
+  (interactive "cScript trigger letter: \nMScript name: ")
+  (etc-new-script-impl 'run letter script-name))
+
 (global-set-key (kbd "C-c b") #'etc-compile)
 (global-set-key (kbd "C-c r") #'etc-stale-run)
 (global-set-key (kbd "C-c c") #'etc-compile-and-run)
+(global-set-key (kbd "C-c n b") #'etc-new-build-script)
+(global-set-key (kbd "C-c n r") #'etc-new-run-script)
