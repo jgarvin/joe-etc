@@ -1,0 +1,97 @@
+#!/usr/bin/env zsh
+
+# TODO: Logic for ssh'ing?
+# Yeah, look for being a subfolder of ~/rmt
+# Then just execute self on remote host
+
+setopt chasedots
+
+projectile_loc=$(find_up -name .projectile)
+if [ -z "$projectile_loc" ]; then
+    echo >&2 "ERROR: No .projectile file found. Are you in a sandbox?"
+    exit 1
+fi
+
+set -e
+
+projectile_dir=$(dirname "$projectile_loc")
+
+key=""
+list=false
+mode="bld"
+while [ "$#" -gt "0" ]
+do
+    case $1 in
+		-d)
+			echo "$projectile_dir"
+            exit 0
+			;;
+        -l)
+            list=true
+            ;;
+        -b)
+            mode="bld"
+            ;;
+        -r)
+            mode="run"
+            ;;
+        -e)
+            key="$2"
+            shift
+            ;;
+        *)
+            # Pass everything else onto make
+            break
+            ;;
+    esac
+    shift
+done
+
+cd "$projectile_dir"
+
+if $list; then
+    # Use find instead of echo since
+    # TODO: use -print0 for names with spaces
+    find . -maxdepth 1 -name '*-*'.$mode.sh
+fi
+
+if [ -n "$key" ]; then
+    # should only be one
+    script=$(echo ./$key-*.$mode.sh)
+    $script
+    exit $!
+fi
+
+# cd $projectile_dir
+
+# echo *-*.bld.sh
+
+# # Makefiles tend to assume bashisms
+# export SHELL=$(which bash)
+# echo "Shell set to: $SHELL"
+
+# (
+# echo "Building from: $PWD"
+# for i in $(cat bld-list | grep -v '^#'); do
+#     echo "Building: $i"
+#     if [ -d "$i" ]; then
+#         pushd "$i"
+#         # Taskset stuff is a temporary hack
+#         taskset 0xFFFFFFFF make "$@"
+#         popd
+#     else
+#         pushd $(dirname "$i")
+#         # Taskset stuff is a temporary hack
+#         taskset 0xFFFFFFFF make $(basename "$i") "$@"
+#         popd
+#     fi
+# done
+
+# if which gtags &> /dev/null; then
+#     echo "Regenerating tags"
+#     if ! global -u &> /dev/null; then
+#         gtags
+#     fi &
+# fi
+# ) 2>&1 | tee .bldlog
+# exit $pipestatus[1]

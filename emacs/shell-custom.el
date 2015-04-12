@@ -16,12 +16,13 @@
   ;;(rename-uniquely)
   ;; make it so I can hit enter on error messages from gcc
   ;; to open the file at that location
-  (compilation-shell-minor-mode 1)
+  ;;(compilation-shell-minor-mode 1)
   (shell-dirtrack-mode -1)
   (dirtrack-mode 1)
   ;;(setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
   (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
-  (ansi-color-for-comint-mode-on))
+  ;; (ansi-color-for-comint-mode-on)
+  )
 
 ;;(let ((s "[</ssh:prophet@panopticon:/home/prophet>]$ "))
 ;; (let ((s "[prophet@panopticon:<~/etc/shell>]$ "))  

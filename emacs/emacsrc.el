@@ -150,6 +150,8 @@
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 
+(load-file "~/etc/emacs/build-custom.el")
+
 (delete-selection-mode 1)
 
 (when (getenv "DISPLAY")
@@ -745,3 +747,4 @@
 ;;                       :foreground cyberpunk-blue-5
 ;;                       :background cyberpunk-gray-5
 ;;                       :box '(:line-width -1)))
+

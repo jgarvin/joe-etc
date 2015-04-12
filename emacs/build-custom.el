@@ -1,0 +1,125 @@
+;; -*- lexical-binding: t -*-
+
+;; very useful for defining quick menus
+;; for builds and such
+(add-to-list 'load-path "~/etc/popup-keys")
+(require 'popup-keys)
+
+(defvar etc-build-choice "a")
+(defvar etc-run-choice "a")
+
+(defvar-local etc-compilation-run-command nil)
+(defvar-local etc-compilation-project nil)
+(defvar-local etc-compilation-compile-command nil)
+(defvar-local etc-compilation-invoking-buffer nil)
+
+(defun etc-build-menu (type)
+  (let* ((cmd (gensym))
+         (scripts)
+         (flag (if (eq type 'build) "b" "r"))
+         (choice-sym (if (eq type 'build) 'etc-build-choice 'etc-run-choice))
+         (actions))
+    (with-temp-buffer
+      (shell-command (format "find-builds -%s -l" flag) (current-buffer))
+      (setq scripts (split-string (buffer-substring-no-properties (point-min) (point-max))
+                                  (regexp-quote "\n") t)))
+    (setq actions (mapcar (lambda (x)
+                            (save-match-data
+                              ;; files are typically of the form: ./x-foo.run.sh
+                              (string-match "\\(\\./\\)?\\([^-]\\)-\\([^.]+\\).*" x)
+                              (let ((letter (match-string 2 x)))
+                                (message (match-string 3 x))
+                                (list letter
+                                      (match-string 3 x)
+                                      (lambda () (set choice-sym letter))))))
+                          scripts))
+    (popup-keys:new
+     cmd
+     :buf-name (format "*choose %s menu*" (if (eq type 'build) "build" "run"))
+     :actions actions)
+    (funcall cmd)))
+
+(defun etc-build-cmd (type)
+  (format "find-builds -%s -e %s"
+          (if (eq type 'build) "b" "r")
+          (if (eq type 'build) etc-build-choice etc-run-choice)))
+
+(defun etc-compile ()
+  (interactive)
+  (etc-compile-and-run-impl (etc-build-cmd 'build) nil))
+
+(defun etc-stale-run ()
+  (interactive)
+  (etc-run-impl (etc-build-cmd 'run)))
+
+(defun etc-compile-and-run ()
+  (interactive)
+  (etc-compile-and-run-impl (etc-build-cmd 'build) (etc-build-cmd 'run)))
+
+(defun etc-quit-run (&optional kill-buffer)
+  (interactive "P")
+  (quit-window kill-buffer (selected-window)))
+
+(defun etc-build-buffer-name (type cmd)
+  (format "%s|%s|%s"
+          (if (eq type 'build) "compile" "run")
+          (etc-get-project)
+          cmd))
+
+(defun etc-run-impl (cmd)
+  (let* ((buff-name (etc-build-buffer-name 'run cmd))
+         ;; We temporarily customize display-buffer-alist to not pop up
+         ;; a new window if the buffer is already displayed in one.
+         (display-buffer-alist
+          (if (get-buffer-window buff-name t)
+              (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
+            display-buffer-alist))
+         (buff (get-buffer-create buff-name)))
+    (async-shell-command cmd buff)
+    (with-current-buffer buff
+      (font-lock-mode -1)
+      (setq buffer-read-only t)
+      (local-set-key (kbd "q") #'etc-quit-run))))
+
+(defun etc-post-compile-run (comp-buf finish-status)
+  (setq finish-status (string-trim finish-status)) ;; trailing newline
+  (if (string= "finished" finish-status)
+      (with-current-buffer comp-buf
+        (when (and (derived-mode-p major-mode 'compilation-mode)
+                   ;; the variable will only be set if compile is invoked by our custom command
+                   ;; we don't want to do any of this if the user does M-x compile
+                   etc-compilation-invoking-buffer
+                   etc-compilation-run-command)
+          (etc-run-impl etc-compilation-run-command)))))
+
+(add-hook 'compilation-finish-functions #'etc-post-compile-run)
+
+(defun etc-get-project ()
+  (if (projectile-project-p)
+      (projectile-project-name)
+    (if (buffer-file-name)
+        (file-name-directory (buffer-file-name))
+      (default-directory))))
+
+(defun etc-compile-and-run-impl (comp-command run-command &optional arg)
+  (let* (;; make the compilaton buffer depend on the command name and the project,
+         ;; this makes sure we can have multiple compiles going
+         (buf-name (etc-build-buffer-name 'build comp-command))
+         (compilation-buffer-name-function (lambda (mode) buf-name))
+         ;; Pass info on for how to run things from the buffer we invoke in, which
+         ;; in turn could be getting from project or elsewhere.
+         (runc run-command)
+         (comc comp-command)
+         (proj (etc-get-project))
+         (invoking (current-buffer))
+         (compilation-mode-hook (cons (lambda (&rest unused)
+                                        (setq etc-compilation-comp-command comc)
+                                        (setq etc-compilation-project proj)
+                                        (setq etc-compilation-run-command runc)
+                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook)))
+    (compile comp-command arg)))
+
+
+
+
+

@@ -68,7 +68,9 @@ cdr()
 # History settings
 ################################################################################
 # Timestamps for when commands occurred make diagnosing problems easier
-setopt EXTENDED_HISTORY
+# ... unfortunately this breaks emacs reading of shell history so disable
+# for now.
+#setopt EXTENDED_HISTORY
 
 # number of lines kept in history
 export HISTSIZE=100000

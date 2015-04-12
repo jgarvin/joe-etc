@@ -148,77 +148,15 @@
 
   ;; (add-to-list (make-local-variable 'compilation-finish-functions)
   ;;              #'etc-compilation-finished)
+  (define-key c-mode-base-map (kbd "C-c C-b") #'etc-compile)
+  (define-key c-mode-base-map (kbd "C-c C-r") #'etc-stale-run)
+  (define-key c-mode-base-map (kbd "C-c C-c") #'etc-compile-and-run)
   )
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
 
-(defvar-local etc-compilation-run-command nil)
-(defvar-local etc-compilation-project nil)
-(defvar-local etc-compilation-compile-command nil)
-(defvar-local etc-compilation-invoking-buffer nil)
+;; (defun etc-c-init ()
+;;   )
 
-(defun etc-quit-run (&optional kill-buffer)
-  (interactive "P")
-  (quit-window kill-buffer (selected-window)))
-
-;; we only get the compilation buffer, so we either have to store data
-;; on it ahead of time in a buffer-local, or we can store it in the
-;; buffer name somehow
-(defun etc-run (comp-buf finish-status)
-  (setq finish-status (string-trim finish-status)) ;; trailing newline
-  (if (string= "finished" finish-status)
-      (when (with-current-buffer comp-buf (equal major-mode 'compilation-mode))
-        ;; the variable will only be set if compile is invoked by our custom command
-        ;; we don't want to do any of this if the user does M-x compile
-        (when etc-compilation-invoking-buffer 
-              (with-current-buffer etc-compilation-invoking-buffer
-                (let* ((run (or run-command
-                                (file-name-sans-extension (buffer-file-name))))
-                       (buff-name (replace-regexp-in-string "compile|\\(.*?|.*\\)" "run|\\1" (buffer-name comp-buf)))
-                       ;; We temporarily customize display-buffer-alist to not pop up
-                       ;; a new window if the buffer is already displayed in one.
-                       (display-buffer-alist
-                        (if (get-buffer-window buff-name t)
-                            (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
-                          display-buffer-alist))
-                       (buff (get-buffer-create buff-name)))
-                  (async-shell-command run buff)
-                  (with-current-buffer buff
-                    (setq buffer-read-only t)
-                    (local-set-key (kbd "q") #'etc-quit-run))))))))
-  
-(add-hook 'compilation-finish-functions #'etc-run)
-
-(defun etc-get-project ()
-  (if (projectile-project-p)
-      (projectile-project-name)
-    (if (buffer-file-name)
-        (file-name-directory (buffer-file-name))
-      (default-directory))))
-
-(defun etc-compile-and-run (&optional arg)
-  (interactive "P")
-  (let* (;; make the compilaton buffer depend on the command name and the project,
-         ;; this makes sure we can have multiple compiles going
-         (buf-name (format "compile|%s|%s" (etc-get-project) compile-command))
-         (compilation-buffer-name-function (lambda (mode) buf-name))
-         ;; Pass info on for how to run things from the buffer we invoke in, which
-         ;; in turn could be getting from project or elsewhere. Probably should
-         ;; make compile-command and run-command functions...
-         (runc run-command)
-         (comc compile-command)
-         (proj (etc-get-project))
-         (invoking (current-buffer))
-         (compilation-mode-hook (cons (lambda (&rest unused)
-                                        (setq etc-compilation-compile-command comc)
-                                        (setq etc-compilation-project proj)
-                                        (setq etc-compilation-run-command runc)
-                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook)))
-    (compile compile-command arg)))
-
-(defun etc-c-init ()
-  (define-key c-mode-base-map (kbd "C-c C-c") #'etc-compile-and-run))
-
-(add-hook 'c-initialization-hook #'etc-c-init)
-
+;; (remove-hook 'c-initialization-hook #'etc-c-init)
 
