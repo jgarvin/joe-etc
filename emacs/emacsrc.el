@@ -150,6 +150,7 @@
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 
+(load-file "~/etc/emacs/template-custom.el")
 (load-file "~/etc/emacs/build-custom.el")
 
 (delete-selection-mode 1)

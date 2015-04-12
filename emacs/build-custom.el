@@ -23,34 +23,41 @@
       (shell-command (format "find-builds -%s -l" flag) (current-buffer))
       (setq scripts (split-string (buffer-substring-no-properties (point-min) (point-max))
                                   (regexp-quote "\n") t)))
-    (setq actions (mapcar (lambda (x)
-                            (save-match-data
-                              ;; files are typically of the form: ./x-foo.run.sh
-                              (string-match "\\(\\./\\)?\\([^-]\\)-\\([^.]+\\).*" x)
-                              (let ((letter (match-string 2 x)))
-                                (message (match-string 3 x))
-                                (list letter
-                                      (match-string 3 x)
-                                      (lambda () (set choice-sym letter))))))
-                          scripts))
-    (popup-keys:new
-     cmd
-     :buf-name (format "*choose %s menu*" (if (eq type 'build) "build" "run"))
-     :actions actions)
-    (funcall cmd)))
+    (if scripts
+        (progn
+          (setq actions (mapcar (lambda (x)
+                                  (save-match-data
+                                    ;; files are typically of the form: ./x-foo.run.sh
+                                    (string-match "\\(\\./\\)?\\([^-]\\)-\\([^.]+\\).*" x)
+                                    (let ((letter (match-string 2 x)))
+                                      (message (match-string 3 x))
+                                      (list letter
+                                            (match-string 3 x)
+                                            (lambda () (set choice-sym letter))))))
+                                scripts))
+          (popup-keys:new
+           cmd
+           :buf-name (format "*choose %s menu*" (if (eq type 'build) "build" "run"))
+           :actions actions)
+          (funcall cmd))
+      (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
   (format "find-builds -%s -e %s"
           (if (eq type 'build) "b" "r")
           (if (eq type 'build) etc-build-choice etc-run-choice)))
 
-(defun etc-compile ()
-  (interactive)
-  (etc-compile-and-run-impl (etc-build-cmd 'build) nil))
+(defun etc-compile (&optional arg)
+  (interactive "P")
+  (if arg
+      (etc-build-menu 'build)
+    (etc-compile-and-run-impl (etc-build-cmd 'build) nil)))
 
-(defun etc-stale-run ()
-  (interactive)
-  (etc-run-impl (etc-build-cmd 'run)))
+(defun etc-stale-run (&optional arg)
+  (interactive "P")
+  (if arg
+      (etc-build-menu 'run)
+    (etc-run-impl (etc-build-cmd 'run))))
 
 (defun etc-compile-and-run ()
   (interactive)
@@ -119,7 +126,20 @@
                                         (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook)))
     (compile comp-command arg)))
 
+(defun etc-make-build-scripts-executable ()
+  ;; code taken from executable-make-buffer-file-executable-if-script-p
+  (when (and (string-match-p "[^.]+\\.\\(bld\\|run\\)\\.sh" (buffer-file-name))
+             (derived-mode-p 'sh-mode))
+    (with-demoted-errors "Unable to make file executable: %s"
+      (let* ((current-mode (or (file-modes (buffer-file-name)) (default-file-modes)))
+             (add-mode (logand ?\111 (default-file-modes))))
+        (or (/= (logand ?\111 current-mode) 0)
+            (zerop add-mode)
+            (set-file-modes (buffer-file-name)
+                            (logior current-mode add-mode)))))))
 
+(add-hook 'after-save-hook #'etc-make-build-scripts-executable)
 
-
-
+(global-set-key (kbd "C-c b") #'etc-compile)
+(global-set-key (kbd "C-c r") #'etc-stale-run)
+(global-set-key (kbd "C-c c") #'etc-compile-and-run)

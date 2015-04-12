@@ -129,34 +129,7 @@
   (setq c-basic-offset my-indent-size)
   (setq indent-tabs-mode nil)
   (setq default-tab-width my-indent-size)
-  (setq tab-width my-indent-size)
-
-  (require 'compile)
-  (unless (file-exists-p "Makefile")
-    (set (make-local-variable 'compile-command)
-         ;; emulate make's .c.o implicit pattern rule, but with
-         ;; different defaults for the CC, CPPFLAGS, and CFLAGS
-         ;; variables:
-         ;; $(CC) -c -o $@ $(CPPFLAGS) $(CFLAGS) $<
-         (let ((file (file-name-nondirectory buffer-file-name)))
-           (format "%s -c -o %s.o %s %s %s"
-                   (or (getenv "CC") "g++")
-                   (file-name-sans-extension file)
-                   (or (getenv "CPPFLAGS") "-DDEBUG=9")
-                   (or (getenv "CFLAGS") "-ansi -pedantic -Wall -g")
-                   file))))
-
-  ;; (add-to-list (make-local-variable 'compilation-finish-functions)
-  ;;              #'etc-compilation-finished)
-  (define-key c-mode-base-map (kbd "C-c C-b") #'etc-compile)
-  (define-key c-mode-base-map (kbd "C-c C-r") #'etc-stale-run)
-  (define-key c-mode-base-map (kbd "C-c C-c") #'etc-compile-and-run)
-  )
+  (setq tab-width my-indent-size))
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
-
-;; (defun etc-c-init ()
-;;   )
-
-;; (remove-hook 'c-initialization-hook #'etc-c-init)
 

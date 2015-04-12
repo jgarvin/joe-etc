@@ -122,10 +122,3 @@
 
 (add-hook 'python-mode-hook 'etc-python-setup)
 
-(defun maybe-load-template ()
-  (interactive)
-  (when (and 
-         (string-match "\\.py$" (buffer-file-name))
-         (eq 1 (point-max)))
-    (insert-file "~/etc/emacs/template.py")))
-(add-hook 'find-file-hooks 'maybe-load-template)
