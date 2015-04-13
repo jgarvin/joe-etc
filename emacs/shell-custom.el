@@ -36,9 +36,12 @@ same folder. If given prefix argument always make a new shell."
   (interactive "P")
   (let* ((dir (file-truename default-directory))
          (existing (sort (-filter (lambda (x)
-                              (with-current-buffer x
-                                (and (equal dir (file-truename default-directory))
-                                     (derived-mode-p 'shell-mode))))
+                                    (with-current-buffer x
+                                      (let ((process (get-buffer-process (current-buffer))))
+                                        (and (equal dir (file-truename default-directory))
+                                             (derived-mode-p 'shell-mode)
+                                             process
+                                             (string-match-p ".*?\\(zsh\\|bash\\)\\'" (car (process-command process)))))))
                                   (buffer-list))
                          (lambda (x y)
                            (string< (buffer-name x)
