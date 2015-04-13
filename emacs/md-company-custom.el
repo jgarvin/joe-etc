@@ -1,2 +1,5 @@
 (global-company-mode t)
 (setq company-show-numbers t)
+(define-key company-active-map (kbd "RET") nil)
+(define-key company-active-map [return] nil)
+(define-key company-active-map (kbd "C-RET") #'company-complete-selection)
