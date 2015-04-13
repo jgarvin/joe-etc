@@ -1,6 +1,9 @@
 echo \nReading ~/.gdbinit...\n\n
 set print asm-demangle on
 
+# this helps emacs know where we are 
+set annotate 1 
+
 source ~/etc/gdb/stl-views-1.0.3.gdb
 
 set history size 9999999

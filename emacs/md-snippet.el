@@ -555,6 +555,11 @@ go to the highest slot (most recent)."
  :contents "[$1 for $2 in $3]"
  :context '(python-context))
 
+(md-replace-snippet
+ :name "string item"
+ :contents "\"$1\","
+ :context '(python-context))
+
 ;;(md-insert-snippet "dotimes")
 
 (md-snippet-mode-activate 1)
