@@ -87,3 +87,5 @@ xwrits
 moreutils # for sponge
 sox
 libsox-fmt-all
+realpath
+virtualbox

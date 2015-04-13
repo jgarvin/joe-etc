@@ -273,16 +273,18 @@ if (( $zsh_major < 4 )) || (( $zsh_minor < 3 )); then
 		}
 fi
 
-(if [ -f "$HOME/.make-backup-list" ]; then
-    for i in $(cat "$HOME/.make-backup-list"); do
-        name=$(echo $i | cut -d'@' -f1)
-        dir=$(echo $i | cut -d'@' -f2)
-        echo "Making today's backup for: $name" >> "$HOME/.backup-log"
-        if ! make-backup -n "$name" "$dir" >> "$HOME/.backup-log" 2>&1; then
-            echo >&2 "Error making backup!!! For: $name"
-        fi
-    done
-fi) &; disown
+if which tarsnap &> /dev/null; then
+    (if [ -f "$HOME/.make-backup-list" ]; then
+         for i in $(cat "$HOME/.make-backup-list"); do
+             name=$(echo $i | cut -d'@' -f1)
+             dir=$(echo $i | cut -d'@' -f2)
+             echo "Making today's backup for: $name" >> "$HOME/.backup-log"
+             if ! make-backup -n "$name" "$dir" >> "$HOME/.backup-log" 2>&1; then
+                 echo >&2 "Error making backup!!! For: $name"
+             fi
+         done
+     fi) &; disown
+fi
 
 watch-build() {
     while true; do
