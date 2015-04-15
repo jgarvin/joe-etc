@@ -229,6 +229,10 @@
           (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list))
     (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
 
+(defun md-make-snippets (context snippets)
+  (dolist (snip snippets)
+    (md-replace-snippet :context context :name (car snip) :contents (cadr snip))))
+
 (defun md-get-snippet-names (&optional mode)
   (unless mode
     (setq mode major-mode))
@@ -252,31 +256,38 @@
         (jump-point)
         (end)
         (arg-text)
-        (indentation (concat "\n    " (make-string (current-indentation) ? ))))
-    (setq start (make-marker))
-    (set-marker start (point))
-    (when (use-region-p)
-      (setq arg-text (buffer-substring (region-beginning) (region-end)))
-      (delete-region (region-beginning) (region-end)))
-    (setq contents (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
-                                         contents))
-    (when (derived-mode-p 'python-mode)
-          (setq contents (replace-regexp-in-string "\n    " indentation contents)))
-    (md-insert-text contents t nil)
-    (setq end (make-marker))
-    (set-marker end (point))
-    (unless (derived-mode-p 'python-mode)
-      (flet ((deactivate-mark nil))
-        (indent-region (marker-position start) (marker-position end))))
-    (setq jump-point (md-add-glyph-properties (marker-position start) (point)))
-    (when jump-point
-      (set-window-point nil jump-point))
-    (when (use-region-p)
-      (deactivate-mark)
-      (md-insert-text arg-text t nil)
-      (goto-char (marker-position start))
-      (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
-        (goto-char (1- (point)))))))
+        (indentation (concat "\n    " (make-string (current-indentation) ? )))
+        (delete-selection-mode-enabled delete-selection-mode))
+    (unwind-protect
+        (progn
+          ;; delete selection mode messes with our substitution of
+          ;; the marked region for the first argument 
+          (delete-selection-mode 0)
+          (setq start (make-marker))
+          (set-marker start (point))
+          (when (use-region-p)
+            (setq arg-text (buffer-substring (region-beginning) (region-end)))
+            (delete-region (region-beginning) (region-end)))
+          (setq contents (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
+                                                   contents))
+          (when (derived-mode-p 'python-mode)
+            (setq contents (replace-regexp-in-string "\n    " indentation contents)))
+          (md-insert-text contents t nil)
+          (setq end (make-marker))
+          (set-marker end (point))
+          (unless (derived-mode-p 'python-mode)
+            (flet ((deactivate-mark nil))
+              (indent-region (marker-position start) (marker-position end))))
+          (setq jump-point (md-add-glyph-properties (marker-position start) (point)))
+          (when jump-point
+            (set-window-point nil jump-point))
+          (when (use-region-p)
+            (deactivate-mark)
+            (md-insert-text arg-text t nil)
+            (goto-char (marker-position start))
+            (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
+              (goto-char (1- (point))))))
+      (delete-selection-mode (if delete-selection-mode-enabled 1 0)))))
 
 (defun md-sn-find-slot (c)
   (let ((candidates (-filter (lambda (x)
@@ -392,19 +403,18 @@ go to the highest slot (most recent)."
       (setq c (concat "$0" c)))
     (md--insert-snippet-impl
      (make-md-snippet
-      :name "call"
+      :name "funk call"
       :contents c
       :context nil))))
 
-(md-replace-snippet
- :name "cond"
- :contents "(cond\n($1)\n($2))"
- :context '(derived-mode-p 'emacs-lisp-mode))
+(md-make-snippets
+ t
+ '(("path" "$1/$2")))
 
-(md-replace-snippet
- :name "defun"
- :contents "(defun $1 ($2) $3)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+(md-make-snippets
+ '(derived-mode-p 'emacs-lisp-mode)
+ '(("conned" "(cond\n($1)\n($2))")
+   ("defun" "(defun $1 ($2) $3)")))
 
 (md-replace-snippet
  :name "let"
@@ -446,6 +456,7 @@ go to the highest slot (most recent)."
 (defun generic-programming-context ()
   (when (and (derived-mode-p 'prog-mode)
              (not (derived-mode-p 'emacs-lisp-mode))) t))
+
 
 (md-replace-snippet
  :name "plus"
@@ -564,3 +575,5 @@ go to the highest slot (most recent)."
 
 (md-snippet-mode-activate 1)
 ;;(md-snippet-mode-activate 0)
+
+(load-file "~/etc/emacs/md-cpp-snippet.el")

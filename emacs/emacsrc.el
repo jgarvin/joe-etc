@@ -480,10 +480,11 @@
 
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
-(autoload 'markdown-mode "markdown-mode.el"
-  "Major mode for editing Markdown files" t)
-(setq auto-mode-alist
-      (cons '("\\.md" . markdown-mode) auto-mode-alist))
+;; Can enable again once I reinstall markdown mode, marmelade is down...
+;; (autoload 'markdown-mode "markdown-mode.el"
+;;   "Major mode for editing Markdown files" t)
+;; (setq auto-mode-alist
+;;       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
 (if (functionp 'c-subword-mode)
