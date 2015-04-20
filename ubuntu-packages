@@ -89,3 +89,4 @@ sox
 libsox-fmt-all
 realpath
 virtualbox
+dmidecode

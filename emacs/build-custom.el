@@ -97,8 +97,9 @@
 
 (defun etc-post-compile-run (comp-buf finish-status)
   (setq finish-status (string-trim finish-status)) ;; trailing newline
-  (if (string= "finished" finish-status)
-      (with-current-buffer comp-buf
+  (with-current-buffer comp-buf
+    ;;(font-lock-mode 1)
+    (if (string= "finished" finish-status)
         (when (and (derived-mode-p major-mode 'compilation-mode)
                    ;; the variable will only be set if compile is invoked by our custom command
                    ;; we don't want to do any of this if the user does M-x compile
@@ -106,7 +107,7 @@
                    etc-compilation-run-command)
           (etc-run-impl etc-compilation-run-command)))))
 
-(add-hook 'compilation-finish-functions #'etc-post-compile-run)
+(add-hook 'compilation-finish-functions #'etc-post-compile-run))
 
 (defun etc-get-project ()
   (if (projectile-project-p)
@@ -127,6 +128,7 @@
          (proj (etc-get-project))
          (invoking (current-buffer))
          (compilation-mode-hook (cons (lambda (&rest unused)
+                                        (font-lock-mode 0)
                                         (setq etc-compilation-comp-command comc)
                                         (setq etc-compilation-project proj)
                                         (setq etc-compilation-run-command runc)

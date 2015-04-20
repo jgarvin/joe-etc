@@ -718,7 +718,10 @@
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
 
 ;; enables focus follows mouse, needed for head tracking
-(setq mouse-autoselect-window t)
+;; FIXME: disabled for now, when not using head tracking
+;; causes surprising behavior when interacting w/ xmonad
+;; warping the pointer to the center of the window on focus
+(setq mouse-autoselect-window nil)
 ;; makes emacs aware of my window manager behavior, not sure what this gets me
 (setq focus-follows-mouse t)
 

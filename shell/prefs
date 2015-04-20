@@ -175,7 +175,13 @@ if [ -f $ZDOTDIR/etc/jsh/init.zsh ]; then
     source $ZDOTDIR/etc/jsh/init.zsh
 fi
 
-export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
+if grep -o '^flags\b.*: .*\bht\b' /proc/cpuinfo | tail -1 &> /dev/null; then
+    export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
+else
+    export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
+fi
+
+#export MAKEFLAGS="-j$(grep 'processor' /proc/cpuinfo | sort -u | wc -l)"
 #export MAKEFLAGS="$MAKEFLAGS -l10"
 
 export PATH

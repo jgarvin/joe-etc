@@ -41,7 +41,9 @@ same folder. If given prefix argument always make a new shell."
                                         (and (equal dir (file-truename default-directory))
                                              (derived-mode-p 'shell-mode)
                                              process
-                                             (string-match-p ".*?\\(zsh\\|bash\\)\\'" (car (process-command process)))))))
+                                             (string-match-p ".*?\\(zsh\\|bash\\)\\'" (car (process-command process)))
+                                             (not (string-match-p "run|.*" (buffer-name)))
+                                             (not (string-match-p "compile|.*" (buffer-name)))))))
                                   (buffer-list))
                          (lambda (x y)
                            (string< (buffer-name x)

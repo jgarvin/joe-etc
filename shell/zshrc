@@ -45,8 +45,8 @@ if [[ $(uname -s) = "Linux" ]]; then
     cd "$curdir"
 fi
 
-# I want to see my core dumps, up to 4GB
-ulimit -c 8000000
+# I want to see my core dumps
+ulimit -c unlimited
 # "core.%e.%p.%u.%t"
 
 echo "DATE=$(date) HOST=$(hostname) USER=$LOGNAME TERM=$TERM" >> ~/.shell_log
