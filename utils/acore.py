@@ -80,13 +80,10 @@ if len(sys.argv) > 2:
     print >> sys.stderr, "Only takes one argument, the application name."
     sys.exit(1)
 
-coreList = glob.glob("/var/core/core.*")
-for f in sh.find(".", "-name", "core").stdout.split("\n"):
-    if f:
-        coreList.append(f)
+coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*")
 
 if len(coreList) == 0:
-    print >> sys.stderr, "Found no cores in /var/core or current directory."
+    print >> sys.stderr, "Found no cores in /tmp or current directory."
     sys.exit(1)
 
 if len(sys.argv) != 1:

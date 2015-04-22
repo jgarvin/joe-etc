@@ -25,6 +25,7 @@
                                   (regexp-quote "\n") t)))
     (if scripts
         (progn
+          (setq scripts (cl-sort scripts #'string< :key))
           (setq actions (mapcar (lambda (x)
                                   (save-match-data
                                     ;; files are typically of the form: ./x-foo.run.sh
