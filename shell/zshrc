@@ -248,7 +248,7 @@ if which xwrits &> /dev/null && \
     ! tsk xwrits &> /dev/null && \
     [ -n "$DISPLAY" ]
 then
-    xwrits +breakclock +multiscreen +mouse typetime=18 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1 &; disown
+    xwrits +quota=3 +breakclock +multiscreen +mouse typetime=18 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1 &; disown
 fi
 
 if [ -d "$ZDOTDIR/rmt" ]; then

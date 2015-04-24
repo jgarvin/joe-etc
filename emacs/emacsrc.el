@@ -155,11 +155,15 @@
 
 (delete-selection-mode 1)
 
-(when (getenv "DISPLAY")
+(defun etc-set-repeat-rate ()
   ;; Set the keyboard repeat rate to be a lot faster
   ;; technically this should be triggered by some sort of udev
-  ;; event because this resets if you unplug and replug in the kbd
-  (shell-command "xset r rate 200 60")
+  ;; event because this resets if you unplug and replug in the kbd.
+  ;; instead we just run it once a minute, blame laziness :p
+  (call-process "xset" nil nil nil "r" "rate" "200" "60"))
+(run-with-timer 0 60 #'etc-set-repeat-rate)
+
+(when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
   (setq x-select-enable-clipboard t)
   (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
