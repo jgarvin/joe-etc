@@ -491,9 +491,14 @@ Ignores CHAR at point."
         ;;(back-to-indentation)
         (md-skip-invisible-and-spaces)
         (setq start-of-line (point))
-        ;; skip over invisible characters
+        ;; skip over invisible characters, this is needed to work right
+        ;; with dired+, which makes its summary info toggle'able.
+        ;; techincally we look at the invisible property being true period
+        ;; rather than being a toggle... dired might just need special
+        ;; treatment in the future since this could conflict with other
+        ;; modes.
         (while (and (re-search-forward (char-to-string char) (point-at-eol) t)
-                    (invisible-p (point))))
+                    (plist-get (text-properties-at (point)) 'invisible)))
         ;; if we found something, record it
         (when (/= (point) start-of-line)
           (let ((distance (md-vertical-biased-distance origin (point))))
