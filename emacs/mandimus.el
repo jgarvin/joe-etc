@@ -450,16 +450,27 @@ Ignores CHAR at point."
     (goto-char p)
     (current-column)))
 
+(defun md-skip-invisible-and-spaces ()
+  (beginning-of-line)
+  (while (and
+          (not (eolp))
+          (or (looking-at "[[:space:]\n]")
+              (plist-get (text-properties-at (point)) 'invisible)
+              ;; (invisible-p (point))
+              ))
+    (goto-char (1+ (point)))))
+
 (defun md-get-relative-column (p)
   (save-excursion
     (goto-char p)
-    (back-to-indentation)
+    (md-skip-invisible-and-spaces)
+    ;;(back-to-indentation)
     (let ((distance (- (md-get-column p) (md-get-column (point)))))
       (assert (>= distance 0))
       distance)))
     
 (defun md-vertical-biased-distance (a b)
-  (sqrt (+ (expt (* 2 (md-get-relative-column b)) 4)
+  (sqrt (+ (expt (* 2 (md-get-relative-column b)) 10)
            (expt (abs (- (line-number-at-pos a) (line-number-at-pos b))) 2))))
 
 (defun md-find-line-starting-with-char (arg char)
@@ -470,19 +481,27 @@ Ignores CHAR at point."
          (origin (point))
          (start-of-line)
          (closest-distance most-positive-fixnum)
+         (line-extent-func (if (= direction 1) #'end-of-line #'beginning-of-line))
          (closest-point))
     (save-excursion
       (while (funcall compare (point) end)
+        (message "point %S end %S" (point) end)
         (forward-line direction)
-        (back-to-indentation)
+        ;;(beginning-of-line)
+        ;;(back-to-indentation)
+        (md-skip-invisible-and-spaces)
         (setq start-of-line (point))
-        (when (re-search-forward (char-to-string char) (point-at-eol) t)
+        ;; skip over invisible characters
+        (while (and (re-search-forward (char-to-string char) (point-at-eol) t)
+                    (invisible-p (point))))
+        ;; if we found something, record it
+        (when (/= (point) start-of-line)
           (let ((distance (md-vertical-biased-distance origin (point))))
             (when (< distance closest-distance)
               (setq closest-point start-of-line)
               (setq closest-distance distance))))
-        ;; without this it's possbile point never reaches point-min
-        (beginning-of-line)))
+        ;; without this it's possbile point never reaches point-min/max
+        (funcall line-extent-func)))
     (when closest-point
       (goto-char closest-point))))
     
@@ -585,3 +604,4 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-undo.el")
 (load-file "~/etc/emacs/md-snippet.el")
 (load-file "~/etc/emacs/md-homophones.el")
+(load-file "~/etc/emacs/md-navigation.el")

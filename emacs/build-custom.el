@@ -108,7 +108,7 @@
                    etc-compilation-run-command)
           (etc-run-impl etc-compilation-run-command)))))
 
-(add-hook 'compilation-finish-functions #'etc-post-compile-run))
+(add-hook 'compilation-finish-functions #'etc-post-compile-run)
 
 (defun etc-get-project ()
   (if (projectile-project-p)
