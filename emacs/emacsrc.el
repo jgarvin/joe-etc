@@ -745,6 +745,12 @@
 (setq scroll-margin 6)
 (setq auto-window-vscroll nil)
 
+;; Without an active region, assume we want to copy/paste
+;; symbols, unless we're on a opener/closer in which case
+;; assume we want the sexp/string.
+(global-set-key (kbd "C-w") #'md-kill-symbol-or-sexp-or-region)
+(global-set-key (kbd "M-w") #'md-copy-symbol-or-sexp-or-region)
+
 ;; couldn't get this to work with existing theme....
 ;; (require 'smart-mode-line)
 ;; (sml/setup)

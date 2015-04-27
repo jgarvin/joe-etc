@@ -68,7 +68,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
        ((md-likely-preceded-by-opener (point)) t)))))
 
 (defun md-likely-followed-by-closer (pos)
-  "If the characters preceding pos form a delimeter in a pair
+  "If the characters following pos form a delimeter in a pair
 where the opening and closing delimeters differ, then we can know
 with certainty that the character is an opener and return t.
 
