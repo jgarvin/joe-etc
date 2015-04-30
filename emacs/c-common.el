@@ -7,14 +7,14 @@
 (require 'gtags)
 (gtags-mode t)
 
-(defun gtags-select-tag-and-kill-buffer ()
-  (interactive)
-  (let ((buf (current-buffer)))
-    (gtags-select-tag)
-    (kill-buffer buf)))
+;; (defun gtags-select-tag-and-kill-buffer ()
+;;   (interactive)
+;;   (let ((buf (current-buffer)))
+;;     (gtags-select-tag)
+;;     (kill-buffer buf)))
 
-(defun etc-setup-gtags ()
-  (define-key gtags-select-mode-map (kbd "<return>") 'gtags-select-tag-and-kill-buffer))
+;; (defun etc-setup-gtags ()
+;;   (define-key gtags-select-mode-map (kbd "<return>") #'gtags-select-tag))
 
 (add-hook 'gtags-select-mode-hook 'etc-setup-gtags)          
 
@@ -44,29 +44,29 @@
 ;;------------
 ;; Association list of extension -> inverse extension
 (setq exts '(("c"   . ("hpp" "h" "H"))
-	     ("cc"  . ("hpp" "h" "H"))
-	     ("cpp" . ("hpp" "h" "H"))
+             ("cc"  . ("hpp" "h" "H"))
+             ("cpp" . ("hpp" "h" "H"))
              ("hpp" . ("cpp" "c" "C" "cc" "CC"))
              ("h"   . ("cpp" "c" "C" "cc" "CC"))
-	     ("H"   . ("cpp" "c" "C" "cc" "CC"))
-	     ("C"   . ("hpp" "h" "H"))))
+             ("H"   . ("cpp" "c" "C" "cc" "CC"))
+             ("C"   . ("hpp" "h" "H"))))
 
 ;; Process the association list of extensions and find the last file
 ;; that exists
 (defun find-other-file (fname fext)
   (dolist (value (cdr (assoc fext exts)) result)
     (let ((path (file-name-directory fname))
-	  (name (file-name-nondirectory fname)))
+          (name (file-name-nondirectory fname)))
       (if (file-exists-p (concat path name "." value))
-	  (setq result (concat path name "." value))
-	(if (file-exists-p (concat path "private/" name "." value))
-	    (setq result (concat path "private/" name "." value))
-	  (if (file-exists-p (concat path "../" name "." value))
-	      (setq result (concat path "../" name "." value))
-	    (if (file-exists-p (concat path name "INLINES." value))
-		(setq result (concat path name "INLINES." value))
-	      (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
-		  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
+          (setq result (concat path name "." value))
+        (if (file-exists-p (concat path "private/" name "." value))
+            (setq result (concat path "private/" name "." value))
+          (if (file-exists-p (concat path "../" name "." value))
+              (setq result (concat path "../" name "." value))
+            (if (file-exists-p (concat path name "INLINES." value))
+                (setq result (concat path name "INLINES." value))
+              (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
+                  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
 
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file

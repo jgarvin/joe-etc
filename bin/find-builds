@@ -58,7 +58,15 @@ fi
 if [ -n "$key" ]; then
     # should only be one
     script=$(echo ./$key-*.$mode.sh)
-    $script
+    
+    # we make a copy and run the copy so that
+    # if we edit the script while the script
+    # is running we don't cause weird errors
+    target=$(mktemp)
+    cp $script $target
+    chmod +x $target
+    
+    $target
     exit $!
 fi
 
