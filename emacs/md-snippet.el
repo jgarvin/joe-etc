@@ -257,7 +257,8 @@
         (end)
         (arg-text)
         (indentation (concat "\n    " (make-string (current-indentation) ? )))
-        (delete-selection-mode-enabled delete-selection-mode))
+        (delete-selection-mode-enabled delete-selection-mode)
+        (using-region (use-region-p)))
     (unwind-protect
         (progn
           ;; delete selection mode messes with our substitution of
@@ -265,7 +266,7 @@
           (delete-selection-mode 0)
           (setq start (make-marker))
           (set-marker start (point))
-          (when (use-region-p)
+          (when using-region
             (setq arg-text (buffer-substring (region-beginning) (region-end)))
             (delete-region (region-beginning) (region-end)))
           (setq contents (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
@@ -281,7 +282,7 @@
           (setq jump-point (md-add-glyph-properties (marker-position start) (point)))
           (when jump-point
             (set-window-point nil jump-point))
-          (when (use-region-p)
+          (when using-region
             (deactivate-mark)
             (md-insert-text arg-text t nil)
             (goto-char (marker-position start))
