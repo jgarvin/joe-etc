@@ -152,6 +152,7 @@
 
 (load-file "~/etc/emacs/template-custom.el")
 (load-file "~/etc/emacs/build-custom.el")
+(load-file "~/etc/emacs/midnight-custom.el")
 
 (delete-selection-mode 1)
 
@@ -491,11 +492,7 @@
 ;;       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
-(if (functionp 'c-subword-mode)
-    (progn
-      (require 'cc-mode)
-      (c-subword-mode 1))
-  (subword-mode t))
+(subword-mode t)
 
 (defvar-local mandimus-last-word-event "")
 
@@ -579,10 +576,7 @@
 (setq-default mark-ring-max 65535)
 
 (put 'upcase-region 'disabled nil)
-
-
-
-
+(put 'downcase-region 'disabled nil)
 
 ;;
 ;; ace jump mode major function
