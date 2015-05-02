@@ -75,7 +75,7 @@ debug mode causing timers to die."
                                             #'md-cancel-timer-after-executing v f local args)))
 
 (defun md-go-to-next (str)
-  (interactive) 
+  (interactive)
   (let ((p))
     (save-excursion
       (ignore-errors (end-of-thing 'symbol))
@@ -108,8 +108,8 @@ debug mode causing timers to die."
   (interactive)
   (let ((sym (thing-at-point 'symbol)))
     (if sym
-        (progn  
-          (message "looking for symbol:%s" sym) 
+        (progn
+          ;; (message "looking for symbol:%s" sym)
           (md-go-to-previous sym))
       (user-error "No symbol under point."))))
 
@@ -157,7 +157,7 @@ debug mode causing timers to die."
     ;;(message "Starting utterance")
     (setq md-in-utterance t)
     (run-hooks 'md-start-utterance-hooks)))
-    
+
 (defun md-check-end-utterance ()
   (when md-in-utterance
     ;;(message "Ending utterance")
@@ -218,13 +218,13 @@ debug mode causing timers to die."
   (if (re-search-backward "[^[:blank:]][[:blank:]]" (point-at-bol) t)
       (goto-char (+ (point) 1))
     (beginning-of-line)))
-      
+
 (defun md-next-whitespace-separated-thing ()
   (interactive)
   (if (re-search-forward "[[:blank:]][^[:blank:]]" (point-at-eol) t)
       (goto-char (- (point) 1))
     (end-of-line)))
-  
+
 (defun md-select-minibuffer ()
   (interactive)
   (select-window (minibuffer-window)))
@@ -314,16 +314,34 @@ debug mode causing timers to die."
 
 (defun md-backward-kill-word ()
   (interactive)
-  (backward-word)
-  (kill-word 1)
-  (save-excursion (just-one-space)))
+  (let ((p (point))
+        (p2 (progn
+              (backward-word)
+              (point))))
+    (save-restriction
+      (narrow-to-region p p2)
+      (goto-char (point-min))
+      (while (re-search-forward "[^][()<>{};]" nil t) (replace-match "" nil t)))
+    ;;(kill-word 1)
+    (save-excursion
+      (just-one-space)
+      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-forward-kill-word ()
   (interactive)
-  (forward-word)
-  (backward-word)
-  (kill-word 1)
-  (save-excursion (just-one-space)))
+  (let ((p (point))
+        (p2 (progn
+              (forward-word)
+              ;;(backward-word)
+              (point))))
+    (save-restriction
+      (narrow-to-region (min p p2) (max p p2))
+      (goto-char (point-min))
+      (while (re-search-forward "[^][()<>{};]" nil t) (replace-match "" nil t)))
+    ;;(kill-word 1)
+    (save-excursion
+      (just-one-space)
+      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-copy-word ()
   (interactive)
@@ -403,7 +421,7 @@ debug mode causing timers to die."
     (insert ";; " (if window-id window-id ""))
     (newline)
     (newline)))
-  
+
 ;(md-temp-file "test")
 ;;(message "now testing agan")
 (defun md-filter (condp lst)
@@ -456,7 +474,7 @@ Ignores CHAR at point."
     (let ((distance (- (md-get-column p) (md-get-column (point)))))
       (assert (>= distance 0))
       distance)))
-    
+
 (defun md-vertical-biased-distance (a b)
   (sqrt (+ (expt (* 2 (md-get-relative-column b)) 10)
            (expt (abs (- (line-number-at-pos a) (line-number-at-pos b))) 2))))
@@ -497,7 +515,7 @@ Ignores CHAR at point."
         (funcall line-extent-func)))
     (when closest-point
       (goto-char closest-point))))
-    
+
 (defun md-move-up-to-symbol-starting-with-char (arg char)
   (interactive "p\ncMove up to symbol starting with char: ")
   (let ((direction (if (>= arg 0) 1 -1)))
