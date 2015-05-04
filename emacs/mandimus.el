@@ -335,7 +335,7 @@ debug mode causing timers to die."
               ;;(backward-word)
               (point))))
     (save-restriction
-      (narrow-to-region (min p p2) (max p p2))
+      (narrow-to-region p p2)
       (goto-char (point-min))
       (while (re-search-forward "[^][()<>{};]" nil t) (replace-match "" nil t)))
     ;;(kill-word 1)

@@ -244,13 +244,10 @@
 (global-set-key "\C-a" 'beginning-or-indentation)
 (global-set-key "\C-e" 'end-or-trailing)
 
-;; Make C-w consistent with shell usage
-;; Rebinds cut to C-x C-k though
-
 ;; turns out don't want this since i have kinesis, C-backspace
 ;; is better
 ;;(global-set-key "\C-w" 'backward-kill-word)
-(global-set-key "\C-x\C-k" 'kill-region)
+;;(global-set-key "\C-x\C-k" 'kill-region)
 
 (global-set-key (kbd "S-SPC") 'dabbrev-expand)
 (global-set-key (kbd "M-SPC") 'dabbrev-expand)
