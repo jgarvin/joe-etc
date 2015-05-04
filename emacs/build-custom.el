@@ -76,15 +76,15 @@
 
 (defun etc-run-impl (cmd)
   (let* ((buff-name (etc-build-buffer-name 'run cmd))
+         (buff (generate-new-buffer buff-name))
          ;; We temporarily customize display-buffer-alist to not pop up
          ;; a new window if the buffer is already displayed in one.
          (display-buffer-alist
-          (if (get-buffer-window buff-name t)
-              (cons (cons (regexp-quote buff-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
+          (if (get-buffer-window (buffer-name buff) t)
+              (cons (cons (regexp-quote (buffer-name buff)) (cons #'display-buffer-no-window '())) display-buffer-alist)
             display-buffer-alist))
-         (buff (get-buffer-create buff-name))
          (split-cmd (split-string-and-unquote cmd)))
-    (async-shell-command cmd buff)
+    (async-shell-command cmd buff-name)
     ;;(start-process (concat cmd "-process") buff (car split-cmd) (cdr split-cmd))
     (with-current-buffer buff
       ;; (let ((inhibit-read-only t))
