@@ -94,6 +94,7 @@
       ;; (comint-mode)
       (font-lock-mode -1)
       (setq buffer-read-only t)
+      (setq buffer-undo-list t)
       (local-set-key (kbd "q") #'etc-quit-run))))
 
 (defun etc-post-compile-run (comp-buf finish-status)
