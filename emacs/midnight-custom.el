@@ -16,5 +16,3 @@
 
 (add-to-list 'clean-buffer-list-kill-regexps "compile|.*?|.*")
 (add-to-list 'clean-buffer-list-kill-regexps "run|.*?|.*")
-
-

@@ -134,6 +134,7 @@
       ;; supposedly it's also a text property, but that doesn't seem to
       ;; work at least in emacs 24.4.1.
       ;; update: it doesn't work because font-lock clobbers this property, wtf?
+      (overlay-put o 'evaporate t)
       (overlay-put o 'md-glyph-choice glyph-choice)
       (overlay-put o 'insert-in-front-hooks
                    (list
@@ -258,7 +259,15 @@
         (arg-text)
         (indentation (concat "\n    " (make-string (current-indentation) ? )))
         (delete-selection-mode-enabled delete-selection-mode)
-        (using-region (use-region-p)))
+        (region-bounds
+         ;; TODO: should also work on sexps!
+         (cond
+          ((use-region-p) (cons (region-beginning) (region-end)))
+          ((thing-at-point 'symbol) (bounds-of-thing-at-point 'symbol))
+          ((or (md-likely-followed-by-closer (point))
+               (md-likely-preceded-by-opener (1+ (point))))
+           (cons (plist-get (sp-get-thing) :beg)
+                 (plist-get (sp-get-thing) :end))))))
     (unwind-protect
         (progn
           ;; delete selection mode messes with our substitution of
@@ -266,9 +275,9 @@
           (delete-selection-mode 0)
           (setq start (make-marker))
           (set-marker start (point))
-          (when using-region
-            (setq arg-text (buffer-substring (region-beginning) (region-end)))
-            (delete-region (region-beginning) (region-end)))
+          (when region-bounds
+            (setq arg-text (buffer-substring (car region-bounds) (cdr region-bounds)))
+            (delete-region (car region-bounds) (cdr region-bounds)))
           (setq contents (replace-regexp-in-string "\\$[0-9]+" (char-to-string md-placeholder)
                                                    contents))
           (when (derived-mode-p 'python-mode)
@@ -282,7 +291,7 @@
           (setq jump-point (md-add-glyph-properties (marker-position start) (point)))
           (when jump-point
             (set-window-point nil jump-point))
-          (when using-region
+          (when region-bounds
             (deactivate-mark)
             (md-insert-text arg-text t nil)
             (goto-char (marker-position start))

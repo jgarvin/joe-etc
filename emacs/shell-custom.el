@@ -24,6 +24,17 @@
   ;; (ansi-color-for-comint-mode-on)
   )
 
+(defun etc-write-shell-history-advice (original-function &rest args)
+  ;; with my settings zsh incrementally writes history as you execute
+  ;; commands and also appends, so you can share history between shells.
+  ;; emacs doesn't emulate these behaviors and just overwrites the whole
+  ;; file, which is not what we want. We still want emacs to read ~/.zhistory
+  ;; just not write to it, since zsh will take care of it.
+  (unless (equal major-mode 'shell-mode)
+    (apply original-function args)))
+
+(advice-add #'comint-write-input-ring :around #'etc-write-shell-history-advice)
+
 ;;(let ((s "[</ssh:prophet@panopticon:/home/prophet>]$ "))
 ;; (let ((s "[prophet@panopticon:<~/etc/shell>]$ "))  
 ;;   (string-match "^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" s)

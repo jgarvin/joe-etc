@@ -3,11 +3,12 @@
   (cond
    ((derived-mode-p 'prog-mode 'comint-mode) nil)
    ((md-beginning-of-input) t)
+   ((md-likely-preceded-by-opener (point)) t)
    ((save-excursion
-      (re-search-backward "[^[:blank:]]" (max (- (point) 10000) (point-min)) t)
+      (re-search-backward "[^[:space:]]" (max (- (point) 10000) (point-min)) t)
       ;; string-match when it matches can return 0, which we still want to be true,
       ;; so yeah double negation
-      (not (not (string-match "[?!.]" (char-to-string (char-after)))))) t)
+      (string-match "[?!.]" (char-to-string (char-after)))) t)
    (t nil)))
 
 (defun md-matching-pairs ()
@@ -186,9 +187,11 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (let ((p (point)))
     (insert text)
     (save-excursion
-      (when (and (save-excursion
-                   (re-search-forward "[[:space:]]" (1+ (point)) t)))
-        (just-one-space))
+      (when (save-excursion
+              (re-search-forward "[[:space:]]" (1+ (point)) t))
+        (just-one-space)
+        ;; if we're just introducing trailing whitespace, delete it
+        (delete-trailing-whitespace (beginning-of-line) (end-of-line)))
       (goto-char p)
       (when (and (save-excursion
                    (re-search-backward "[[:space:]]" (1- (point)) t))
