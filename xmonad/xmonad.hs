@@ -57,6 +57,8 @@ import Data.List                  (isInfixOf)
 
 import XMonad.Actions.CycleWS (nextScreen, prevScreen, shiftNextScreen, shiftPrevScreen)
 
+import XMonad.Layout.Reflect
+
 -- The default number of workspaces (virtual screens) and their names.
 -- By default we use numeric strings, but any string may be used as a
 -- workspace name. The number of workspaces is determined by the length
@@ -132,6 +134,10 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
 
     -- Increment the number of windows in the master area
     , ((modMask              , xK_comma ), sendMessage (IncMasterN 1))
+
+    , ((modMask .|. shiftMask , xK_x), sendMessage $ MultiToggle.Toggle REFLECTX)
+
+    , ((modMask .|. shiftMask , xK_y), sendMessage $ MultiToggle.Toggle REFLECTY)
 
     -- Deincrement the number of windows in the master area
     , ((modMask              , xK_period), sendMessage (IncMasterN (-1)))
@@ -229,7 +235,7 @@ main = do
 -- decoFunc = simpleDeco
 
 myTheme = defaultTheme { decoWidth = -1, fontName = "-*-helvetica-bold-r-*-*-18-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" }
-          
+
 -- myDeco = simpleDeco shrinkText myTheme (layoutHook gnomeConfig)
 
 -- data DECORATIONS = DECORATIONS deriving (Read, Show, Eq, Typeable)
@@ -272,6 +278,8 @@ defaults editor home_folder browser_name = gnomeConfig {
 
       -- hooks, layouts
         layoutHook         = smartBorders
+                             $ MultiToggle.mkToggle (MultiToggle.single REFLECTX)
+                             $ MultiToggle.mkToggle (MultiToggle.single REFLECTY)
                              $ avoidStruts
                              -- $ myDeco,
                              $ simpleDeco shrinkText myTheme
