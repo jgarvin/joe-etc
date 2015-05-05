@@ -312,6 +312,14 @@ debug mode causing timers to die."
 ;; (md-open-most-recent-file "/tmp" "server-[^.]*.log")
 ;; (md-get-most-recently-modified-file "/tmp" "server-[^.]*.log")
 
+;; TODO: change this to only delete '-' and '_' on the deleted
+;; side of the word, should be more robust.
+
+(defun at-most-one-space ()
+  (interactive)
+  (when (looking-at "[[:space:]]")
+    (just-one-space)))
+
 (defun md-backward-kill-word ()
   (interactive)
   (let ((p (point))
@@ -321,10 +329,11 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while (re-search-forward "[^][()<>{};]" nil t) (replace-match "" nil t)))
+      (while (re-search-forward "[^][()<>{}\"';]" nil t) (replace-match "" nil t)))
     ;;(kill-word 1)
     (save-excursion
-      (just-one-space)
+      ;;(just-one-space)
+      (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-forward-kill-word ()
@@ -337,10 +346,11 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while (re-search-forward "[^][()<>{};]" nil t) (replace-match "" nil t)))
+      (while (re-search-forward "[^][()<>{}\"';]" nil t) (replace-match "" nil t)))
     ;;(kill-word 1)
     (save-excursion
-      (just-one-space)
+      ;;(just-one-space)
+      (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-copy-word ()

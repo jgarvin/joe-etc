@@ -189,7 +189,8 @@ If the string preceeding pos isn't part of any pair, then returns nil."
     (save-excursion
       (when (save-excursion
               (re-search-forward "[[:space:]]" (1+ (point)) t))
-        (just-one-space)
+        ;;(just-one-space)
+        (at-most-one-space)
         ;; if we're just introducing trailing whitespace, delete it
         (delete-trailing-whitespace (beginning-of-line) (end-of-line)))
       (goto-char p)
@@ -198,7 +199,9 @@ If the string preceeding pos isn't part of any pair, then returns nil."
                  (not (md-at-start-of-erc-input-line))
                  (not (bolp))
                  (md-causes-move #'back-to-indentation))
-        (just-one-space))))
+        ;;(just-one-space)
+        (at-most-one-space)
+        )))
   ;; some modes wait for an input event
   (md-generate-noop-input-event)
   ;; some modes inspect this from the post command handler.

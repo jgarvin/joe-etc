@@ -499,7 +499,7 @@
                ;; the buffer name; the file name as a tool tip
                '(:eval (propertize "%b " 'face 'font-lock-warning-face
                                    'help-echo (buffer-file-name)))
-               
+
                ;; line and column
                "(" ;; '%02' to set to 2 chars at least; prevents flickering
                (propertize "%02l" 'face 'font-lock-type-face) ","
@@ -527,7 +527,7 @@
                                        'face 'font-lock-string-face
                                        'help-echo "Terminal is in char mode"))))
                "] "
-               
+
                "[" ;; insert vs overwrite mode, input-method in a tooltip
                '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
                                    'face 'font-lock-variable-name-face
@@ -561,7 +561,7 @@
                ;;minor-mode-alist  ;; list of minor modes
                " %-" ;; fill with '-'
                ))
- 
+
 
 ;; Ostensibly this is for letting you insert the results of minibuffer
 ;; commands into other minibuffer commands, but I like it because it
@@ -577,7 +577,7 @@
 
 ;;
 ;; ace jump mode major function
-;; 
+;;
 (add-to-list 'load-path "~/etc/ace-jump-mode")
 (autoload
   'ace-jump-mode
@@ -592,14 +592,14 @@
 ;; you can select the key you prefer to
 (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 
-;; 
+;;
 ;; enable a more powerful jump back function from ace jump mode
 ;;
 (autoload
   'ace-jump-mode-pop-mark
   "ace-jump-mode"
   "Ace jump back:-)"
-  t) 
+  t)
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
@@ -624,7 +624,7 @@
 (defun copy-word (&optional arg)
   "Copy words at point into kill-ring"
   (interactive "P")
-  (copy-thing 'backward-word 'forward-word arg) 
+  (copy-thing 'backward-word 'forward-word arg)
   ;;(paste-to-mark arg)
   )
 
@@ -727,6 +727,10 @@
 (global-set-key (kbd "<next>") #'md-down-screenful)
 (global-set-key (kbd "<prior>") #'md-up-screenful)
 
+;; let ctrl-backspace/delete skip over punctuation
+(global-set-key (kbd "C-<backspace>") #'md-backward-kill-word)
+(global-set-key (kbd "C-<delete>") #'md-forward-kill-word)
+
 ;; with speech recognition we don't want to have to
 ;; constantly recenter the window around point, so
 ;; we actually *want* jumpy scrolling rather than
@@ -753,4 +757,3 @@
 ;;                       :foreground cyberpunk-blue-5
 ;;                       :background cyberpunk-gray-5
 ;;                       :box '(:line-width -1)))
-

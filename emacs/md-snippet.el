@@ -214,18 +214,18 @@
   (cond
    ((and md-snippet-mode (= 0 arg)) (md-sn-teardown))
    ((and (not md-snippet-mode) (= 1 arg)) (md-sn-setup))))
-  
+
 (defun md-compare-snippets (x y)
   (and
    (equal (md-snippet-name x) (md-snippet-name y))
    (equal (md-snippet-context x) (md-snippet-context y))))
 
 (cl-defun md-add-snippet (&key name contents context)
-  (let ((snippet (make-md-snippet :name name :contents contents :context context))) 
+  (let ((snippet (make-md-snippet :name name :contents contents :context context)))
     (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
 
 (cl-defun md-replace-snippet (&key name contents context)
-  (let ((snippet (make-md-snippet :name name :contents contents :context context))) 
+  (let ((snippet (make-md-snippet :name name :contents contents :context context)))
     (setq md-snippet-list
           (remove-if (lambda (x) (md-compare-snippets snippet x)) md-snippet-list))
     (add-to-list 'md-snippet-list snippet nil #'md-compare-snippets)))
@@ -260,7 +260,6 @@
         (indentation (concat "\n    " (make-string (current-indentation) ? )))
         (delete-selection-mode-enabled delete-selection-mode)
         (region-bounds
-         ;; TODO: should also work on sexps!
          (cond
           ((use-region-p) (cons (region-beginning) (region-end)))
           ((thing-at-point 'symbol) (bounds-of-thing-at-point 'symbol))
@@ -271,7 +270,7 @@
     (unwind-protect
         (progn
           ;; delete selection mode messes with our substitution of
-          ;; the marked region for the first argument 
+          ;; the marked region for the first argument
           (delete-selection-mode 0)
           (setq start (make-marker))
           (set-marker start (point))
@@ -296,7 +295,9 @@
             (md-insert-text arg-text t nil)
             (goto-char (marker-position start))
             (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
-              (goto-char (1- (point))))))
+              (goto-char (1- (point)))))
+          (when (derived-mode-p 'c++-mode)
+            (save-excursion (while (re-search-forward ";;" (1+ (marker-position end)) t) (replace-match ";" nil t)))))
       (delete-selection-mode (if delete-selection-mode-enabled 1 0)))))
 
 (defun md-sn-find-slot (c)
@@ -398,18 +399,18 @@ go to the highest slot (most recent)."
               ")"))))
 
 (defun md-gen-elisp-snippet (sym)
-  (md-add-snippet 
+  (md-add-snippet
    :name (format "%s" sym)
    :contents (md-gen-elisp-snippet-contents sym)
    :context '(derived-mode-p 'emacs-lisp-mode)))
 
 (defun md-insert-call-snippet (n)
-  (interactive) 
+  (interactive)
   (let* ((separator (if (derived-mode-p 'emacs-lisp-mode) " " ", "))
          (c (concat "(" (mapconcat (lambda (x) (format "$%d" x)) (number-sequence 1 n) separator)
                     ")")))
     (when (not (derived-mode-p 'emacs-lisp-mode))
-      ;; most non- lisps have function calls of the format f(x, y) 
+      ;; most non- lisps have function calls of the format f(x, y)
       (setq c (concat "$0" c)))
     (md--insert-snippet-impl
      (make-md-snippet
@@ -482,12 +483,12 @@ go to the highest slot (most recent)."
 (md-replace-snippet
  :name "multiply"
  :contents "$1 * $2"
- :context '(generic-programming-context)) 
+ :context '(generic-programming-context))
 
 (md-replace-snippet
  :name "mod"
  :contents "$1 % $2"
- :context '(generic-programming-context)) 
+ :context '(generic-programming-context))
 
 (md-replace-snippet
  :name "divide"

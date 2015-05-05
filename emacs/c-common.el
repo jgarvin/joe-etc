@@ -121,8 +121,9 @@
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
 
   ;; Prefer 4-space tabs
-  (setq my-indent-size 4)
-  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
+  (setq my-indent-size 2)
+;;  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
+  (c-set-offset 'innamespace my-indent-size) ;; don't indent top level namespace
   (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
 
   (setq c-default-style "bsd")
