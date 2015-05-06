@@ -297,7 +297,11 @@
             (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
               (goto-char (1- (point)))))
           (when (derived-mode-p 'c++-mode)
-            (save-excursion (while (re-search-forward ";;" (1+ (marker-position end)) t) (replace-match ";" nil t)))))
+            (save-excursion (while (re-search-forward "[;,][:space:];" (1+ (marker-position end)) t) (replace-match ";" nil t)))
+            (save-excursion (while (re-search-forward "[;,][:space:]," (1+ (marker-position end)) t) (replace-match "," nil t)))
+            (save-excursion (while (re-search-forward "[;,][:space:]*)" (1+ (marker-position end)) t) (replace-match ")" nil t)))
+            (save-excursion (while (re-search-forward "[;,][:space:]*]" (1+ (marker-position end)) t) (replace-match "]" nil t)))
+            (save-excursion (while (re-search-forward "[;,][:space:]*>" (1+ (marker-position end)) t) (replace-match ">" nil t)))))
       (delete-selection-mode (if delete-selection-mode-enabled 1 0)))))
 
 (defun md-sn-find-slot (c)
