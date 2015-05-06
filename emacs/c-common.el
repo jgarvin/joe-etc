@@ -16,7 +16,7 @@
 ;; (defun etc-setup-gtags ()
 ;;   (define-key gtags-select-mode-map (kbd "<return>") #'gtags-select-tag))
 
-(add-hook 'gtags-select-mode-hook 'etc-setup-gtags)          
+;; (remove-hook 'gtags-select-mode-hook 'etc-setup-gtags)
 
 ;; Run makefile, or if there isn't one
 (defun smart-compile()
@@ -81,18 +81,18 @@
 
 (defun etc-setup-c-common ()
   (local-set-key "\M-t" 'toggle-header-buffer)
-  
+
   ;; Starting in emacs 23 there's some stupid default abbreviation
   ;; for trying to correct mispellings of 'else', problem is it doesn't
   ;; understand context, so a legit variable named elSE will always get
   ;; changed to Else.
   (abbrev-mode 0)
-  
+
   (subword-mode 1)
   (require 'whitespace)
   (setq whitespace-style '(face lines))
   (whitespace-mode t)
-  
+
   ;; Rebind the normal find tag functions to use the GNU global versions
   (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
   (local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
@@ -114,7 +114,7 @@
   (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
 
   ;;(setq require-final-newline t)
-  
+
   (setq c-hungry-delete-key t)
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "DEL") 'c-hungry-delete-forward)
@@ -133,4 +133,3 @@
   (setq tab-width my-indent-size))
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
-
