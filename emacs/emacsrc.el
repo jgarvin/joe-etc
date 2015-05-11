@@ -273,11 +273,11 @@
          ("\\.do\\'" . shell-script-mode))
        auto-mode-alist))
 
-(setq auto-mode-alist
-      (append
-       ;; File name (within directory) starts with a dot.
-       '(("\\.json\\'" . js2-mode))
-       auto-mode-alist))
+;; (setq auto-mode-alist
+;;       (append
+;;        ;; File name (within directory) starts with a dot.
+;;        '(("\\.json\\'" . js2-mode))
+;;        auto-mode-alist))
 
 (setq auto-mode-alist
       (append
@@ -446,6 +446,7 @@
 ;; Threshold after which we consider the file to be large
 ;; and don't want to do anything too expensive.
 (setq uncomfortable-buffer-size (* 10 1024 1024))
+(setq uncomfortable-line-size (* 10 1024))
 
 ;; Make more notepad like out of the box
 (setq default-major-mode 'text-mode)
@@ -463,7 +464,12 @@
 ;; Taken from Trey Jackson's answer on superuser.com
 ;; http://superuser.com/questions/205420/how-can-i-interrupt-emacs-opening-a-large-file
 (defun my-find-file-check-make-large-file-read-only-hook ()
-  "If a file is over a given size, make the buffer read only."
+  ;; Long lines make emacs slow, use first line to judge if we should wrap.
+  ;; Not perfect, but good enough for big JSON dumps
+  (when (> (- (point-at-eol) (point-at-bol)) uncomfortable-line-size)
+    (visual-line-mode 1)
+    (message "Large line: Enabling visual line mode to preserve sanity."))
+  ;; Turn lots of other stuff off
   (when (> (buffer-size) uncomfortable-buffer-size)
     (setq buffer-read-only t)
     (setq auto-save-default nil)
