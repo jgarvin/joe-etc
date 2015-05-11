@@ -76,7 +76,8 @@ debug mode causing timers to die."
 
 (defun md-go-to-next (str)
   (interactive)
-  (let ((p))
+  (let ((p)
+        (case-fold-search nil))
     (save-excursion
       (ignore-errors (end-of-thing 'symbol))
       (if (re-search-forward (concat "\\_<" (regexp-quote str) "\\_>"))
@@ -88,7 +89,8 @@ debug mode causing timers to die."
 
 (defun md-go-to-previous (str)
   (interactive)
-  (let ((p))
+  (let ((p)
+        (case-fold-search nil))
     (save-excursion
       (ignore-errors (beginning-of-thing 'symbol))
       (if (re-search-backward (concat "\\_<" (regexp-quote str) "\\_>"))
@@ -169,45 +171,47 @@ debug mode causing timers to die."
 
 (defun md-new-mic-state-impl (state)
   ;;(message "Mic state: %s" state)
-  (cond
-   ((string= state "on")
-    (md-update-cursor-color "green")
-    (md-check-end-utterance))
-   ((string= state "success")
-    (md-update-cursor-color "green")
-    (md-check-end-utterance))
-   ((string= state "off")
-    (md-update-cursor-color "brown")
-    (md-check-end-utterance))
-   ((string= state "sleeping")
-    (md-update-cursor-color "yellow")
-    (md-check-end-utterance))
-   ((string= state "disconnected")
-    (md-update-cursor-color "orange")
-    (md-check-end-utterance))
-   ((string= state "server-disconnected")
-    (md-update-cursor-color "purple")
-    (md-check-end-utterance))
-   ((string= state "thinking")
-    (md-update-cursor-color "blue")
-    (md-check-start-utterance))
-   ((string= state "failure")
-    (md-update-cursor-color "red")
-    (md-check-end-utterance))
-   (t
-    (message "Unknown mic state: %s" state)
-    (md-update-cursor-color md-startup-cursor-color)
-    (md-check-end-utterance)))
-  (setq md-mic-state state))
+  (unless (equal md-mic-state state)
+    (dolist (frame (frame-list))
+      (with-selected-frame frame
+        (cond
+         ((string= state "on")
+          (md-update-cursor-color "green")
+          (md-check-end-utterance))
+         ((string= state "success")
+          (md-update-cursor-color "green")
+          (md-check-end-utterance))
+         ((string= state "off")
+          (md-update-cursor-color "brown")
+          (md-check-end-utterance))
+         ((string= state "sleeping")
+          (md-update-cursor-color "yellow")
+          (md-check-end-utterance))
+         ((string= state "disconnected")
+          (md-update-cursor-color "orange")
+          (md-check-end-utterance))
+         ((string= state "server-disconnected")
+          (md-update-cursor-color "purple")
+          (md-check-end-utterance))
+         ((string= state "thinking")
+          (md-update-cursor-color "blue")
+          (md-check-start-utterance))
+         ((string= state "failure")
+          (md-update-cursor-color "red")
+          (md-check-end-utterance))
+         (t
+          (message "Unknown mic state: %s" state)
+          (md-update-cursor-color md-startup-cursor-color)
+          (md-check-end-utterance)))))
+    (setq md-mic-state state)))
 
 (defun md-new-mic-state (state)
-  (dolist (frame (frame-list))
-    (with-selected-frame frame
-      (md-new-mic-state-impl state))))
+  (md-new-mic-state-impl state))
 
 (defun md-give-new-frame-color (frame)
   (when frame
     (with-selected-frame frame
+      (message "Giving new frame mandimus cursor color.")
       (md-update-cursor-color (or md-cursor-color
                                   (face-attribute 'cursor :background))))))
 
@@ -576,23 +580,47 @@ Ignores CHAR at point."
       list-buffers-directory
     buffer-file-name))
 
-(defun md-run-window-selection-hooks ()
-  (unless (or md-inhibit-window-selection-hooks
-              ;; for some reason getting projectile files triggers buffer-list-update-hook
-              (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
-              ;; opening any old temporary buffer in the background fires buffer-update-list hook,
-              ;; when what we're really after is when we select a new window or the buffer in the
-              ;; current window changes. note you can't rely on (current-buffer) to be the currently
-              ;; displayed window inside buffer-list-update hook, so we use the circumlocution:
-              ;; (window-buffer (selected-window)). Also we avoid redundant events by saving the
-              ;; last buffer/window pair.
-              (and md-last-value-pair (and (eq (window-buffer (selected-window)) (car md-last-value-pair))
-                                           (eq (selected-window) (cdr md-last-value-pair)))))
-    (let ((md-inhibit-window-selection-hooks t))
-      (setq md-last-value-pair (cons (window-buffer (selected-window)) (selected-window)))
-      (run-hooks 'md-window-selection-hook))))
+(defun md-real-selected-window ()
+  ;;(car (window-list (selected-frame) 0))
+  (get-buffer-window (md-real-selected-buffer))
+  )
 
-(add-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
+(defun md-real-selected-buffer ()
+  ;; opening any old temporary buffer in the background fires buffer-update-list hook,
+  ;; when what we're really after is when we select a new window or the buffer in the
+  ;; current window changes. note you can't rely on (current-buffer) to be the currently
+  ;; displayed window inside buffer-list-update hook, so we use the circumlocution:
+  ;; (window-buffer (selected-window)). Also we avoid redundant events by saving the
+  ;; last buffer/window pair.
+  (window-buffer (selected-window))
+  ;; (window-buffer (car (window-list (selected-frame) 0)))
+  ;; (car (-remove #'md-special-buffer-p (buffer-list (selected-frame))))
+  )
+
+(defun md-run-window-selection-hooks (&rest ARGS)
+  (let ((real-window (md-real-selected-window))
+        (real-buffer (md-real-selected-buffer)))
+    (unless (or md-inhibit-window-selection-hooks
+                (and md-last-value-pair (and (eq real-buffer (car md-last-value-pair))
+                                             (eq real-window (cdr md-last-value-pair))))
+                ;; for some reason getting projectile files triggers buffer-list-update-hook
+                (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
+                ;; (md-special-buffer-p real-buffer)
+                ;;(not (memq (selected-window) (window-list (selected-frame) 0)))
+                )
+      ;; (message "selection hook running %S %S" real-buffer real-window)
+      ;; (message "buffer list: %S" (buffer-list))
+      (let ((md-inhibit-window-selection-hooks t))
+        (setq md-last-value-pair (cons real-buffer real-window))
+        (run-hooks 'md-window-selection-hook)))))
+(byte-compile #'md-run-window-selection-hooks)
+
+;; window-configuration-change-hook will catch windows showing different buffs
+;; focus-in-hook will catch frames changing focus
+;; post-command-hook for switching windows?
+;; but still need to catch changing which window has focus...
+;;(remove-hook 'buffer-list-update-hook #'md-run-window-selection-hooks)
+(add-hook 'post-command-hook #'md-run-window-selection-hooks)
 
 (defun md-down-screenful ()
   (interactive)
