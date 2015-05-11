@@ -95,8 +95,9 @@
       (font-lock-mode -1)
       (setq buffer-read-only t)
       (setq buffer-undo-list t)
-      (local-set-key (kbd "q") #'etc-quit-run))))
-
+      ;;(message "running?")
+      ;;(local-set-key (kbd "q") #'self-insert-command)
+      )))
 (defun etc-post-compile-run (comp-buf finish-status)
   (setq finish-status (string-trim finish-status)) ;; trailing newline
   (with-current-buffer comp-buf
