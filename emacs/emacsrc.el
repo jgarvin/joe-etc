@@ -469,6 +469,7 @@
     (setq auto-save-default nil)
     (buffer-disable-undo)
     (fundamental-mode)
+    (font-lock-mode -1)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -688,6 +689,7 @@
 (add-hook 'focus-out-hook #'etc-abort-minibuffer)
 
 (global-set-key "\C-xg" #'magit-status)
+(global-set-key (kbd "C-c i") #'magit-blame-mode)
 
 ;;(global-font-lock-mode 1)
 ;; (cancel-timer jit-lock-defer-timer)
@@ -757,3 +759,6 @@
 ;;                       :foreground cyberpunk-blue-5
 ;;                       :background cyberpunk-gray-5
 ;;                       :box '(:line-width -1)))
+
+;; see if this helps with window popups any
+(setq display-buffer-reuse-frames t)
