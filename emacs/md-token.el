@@ -260,7 +260,9 @@
 (defun md-refresh-symbols (&optional _start _end _old-length)
   (unless (or (window-minibuffer-p)
               (minibufferp)
-              (not (get-buffer-window (current-buffer) 'visible)))
+              (not (get-buffer-window (current-buffer) 'visible))
+              (md-special-buffer-p (current-buffer)))
+    ;;(message "md-refresh-symbols run %S %S %S %S" (current-buffer) _start _end _old-length)
     (md-run-when-idle-once 'md-refresh-timer
                            (lambda ()
                              (md-refresh-unit-cache (current-buffer) 'md-symbols-cache 'symbol)
@@ -418,6 +420,7 @@ on the ends. Also we want to store as lowercase."
     new-unit-cache))
 
 (defun md-refresh-global-caches-impl ()
+  ;; (message "md-refresh-global-caches-impl run")
   (let ((buffers (md-get-prioritized-buffer-list)))
     (with-current-buffer (window-buffer (selected-window)) 
       (setq md-global-word-cache (md-refresh-global-cache-unit
@@ -429,6 +432,7 @@ on the ends. Also we want to store as lowercase."
                                     (make-hash-table :test 'equal))))))
 
 (defun md-refresh-global-caches ()
+  ;;(message "md-refresh-global-caches run")
   (md-run-when-idle-once 'md-global-refresh-timer #'md-refresh-global-caches-impl 0.5 nil))
 
 (add-hook 'md-symbols-cache-refresh-hook #'md-refresh-global-caches)

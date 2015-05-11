@@ -17,7 +17,7 @@
    ("for each" "for(auto& $1 : $2) {\n    $3;\n}")
    ("function signature" "$1 $2($3);")
    ("header guard" "#ifndef $1\n#define $2\n\n$3\n\n#endif")
-   ("get" "std::get<$1>($2)")
+   ("get" "std::get<$2>($1)")
    ("if" "if($1) {\n    $2;\n}")
    ("include" "#include <$1>")
    ("init var" "$1 $2 = $3;")

@@ -10,6 +10,7 @@
     (error nil)))
 
 (defun md-update-projectile-files ()
-  (setq md-projectile-files (md-get-projectile-files-impl)))
-  
+  (let ((md-update-projectile-files t))
+    (setq md-projectile-files (md-get-projectile-files-impl))))
+
 (add-hook 'md-window-selection-hook #'md-update-projectile-files)

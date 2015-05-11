@@ -20,10 +20,15 @@
                (not (apply #'derived-mode-p modes)))) (buffer-list)))
 (byte-compile #'md-get-buffers-not-in-modes)
 
+(defun md-special-buffer-p (x)
+  (or (minibufferp x)
+      (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x))))
+(byte-compile #'md-special-buffer-p)
+
+(md-special-buffer-p (get-buffer "*Find*"))
+
 (defun md-get-special-buffers ()
-  (-filter
-   (lambda (x) (and (not (minibufferp x))
-                    (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x)))) (buffer-list)))
+  (-filter #'md-special-buffer-p (buffer-list)))
 
 (defun md-buffer-name (&optional buffer)
   (md-strip-text-properties (buffer-name buffer)))

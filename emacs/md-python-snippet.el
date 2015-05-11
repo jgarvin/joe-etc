@@ -84,4 +84,5 @@
 (md-make-snippets
  '(python-context)
  '(("default" "$1=$2")
+   ("item" "$1 : $2")
    ))

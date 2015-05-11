@@ -130,10 +130,11 @@
           (goto-char (overlay-start choice))
           (bounds-of-thing-at-point 'symbol))))))
 
-;; (md-hl-pick-symbol "r" #x31a "orange")   
-;;(md-hl-insert-symbol "r" #x31a "orange") 
+;; (md-hl-pick-symbol "r" #x31a "orange")
+;;(md-hl-insert-symbol "r" #x31a "orange")
 
 (defun md-hl-schedule-update ()
+  (message "md-hl-schedule-update run")
   (md-run-when-idle-once 'md-hl-timer #'md-highlight-symbols 0.25 nil))
 
 (defun md-hl-scroll (w new-start)
