@@ -121,15 +121,27 @@
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
 
   ;; Prefer 4-space tabs
-  (setq my-indent-size 2)
+
 ;;  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
-  (c-set-offset 'innamespace my-indent-size) ;; don't indent top level namespace
+   ;; don't indent top level namespace
   (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
 
   (setq c-default-style "bsd")
-  (setq c-basic-offset my-indent-size)
   (setq indent-tabs-mode nil)
+  (etc-set-indent-preference 4)
+  )
+
+(defun etc-toggle-namespace-indent ()
+  (if (equal (assoc 'innamespace c-offsets-alist) 0)
+      (c-set-offset 'innamespace my-indent-size)
+    (c-set-offset 'innamespace 0)))
+
+(defun etc-set-indent-preference (n)
+  (setq my-indent-size n)
+  (setq c-basic-offset my-indent-size)
   (setq default-tab-width my-indent-size)
-  (setq tab-width my-indent-size))
+  (setq tab-width my-indent-size)
+  (when (not (equal (assoc 'innamespace c-offsets-alist) 0))
+    (c-set-offset 'innamespace my-indent-size)))
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
