@@ -11,6 +11,11 @@
       (setq name (match-string 1 name)))
     (concat "$" name)))
 
+(setq shell-prompt-pattern "\\[.*?@.*?:<.*?>\\]")
+
+;; (let ((s "[jgarvin@jgarvin:<~/etc/emacs>]$"))
+;;   (string-match shell-prompt-pattern s))
+
 (defun etc-shell-mode-hook ()
   ;; (rename-buffer (generate-new-buffer-name (etc-shell-name)))
   ;;(rename-uniquely)
