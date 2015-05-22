@@ -10,7 +10,10 @@
     (error nil)))
 
 (defun md-update-projectile-files ()
-  (let ((md-update-projectile-files t))
-    (setq md-projectile-files (md-get-projectile-files-impl))))
+  (when (and (boundp 'projectile-mode) projectile-mode
+             ;; doing while minibuffer window is up annoys TRAMP sudo
+             (not (active-minibuffer-window)))
+    (let ((md-update-projectile-files t))
+      (setq md-projectile-files (md-get-projectile-files-impl)))))
 
 (add-hook 'md-window-selection-hook #'md-update-projectile-files)

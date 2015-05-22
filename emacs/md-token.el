@@ -379,7 +379,7 @@ of buffers are part of the project that are not..."
 ;;(defun md-file-inside-folder (f dir )nil)
 
 (defun md-get-prioritized-buffer-list ()
-  (let ((proj-buffers (if (projectile-project-p)
+  (let ((proj-buffers (if (and (fboundp #'projectile-project-p) (projectile-project-p))
                           (md-get-real-projectile-buffers)
                         (md-token-elidgible-buffers))))
       (cl-sort (md-token-elidgible-buffers)

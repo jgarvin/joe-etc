@@ -9,4 +9,6 @@
 ;; without this indexing some projects is seriously slow
 (setq projectile-enable-caching t)
 
-
+;; without this accessing files via /sudo:: will freeze for some reason.
+;; see: https://github.com/bbatsov/prelude/issues/594
+(setq projectile-mode-line " Projectile")

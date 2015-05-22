@@ -290,9 +290,6 @@
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
 
-;; Show matching parentheses
-;;(show-paren-mode 0)
-
 ;; So I can delete it
 (setq show-trailing-whitespace t)
 
@@ -497,6 +494,8 @@
 
 ;; lets you delete camelcase words one at a time
 (subword-mode t)
+;; for consistency have in minibuffer too
+;;(add-hook 'minibuffer-setup-hook #'subword-mode)
 
 (defvar-local mandimus-last-word-event "")
 
@@ -768,3 +767,7 @@
 
 ;; see if this helps with window popups any
 (setq display-buffer-reuse-frames t)
+
+;; Show matching parentheses
+;; disable, conflicts with smartparens highlighting
+(show-paren-mode 0)

@@ -9,7 +9,7 @@
 (md-replace-snippet
  :name "flat if"
  :contents "$1 if $2"
- :context '(python-context)) 
+ :context '(python-context))
 
 (md-replace-snippet
  :name "flat else"
@@ -19,7 +19,7 @@
 (md-replace-snippet
  :name "flat if else"
  :contents "$1 if $2 else $3"
- :context '(python-context)) 
+ :context '(python-context))
 
 (md-replace-snippet
  :name "if"
@@ -85,4 +85,6 @@
  '(python-context)
  '(("default" "$1=$2")
    ("item" "$1 : $2")
+   ("set comp" "{$1 for $2 in $3}")
+   ("len" "len($1)")
    ))

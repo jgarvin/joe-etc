@@ -602,6 +602,8 @@ Ignores CHAR at point."
                                              (eq real-window (cdr md-last-value-pair))))
                 ;; for some reason getting projectile files triggers buffer-list-update-hook
                 (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
+                (active-minibuffer-window)
+                (minibufferp real-buffer)
                 ;; (md-special-buffer-p real-buffer)
                 ;;(not (memq (selected-window) (window-list (selected-frame) 0)))
                 )
@@ -652,3 +654,30 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-homophones.el")
 (load-file "~/etc/emacs/md-navigation.el")
 (load-file "~/etc/emacs/md-edit.el")
+
+;; this ended up being more trouble than it's worth, just use visual-line-mode
+;; (defun md-smallest-multiple-greater-than (x y))
+
+;; (with-current-buffer "server-1431638372.log"
+;;   (- (window-width) hscroll-margin)
+;;   (set-window-point (get-buffer-window nil t) (md-screen-width-end-of-line)))
+
+;; (defun md-screen-width-end-of-line ()
+;;   (let* ((screen-width-multiple (- (window-width) hscroll-margin))
+;;          (relative-column (- (current-column) (window-left-column)))
+;;          (target))
+;;     (cond
+;;      ((< relative-column screen-width-multiple) (move-to-column )))))
+
+;; (defun md-screen-width-end-of-line ()
+;;   (interactive)
+;;   (let* ((screen-width-multiple (- (window-width) hscroll-margin))
+;;          (mult (/ (- (point) (point-at-bol)) screen-width-multiple))
+;;          (rem (% (- (point) (point-at-bol)) screen-width-multiple)))
+;;     (message "%s" (% (- (point) (point-at-bol)) screen-width-multiple))
+;;     (if (= (% (- (current-column) (window-left-column)) screen-width-multiple) 0)
+;;         (progn
+;;           (message "case1")
+;;           (goto-char (min (point-at-eol) (+ (point) screen-width-multiple))))
+;;       (message "case2")
+;;       (goto-char (min (point-at-eol) (+ (point-at-bol) screen-width-multiple))))))
