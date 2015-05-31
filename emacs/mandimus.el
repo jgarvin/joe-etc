@@ -330,7 +330,7 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while (re-search-forward "[^][()<>{}\"';]" nil t) (replace-match "" nil t)))
+      (while (re-search-forward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
     ;;(kill-word 1)
     (save-excursion
       ;;(just-one-space)
@@ -347,7 +347,7 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while (re-search-forward "[^][()<>{}\"';]" nil t) (replace-match "" nil t)))
+      (while (re-search-forward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
     ;;(kill-word 1)
     (save-excursion
       ;;(just-one-space)
