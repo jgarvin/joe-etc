@@ -324,33 +324,34 @@ debug mode causing timers to die."
 (defun md-backward-kill-word ()
   (interactive)
   (let ((p (point))
-        (p2 (progn
+        (p2 (if subword-mode
+                (let ((case-fold-search nil))
+                  (re-search-backward subword-backward-regexp)
+                  (1+ (point)))
               (backward-word)
               (point))))
     (save-restriction
       (narrow-to-region p p2)
-      (goto-char (point-min))
-      (while (re-search-forward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
-    ;;(kill-word 1)
+      (goto-char (point-max))
+      (while (re-search-backward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
     (save-excursion
-      ;;(just-one-space)
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-forward-kill-word ()
   (interactive)
   (let ((p (point))
-        (p2 (progn
+        (p2 (if subword-mode
+                (let ((case-fold-search nil))
+                  (re-search-forward subword-forward-regexp)
+                  (point))
               (forward-word)
-              ;;(backward-word)
               (point))))
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
       (while (re-search-forward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
-    ;;(kill-word 1)
     (save-excursion
-      ;;(just-one-space)
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
