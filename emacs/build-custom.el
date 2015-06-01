@@ -12,6 +12,7 @@
 (defvar-local etc-compilation-project nil)
 (defvar-local etc-compilation-compile-command nil)
 (defvar-local etc-compilation-invoking-buffer nil)
+(defvar-local etc-run-finished-status nil)
 
 (defun etc-build-menu (type)
   (let* ((cmd (gensym))
@@ -69,40 +70,45 @@
   (quit-window kill-buffer (selected-window)))
 
 (defun etc-build-buffer-name (type cmd)
-  (format "%s|%s|%s"
+  (format "*%s|%s|%s*"
           (if (eq type 'build) "compile" "run")
           (etc-get-project)
           cmd))
 
 (defun etc-run-impl (cmd)
   (let* ((buff-name (etc-build-buffer-name 'run cmd))
-         (buff (generate-new-buffer buff-name))
+         ;; if there is an existing run buffer and the run has finished
+         ;; then recycle it. otherwise generate a new one.
+         (buff-real-name
+          (if (and (get-buffer buff-name)
+                   (get-buffer-process buff-name))
+              (generate-new-buffer-name buff-name)
+            buff-name))
          ;; We temporarily customize display-buffer-alist to not pop up
          ;; a new window if the buffer is already displayed in one.
+         (existing-window (get-buffer-window buff-real-name t))
          (display-buffer-alist
-          (if (get-buffer-window (buffer-name buff) t)
-              (cons (cons (regexp-quote (buffer-name buff)) (cons #'display-buffer-no-window '())) display-buffer-alist)
+          (if existing-window
+              (cons (cons (regexp-quote buff-real-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
             display-buffer-alist))
          (split-cmd (split-string-and-unquote cmd)))
-    (async-shell-command cmd buff-name)
-    ;;(start-process (concat cmd "-process") buff (car split-cmd) (cdr split-cmd))
-    (with-current-buffer buff
-      ;; (let ((inhibit-read-only t))
-      ;;   (erase-buffer))
-      ;;(apply #'start-process (concat cmd "-process") buff (car split-cmd) (cdr split-cmd))
+    (message "%S %S %S" buff-name (get-buffer buff-name) (and (get-buffer buff-name) (with-current-buffer (get-buffer buff-name))))
+    (when (get-buffer buff-real-name)
+        (kill-buffer buff-real-name))
+    (async-shell-command cmd buff-real-name)
+    (if existing-window
+        (set-window-buffer existing-window buff-real-name))
+    (with-current-buffer buff-real-name
       (goto-char (point-max))
-      ;; (comint-mode)
       (font-lock-mode -1)
       (setq buffer-read-only t)
-      (setq buffer-undo-list t)
-      ;;(message "running?")
-      ;;(local-set-key (kbd "q") #'self-insert-command)
-      )))
+      (setq buffer-undo-list t))))
+
 (defun etc-post-compile-run (comp-buf finish-status)
-  (setq finish-status (string-trim finish-status)) ;; trailing newline
   (with-current-buffer comp-buf
+    (setq etc-run-finished-status (string-trim finish-status)) ;; trailing newline
     ;;(font-lock-mode 1)
-    (if (string= "finished" finish-status)
+    (if (string= "finished" etc-run-finished-status)
         (when (and (derived-mode-p major-mode 'compilation-mode)
                    ;; the variable will only be set if compile is invoked by our custom command
                    ;; we don't want to do any of this if the user does M-x compile
