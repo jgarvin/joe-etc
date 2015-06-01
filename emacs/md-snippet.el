@@ -263,8 +263,10 @@
          (cond
           ((use-region-p) (cons (region-beginning) (region-end)))
           ((thing-at-point 'symbol) (bounds-of-thing-at-point 'symbol))
-          ((or ;; (md-likely-followed-by-closer (1- (point)))
-               (md-likely-preceded-by-opener (1+ (point))))
+          ((md-likely-followed-by-closer (1- (point)))
+           (cons (plist-get (sp-get-thing t) :beg)
+                 (plist-get (sp-get-thing t) :end)))
+          ((md-likely-preceded-by-opener (1+ (point)))
            (cons (plist-get (sp-get-thing) :beg)
                  (plist-get (sp-get-thing) :end))))))
     (unwind-protect
