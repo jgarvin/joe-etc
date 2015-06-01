@@ -21,8 +21,6 @@
 ;; i
 
 ;; available keys:
-;; C-M-pageup
-;; C-M-pagedown
 ;; C-M-tab
 ;; C-M-]
 ;; C-M-left
@@ -37,19 +35,24 @@
 (define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-a") 'sp-backward-down-sexp)
+(define-key smartparens-mode-map (kbd "C-S-d") 'sp-backward-down-sexp)
 (define-key smartparens-mode-map (kbd "C-M-o") 'sp-up-sexp)
-(define-key smartparens-mode-map (kbd "C-M-u") 'sp-backward-up-sexp)
+(define-key smartparens-mode-map (kbd "C-S-u") 'sp-backward-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-n") 'sp-next-sexp)
 (define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)
-(define-key smartparens-mode-map (kbd "C-S-a") 'sp-beginning-of-sexp)
-(define-key smartparens-mode-map (kbd "C-S-e") 'sp-end-of-sexp)
+(define-key smartparens-mode-map (kbd "C-<home>") 'sp-beginning-of-sexp)
+(define-key smartparens-mode-map (kbd "C-<end>") 'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-t") 'sp-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") 'sp-forward-slurp-sexp)
 (define-key smartparens-mode-map (kbd "C-M-g") 'sp-splice-sexp)
-;;(define-key smartparens-mode-map (kbd "C-M-i") 'none)
 
-;; (defun etc-space-inserter (arg)
-;;   )
 
-;; (advice-add #'etc-space-inserter :before #'sp--self-insert-command)
+;; without these you can't dive into a string
+(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
+(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
+(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)
+(add-to-list 'sp-navigate-consider-stringlike-sexp 'shell-mode)
+
+;; but python has a bug: https://github.com/Fuco1/smartparens/issues/473
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'python-mode)
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'inferior-python-mode)

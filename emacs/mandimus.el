@@ -323,6 +323,9 @@ debug mode causing timers to die."
 
 (defun md-backward-kill-word ()
   (interactive)
+  (while (and (md-likely-preceded-by-opener (point))
+              (md-likely-followed-by-closer (point)))
+    (sp-splice-sexp))
   (let ((p (point))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
@@ -333,13 +336,16 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-max))
-      (while (re-search-backward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
+      (while (re-search-backward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
 
 (defun md-forward-kill-word ()
   (interactive)
+  (while (and (md-likely-preceded-by-opener (point))
+              (md-likely-followed-by-closer (point)))
+    (sp-splice-sexp))
   (let ((p (point))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
@@ -350,7 +356,8 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while (re-search-forward "[-_,A-Za-Z0-9]" nil t) (replace-match "" nil t)))
+      (while
+          (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
@@ -382,14 +389,37 @@ debug mode causing timers to die."
     (forward-paragraph)
     (kill-region (region-beginning) (region-end))))
 
+(defun md-pair-bounds (opener)
+  (let ((r (sp-restrict-to-pairs opener 'sp-get-enclosing-sexp)))
+    (cons (plist-get r :beg)
+          (plist-get r :end))))
+
 (defun md-mark-thing (thing)
   (with-selected-window (if (eq (window-buffer) (current-buffer))
                             (selected-window)
                           (get-buffer-window nil t))
-    (let ((b (bounds-of-thing-at-point thing)))
-      (set-window-point (get-buffer-window) (car b))
+    (let ((bounds))
+      (cond
+       ((eq thing 'string)
+        (setq bounds (cons (plist-get (sp-get-string) :beg)
+                           (plist-get (sp-get-string) :end))))
+       ((eq thing 'pair)
+        (setq bounds (cons (plist-get (sp-get-enclosing-sexp) :beg)
+                           (plist-get (sp-get-enclosing-sexp) :end))))
+       ;; sp-restrict-pairs needs to work first
+       ;; ((eq thing 'parens)
+       ;;  (setq bounds (md-pair-bounds "(")))
+       ;; ((eq thing 'brackets)
+       ;;  (setq bounds (md-pair-bounds "[")))
+       ;; ((eq thing 'braces)
+       ;;  (setq bounds (md-pair-bounds "{")))
+       ;; need c++ template support first
+       ;; ((eq thing 'angles)
+       ;;  (setq bounds (md-pair-bounds "<")))
+       (t (setq bounds (bounds-of-thing-at-point thing))))
+      (set-window-point (get-buffer-window) (car bounds))
       (set-mark (point))
-      (set-window-point (get-buffer-window) (cdr b)))))
+      (set-window-point (get-buffer-window) (cdr bounds)))))
 
 (defun md-copy-line ()
   "Copy the whole line that point is on and move to the beginning of the next line.

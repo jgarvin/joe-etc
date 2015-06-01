@@ -153,6 +153,7 @@
 (load-file "~/etc/emacs/template-custom.el")
 (load-file "~/etc/emacs/build-custom.el")
 (load-file "~/etc/emacs/midnight-custom.el")
+(load-file "~/etc/emacs/last-change-custom.el")
 
 (delete-selection-mode 1)
 
@@ -771,3 +772,18 @@
 ;; Show matching parentheses
 ;; disable, conflicts with smartparens highlighting
 (show-paren-mode 0)
+
+;; Two spaces is heresy! ;)
+(setq sentence-end-double-space nil)
+
+;; This way mandimus doesn't need special support
+;; for dealing with sudo, it's just a normal
+;; consequence of opening a file.
+(defun find-file-sudo ()
+  "If file exists, but we can't write to it, try
+opening it with sudo."
+  (when (and buffer-file-name
+             (not (file-writable-p buffer-file-name))
+             (file-exists-p buffer-file-name))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+(add-hook 'find-file-hook 'find-file-sudo)
