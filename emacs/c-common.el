@@ -137,6 +137,7 @@
     (c-set-offset 'innamespace 0)))
 
 (defun etc-set-indent-preference (n)
+  (interactive "nNumber of spaces: ")
   (setq my-indent-size n)
   (setq c-basic-offset my-indent-size)
   (setq default-tab-width my-indent-size)

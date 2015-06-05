@@ -7,12 +7,23 @@
 
 (defvar etc-build-choice "a")
 (defvar etc-run-choice "a")
-
+(defvar etc-run-debug nil)
+(defvar etc-run-valgrind nil)
 (defvar-local etc-compilation-run-command nil)
 (defvar-local etc-compilation-project nil)
 (defvar-local etc-compilation-compile-command nil)
 (defvar-local etc-compilation-invoking-buffer nil)
 (defvar-local etc-run-finished-status nil)
+
+(defun etc-toggle-debug ()
+  (interactive)
+  (setq etc-run-debug (not etc-run-debug))
+  (message "Running in debugger is now: %s" etc-run-debug))
+
+(defun etc-toggle-valgrind ()
+  (interactive)
+  (setq etc-run-valgrind (not etc-run-valgrind))
+  (message "Running in valgrinder is now: %s" etc-run-valgrind))
 
 (defun etc-build-menu (type)
   (let* ((cmd (gensym))
@@ -45,7 +56,9 @@
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
-  (format "find-builds -%s -e %s"
+  (format "GDB=\"%s\" VALGRIND=\"%s\" find-builds -%s -e %s"
+          (if etc-run-debug "on" "")
+          (if etc-run-valgrind "on" "")
           (if (eq type 'build) "b" "r")
           (if (eq type 'build) etc-build-choice etc-run-choice)))
 
@@ -54,6 +67,11 @@
   (if arg
       (etc-build-menu 'build)
     (etc-compile-and-run-impl (etc-build-cmd 'build) nil)))
+
+(defun etc-debug-run ()
+  (interactive)
+  (let ((etc-run-debug t))
+    (realgud:gdb (etc-build-cmd 'run))))
 
 (defun etc-stale-run (&optional arg)
   (interactive "P")
@@ -179,3 +197,6 @@
 (global-set-key (kbd "C-c c") #'etc-compile-and-run)
 (global-set-key (kbd "C-c n b") #'etc-new-build-script)
 (global-set-key (kbd "C-c n r") #'etc-new-run-script)
+(global-set-key (kbd "C-c t d") #'etc-toggle-debug)
+(global-set-key (kbd "C-c t v") #'etc-toggle-valgrind)
+(global-set-key (kbd "C-c d") #'etc-debug-run)

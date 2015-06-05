@@ -427,7 +427,13 @@ go to the highest slot (most recent)."
 (md-make-snippets
  t
  '(("path" "$1/$2")
-   ("band" "$1 | $2")))
+   ("band" "$1 | $2")
+   ("arg" "$1, $2")
+   ("larp" "($1)")
+   ("lack" "[$1]")
+   ("lace" "{$1}")
+   ("quote" "\"$1\"")
+   ("soot" "'$1'")))
 
 (md-make-snippets
  '(derived-mode-p 'emacs-lisp-mode)
@@ -517,3 +523,4 @@ go to the highest slot (most recent)."
 
 (load-file "~/etc/emacs/md-cpp-snippet.el")
 (load-file "~/etc/emacs/md-python-snippet.el")
+(load-file "~/etc/emacs/md-shell-snippet.el")

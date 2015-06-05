@@ -1,7 +1,6 @@
 (md-make-snippets
  '(derived-mode-p 'c++-mode)
  '(
-   ("arg" "$1, $2")
    ("assign" "$1 = $2;")
    ("auto" "auto $1 = $2;")
    ("boost" "bxxst::")
@@ -15,6 +14,7 @@
    ("deque" "std::deque<$1>")
    ("do while" "do {\n    $1;\n} while($2);")
    ("ellipses" "$1...")
+   ("else" "else {\n    $1;\n}")
    ("for" "for($1; $2; $3) {\n    $4;\n}")
    ("for each" "for(auto& $1 : $2) {\n    $3;\n}")
    ("forward" "std::forward<$1>($2)")
@@ -51,6 +51,10 @@
    ("public" "public $1")
    ("return" "return $1;")
    ("right shift" "$1 >> $2")
+   ("debug block" "if(DEBUG_OUTPUT) {\n    $1;\n}")
+   ("debug see err" "if(DEBUG_OUTPUT) {\n    std::cerr << $1 << std::endl;\n}")
+   ("debug see out" "if(DEBUG_OUTPUT) {\n    std::out << $1 << std::endl;\n}")
+   ("scope" "$1::$2")
    ("see err" "std::cerr << $1 << std::endl;")
    ("see out" "std::cout << $1 << std::endl;")
    ("set" "std::set<$1>")

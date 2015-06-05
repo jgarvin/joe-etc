@@ -80,7 +80,7 @@ if len(sys.argv) > 2:
     print >> sys.stderr, "Only takes one argument, the application name."
     sys.exit(1)
 
-coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*")
+coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*") + glob.glob("/tmp/cores/core.*")
 
 if len(coreList) == 0:
     print >> sys.stderr, "Found no cores in /tmp or current directory."

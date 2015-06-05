@@ -407,34 +407,6 @@
                         (kill-buffer ob)))))
         (default (message "This buffer has no file name."))))
 
-(defun unindent-region-with-tab ()
-  (interactive)
-  (save-excursion
-    (if (< (point) (mark)) (exchange-point-and-mark))
-    (let ((save-mark (mark)))
-      (if (= (point) (line-beginning-position)) (previous-line 1))
-      (goto-char (line-beginning-position))
-      (while (>= (point) save-mark)
-        (goto-char (line-beginning-position))
-        (if (= (string-to-char "\t") (char-after (point))) (delete-char 1))
-        (previous-line 1)))))
-
-(defun unindent-block()
-  (interactive)
-  (shift-region (- tab-width))
-  (setq deactivate-mark nil))
-
-(defun shift-region(numcols)
-  (if (< (point)(mark))
-      (if (not(bolp))    (progn (beginning-of-line)(exchange-point-and-mark) (end-of-line)))
-    (progn (end-of-line)(exchange-point-and-mark)(beginning-of-line)))
-  (setq region-start (region-beginning))
-  (setq region-finish (region-end))
-  (save-excursion
-    (if (< (point) (mark)) (exchange-point-and-mark))
-    (let ((save-mark (mark)))
-      (indent-rigidly region-start region-finish numcols))))
-
 ;; can use M-r to toggle instead
 ;; (global-set-key "\C-s" 'isearch-forward)
 ;; (global-set-key "\C-r" 'isearch-backward)
