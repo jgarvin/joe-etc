@@ -132,6 +132,7 @@
   )
 
 (defun etc-toggle-namespace-indent ()
+  (interactive)
   (if (equal (assoc 'innamespace c-offsets-alist) 0)
       (c-set-offset 'innamespace my-indent-size)
     (c-set-offset 'innamespace 0)))

@@ -21,8 +21,9 @@
              (> (buffer-size) comint-buffer-maximum-size)
              (get-buffer-process (current-buffer)))
     (comint-truncate-buffer)
-    (setq etc-next-truncate-allowed-timer
-          (run-at-time 1 1 #'etc-clear-truncate-timer (current-buffer)))))
+    (unless etc-next-truncate-allowed-timer
+      (setq etc-next-truncate-allowed-timer
+            (run-at-time 1 1 #'etc-clear-truncate-timer (current-buffer))))))
 
 (defun etc-cancel-truncate-timer ()
   (when (timerp etc-next-truncate-allowed-timer)
@@ -32,9 +33,14 @@
 (add-hook 'kill-buffer-hook #'etc-cancel-truncate-timer)
 
 (defun etc-clear-truncate-timer (buffer)
-  (with-current-buffer buffer
-    (etc-cancel-truncate-timer)
-    (etc-comint-truncate)))
+  ;; technically we should never have to check if buffer is killed
+  ;; because our kill-buffer-hook should take care of making sure
+  ;; that the timer is canceled... but it happens anyway sometimes,
+  ;; not sure why.
+  (when (buffer-name buffer)
+    (with-current-buffer buffer
+      (etc-cancel-truncate-timer)
+      (etc-comint-truncate))))
 
 (defun etc-setup-delayed-truncate (&optional unused)
   (unless etc-next-truncate-allowed-timer

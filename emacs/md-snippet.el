@@ -478,13 +478,18 @@ go to the highest slot (most recent)."
 ;; most non-lisp languages share a lot of tiny snippets,
 ;; like infix operators
 (defun generic-programming-context ()
-  (when (and (derived-mode-p 'prog-mode)
+  (when (and (derived-mode-p 'prog-mode 'inferior-python-mode)
              (not (derived-mode-p 'emacs-lisp-mode))) t))
 
 
 (md-make-snippets
  '(generic-programming-context)
- '(("not equal" "$1 != $2")))
+ '(("not equal" "$1 != $2")
+   ("plus assign" "$1 += $2")
+   ("minus assign" "$1 -= $2")
+   ("multiply assign" "$1 *= $2")
+   ("divide assign" "$1 /= $2")
+   ("mod assign" "$1 %= $2")))
 
 (md-replace-snippet
  :name "plus"

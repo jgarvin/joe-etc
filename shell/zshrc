@@ -244,11 +244,10 @@ then
 	    synergys -f --config $synergy_conf > $ZDOTDIR/.synergy_log 2>&1 &; disown
 fi
 
-if which xwrits &> /dev/null && \
-    ! tsk xwrits &> /dev/null && \
-    [ -n "$DISPLAY" ]
-then
-    xwrits +quota=3 +breakclock +multiscreen +mouse typetime=18 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1 &; disown
+if ! crontab -l | grep xwrits &> /dev/null; then
+    echo >&2 "xwrits not in crontab! you should add it..."
+    # Preferred settings:
+    # xwrits +quota=3 +breakclock +multiscreen +mouse typetime=18 finger after 15 clock multiply=5:1.4 > $ZDOTDIR/.xwrits_log 2>&1
 fi
 
 if [ -d "$ZDOTDIR/rmt" ]; then

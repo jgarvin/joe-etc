@@ -759,3 +759,6 @@ opening it with sudo."
              (file-exists-p buffer-file-name))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 (add-hook 'find-file-hook 'find-file-sudo)
+
+(require 'linum-relative)
+(global-linum-mode)

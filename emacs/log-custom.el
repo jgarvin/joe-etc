@@ -9,6 +9,7 @@
   (make-variable-buffer-local 'auto-revert-verbose)
   (setq auto-revert-verbose nil)
   (read-only-mode t)
+  (font-lock-mode 0)
   (when (fboundp 'show-smartparens-mode)
     (show-smartparens-mode 0)))
 
