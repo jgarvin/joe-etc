@@ -5,8 +5,8 @@
 (add-to-list 'load-path "~/etc/popup-keys")
 (require 'popup-keys)
 
-(defvar etc-build-choice "a")
-(defvar etc-run-choice "a")
+(defvar etc-build-choice nil)
+(defvar etc-run-choice nil)
 (defvar etc-run-debug nil)
 (defvar etc-run-valgrind nil)
 (defvar-local etc-compilation-run-command nil)
@@ -23,7 +23,7 @@
 (defun etc-toggle-valgrind ()
   (interactive)
   (setq etc-run-valgrind (not etc-run-valgrind))
-  (message "Running in valgrinder is now: %s" etc-run-valgrind))
+  (message "Running in valgrind is now: %s" etc-run-valgrind))
 
 (defun etc-build-menu (type)
   (let* ((cmd (gensym))
@@ -38,16 +38,15 @@
     (if scripts
         (progn
           (setq scripts (cl-sort scripts #'string< :key))
-          (setq actions (mapcar (lambda (x)
-                                  (save-match-data
-                                    ;; files are typically of the form: ./x-foo.run.sh
-                                    (string-match "\\(\\./\\)?\\([^-]\\)-\\([^.]+\\).*" x)
-                                    (let ((letter (match-string 2 x)))
-                                      (message (match-string 3 x))
-                                      (list letter
-                                            (match-string 3 x)
-                                            (lambda () (set choice-sym letter))))))
-                                scripts))
+          (dotimes (ii (min 26 (length scripts)))
+            (let ((script (file-truename (nth ii scripts))))
+              (push (list (format "%c" (+ 97 ii))
+                          (file-name-sans-extension
+                           (file-name-sans-extension
+                            (file-name-nondirectory script)))
+                          (lambda ()
+                            (set choice-sym script))) actions)))
+          (setq actions (cl-sort actions #'string< :key (lambda (x) (cadr x))))
           (popup-keys:new
            cmd
            :buf-name (format "*choose %s menu*" (if (eq type 'build) "build" "run"))
@@ -56,11 +55,7 @@
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
-  (format "GDB=\"%s\" VALGRIND=\"%s\" find-builds -%s -e %s"
-          (if etc-run-debug "on" "")
-          (if etc-run-valgrind "on" "")
-          (if (eq type 'build) "b" "r")
-          (if (eq type 'build) etc-build-choice etc-run-choice)))
+  (if (eq type 'build) etc-build-choice etc-run-choice))
 
 (defun etc-compile (&optional arg)
   (interactive "P")
@@ -192,11 +187,21 @@
   (interactive "cScript trigger letter: \nMScript name: ")
   (etc-new-script-impl 'run letter script-name))
 
+(defun etc-open-build-script ()
+  (interactive)
+  (find-file etc-build-choice))
+
+(defun etc-open-run-script ()
+  (interactive)
+  (find-file etc-run-choice))
+
 (global-set-key (kbd "C-c b") #'etc-compile)
 (global-set-key (kbd "C-c r") #'etc-stale-run)
 (global-set-key (kbd "C-c c") #'etc-compile-and-run)
 (global-set-key (kbd "C-c n b") #'etc-new-build-script)
 (global-set-key (kbd "C-c n r") #'etc-new-run-script)
+(global-set-key (kbd "C-c o r") #'etc-open-run-script)
+(global-set-key (kbd "C-c o b") #'etc-open-build-script)
 (global-set-key (kbd "C-c t d") #'etc-toggle-debug)
 (global-set-key (kbd "C-c t v") #'etc-toggle-valgrind)
 (global-set-key (kbd "C-c d") #'etc-debug-run)
