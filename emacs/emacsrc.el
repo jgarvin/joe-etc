@@ -569,7 +569,7 @@
   "Emacs quick move minor mode"
   t)
 ;; you can select the key you prefer to
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+(define-key global-map (kbd "C-c C-SPC") 'ace-jump-mode)
 
 ;;
 ;; enable a more powerful jump back function from ace jump mode
@@ -748,17 +748,10 @@
 ;; Two spaces is heresy! ;)
 (setq sentence-end-double-space nil)
 
-;; This way mandimus doesn't need special support
-;; for dealing with sudo, it's just a normal
-;; consequence of opening a file.
-(defun find-file-sudo ()
-  "If file exists, but we can't write to it, try
-opening it with sudo."
-  (when (and buffer-file-name
-             (not (file-writable-p buffer-file-name))
-             (file-exists-p buffer-file-name))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
-(add-hook 'find-file-hook 'find-file-sudo)
+(defun etc-reopen-with-sudo ()
+  (interactive)
+  (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
+(global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
 (require 'linum-relative)
 (global-linum-mode)
