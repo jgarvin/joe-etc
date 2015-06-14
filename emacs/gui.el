@@ -17,15 +17,15 @@
 ;; have to do this as a frame functon or daemon doesn't work
 (defun etc-customize-frame (new-frame)
   (when (getenv "DISPLAY")
-;;    (setq etc-font-choice "DejaVu Sans Mono-12")
+   ;; (setq etc-font-choice "DejaVu Sans Mono-12")
     ;;(setq my-font-choice "Consolas-14")
-    
+
     ;; and can't call this or emacsclient -c crashes, wtf
     ;;(set-face-attribute 'default t :font etc-font-choice)
-    
+
     (set-frame-font etc-font-choice t t)))
 
-(add-hook 'after-make-frame-functions #'etc-customize-frame)
+;;(add-hook 'after-make-frame-functions #'etc-customize-frame)
 
 ;; Turn off GUI parts
 (when (functionp 'tool-bar-mode)
@@ -41,8 +41,8 @@
 ;; Stop this crazy blinking cursor
 (blink-cursor-mode 0)
 
-;; Show column number in the mode line
-(column-number-mode 1)
+;; Hide column number in the mode line
+(column-number-mode 0)
 
 ;; Show current buffer name in titlebar (instead of emacs@whatever)
 (setq frame-title-format "%b")
