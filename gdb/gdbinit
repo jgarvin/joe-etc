@@ -37,3 +37,6 @@ end
 # to prevent other threads from being able to run
 # when you are stepping 
 #set scheduler-locking on
+
+break main
+delete 1

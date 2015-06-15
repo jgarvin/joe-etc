@@ -5,6 +5,8 @@
 (add-to-list 'load-path "~/etc/popup-keys")
 (require 'popup-keys)
 
+(require 'realgud)
+
 (defvar etc-build-choice nil)
 (defvar etc-run-choice nil)
 (defvar etc-run-debug nil)
@@ -65,8 +67,13 @@
 
 (defun etc-debug-run ()
   (interactive)
-  (let ((etc-run-debug t))
-    (realgud:gdb (etc-build-cmd 'run))))
+  (let ((etc-run-debug t)
+        (old-val (getenv "GDB")))
+    (unwind-protect
+        (progn
+          (setenv "GDB" "on")
+          (etc-run-impl (etc-build-cmd 'run) t))
+      (setenv "GDB" old-val))))
 
 (defun etc-stale-run (&optional arg)
   (interactive "P")
@@ -88,7 +95,7 @@
           (etc-get-project)
           cmd))
 
-(defun etc-run-impl (cmd)
+(defun etc-run-impl (cmd &optional debugging)
   (let* ((buff-name (etc-build-buffer-name 'run cmd))
          ;; if there is an existing run buffer and the run has finished
          ;; then recycle it. otherwise generate a new one.
@@ -112,10 +119,13 @@
     (if existing-window
         (set-window-buffer existing-window buff-real-name))
     (with-current-buffer buff-real-name
-      (goto-char (point-max))
-      (font-lock-mode -1)
-      (setq buffer-read-only t)
-      (setq buffer-undo-list t))))
+      (if debugging
+          (progn
+            (realgud-track-mode))
+        (goto-char (point-max))
+        (font-lock-mode -1)
+        (setq buffer-read-only t)
+        (setq buffer-undo-list t)))))
 
 (defun etc-post-compile-run (comp-buf finish-status)
   (with-current-buffer comp-buf

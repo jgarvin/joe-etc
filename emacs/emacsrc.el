@@ -687,7 +687,8 @@
     (recenter-top-bottom)))
 
 ;; much more convenient to reach
-(global-set-key (kbd "C-M-]") #'etc-delete-other-windows)
+(global-set-key (kbd "C-]") #'etc-delete-other-windows)
+(global-set-key (kbd "M-]") #'abort-recursive-edit)
 (global-unset-key (kbd "C-x 1"))
 
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
