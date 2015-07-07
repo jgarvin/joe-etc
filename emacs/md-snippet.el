@@ -489,7 +489,11 @@ go to the highest slot (most recent)."
    ("minus assign" "$1 -= $2")
    ("multiply assign" "$1 *= $2")
    ("divide assign" "$1 /= $2")
-   ("mod assign" "$1 %= $2")))
+   ("mod assign" "$1 %= $2")
+   ("lesser" "$1 < $2")
+   ("less equal" "$1 <= $2")
+   ("greater" "$1 > $2")
+   ("great equal" "$1 >= $2")))
 
 (md-replace-snippet
  :name "plus"

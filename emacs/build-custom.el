@@ -96,6 +96,7 @@
           cmd))
 
 (defun etc-run-impl (cmd &optional debugging)
+  (etc-save-if-necessary)
   (let* ((buff-name (etc-build-buffer-name 'run cmd))
          ;; if there is an existing run buffer and the run has finished
          ;; then recycle it. otherwise generate a new one.
@@ -110,12 +111,15 @@
          (display-buffer-alist
           (if existing-window
               (cons (cons (regexp-quote buff-real-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
-            display-buffer-alist))
-         (split-cmd (split-string-and-unquote cmd)))
+            display-buffer-alist)))
     (message "%S %S %S" buff-name (get-buffer buff-name) (and (get-buffer buff-name) (with-current-buffer (get-buffer buff-name))))
     (when (get-buffer buff-real-name)
-        (kill-buffer buff-real-name))
-    (async-shell-command cmd buff-real-name)
+      (kill-buffer buff-real-name))
+    (let ((default-directory (file-name-directory cmd))
+          (temp-file (make-temp-file "run.")))
+      (message "directory: %S" default-directory)
+      (copy-file cmd temp-file t nil nil t)
+      (async-shell-command temp-file buff-real-name))
     (if existing-window
         (set-window-buffer existing-window buff-real-name))
     (with-current-buffer buff-real-name
@@ -149,6 +153,9 @@
       (default-directory))))
 
 (defun etc-compile-and-run-impl (comp-command run-command &optional arg)
+  (unless comp-command
+    (user-error "No compile command set."))
+  (etc-save-if-necessary)
   (let* (;; make the compilaton buffer depend on the command name and the project,
          ;; this makes sure we can have multiple compiles going
          (buf-name (etc-build-buffer-name 'build comp-command))
@@ -164,8 +171,12 @@
                                         (setq etc-compilation-comp-command comc)
                                         (setq etc-compilation-project proj)
                                         (setq etc-compilation-run-command runc)
-                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook)))
-    (compile comp-command arg)))
+                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook))
+         (default-directory (file-name-directory comp-command))
+         (temp-file (make-temp-file "bld.")))
+    (message "directory: %S" default-directory)
+    (copy-file comp-command temp-file t nil nil t)
+    (compile temp-file arg)))
 
 (defun etc-make-build-scripts-executable ()
   ;; code taken from executable-make-buffer-file-executable-if-script-p
@@ -206,8 +217,11 @@
   (find-file etc-run-choice))
 
 (global-set-key (kbd "C-c b") #'etc-compile)
+(global-set-key (kbd "<f10>") #'etc-compile)
 (global-set-key (kbd "C-c r") #'etc-stale-run)
+(global-set-key (kbd "<f11>") #'etc-stale-run)
 (global-set-key (kbd "C-c c") #'etc-compile-and-run)
+(global-set-key (kbd "<f12>") #'etc-compile-and-run)
 (global-set-key (kbd "C-c n b") #'etc-new-build-script)
 (global-set-key (kbd "C-c n r") #'etc-new-run-script)
 (global-set-key (kbd "C-c o r") #'etc-open-run-script)

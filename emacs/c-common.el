@@ -129,6 +129,7 @@
   (setq c-default-style "bsd")
   (setq indent-tabs-mode nil)
   (etc-set-indent-preference 4)
+  (setq c-indent-comments-syntactically-p t)
   )
 
 (defun etc-toggle-namespace-indent ()

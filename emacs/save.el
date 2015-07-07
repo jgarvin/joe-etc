@@ -24,6 +24,10 @@
 
 ;;(cancel-timer etc-save-timer)
 
+;; (dolist (v timer-list)
+;;   (when (string-match-p "etc-save-if-necessary" (format "%S" v))
+;;     (cancel-timer v)))
+
 ;; autosave under all these circumstances too, never want to save
 ;; manually
 (add-hook 'focus-out-hook #'etc-save-if-necessary)

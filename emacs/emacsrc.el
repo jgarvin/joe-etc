@@ -446,6 +446,7 @@
     (buffer-disable-undo)
     (fundamental-mode)
     (font-lock-mode -1)
+    (linum-mode 0)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -755,4 +756,13 @@
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
 (require 'linum-relative)
-(global-linum-mode)
+;; (defun etc-enable-linum-mode ()
+;;   (linum-mode 1))
+;; ;; makes navigating dired by voice much easier
+;; (add-hook 'dired-mode-hook #'etc-enable-linum-mode)
+(global-linum-mode 1)
+
+;; I don't actually like line wrapping, but emacs becomes
+;; totally unresponsive when there are really long lines,
+;; so this has to be on as a safety measure -_-
+(global-visual-line-mode 1)
