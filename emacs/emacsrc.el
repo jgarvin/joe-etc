@@ -766,3 +766,10 @@
 ;; totally unresponsive when there are really long lines,
 ;; so this has to be on as a safety measure -_-
 (global-visual-line-mode 1)
+
+(require 'string-inflection)
+(global-set-key (kbd "C-c y") #'string-inflection-cycle)
+(global-set-key (kbd "C-c m s") #'string-inflection-underscore)
+(global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
+(global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
+(global-set-key (kbd "C-c m u") #'string-inflection-upcase)
