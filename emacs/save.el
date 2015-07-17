@@ -19,8 +19,8 @@
 
 ;; builtin autosave randomly stops working for no reason,
 ;; so implement my own
-(setq etc-save-timer
-      (run-at-time t 1 #'etc-save-if-necessary))
+;; (setq etc-save-timer
+;;       (run-at-time t 1 #'etc-save-if-necessary))
 
 ;;(cancel-timer etc-save-timer)
 
@@ -33,11 +33,11 @@
 (add-hook 'focus-out-hook #'etc-save-if-necessary)
 (add-hook 'focus-in-hook #'etc-save-if-necessary)
 (defadvice switch-to-buffer (before save-buffer-now activate)
-  (when (etc-buffer-needs-saving) (etc-save-if-necessary)))
+  (etc-save-if-necessary))
 (defadvice other-window (before other-window-now activate)
-  (when (etc-buffer-needs-saving) (etc-save-if-necessary)))
+  (etc-save-if-necessary))
 (defadvice other-frame (before other-frame-now activate)
-  (when (etc-buffer-needs-saving) (etc-save-if-necessary)))
+  (etc-save-if-necessary))
 
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")
