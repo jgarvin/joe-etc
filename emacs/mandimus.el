@@ -356,8 +356,9 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while
-          (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
+      (skip-chars-forward "[:space:]")
+      (while (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t)
+        (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))

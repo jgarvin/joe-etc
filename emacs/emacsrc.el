@@ -58,7 +58,7 @@
  )
 
 ;; for emacsclient
-;; (server-start)
+(server-start)
 
 (if (< emacs-major-version 24)
     (load-file "~/etc/emacs/cl-lib-0.3.el")

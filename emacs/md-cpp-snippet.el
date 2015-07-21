@@ -33,6 +33,7 @@
    ("for each" "for(auto& $1 : $2) {\n    $3;\n}")
    ("for" "for($1; $2; $3) {\n    $4;\n}")
    ("forward" "std::forward<$1>($2)")
+   ("friend class" "friend class $1;")
    ("function deaf" "$1 $2($3)\n{\n    $4;\n}")
    ("function signature" "$1 $2($3);")
    ("get" "std::get<$2>($1)")
