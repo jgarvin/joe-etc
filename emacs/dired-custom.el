@@ -1,14 +1,10 @@
-(require 'dired+)
+(require 'dired)
 
-(defun etc-dired-name ()
-  (concat "!" (buffer-name (current-buffer))))
+;; (defun etc-dired-hook ()
+;;   ;;(auto-revert-mode)
+;;   )
 
-(defun etc-dired-hook ()
-  ;; (rename-buffer (etc-dired-name))
-  (auto-revert-mode)
-  )
-
-(add-hook 'dired-mode-hook #'etc-dired-hook)
+;; (add-hook 'dired-mode-hook #'etc-dired-hook)
 
 (defun dired-back-to-top ()
   (interactive)
@@ -30,6 +26,14 @@
   (interactive "fFile to open: ")
   (let ((process-connection-type nil))
     (start-process "" nil "/usr/bin/xdg-open" filename)))
+
+(defun etc-open-dired ()
+  (interactive)
+  ;;(dired (file-name-directory (buffer-file-name)))
+  (dired (file-name-directory default-directory))
+  )
+
+(global-set-key (kbd "C-x C-j") #'etc-open-dired)
 
 (define-key dired-mode-map (kbd "e") 'dired-xdg-open-file)
 

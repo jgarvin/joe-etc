@@ -156,6 +156,8 @@ If the string preceeding pos isn't part of any pair, then returns nil."
      ((and (derived-mode-p 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      (isearch-mode nil)
      ((md-likely-preceded-by-opener (point)) nil)
+     ((and (or (equal str "0") (not (equal (string-to-number str) 0)))
+           (derived-mode-p 'prog-mode 'shell-mode)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)
      ((save-excursion
         (re-search-backward space-inhibiting-before-characters (1- (point)) t)) nil)

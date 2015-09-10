@@ -25,9 +25,6 @@
 [submodule "smartparens"]
 	path = smartparens
 	url = git@github.com:Fuco1/smartparens.git
-[submodule "dash"]
-	path = dash
-	url = git@github.com:magnars/dash.el.git
 [submodule "popup-keys"]
 	path = popup-keys
 	url = git@github.com:QBobWatson/popup-keys.git
