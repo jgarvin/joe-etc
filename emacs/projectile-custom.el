@@ -12,3 +12,7 @@
 ;; without this accessing files via /sudo:: will freeze for some reason.
 ;; see: https://github.com/bbatsov/prelude/issues/594
 (setq projectile-mode-line " Projectile")
+
+;; disable projectile on remote hosts, too slow
+(defadvice projectile-project-root (around ignore-remote first activate)
+  (unless (file-remote-p default-directory) ad-do-it))

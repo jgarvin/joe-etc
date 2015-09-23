@@ -14,4 +14,4 @@ fi
 
 # By launching emacsclient through an interactive zsh,
 # we know we get the emacsclient from the $PATH we want.
-zsh -i -c "emacsclient $arg"
+zsh -i -c "emacsclient --alternate-editor=\"\" $arg"

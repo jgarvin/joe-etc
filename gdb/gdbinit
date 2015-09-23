@@ -23,14 +23,7 @@ quit
 end
 
 set script-extension soft
-source ~/etc/rwtime.py
-
-echo Turning off listening for SIGUSR1...\n
-handle SIGUSR1 nostop
 
 # to prevent other threads from being able to run
 # when you are stepping 
 #set scheduler-locking on
-
-break main
-delete 1

@@ -154,6 +154,7 @@
 (load-file "~/etc/emacs/build-custom.el")
 (load-file "~/etc/emacs/midnight-custom.el")
 (load-file "~/etc/emacs/last-change-custom.el")
+(load-file "~/etc/emacs/linum-custom.el")
 
 (delete-selection-mode 1)
 
@@ -411,6 +412,7 @@
 ;; (global-set-key "\C-s" 'isearch-forward)
 ;; (global-set-key "\C-r" 'isearch-backward)
 
+(global-set-key (kbd "C-%") 'query-replace-regexp)
 (global-set-key "\M-%" 'query-replace)
 
 ;; Threshold after which we consider the file to be large
@@ -757,13 +759,6 @@
   (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
-(require 'linum-relative)
-;; (defun etc-enable-linum-mode ()
-;;   (linum-mode 1))
-;; ;; makes navigating dired by voice much easier
-;; (add-hook 'dired-mode-hook #'etc-enable-linum-mode)
-(global-linum-mode 1)
-
 ;; I don't actually like line wrapping, but emacs becomes
 ;; totally unresponsive when there are really long lines,
 ;; so this has to be on as a safety measure -_-
@@ -775,3 +770,6 @@
 (global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
 (global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
 (global-set-key (kbd "C-c m u") #'string-inflection-upcase)
+
+;; force myself to use C-i so I don't stretch my left pinky
+;;(global-unset-key (kbd "<tab>"))

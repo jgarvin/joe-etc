@@ -11,7 +11,6 @@ import datetime
 import popen2
 import sh
 
-# TODO: Determine scratchhost binary to open based on timestamps when ambiguous.
 # TODO: -s to just list cores
 # TODO: Search for versions in logfiles (flail integration). Would
 # help with apps whose name is too long.
@@ -101,7 +100,7 @@ elif len(possibleCores) == 1:
     chosenCore = possibleCores[0]
 else:
     possibleCores = [[core, op.getmtime(core)] for core in possibleCores]
-    possibleCores.sort(key=lambda x: x[1], reverse=True)
+    possibleCores.sort(key=lambda x: x[1])
 
     if "-r" in sys.argv or "--recent" in sys.argv:
         choice = 0
@@ -111,16 +110,16 @@ else:
 
         while 1:
             for i, (core, timestamp) in enumerate(possibleCores):
-                print "%d. %s (%s)" % (i, core, time_str(timestamp))
+                print "%d. %s (%s)" % (len(possibleCores)-1-i, core, time_str(timestamp))
             print "> ",
 
             choice = raw_input()
 
             if choice == '':
-                choice = 0
+                choice = len(possibleCores)-1
             else:
                 try:
-                    choice = int(choice)
+                    choice = len(possibleCores)-1-int(choice)
                 except ValueError:
                     print >> sys.stderr, ("'%s' is not an integer. Enter a number "
                                           "from the list." % choice)
