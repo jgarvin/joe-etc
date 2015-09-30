@@ -658,14 +658,14 @@ Ignores CHAR at point."
   (let ((p (point)))
     (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
                 (not (eobp)))
-      (forward-line 1))))
+      (next-logical-line 1))))
 
 (defun md-up-screenful ()
   (interactive)
   (let ((p (point)))
     (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
                 (not (bobp)))
-      (forward-line -1))))
+      (next-logical-line -1))))
 
 ;; (defun md-wrap-sexp ()
 ;;   (interactive)

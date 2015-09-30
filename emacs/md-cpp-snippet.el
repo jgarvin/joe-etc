@@ -35,6 +35,7 @@
    ("else" "else {\n    $1;\n}")
    ("enable if" "std::enable_if_t<$1>")
    ("end" "std::end($1)")
+   ("E numb" "enum $1 {\n    ☢,\n};")
    ("equals" "$1 == $2")
    ("find" "std::find($1, $2, $3)")
    ("for each" "for(auto& $1 : $2) {\n    $3;\n}")

@@ -1,10 +1,11 @@
 (require 'dired)
 
-;; (defun etc-dired-hook ()
-;;   ;;(auto-revert-mode)
-;;   )
+(defun etc-dired-hook ()
+  ;;(auto-revert-mode)
+  (dired-hide-details-mode 1)
+  )
 
-;; (add-hook 'dired-mode-hook #'etc-dired-hook)
+(add-hook 'dired-mode-hook #'etc-dired-hook)
 
 (defun dired-back-to-top ()
   (interactive)
