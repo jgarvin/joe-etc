@@ -1,17 +1,21 @@
 #!/usr/bin/env zsh
 
 if [ -n "$DISPLAY" ]; then
+    echo wat >> /tmp/debug
     arg="-c"
 fi
 
 if [ -z "$@" ]; then
     # emacsclient requires you to run on something, can't just
     # pop open a window.
+    echo wat2 >> /tmp/debug
     arg="$arg $HOME"
 else
+    echo wat3 >> /tmp/debug
     arg="$arg $@"
 fi
 
 # By launching emacsclient through an interactive zsh,
 # we know we get the emacsclient from the $PATH we want.
+echo wat4 >> /tmp/debug
 zsh -i -c "emacsclient --alternate-editor=\"\" $arg"

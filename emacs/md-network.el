@@ -2,7 +2,7 @@
 (require 'timer)
 
 (defvar md-server-clients nil)
-(defvar md-server-eval-timeout 5)
+(defvar md-server-eval-timeout 60)
 (defvar md-server-connect-hook nil)
 (defvar md-server-disconnect-hook nil)
 
@@ -46,7 +46,7 @@
     (md-server-stop))
   (md-server-start))
 
-(defun md-server-filter (proc string)   
+(defun md-server-filter (proc string)
   (or (catch 'restart
         (let ((pending (assoc proc md-server-clients))
               message
@@ -64,11 +64,12 @@
             (unwind-protect
                 (setq result
                       (condition-case err
-                          (with-timeout (md-server-eval-timeout
-                                         (progn
-                                           (message "Timeout exceeded while running: [%S]" command)
-                                           (throw 'restart nil)))
-                            (eval (car (read-from-string command))))
+                          (eval (car (read-from-string command)))
+                          ;; (with-timeout (md-server-eval-timeout
+                          ;;                (progn
+                          ;;                  (message "Timeout exceeded while running: [%S]" command)
+                          ;;                  (throw 'restart nil)))
+                          ;;   (eval (car (read-from-string command))))
                         (user-error (message "Error: %s" (error-message-string err)))
                         (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
               ;; We always want to send the newline because the client will block until

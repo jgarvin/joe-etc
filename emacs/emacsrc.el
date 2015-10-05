@@ -155,6 +155,7 @@
 (load-file "~/etc/emacs/midnight-custom.el")
 (load-file "~/etc/emacs/last-change-custom.el")
 (load-file "~/etc/emacs/linum-custom.el")
+(load-file "~/etc/emacs/visual-line-custom.el")
 
 (delete-selection-mode 1)
 
@@ -218,16 +219,27 @@
   (interactive "P")
   (cond
    ((or (eolp) n)
-    (forward-line (prefix-numeric-value (or n 1)))
-    (end-of-line)
+    (line-move (prefix-numeric-value (or n 1)))
+    (end-of-visual-line)
     (skip-chars-backward "[:space:]"))
    ((save-excursion
       (skip-chars-forward "[:space:]")
       (eolp)) ; At start of trailing whitespace
-    (end-of-line))
+    (end-of-visual-line))
    (t
-    (end-of-line)
+    (end-of-visual-line)
     (skip-chars-backward "[:space:]"))))
+
+(defun back-to-visual-indentation ()
+  "Move point to the first non-whitespace character on this line."
+  (interactive "^")
+  (beginning-of-visual-line 1)
+  (skip-syntax-forward " "
+                       (save-excursion (end-of-visual-line) (point))
+                       ;;(line-end-position)
+                       )
+  ;; Move back over chars that have whitespace syntax but have the p flag.
+  (backward-prefix-chars))
 
 (defun beginning-or-indentation (&optional n)
   "Move cursor to beginning of this line or to its indentation.
@@ -237,11 +249,14 @@
   With arg N, move backward to the beginning of the Nth previous line.
   Interactively, N is the prefix arg."
   (interactive "P")
-  (cond ((or (bolp) n)
-         (forward-line (- (prefix-numeric-value n))))
-        ((save-excursion (skip-chars-backward "[:space:]") (bolp)) ; At indentation.
-         (forward-line 0))
-        (t (back-to-indentation))))
+  (let ((p (point)))
+    (cond
+     ((= p (save-excursion (beginning-of-visual-line) (point)))
+      (line-move -1)
+      (back-to-visual-indentation))
+     ((= p (save-excursion (back-to-visual-indentation) (point)))
+      (beginning-of-visual-line))
+     (t (back-to-visual-indentation)))))
 
 (global-set-key "\C-a" 'beginning-or-indentation)
 (global-set-key "\C-e" 'end-or-trailing)
@@ -758,11 +773,6 @@
   (interactive)
   (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
-
-;; I don't actually like line wrapping, but emacs becomes
-;; totally unresponsive when there are really long lines,
-;; so this has to be on as a safety measure -_-
-(global-visual-line-mode 1)
 
 (require 'string-inflection)
 (global-set-key (kbd "C-c y") #'string-inflection-cycle)
