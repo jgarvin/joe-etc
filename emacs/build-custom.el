@@ -90,7 +90,7 @@
   (quit-window kill-buffer (selected-window)))
 
 (defun etc-build-buffer-name (type cmd)
-  (format "*%s|%s|%s*"
+  (format "*%s,%s,%s*"
           (if (eq type 'build) "compile" "run")
           (etc-get-project)
           cmd))

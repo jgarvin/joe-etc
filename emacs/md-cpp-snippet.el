@@ -56,6 +56,7 @@
    ("index sequence" "std::index_sequence<$1>")
    ("init var" "$1 $2 = $3;")
    ("inline" "inline $1")
+   ("integral constant" "std::integral_constant<$1, $2>")
    ("is same" "std::is_same<$1, $2>::value")
    ("is base of" "std::is_base_of<$1, $2>::value")
    ("left shift" "$1 << $2")

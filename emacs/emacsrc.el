@@ -117,7 +117,7 @@
   (message "No ~/.emacspass file found!"))
 
 (load-file "~/etc/emacs/smartparens-custom.el")
-(load-file "~/etc/emacs/ido-custom.el")
+;;(load-file "~/etc/emacs/ido-custom.el")
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
@@ -156,6 +156,7 @@
 (load-file "~/etc/emacs/last-change-custom.el")
 (load-file "~/etc/emacs/linum-custom.el")
 (load-file "~/etc/emacs/visual-line-custom.el")
+(load-file "~/etc/emacs/helm-custom.el")
 
 (delete-selection-mode 1)
 
@@ -258,8 +259,16 @@
       (beginning-of-visual-line))
      (t (back-to-visual-indentation)))))
 
-(global-set-key "\C-a" 'beginning-or-indentation)
-(global-set-key "\C-e" 'end-or-trailing)
+;; (global-set-key "\C-a" 'beginning-or-indentation)
+;; (global-set-key "\C-e" 'end-or-trailing)
+;; (global-unset-key "\C-a")
+;; (global-unset-key "\C-e")
+
+;; lets try this for awhile
+(global-set-key (kbd "<home>") 'beginning-or-indentation)
+(global-set-key (kbd "<end>") 'end-or-trailing)
+
+
 
 ;; turns out don't want this since i have kinesis, C-backspace
 ;; is better
@@ -372,7 +381,7 @@
 
 (defun kill-and-indent (&optional ARG)
   (interactive)
-  (kill-line ARG)
+  (kill-visual-line ARG)
   (indent-according-to-mode))
 
 (global-set-key (kbd "RET") #'reindent-then-newline-and-indent)

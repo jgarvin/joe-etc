@@ -7,6 +7,22 @@
 (require 'gtags)
 (gtags-mode t)
 
+;; In later gtags versions these aren't set by default.
+(define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\^?" 'scroll-down)
+(define-key gtags-select-mode-map " " 'scroll-up)
+(define-key gtags-select-mode-map "\C-b" 'scroll-down)
+(define-key gtags-select-mode-map "\C-f" 'scroll-up)
+(define-key gtags-select-mode-map "k" 'previous-line)
+(define-key gtags-select-mode-map "j" 'next-line)
+(define-key gtags-select-mode-map "p" 'previous-line)
+(define-key gtags-select-mode-map "n" 'next-line)
+(define-key gtags-select-mode-map "q" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "u" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
+(define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
+(define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
+
 ;; (defun gtags-select-tag-and-kill-buffer ()
 ;;   (interactive)
 ;;   (let ((buf (current-buffer)))
@@ -79,6 +95,35 @@
 (defun etc-compilation-finished (buffer finished-status)
   (message "Result: [%S] [%S]" buffer finished-status))
 
+;; (defun etc-gtags-find-tag ()
+;;   (interactive)
+;;   ;; (message "%S" default-directory)
+;;   ;; (gtags-find-tag)
+;;   (let* ((project-root (projectile-project-root))
+;;          (default-directory
+;;            (cond
+;;             ((file-exists-p (concat project-root "source"))
+;;              (concat project-root "source"))
+;;             (t project-root))))
+;;     (message "%S" default-directory)
+;;     (gtags-find-tag)))
+
+;; (defun etc-gtags-find-rtag ()
+;;   (interactive)
+;;   (let* ((project-root (projectile-project-root))
+;;          (default-directory
+;;            (cond
+;;             ((file-exists-p (concat project-root "source"))
+;;              (concat project-root "source"))
+;;             (t project-root))))
+;;     (gtags-find-rtag)))
+
+;; (global-set-key (kbd "M-.") #'etc-gtags-find-tag)
+;; (global-set-key (kbd "M-,") #'etc-gtags-find-rtag)
+
+(global-set-key (kbd "M-.") #'gtags-find-tag)
+(global-set-key (kbd "M-,") #'gtags-find-rtag)
+
 (defun etc-setup-c-common ()
   (local-set-key "\M-t" 'toggle-header-buffer)
 
@@ -96,22 +141,6 @@
   ;; Rebind the normal find tag functions to use the GNU global versions
   (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
   (local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
-
-  ;; In later gtags versions these aren't set by default.
-  (define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
-  (define-key gtags-select-mode-map "\^?" 'scroll-down)
-  (define-key gtags-select-mode-map " " 'scroll-up)
-  (define-key gtags-select-mode-map "\C-b" 'scroll-down)
-  (define-key gtags-select-mode-map "\C-f" 'scroll-up)
-  (define-key gtags-select-mode-map "k" 'previous-line)
-  (define-key gtags-select-mode-map "j" 'next-line)
-  (define-key gtags-select-mode-map "p" 'previous-line)
-  (define-key gtags-select-mode-map "n" 'next-line)
-  (define-key gtags-select-mode-map "q" 'gtags-pop-stack)
-  (define-key gtags-select-mode-map "u" 'gtags-pop-stack)
-  (define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
-  (define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
-  (define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
 
   ;;(setq require-final-newline t)
 
@@ -146,5 +175,45 @@
   (setq tab-width my-indent-size)
   (when (not (equal (assoc 'innamespace c-offsets-alist) 0))
     (c-set-offset 'innamespace my-indent-size)))
+
+(require 'font-lock)
+
+(defun --copy-face (new-face face)
+  "Define NEW-FACE from existing FACE."
+  (copy-face face new-face)
+  (eval `(defvar ,new-face nil))
+  (set new-face new-face))
+
+(--copy-face 'font-lock-label-face  ; labels, case, public, private, proteced, namespace-tags
+             'font-lock-keyword-face)
+(--copy-face 'font-lock-doc-markup-face ; comment markups such as Javadoc-tags
+             'font-lock-doc-face)
+(--copy-face 'font-lock-doc-string-face ; comment markups
+             'font-lock-comment-face)
+
+;;(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+
+(defun etc-c++-mode-hook ()
+  (font-lock-add-keywords
+   nil '(;; complete some fundamental keywords
+         ("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
+         ;; add the new C++11 keywords
+         ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
+         ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
+         ;; PREPROCESSOR_CONSTANT
+         ("\\<[A-Z]+[A-Z_]+\\>" . font-lock-constant-face)
+         ;; hexadecimal numbers
+         ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
+         ;; integer/float/scientific numbers
+         ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
+         ;; user-types (customize!)
+         ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|type\\|ptr\\)\\>" . font-lock-type-face)
+         ("\\<\\(xstring\\|xchar\\)\\>" . font-lock-type-face)
+         ("auto ?&? +\(\\w+\)" 1 'font-lock-variable-name-face)
+         )))
+
+(add-hook 'c++-mode-hook #'etc-c++-mode-hook)
+             
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)

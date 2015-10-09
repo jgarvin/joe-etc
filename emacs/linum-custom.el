@@ -13,5 +13,9 @@
     (setq my-linum-current-timer
           (run-with-idle-timer 0.1 nil #'linum-update-current))))
 
+
 (require 'linum-relative)
-(global-linum-mode 1)
+(global-linum-mode)
+
+;; (global-relative-line-numbers-mode)
+;; (setq relative-line-numbers-motion-function #'vertical-motion)
