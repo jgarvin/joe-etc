@@ -1,3 +1,5 @@
+(load-file "~/etc/emacs/linum-relative-custom.el")
+(linum-relative-on)
 (with-eval-after-load "linum"
   ;; set `linum-delay' so that linum uses `linum-schedule' to update linums.
   (setq linum-delay t)
@@ -14,7 +16,7 @@
           (run-with-idle-timer 0.1 nil #'linum-update-current))))
 
 
-(require 'linum-relative)
+;;(require 'linum-relative)
 (global-linum-mode)
 
 ;; (global-relative-line-numbers-mode)

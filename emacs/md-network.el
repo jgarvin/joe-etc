@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 ;; needed for with-timeout
 (require 'timer)
 
@@ -5,6 +7,8 @@
 (defvar md-server-eval-timeout 60)
 (defvar md-server-connect-hook nil)
 (defvar md-server-disconnect-hook nil)
+(defvar md-server-pending-actions nil)
+(defvar md-server-execute-pending-timer nil)
 
 ;; hacked around this for now
 ;; ;; You are rightly wondering why this is here. The reason
@@ -20,6 +24,13 @@
 ;; ;; is never received, so then the down arrow continues to be
 ;; ;; held, which triggers the visual bell AGAIN..
 ;; (setq ring-bell-function #'ignore)
+
+(defun md-execute-pending ()
+  (unwind-protect
+      (while md-server-pending-actions
+        (funcall (pop md-server-pending-actions)))
+    (cancel-timer md-server-execute-pending-timer)
+    (setq md-server-execute-pending-timer nil)))
 
 (defun md-server-start nil
   (interactive)
@@ -38,6 +49,8 @@
   (while md-server-clients
     (delete-process (car (car md-server-clients)))
     (setq md-server-clients (cdr md-server-clients)))
+  (cancel-timer md-server-execute-pending-timer)
+  (setq md-server-pending-actions nil)
   (delete-process "mandimus-eval-server"))
 
 (defun md-server-restart ()
@@ -61,27 +74,27 @@
           (while (setq index (string-match "\n" message))
             (setq index (1+ index))
             (setq command (substring message 0 index))
+            ;; we don't actually execute the actions while we're in the filter
+            ;; because that tends to cause disconnects
+            (setq md-server-pending-actions
+                  (append md-server-pending-actions
+                    (list (lambda ()
+                      (setq result
+                            (condition-case err
+                                (eval (car (read-from-string command)))
+                              (user-error (message "Error: %s" (error-message-string err)))
+                              (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
+                      (let ((print-length nil))
+                        (setq result (format "%S" result)))
+                      ;; because newline is the protocol delimeter we have to nuke it
+                      (setq result (replace-regexp-in-string "\n" "" result))
+                      (setq result (concat result "\n"))
+                      (process-send-string proc result)
+                      (md-server-log command proc)))))
+            (unless md-server-execute-pending-timer
+              (setq md-server-execute-pending-timer (run-with-idle-timer 0 t #'md-execute-pending)))
             (unwind-protect
-                (setq result
-                      (condition-case err
-                          (eval (car (read-from-string command)))
-                          ;; (with-timeout (md-server-eval-timeout
-                          ;;                (progn
-                          ;;                  (message "Timeout exceeded while running: [%S]" command)
-                          ;;                  (throw 'restart nil)))
-                          ;;   (eval (car (read-from-string command))))
-                        (user-error (message "Error: %s" (error-message-string err)))
-                        (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
-              ;; We always want to send the newline because the client will block until
-              ;; it receives it.
-              (let ((print-length nil))
-                (setq result (format "%S" result)))
-              ;; because newline is the protocol delimeter we have to nuke it
-              (setq result (replace-regexp-in-string "\n" "" result))
-              (setq result (concat result "\n"))
-              (process-send-string proc result)
               (setq message (substring message index))
-              (md-server-log command proc)
               (setcdr pending message)))
           t))
       (md-server-restart)))

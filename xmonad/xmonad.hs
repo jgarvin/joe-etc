@@ -227,7 +227,7 @@ myManageHook = composeAll
 
 main = do
   home_folder <- getEnv "HOME"
-  editor <- return (home_folder ++ "/etc/bin/launch-emacs -n")
+  editor <- return (home_folder ++ "/etc/bin/launch-emacs-no-wait")
   browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 

@@ -41,13 +41,15 @@
         (progn
           (setq scripts (cl-sort scripts #'string< :key))
           (dotimes (ii (min 26 (length scripts)))
-            (let ((script (file-truename (nth ii scripts))))
-              (push (list (format "%c" (+ 97 ii))
-                          (file-name-sans-extension
-                           (file-name-sans-extension
-                            (file-name-nondirectory script)))
-                          (lambda ()
-                            (set choice-sym script))) actions)))
+            (let ((script (file-truename (nth ii scripts)))
+                  (letter (format "%c" (+ 97 ii))))
+              (when (not (equal letter "q")) ;; used for quitting
+                    (push (list letter
+                                (file-name-sans-extension
+                                 (file-name-sans-extension
+                                  (file-name-nondirectory script)))
+                                (lambda ()
+                                  (set choice-sym script))) actions))))
           (setq actions (cl-sort actions #'string< :key (lambda (x) (cadr x))))
           (popup-keys:new
            cmd

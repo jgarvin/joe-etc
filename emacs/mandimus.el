@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 (require 'cl)
 (require 'dash)
 (require 'ring)
