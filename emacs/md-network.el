@@ -29,7 +29,9 @@
   (unwind-protect
       (while md-server-pending-actions
         (funcall (pop md-server-pending-actions)))
-    (cancel-timer md-server-execute-pending-timer)
+    (setq md-server-pending-actions nil)
+    (when md-server-execute-pending-timer
+      (cancel-timer md-server-execute-pending-timer))
     (setq md-server-execute-pending-timer nil)))
 
 (defun md-server-start nil
@@ -49,7 +51,8 @@
   (while md-server-clients
     (delete-process (car (car md-server-clients)))
     (setq md-server-clients (cdr md-server-clients)))
-  (cancel-timer md-server-execute-pending-timer)
+  (when md-server-execute-pending-timer
+    (cancel-timer md-server-execute-pending-timer))
   (setq md-server-pending-actions nil)
   (delete-process "mandimus-eval-server"))
 
@@ -78,23 +81,29 @@
             ;; because that tends to cause disconnects
             (setq md-server-pending-actions
                   (append md-server-pending-actions
-                    (list (lambda ()
-                      (setq result
-                            (condition-case err
-                                (eval (car (read-from-string command)))
-                              (user-error (message "Error: %s" (error-message-string err)))
-                              (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
-                      (let ((print-length nil))
-                        (setq result (format "%S" result)))
-                      ;; because newline is the protocol delimeter we have to nuke it
-                      (setq result (replace-regexp-in-string "\n" "" result))
-                      (setq result (concat result "\n"))
-                      (process-send-string proc result)
-                      (md-server-log command proc)))))
+                          (list (lambda ()
+                                  ;; (message "runing")
+                                  (setq result
+                                        (condition-case err
+                                            (eval (car (read-from-string command)))
+                                          (user-error (message "Error: %s" (error-message-string err)))
+                                          (error (message "Mandimus error: [%S] in [%S]" (error-message-string err) command))))
+                                  (let ((print-length nil))
+                                    (setq result (format "%S" result)))
+                                  ;; because newline is the protocol delimeter we have to nuke it
+                                  (setq result (replace-regexp-in-string "\n" "" result))
+                                  (setq result (concat result "\n"))
+                                  (let ((status (process-status "mandimus-eval-server")))
+                                    (if (eq status 'listen)
+                                        (progn
+                                          (process-send-string proc result)
+                                          (md-server-log command proc))
+                                      (error "Couldn't run command, server status: %S" status)))))))
             (unless md-server-execute-pending-timer
+              ;; (message "scheduling")
               (setq md-server-execute-pending-timer (run-with-idle-timer 0 t #'md-execute-pending)))
             (unwind-protect
-              (setq message (substring message index))
+                (setq message (substring message index))
               (setcdr pending message)))
           t))
       (md-server-restart)))

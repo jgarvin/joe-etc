@@ -473,6 +473,8 @@
     (fundamental-mode)
     (font-lock-mode -1)
     (linum-mode 0)
+    (smartparens-mode 0)
+    (setq md-enable-symbol-refresh nil)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -647,9 +649,9 @@
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "M-=") 'er/contract-region)
 
-(require 'change-inner)
-(global-set-key (kbd "M-i") 'change-inner)
-(global-set-key (kbd "M-o") 'change-outer)
+;; (require 'change-inner)
+;; (global-set-key (kbd "M-i") 'change-inner)
+;; (global-set-key (kbd "M-o") 'change-outer)
 
 (defun chomp (str)
   "Chomp leading and tailing whitespace from STR."
