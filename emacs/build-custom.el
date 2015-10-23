@@ -16,6 +16,18 @@
 (defvar-local etc-compilation-compile-command nil)
 (defvar-local etc-compilation-invoking-buffer nil)
 (defvar-local etc-run-finished-status nil)
+(defvar etc-most-recent-build-buffer nil)
+(defvar etc-most-recent-run-buffer nil)
+
+(defun etc-stop-most-recent-build ()
+  (interactive)
+  (with-current-buffer etc-most-recent-build-buffer
+    (kill-compilation)))
+
+(defun etc-stop-most-recent-run ()
+  (interactive)
+  (with-current-buffer etc-most-recent-run-buffer
+    (etc-interrupt-subjob)))
 
 (defun etc-toggle-debug ()
   (interactive)
@@ -94,7 +106,8 @@
 (defun etc-build-buffer-name (type cmd)
   (format "*%s,%s,%s*"
           (if (eq type 'build) "compile" "run")
-          (etc-get-project)
+          (let ((default-directory (file-name-directory cmd)))
+               (etc-get-project))
           cmd))
 
 (defun etc-run-impl (cmd &optional debugging)
@@ -125,6 +138,8 @@
     (if existing-window
         (set-window-buffer existing-window buff-real-name))
     (with-current-buffer buff-real-name
+      (setq etc-most-recent-run-buffer (current-buffer))
+      (local-set-key (kbd "C-c C-k") #'etc-interrupt-subjob)
       (if debugging
           (progn
             (realgud-track-mode))
@@ -160,6 +175,7 @@
   (etc-save-if-necessary)
   (let* (;; make the compilaton buffer depend on the command name and the project,
          ;; this makes sure we can have multiple compiles going
+         (default-directory (file-name-directory comp-command))
          (buf-name (etc-build-buffer-name 'build comp-command))
          (compilation-buffer-name-function (lambda (mode) buf-name))
          ;; Pass info on for how to run things from the buffer we invoke in, which
@@ -169,6 +185,7 @@
          (proj (etc-get-project))
          (invoking (current-buffer))
          (compilation-mode-hook (cons (lambda (&rest unused)
+                                        (setq etc-most-recent-build-buffer (current-buffer))
                                         (font-lock-mode 0)
                                         (setq etc-compilation-comp-command comc)
                                         (setq etc-compilation-project proj)
@@ -218,9 +235,16 @@
   (interactive)
   (find-file etc-run-choice))
 
+(defun etc-interrupt-subjob ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (comint-interrupt-subjob)))
+
 (global-set-key (kbd "C-c b") #'etc-compile)
+(global-set-key (kbd "C-c s b") #'etc-stop-most-recent-build)
 (global-set-key (kbd "<f10>") #'etc-compile)
 (global-set-key (kbd "C-c r") #'etc-stale-run)
+(global-set-key (kbd "C-c s r") #'etc-stop-most-recent-run)
 (global-set-key (kbd "<f11>") #'etc-stale-run)
 (global-set-key (kbd "C-c c") #'etc-compile-and-run)
 (global-set-key (kbd "<f12>") #'etc-compile-and-run)

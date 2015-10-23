@@ -157,6 +157,7 @@
 (load-file "~/etc/emacs/helm-custom.el")
 (load-file "~/etc/emacs/linum-custom.el")
 (load-file "~/etc/emacs/visual-line-custom.el")
+(load-file "~/etc/emacs/visible-mark-custom.el")
 
 (delete-selection-mode 1)
 

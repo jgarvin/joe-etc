@@ -93,12 +93,13 @@
                                   ;; because newline is the protocol delimeter we have to nuke it
                                   (setq result (replace-regexp-in-string "\n" "" result))
                                   (setq result (concat result "\n"))
-                                  (let ((status (process-status "mandimus-eval-server")))
-                                    (if (eq status 'listen)
+                                  (let ((status (process-status proc)))
+                                    (if (eq status 'open)
                                         (progn
                                           (process-send-string proc result)
                                           (md-server-log command proc))
-                                      (error "Couldn't run command, server status: %S" status)))))))
+                                      ;; not really user error but don't want back traces
+                                      (user-error "Couldn't run command, server status: %S" status)))))))
             (unless md-server-execute-pending-timer
               ;; (message "scheduling")
               (setq md-server-execute-pending-timer (run-with-idle-timer 0 t #'md-execute-pending)))
