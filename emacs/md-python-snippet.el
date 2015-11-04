@@ -93,4 +93,5 @@
    ("and" "$1 and $2")
    ("or" "$1 or $2")
    ("else" "else:\n    $1")
+   ("print" "print $1")
    ))

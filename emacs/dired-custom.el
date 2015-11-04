@@ -1,5 +1,9 @@
 (require 'dired)
 
+(use-package async :ensure t)
+
+(dired-async-mode 1)
+
 (defun etc-dired-hook ()
   ;;(auto-revert-mode)
   (dired-hide-details-mode 1)

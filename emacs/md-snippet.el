@@ -533,3 +533,4 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-cpp-snippet.el")
 (load-file "~/etc/emacs/md-python-snippet.el")
 (load-file "~/etc/emacs/md-shell-snippet.el")
+(load-file "~/etc/emacs/md-eshell-snippet.el")

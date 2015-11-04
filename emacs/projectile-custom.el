@@ -1,3 +1,7 @@
+(use-package
+  projectile
+  :ensure t)
+
 (projectile-global-mode)
 
 ;; allow projectile to use external utils to speed up indexing

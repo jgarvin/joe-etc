@@ -1,3 +1,11 @@
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/packages/") t))
+
+(require 'use-package)
+
 ;; for emacsclient
 (server-start)
 
@@ -97,13 +105,6 @@
            (not (memq "/usr/share/emacs/site-lisp" load-path)))
   (add-to-list 'load-path "/usr/share/emacs/site-lisp"))
 
-(when (>= emacs-major-version 24)
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/packages/") t)
-  )
-
 (add-to-list 'load-path "~/etc/dash")
 (require 'dash)
 (eval-after-load "dash" '(dash-enable-font-lock))
@@ -158,6 +159,7 @@
 (load-file "~/etc/emacs/linum-custom.el")
 (load-file "~/etc/emacs/visual-line-custom.el")
 (load-file "~/etc/emacs/visible-mark-custom.el")
+(load-file "~/etc/emacs/eshell-custom.el")
 
 (delete-selection-mode 1)
 
@@ -262,8 +264,8 @@
 
 ;; (global-set-key "\C-a" 'beginning-or-indentation)
 ;; (global-set-key "\C-e" 'end-or-trailing)
-;; (global-unset-key "\C-a")
-;; (global-unset-key "\C-e")
+(global-unset-key "\C-a")
+(global-unset-key "\C-e")
 
 ;; lets try this for awhile
 (global-set-key (kbd "<home>") 'beginning-or-indentation)
@@ -795,3 +797,18 @@
 
 ;; force myself to use C-i so I don't stretch my left pinky
 ;;(global-unset-key (kbd "<tab>"))
+
+(defun etc-after-init ()
+  ;; swap c-x and c-t. c-x is a really
+  ;; common prefix, and I'd rather it
+  ;; be on the home row (which C-t is
+  ;; in WORKMAN layout).
+  ;; for reasons unknown only works
+  ;; after init.
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+
+(keyboard-translate ?\C-t ?\C-x)
+(keyboard-translate ?\C-x ?\C-t)
+
+(add-hook 'after-init-hook #'etc-after-init)

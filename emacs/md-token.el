@@ -467,11 +467,20 @@ on the ends. Also we want to store as lowercase."
 (add-hook 'md-window-selection-hook #'md-refresh-global-caches)
 ;; (remove-hook 'md-window-selection-hook #'md-refresh-global-caches)
 
+;; TODO: should be an LRU cache of last N regexps, so that people coming
+;; and going don't churn the CPU.
+(defvar-local md-erc-regexp-cache nil)
 (defun md-get-active-erc-nicknames (&optional max-results)
   (when (derived-mode-p 'erc-mode)
-    (let ((candidates (erc-get-channel-nickname-list)))
+    (let ((candidates (cl-sort (erc-get-channel-nickname-list) #'string<)))
       (when candidates
-        (let* ((regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
+        (if (not (equal (car md-erc-regexp-cache) candidates))
+            ;; have to use regexp-opt or the regexes get too big, so we error even
+            ;; before max-results has a chance to kick in.
+            (setq md-erc-regexp-cache
+                  (list candidates (regexp-opt (mapcar (lambda (x) (concat "<" x ">")) candidates)))))
+        (let* ((regex (cadr md-erc-regexp-cache))
+               ;; (regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
                (scan-limit (max (point-min) (- (point-max) (max md-nick-scan-limit (- (window-end) (window-start))))))
                (scan-start (point-max))
                (presence (make-hash-table :test 'equal))

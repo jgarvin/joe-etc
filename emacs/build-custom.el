@@ -177,8 +177,8 @@
          ;; this makes sure we can have multiple compiles going
          (default-directory (file-name-directory comp-command))
          (buf-name (etc-build-buffer-name 'build comp-command))
-         (compilation-buffer-name-function (lambda (mode) buf-name))
-         ;; Pass info on for how to run things from the buffer we invoke in, which
+         (compilation-buffer-name-function (lambda (mode) buf-name)) 
+        ;; Pass info on for how to run things from the buffer we invoke in, which
          ;; in turn could be getting from project or elsewhere.
          (runc run-command)
          (comc comp-command)

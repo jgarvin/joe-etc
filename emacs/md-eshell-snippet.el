@@ -1,0 +1,15 @@
+(md-make-snippets
+ '(derived-mode-p 'eshell-mode)
+ '(
+   ("echo" "echo $1")
+   ("grep" "grep $1")
+   ("for" "for $1 in $2 { $3 }")
+   ("lisp" "$($1)")
+   ("said" "sed 's/$1/$2/g' $3")
+   ("tee" "tee $1")
+   ("grep" "grep \"$1\"")
+   ("stood out" "$1 > $2")
+   ("stood err" "$1 2> $2")
+   ("stood both" "$1 &> $2")
+   ("line count" "wc -l")
+   ))
