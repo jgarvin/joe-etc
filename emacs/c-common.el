@@ -137,6 +137,7 @@
   (require 'whitespace)
   (setq whitespace-style '(face lines))
   (whitespace-mode t)
+  (setq whitespace-line-column 100)
 
   ;; Rebind the normal find tag functions to use the GNU global versions
   (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
@@ -148,7 +149,8 @@
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-
+  (local-set-key (kbd "C-M-y") #'sp-slurp-hybrid-sexp)
+  (local-set-key (kbd "C-M-k") #'sp-kill-hybrid-sexp)
   ;; Prefer 4-space tabs
 
 ;;  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
@@ -214,6 +216,48 @@
          )))
 
 (add-hook 'c++-mode-hook #'etc-c++-mode-hook)
-             
+
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
+
+(defadvice c-lineup-arglist (around my activate)
+  "Improve indentation of continued C++11 lambda function opened as argument."
+  (setq ad-return-value
+        (if (and (equal major-mode 'c++-mode)
+                 (ignore-errors
+                   (save-excursion
+                     (goto-char (c-langelem-pos langelem))
+                     ;; Detect "[...](" or "[...]{". preceded by "," or "(",
+                     ;;   and with unclosed brace.
+                     (looking-at ".*[(,][ \t]*\\[[^]]*\\][ \t]*[({][^}]*$"))))
+            0                           ; no additional indent
+          ad-do-it)))                   ; default behavior
+
+;; This hack fixes indentation for C++11's "enum class" in Emacs.
+;; http://stackoverflow.com/questions/6497374/emacs-cc-mode-indentation-problem-with-c0x-enum-class/6550361#6550361
+(defun inside-class-enum-p (pos)
+  "Checks if POS is within the braces of a C++ \"enum class\"."
+  (ignore-errors
+    (save-excursion
+      (goto-char pos)
+      (up-list -1)
+      (backward-sexp 1)
+      (looking-back "enum[ \t]+class[ \t]+[^}]+"))))
+
+(defun align-enum-class (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      0
+    (c-lineup-topmost-intro-cont langelem)))
+
+(defun align-enum-class-closing-brace (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      '-
+    '+))
+
+(defun fix-enum-class ()
+  "Setup `c++-mode' to better handle \"class enum\"."
+  (add-to-list 'c-offsets-alist '(topmost-intro-cont . align-enum-class))
+  (add-to-list 'c-offsets-alist
+               '(statement-cont . align-enum-class-closing-brace)))
+
+(add-hook 'c++-mode-hook 'fix-enum-class)

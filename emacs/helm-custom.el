@@ -72,3 +72,5 @@
   (let ((helm-completing-read-handlers-alist '((execute-extended-command . nil))))
     (call-interactively 'execute-extended-command)))
 (global-set-key (kbd "C-c m x") #'etc-no-helm-M-x)
+
+(setq helm-buffer-max-length 30)

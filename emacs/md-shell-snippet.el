@@ -9,4 +9,7 @@
    ("stood err" "$1 2> $2")
    ("stood both" "$1 &> $2")
    ("line count" "wc -l")
+   ("move" "mv $1 $2")
+   ("copy" "cp $1 $2")
+   ("CD", "cd $1")
    ))

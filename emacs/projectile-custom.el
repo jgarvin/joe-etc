@@ -20,3 +20,5 @@
 ;; disable projectile on remote hosts, too slow
 (defadvice projectile-project-root (around ignore-remote first activate)
   (unless (file-remote-p default-directory) ad-do-it))
+
+(setq projectile-use-git-grep t)

@@ -38,6 +38,9 @@
 (setq initial-scratch-message nil)
 (fset 'yes-or-no-p 'y-or-n-p) ;; Make all "yes or no" prompts be "y or n" instead
 
+;; Don't use modal popup dialogs, they block all of emacs and prevent mandimus from working
+(setq use-dialog-box nil)
+
 ;; Stop this crazy blinking cursor
 (blink-cursor-mode 0)
 

@@ -70,12 +70,12 @@
 (defun md-clear-slot (o)
   ;;(message "clearing")
   ;; we have to verify we are dealing with the intended
-  ;; overlay because old overlays can get left in the
   ;; buffer from undo and other actions.
   (let ((inhibit-modification-hooks t))
     (when (md-pos-is-ours o)
       (save-excursion
         (goto-char (overlay-start o))
+  ;; overlay because old overlays can get left in the
         (delete-char 1)))
     (md-sn-destroy-overlay o)))
 
@@ -251,6 +251,7 @@
           (md--insert-snippet-impl (car candidate))
         (user-error "Can't find snippet with name \"%s\" in current context" name)))))
 
+(defconst md-snippet-collapse-lookahead 100)
 (defun md--insert-snippet-impl (snippet)
   (let ((contents (md-snippet-contents snippet))
         (start)
@@ -283,7 +284,7 @@
                                                    contents))
           (when (derived-mode-p 'python-mode)
             (setq contents (replace-regexp-in-string "\n    " indentation contents)))
-          (md-insert-text contents t nil)
+          (md-insert-text contents nil nil)
           (setq end (make-marker))
           (set-marker end (point))
           (unless (derived-mode-p 'python-mode)
@@ -294,16 +295,16 @@
             (set-window-point nil jump-point))
           (when region-bounds
             (deactivate-mark)
-            (md-insert-text arg-text t nil)
+            (md-insert-text arg-text nil nil)
             (goto-char (marker-position start))
             (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
               (goto-char (1- (point)))))
           (when (derived-mode-p 'c++-mode)
-            (save-excursion (while (re-search-forward "[;,][:space:]*;" (1+ (marker-position end)) t) (replace-match ";" nil t)))
-            (save-excursion (while (re-search-forward "[;,][:space:]*," (1+ (marker-position end)) t) (replace-match "," nil t)))
-            (save-excursion (while (re-search-forward "[;,][:space:]*)" (1+ (marker-position end)) t) (replace-match ")" nil t)))
-            (save-excursion (while (re-search-forward "[;,][:space:]*]" (1+ (marker-position end)) t) (replace-match "]" nil t)))
-            (save-excursion (while (re-search-forward "[;,][:space:]*>" (1+ (marker-position end)) t) (replace-match ">" nil t)))))
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*;" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match ";" nil t)))
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*," (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match "," nil t)))
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*)" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match ")" nil t)))
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*]" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match "]" nil t)))
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*>" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match ">" nil t)))))
       (delete-selection-mode (if delete-selection-mode-enabled 1 0)))))
 
 (defun md-sn-find-slot (c)
@@ -408,14 +409,14 @@ go to the highest slot (most recent)."
   (md-add-snippet
    :name (format "%s" sym)
    :contents (md-gen-elisp-snippet-contents sym)
-   :context '(derived-mode-p 'emacs-lisp-mode)))
+   :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode)))
 
 (defun md-insert-call-snippet (n)
   (interactive)
-  (let* ((separator (if (derived-mode-p 'emacs-lisp-mode) " " ", "))
+  (let* ((separator (if (derived-mode-p 'emacs-lisp-mode 'eshell-mode) " " ", "))
          (c (concat "(" (mapconcat (lambda (x) (format "$%d" x)) (number-sequence 1 n) separator)
                     ")")))
-    (when (not (derived-mode-p 'emacs-lisp-mode))
+    (when (not (derived-mode-p 'emacs-lisp-mode 'eshell-mode))
       ;; most non- lisps have function calls of the format f(x, y)
       (setq c (concat "$0" c)))
     (md--insert-snippet-impl
@@ -436,50 +437,50 @@ go to the highest slot (most recent)."
    ("soot" "'$1'")))
 
 (md-make-snippets
- '(derived-mode-p 'emacs-lisp-mode)
+ '(derived-mode-p 'emacs-lisp-mode 'eshell-mode)
  '(("conned" "(cond\n($1)\n($2))")
    ("defun" "(defun $1 ($2) $3)")))
 
 (md-replace-snippet
  :name "let"
  :contents "(let (($1)) $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "setq"
  :contents "(setq $1 $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "setq-default"
  :contents "(setq-default $1 $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "message"
  :contents "(message \"$1\" $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "and"
  :contents "(and $1 $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "or"
  :contents "(or $1 $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
  :name "lambda"
  :contents "(lambda ($1) $2)"
- :context '(derived-mode-p 'emacs-lisp-mode))
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 ;; most non-lisp languages share a lot of tiny snippets,
 ;; like infix operators
 (defun generic-programming-context ()
   (when (and (derived-mode-p 'prog-mode 'inferior-python-mode)
-             (not (derived-mode-p 'emacs-lisp-mode))) t))
+             (not (derived-mode-p 'emacs-lisp-mode 'eshell-mode))) t))
 
 
 (md-make-snippets

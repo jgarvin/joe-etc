@@ -1,7 +1,7 @@
 (defun md-need-capitalization ()
   (interactive)
   (cond
-   ((derived-mode-p 'prog-mode 'comint-mode) nil)
+   ((derived-mode-p 'prog-mode 'comint-mode 'eshell-mode) nil)
    ((md-beginning-of-input) t)
    ((md-likely-preceded-by-opener (point)) t)
    ((save-excursion
@@ -193,11 +193,13 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (ring-insert md-recent-ring text)
   (when (and check-spaces
              (md-need-space text))
-    (setq text (concat " " text)))
+    (setq text (concat " " text))
+    )
   (when (and check-spaces
              (md-need-space-after text))
     ;; (message "appending space")
-    (setq text (concat text " ")))
+    (setq text (concat text " "))
+    )
   (let ((p (point)))
     (insert text)
     (save-excursion

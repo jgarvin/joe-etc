@@ -1,0 +1,2 @@
+alias up cd ..
+alias tsk ps aux | grep -i $*

@@ -1,3 +1,22 @@
+(require 'eshell)
+
+;; Thanks to J David Smith on Stackoverflow
+;; http://emacs.stackexchange.com/a/18569/2301
+(setq eshell-save-history-on-exit nil)
+(defun etc-eshell-append-history ()
+  "Call `eshell-write-history' with the `append' parameter set to `t',
+and write out only the most recent history item, since we're going to
+execute after every command."
+  (when eshell-history-ring
+    (let ((newest-cmd-ring (make-ring 1)))
+      (ring-insert newest-cmd-ring (car (ring-elements eshell-history-ring)))
+      (let ((eshell-history-ring newest-cmd-ring))
+        (eshell-write-history eshell-history-file-name t)))))
+
+;; setup in comint-custom.el
+;; can't use because there is no process-mark
+;;(remove-hook 'eshell-output-filter-functions #'etc-setup-delayed-truncate)
+
 ;; strangely setting eshell-mode-map doesn't work
 ;; unless you are in an eshell-mode buffer.
 (defun etc-eshell-mode-hook ()
@@ -13,7 +32,16 @@
   ;; for me
   (define-key eshell-mode-map (kbd "<home>") #'eshell-bol)
   (define-key eshell-mode-map (kbd "<up>") #'previous-line)
-  (define-key eshell-mode-map (kbd "<down>") #'next-line))
+  (define-key eshell-mode-map (kbd "<down>") #'next-line)
+  ;; smartparens ignores special buffers by default
+  (smartparens-mode 1)
+  (push "htop" eshell-visual-commands)
+  (push "nethack" eshell-visual-commands)
+  (push "perf report" eshell-visual-commands)
+  (push "iotop" eshell-visual-commands)
+  (setenv "PAGER" "cat")
+  ;; apparently have to add this locally to get it to work
+  (add-hook 'eshell-post-command-hook #'etc-eshell-append-history nil t))
 
 (add-hook 'eshell-mode-hook #'etc-eshell-mode-hook)
 
@@ -46,8 +74,37 @@
 
 (setq eshell-history-size 10000)
 
-(push "htop" eshell-visual-commands)
-(push "nethack" eshell-visual-commands)
-(push "perf report" eshell-visual-commands)
-(push "iotop" eshell-visual-commands)
+(setq eshell-aliases-file "~/etc/emacs/eshell-aliases")
 
+(defun etc-open-eshell (arg)
+  "Switch to shell in same folder as current buffer. If one doesn't already
+exist, make one. If we're already in a shell, switch to the next shell in the
+same folder. If given prefix argument always make a new shell."
+  (interactive "P")
+  (let* ((dir (file-truename default-directory))
+         (existing (sort (-filter (lambda (x)
+                                    (with-current-buffer x
+                                      (and (equal dir (file-truename default-directory))
+                                      (derived-mode-p 'eshell-mode))))
+                                  (buffer-list))
+                         (lambda (x y)
+                           (string< (buffer-name x)
+                                    (buffer-name y))))))
+    (message "%S" existing)
+    (if (and existing (not arg))
+        (let ((pos (position (current-buffer) existing)))
+          (if pos
+              (switch-to-buffer (nth (% (1+ pos) (length existing)) existing))
+            (switch-to-buffer (car existing))))
+      (eshell (generate-new-buffer-name "eshell-")))))
+
+(global-set-key (kbd "C-z") #'etc-open-eshell)
+
+;; Thanks to 'Ben'
+;; http://stackoverflow.com/a/28160819/50385
+(defun etc-unstick-ansi-color-codes ()
+  (interactive)
+  ;;(end-of-buffer)
+  (eshell-reset))
+
+(remove-hook 'eshell-before-prompt-hook #'etc-unstick-ansi-color-codes)

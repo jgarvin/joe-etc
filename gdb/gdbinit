@@ -27,3 +27,9 @@ set script-extension soft
 # to prevent other threads from being able to run
 # when you are stepping 
 #set scheduler-locking on
+
+# disable paging since eshell handles for us
+set height 0
+
+# annoying to remember
+alias -a exit = quit

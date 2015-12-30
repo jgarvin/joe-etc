@@ -60,6 +60,8 @@
   ;; prevent jump scrolling on new lines
   (set (make-local-variable 'scroll-conservatively) 10))
 
+
+
 (add-hook 'comint-mode-hook #'etc-comint-mode-hook)
 
 (defun enter-again-if-enter ()

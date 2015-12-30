@@ -160,6 +160,7 @@
 (load-file "~/etc/emacs/visual-line-custom.el")
 (load-file "~/etc/emacs/visible-mark-custom.el")
 (load-file "~/etc/emacs/eshell-custom.el")
+(load-file "~/etc/emacs/gc-custom.el")
 
 (delete-selection-mode 1)
 
@@ -170,6 +171,14 @@
   ;; instead we just run it once a minute, blame laziness :p
   (call-process "xset" nil nil nil "r" "rate" "200" "60"))
 (run-with-timer 0 60 #'etc-set-repeat-rate)
+
+(defun etc-translate-hack ()
+  ;; doing this on a timer seems to be the only way to get
+  ;; it to work on startup...  after-init-hook doesn't work,
+  ;; neither does just putting top level in emacsrc
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+(run-with-timer 0 2 #'etc-translate-hack)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -188,12 +197,17 @@
 (window-point-remember-mode 1)
 
 (require 'drag-stuff)
-(drag-stuff-global-mode t)
+(drag-stuff-global-mode 1)
 
 
 (require 'undo-tree)
 (global-undo-tree-mode)
-(define-key undo-tree-map (kbd "C-/") nil)
+;;(define-key undo-tree-map (kbd "C-_"))
+(global-unset-key (kbd "C-_"))
+(define-key undo-tree-map (kbd "C-_") nil)
+(define-key undo-tree-map (kbd "C-_") nil)
+(define-key undo-tree-map (kbd "C-/") #'undo-tree-undo)
+(define-key undo-tree-map (kbd "M-/") #'undo-tree-redo)
 (setq-default undo-limit 1000000)
 (setq-default undo-strong-limit 1000000)
 
@@ -330,7 +344,7 @@
 (setq indent-tabs-mode nil)
 
 ;; Most useful binding ever
-(global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
 
 ;; By default compilation frame is half the window. Yuck.
 (setq compilation-window-height 8)
@@ -603,6 +617,7 @@
 ;; you can select the key you prefer to
 (define-key global-map (kbd "M-RET") 'ace-jump-mode)
 (define-key shell-mode-map (kbd "M-RET") nil)
+(define-key global-map (kbd "S-<return>") 'ace-jump-line-mode)
 ;;(global-set-key (kbd "M-RET") 'ace-jump-mode)
 
 ;;
@@ -615,7 +630,7 @@
   t)
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
-(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+;;(define-key global-map (kbd "C-x SPC") 'rectangle-mark-mode)
 (setq ace-jump-mode-scope 'window)
 
 (setq find-file-wildcards t)
@@ -669,7 +684,8 @@
 
 (require 'recentf)
 (recentf-mode 1)
-(setq recentf-max-menu-items 100)
+(setq recentf-max-menu-items 500)
+(setq recentf-max-saved-items 500)
 (global-set-key "\C-c\ \C-e" 'recentf-open-files)
 
 ;; never what I want, almost always a typo. Why would you put this
@@ -703,9 +719,12 @@
 (global-set-key "\C-xg" #'magit-status)
 (global-set-key (kbd "C-c i") #'magit-blame-mode)
 
-;;(global-font-lock-mode 1)
-;; (cancel-timer jit-lock-defer-timer)
-;; (setq jit-lock-defer-timer nil)
+;; otherwise big C++ buffers take forever
+(setq font-lock-support-mode 'jit-lock-mode)
+(setq jit-lock-defer-time 0.032) ;; 30fps
+(setq jit-lock-stealth-time 2) ;; wait 2s before lazily doing the rest
+(setq jit-lock-stealth-nice 0.5)
+
 
 (defun etc-shell-command ()
   (interactive)
@@ -722,7 +741,7 @@
 
 ;; much more convenient to reach
 (global-set-key (kbd "C-]") #'etc-delete-other-windows)
-(global-set-key (kbd "M-]") #'abort-recursive-edit)
+(global-set-key (kbd "M-]") #'abort-edit-recursive)
 (global-unset-key (kbd "C-x 1"))
 
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
@@ -750,10 +769,21 @@
 ;; constantly recenter the window around point, so
 ;; we actually *want* jumpy scrolling rather than
 ;; smooth
-(setq scroll-step 0)
-(setq scroll-conservatively 0)
-(setq scroll-margin 6)
+(setq scroll-step 10)
+(setq scroll-margin 0)
 (setq auto-window-vscroll nil)
+
+;; in this setting makes scrolling downwards slow,
+;; according to profiler because of line-move-partial
+;;(setq scroll-conservatively 0)
+;; so instead we setup on an idle timer
+(defvar etc-recenter-timer nil)
+(progn
+  (when etc-recenter-timer
+    (cancel-timer etc-recenter-timer))
+  (setq etc-recenter-timer nil)
+  (setq etc-recenter-timer (run-with-idle-timer 0.25 t #'recenter)))
+;; (cancel-timer etc-recenter-timer)
 
 ;; Without an active region, assume we want to copy/paste
 ;; symbols, unless we're on a opener/closer in which case
@@ -798,17 +828,34 @@
 ;; force myself to use C-i so I don't stretch my left pinky
 ;;(global-unset-key (kbd "<tab>"))
 
-(defun etc-after-init ()
-  ;; swap c-x and c-t. c-x is a really
-  ;; common prefix, and I'd rather it
-  ;; be on the home row (which C-t is
-  ;; in WORKMAN layout).
-  ;; for reasons unknown only works
-  ;; after init.
-  (keyboard-translate ?\C-t ?\C-x)
-  (keyboard-translate ?\C-x ?\C-t))
+(global-set-key (kbd "C-M-u") #'other-window)
+(global-set-key (kbd "C-S-M-u") #'etc-delete-other-windows)
 
-(keyboard-translate ?\C-t ?\C-x)
-(keyboard-translate ?\C-x ?\C-t)
+(defun etc-prior ()
+  (interactive)
+  (setq unread-command-events (listify-key-sequence "\M-p")))
 
-(add-hook 'after-init-hook #'etc-after-init)
+(defun etc-future ()
+  (interactive)
+  (setq unread-command-events (listify-key-sequence "\M-n")))
+
+;; (global-set-key (kbd "S-<up>") #'etc-prior)
+;; (global-set-key (kbd "S-<down>") #'etc-future)
+;; (global-unset-key (kbd "S-<up>") #'etc-prior)
+;; (global-unset-key (kbd "S-<down>"))
+
+(define-key drag-stuff-mode-map (kbd "M-<right>") nil)
+(define-key drag-stuff-mode-map (kbd "M-<left>") nil)
+(global-set-key (kbd "M-<left>") #'beginning-or-indentation)
+(global-set-key (kbd "M-<right>") #'end-or-trailing)
+(global-set-key (kbd "C-M-<left>") #'sp-beginning-of-sexp)
+(global-set-key (kbd "C-M-<right>") #'sp-end-of-sexp)
+
+(global-set-key (kbd "M-;") #'comment-or-uncomment-region)
+
+;; image mode crashes in Motif mode
+;; Can't use GTK/Athena because they randomly lockup
+;; ... I hate you emacs
+(setq auto-mode-alist (rassq-delete-all 'image-mode auto-mode-alist))
+(setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
+(setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))

@@ -308,6 +308,7 @@ debug mode causing timers to die."
   (interactive)
   (md-open-most-recent-file "~/dragonshare/log" "client-[^.]*.log"))
 
+
 (defun md-open-most-recent-server-log ()
   (interactive)
   (md-open-most-recent-file "/tmp" "server-[^.]*.log"))

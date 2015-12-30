@@ -23,7 +23,7 @@
 ;; ;; waiting for a reply from emacs, so then the pedal up event
 ;; ;; is never received, so then the down arrow continues to be
 ;; ;; held, which triggers the visual bell AGAIN..
-;; (setq ring-bell-function #'ignore)
+ (setq ring-bell-function #'ignore)
 
 (defun md-execute-pending ()
   (unwind-protect
