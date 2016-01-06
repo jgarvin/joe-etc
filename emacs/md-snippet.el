@@ -138,8 +138,10 @@
       (overlay-put o 'md-glyph-choice glyph-choice)
       (overlay-put o 'insert-in-front-hooks
                    (list
-                    (lambda (&rest unused)
-                      (unless undo-in-progress
+                    (lambda (o2 after? begin end &optional delete-length)
+                      (unless (or undo-in-progress
+                                  (string-match-p "[[:space:]\n]" (buffer-substring begin end))
+                                  (not after?))
                         (md-clear-slot o)))))
       (overlay-put o
                    'display

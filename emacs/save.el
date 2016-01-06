@@ -7,26 +7,17 @@
   (unless b
     (setq b (current-buffer)))
   (and (buffer-modified-p b)
-       (buffer-file-name b)))
+       (buffer-file-name b)
+       (not (md-special-buffer-p b))))
 
+;; check if any buffers need saving before actually
+;; saving them, to avoid spurious messages.
 (defun etc-save-if-necessary ()
   (with-demoted-errors
-    (when (reduce (lambda (a b) (or a b))
-                (mapcar (lambda (b)
-                          (etc-buffer-needs-saving b))
-                        (buffer-list)))
-    (save-some-buffers t nil))))
-
-;; builtin autosave randomly stops working for no reason,
-;; so implement my own
-;; (setq etc-save-timer
-;;       (run-at-time t 1 #'etc-save-if-necessary))
-
-;;(cancel-timer etc-save-timer)
-
-;; (dolist (v timer-list)
-;;   (when (string-match-p "etc-save-if-necessary" (format "%S" v))
-;;     (cancel-timer v)))
+      (when (reduce (lambda (a b) (or a b))
+                    (remove-if-not #'etc-buffer-needs-saving (buffer-list))
+                    :initial-value nil)
+        (save-some-buffers t #'etc-buffer-needs-saving))))
 
 ;; autosave under all these circumstances too, never want to save
 ;; manually
@@ -41,7 +32,3 @@
 
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")
-
-;; (dolist (timer timer-list)
-;;   (when (string-match "etc-save-if-necessary" (format "%S" timer))
-;;     (cancel-timer timer)))

@@ -155,14 +155,14 @@
 
 ;;(md-quick-sort (vector 0 3 4 1 5 8 4) 0 4 #'<)
 
-(defun md-quick-sort (vec p q pred)
-  (let ((r))
-    (when (< p q)
-      (setq r (md-partition vec p q pred))
-      (md-quick-sort vec p r pred)
-      (md-quick-sort vec (+ r 1) q pred)))
-  vec)
-(byte-compile 'md-quick-sort)
+;; (defun md-quick-sort (vec p q pred)
+;;   (let ((r))
+;;     (when (< p q)
+;;       (setq r (md-partition vec p q pred))
+;;       (md-quick-sort vec p r pred)
+;;       (md-quick-sort vec (+ r 1) q pred)))
+;;   vec)
+;; (byte-compile 'md-quick-sort)
 
 (defun md-partition (vec p q pred)
   (let ((x (aref vec p))

@@ -33,6 +33,7 @@ execute after every command."
   (define-key eshell-mode-map (kbd "<home>") #'eshell-bol)
   (define-key eshell-mode-map (kbd "<up>") #'previous-line)
   (define-key eshell-mode-map (kbd "<down>") #'next-line)
+  (define-key eshell-mode-map (kbd "M-RET") #'ace-jump-mode)
   ;; smartparens ignores special buffers by default
   (smartparens-mode 1)
   (push "htop" eshell-visual-commands)

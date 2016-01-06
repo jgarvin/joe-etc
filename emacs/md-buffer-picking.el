@@ -28,7 +28,7 @@
       (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x))))
 (byte-compile #'md-special-buffer-p)
 
-(md-special-buffer-p (get-buffer "*Find*"))
+;;(md-special-buffer-p (get-buffer "*Find*"))
 
 (defun md-get-special-buffers ()
   (-filter #'md-special-buffer-p (buffer-list)))

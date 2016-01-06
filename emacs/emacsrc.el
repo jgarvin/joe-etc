@@ -147,10 +147,6 @@
 (load-file "~/etc/emacs/help-custom.el")
 (load-file "~/etc/emacs/tramp-custom.el")
 
-(load-file "~/etc/emacs/mandimus.el")
-(load-file "~/etc/emacs/md-belt-custom.el")
-(load-file "~/etc/emacs/md-company-custom.el")
-
 (load-file "~/etc/emacs/template-custom.el")
 (load-file "~/etc/emacs/build-custom.el")
 (load-file "~/etc/emacs/midnight-custom.el")
@@ -420,10 +416,10 @@
   (interactive)
   (if (= (length (frame-list)) 1)
       (save-buffers-kill-emacs)
+(global-set-key "\C-x\C-c" 'close-frame-or-exit)
     (delete-frame)))
 
 ;; Close windows, not emacs.
-(global-set-key "\C-x\C-c" 'close-frame-or-exit)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -859,3 +855,8 @@
 (setq auto-mode-alist (rassq-delete-all 'image-mode auto-mode-alist))
 (setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
 (setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
+
+;; at the bottom so it has best chance of getting in hooks
+(load-file "~/etc/emacs/mandimus.el")
+(load-file "~/etc/emacs/md-belt-custom.el")
+(load-file "~/etc/emacs/md-company-custom.el")

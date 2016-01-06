@@ -51,7 +51,9 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
   ;; what you will get, window-buffer is a better default
   (let ((local (or local (window-buffer (selected-window)))))
     (with-current-buffer local
-      (md--run-timer-func v f args))))
+      (condition-case err
+          (md--run-timer-func v f args)
+        (message "error running timer %S" f)))))
 
 (defun md-run-when-idle-once (v f seconds &optional local &rest args)
   "Setup an idle timer to run F after SECONDS of idle time, passing
@@ -537,7 +539,6 @@ Ignores CHAR at point."
          (closest-point))
     (save-excursion
       (while (funcall compare (point) end)
-        (message "point %S end %S" (point) end)
         (forward-line direction)
         ;;(beginning-of-line)
         ;;(back-to-indentation)
@@ -689,6 +690,7 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-homophones.el")
 (load-file "~/etc/emacs/md-navigation.el")
 (load-file "~/etc/emacs/md-edit.el")
+(load-file "~/etc/emacs/md-win.el")
 
 ;; this ended up being more trouble than it's worth, just use visual-line-mode
 ;; (defun md-smallest-multiple-greater-than (x y))
