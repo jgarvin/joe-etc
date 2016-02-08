@@ -50,3 +50,9 @@
   (vector 'remap 'beginning-of-buffer) 'dired-back-to-top)
 (define-key dired-mode-map
   (vector 'remap 'end-of-buffer) 'dired-jump-to-bottom)
+
+(load-file "~/etc/emacs/dired-copy-paste.el")
+(require 'dired-copy-paste)
+(define-key dired-mode-map "\C-c\M-w" 'dired-copy-paste-do-copy)
+(define-key dired-mode-map "\C-c\C-c" nil)
+

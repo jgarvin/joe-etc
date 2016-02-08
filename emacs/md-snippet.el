@@ -140,7 +140,7 @@
                    (list
                     (lambda (o2 after? begin end &optional delete-length)
                       (unless (or undo-in-progress
-                                  (string-match-p "[[:space:]\n]" (buffer-substring begin end))
+                                  (string-match-p "\\`[[:space:]\n]+\\'" (buffer-substring begin end))
                                   (not after?))
                         (md-clear-slot o)))))
       (overlay-put o
@@ -537,3 +537,4 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-python-snippet.el")
 (load-file "~/etc/emacs/md-shell-snippet.el")
 (load-file "~/etc/emacs/md-eshell-snippet.el")
+(load-file "~/etc/emacs/md-shell-program-snippets.el")

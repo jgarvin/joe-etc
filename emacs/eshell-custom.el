@@ -40,6 +40,8 @@ execute after every command."
   (push "nethack" eshell-visual-commands)
   (push "perf report" eshell-visual-commands)
   (push "iotop" eshell-visual-commands)
+  (push "watch" eshell-visual-commands)
+  (push "ssh" eshell-visual-commands)
   (setenv "PAGER" "cat")
   ;; apparently have to add this locally to get it to work
   (add-hook 'eshell-post-command-hook #'etc-eshell-append-history nil t))

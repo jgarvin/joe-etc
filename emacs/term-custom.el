@@ -3,10 +3,10 @@
 (defun etc-term-preferences ()
   (visual-line-mode 0)
   (linum-mode 0)
-  (setq scroll-step 0)
-  (setq scroll-conservatively 0)
-  (setq scroll-margin 0)
-  (setq auto-window-vscroll t))
+  (setq (make-local-variable 'scroll-step) 0)
+  (setq (make-local-variable 'scroll-conservatively) 0)
+  (setq (make-local-variable 'scroll-margin) 0)
+  (setq (make-local-variable 'auto-window-vscroll) t))
 
 (add-hook 'term-mode-hook #'etc-term-preferences)
 

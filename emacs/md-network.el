@@ -102,7 +102,13 @@
                                       (user-error "Couldn't run command, server status: %S" status)))))))
             (unless md-server-execute-pending-timer
               ;; (message "scheduling")
-              (setq md-server-execute-pending-timer (run-with-idle-timer 0 t #'md-execute-pending)))
+              (setq md-server-execute-pending-timer
+                    ;; you don't want to do this on idle timer,
+                    ;; because then you can't to do C-c commands
+                    ;; when shell output is scrolling by
+                   (run-with-timer 0 1 #'md-execute-pending)
+                      ;; (run-with-idle-timer 0 t #'md-execute-pending)
+                    ))
             (unwind-protect
                 (setq message (substring message index))
               (setcdr pending message)))

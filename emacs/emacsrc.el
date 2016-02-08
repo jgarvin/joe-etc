@@ -157,6 +157,7 @@
 (load-file "~/etc/emacs/visible-mark-custom.el")
 (load-file "~/etc/emacs/eshell-custom.el")
 (load-file "~/etc/emacs/gc-custom.el")
+(load-file "~/etc/emacs/dabbrev-custom.el")
 
 (delete-selection-mode 1)
 
@@ -769,16 +770,22 @@
 (setq scroll-margin 0)
 (setq auto-window-vscroll nil)
 
-;; in this setting makes scrolling downwards slow,
+(defun etc-maybe-recenter ()
+  (unless (or (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
+              (equal (window-point) (point-max)))
+    ;; don't interfere with erc scroll-to-bottom
+    (recenter)))
+
+;; setting to zero makes scrolling downwards slow,
 ;; according to profiler because of line-move-partial
-;;(setq scroll-conservatively 0)
+(setq scroll-conservatively 1)
 ;; so instead we setup on an idle timer
 (defvar etc-recenter-timer nil)
 (progn
   (when etc-recenter-timer
     (cancel-timer etc-recenter-timer))
   (setq etc-recenter-timer nil)
-  (setq etc-recenter-timer (run-with-idle-timer 0.25 t #'recenter)))
+  (setq etc-recenter-timer (run-with-idle-timer 0.25 t #'etc-maybe-recenter)))
 ;; (cancel-timer etc-recenter-timer)
 
 ;; Without an active region, assume we want to copy/paste
