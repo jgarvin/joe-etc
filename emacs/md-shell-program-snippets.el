@@ -11,4 +11,7 @@
    ("GDB" "gdb --args $1")
    ("diff" "diff -u $1 $2")
    ("man" "man $1")
+   ("help" "$1 --help")
+   ("apt get install" "apt-get install $1")
+   ("apt cache search" "apt-cache search $1")
    ))

@@ -1,3 +1,5 @@
+(require 'tramp)
+
 (setq tramp-default-method "ssh")
 
 ;; By default tramp uses its own control master settings.
@@ -7,4 +9,21 @@
 ;; first remote prompt is displayed.
 (setq tramp-use-ssh-controlmaster-options nil)
 
+;; use remote environment variables when in remote folders
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
+;; tramp-shell-prompt-pattern
+
+;; (setq tramp-verbose 10)
+;; (setq tramp-verbose 3)
+
+
+
+;; (string-match-p "\\(?:^\\|\\)[^]#$%>\n]*#?[]#$%>] *\\(\\[[0-9;]*[a-zA-Z] *\\)*" "[jgarvin@tcs-login-1 ~]$ ")
+
+
+;; (string-match-p "\\[.*?@.*?:<.*?>\\]" "[jgarvin@tcs-login-1 ~]$ ")
+;; (string-match-p "\\(TERM = (.*)\\|Terminal type\\? \\[.*\\]\\)\\s-*" "[jgarvin@tcs-login-1 ~]$ ")
+;; (string-match-p "\\(TERM = (.*)\\|Terminal type\\? \\[.*\\]\\)\\s-*" "jgarvin@ghost12:/$ ")
+
+;; (string-match-p "\\[.*?@.*?:<.*?>\\]" "jgarvin@ghost12:/$")

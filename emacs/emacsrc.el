@@ -867,3 +867,4 @@
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
+(put 'dired-find-alternate-file 'disabled nil)
