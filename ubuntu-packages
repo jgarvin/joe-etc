@@ -47,12 +47,10 @@ ubuntu-restricted-extras
 
 # Misc.
 pidgin
-xchat
 xclip
 thunderbird
 sshfs
 haskell-mode
-nautilus-open-terminal
 python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
 openssh-server
