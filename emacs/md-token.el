@@ -20,6 +20,8 @@
 (defvar md-max-symbol-length 50)
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
+(defvar-local md-enable-symbol-refresh t)
+(defvar md-inhibit-refresh-symbol-hooks nil)
 
 (defconst md-max-global-cache-size 400)
 (defvar md-global-word-cache nil)
@@ -131,13 +133,36 @@
 (byte-compile 'md-filter-symbol)
 
 (defun md-quick-sort (vec p q pred)
-  (let ((r))
-    (when (< p q)
+  (let ((r)
+        (stack (make-vector 128 0))
+        (top -1))
+    (aset stack (incf top) p)
+    (aset stack (incf top) q)
+    (while (>= top 0)
+      (setq q (aref stack top))
+      (decf top)
+      (setq p (aref stack top))
+      (decf top)
       (setq r (md-partition vec p q pred))
-      (md-quick-sort vec p r pred)
-      (md-quick-sort vec (+ r 1) q pred)))
-  vec)
+      (when (> (- r 1) p)
+          (aset stack (incf top) p)
+          (aset stack (incf top) (- r 1)))
+      (when (< (+ r 1) q)
+        (aset stack (incf top) (+ r 1))
+        (aset stack (incf top) q)))
+    vec))
 (byte-compile 'md-quick-sort)
+
+;;(md-quick-sort (vector 0 3 4 1 5 8 4) 0 4 #'<)
+
+;; (defun md-quick-sort (vec p q pred)
+;;   (let ((r))
+;;     (when (< p q)
+;;       (setq r (md-partition vec p q pred))
+;;       (md-quick-sort vec p r pred)
+;;       (md-quick-sort vec (+ r 1) q pred)))
+;;   vec)
+;; (byte-compile 'md-quick-sort)
 
 (defun md-partition (vec p q pred)
   (let ((x (aref vec p))
@@ -239,35 +264,37 @@
     (when (> distance md-safe-scan-limit)
       (setq safe-start (max (point-min) (- (point) md-safe-scan-limit)))
       (setq safe-end (min (point-max) (+ (point) md-safe-scan-limit))))
-    (md-get-unit-impl safe-start safe-end unit)))
+     (md-get-unit-impl safe-start safe-end unit)
+    ))
 (byte-compile 'md-safe-get-unit-impl)
 
 (defun md-refresh-unit-cache (buf v unit)
   ;;(setq md-debug-temp mark-active)
   ;;(message "refreshing symbol cache %S" md-debug-temp)
-  (unwind-protect 
+  (unwind-protect
       (with-current-buffer buf
-        (let ((old (symbol-value v))) 
-          (set v (md-safe-get-unit-impl (point-min) (point-max) unit))
-          (when (not (equal old (symbol-value v))) 
-            ;;(message "running hook")
-            (run-hooks 'md-symbols-cache-refresh-hook))))
-    (when md-refresh-timer
-      (cancel-timer md-refresh-timer)
-      (setq md-refresh-timer nil))))
+        (unless (or (not md-enable-symbol-refresh)
+                    md-inhibit-refresh-symbol-hooks)
+          (let ((old (symbol-value v))
+                (md-inhibit-refresh-symbol-hooks t))
+            (set v (md-safe-get-unit-impl (point-min) (point-max) unit))
+            (when (not (equal old (symbol-value v)))
+              ;;(message "running hook")
+              (run-hooks 'md-symbols-cache-refresh-hook)))))))
 (byte-compile 'md-refresh-unit-cache)
 
 (defun md-refresh-symbols (&optional _start _end _old-length)
-  (unless (or (window-minibuffer-p)
+  (unless (or md-inhibit-refresh-symbol-hooks
+              (window-minibuffer-p)
               (minibufferp)
               (not (get-buffer-window (current-buffer) 'visible))
               (md-special-buffer-p (current-buffer)))
     ;;(message "md-refresh-symbols run %S %S %S %S" (current-buffer) _start _end _old-length)
     (md-run-when-idle-once 'md-refresh-timer
-                           (lambda ()
-                             (md-refresh-unit-cache (current-buffer) 'md-symbols-cache 'symbol)
-                             (md-refresh-unit-cache (current-buffer) 'md-word-cache 'word)
-                             ) 0.5 nil)))
+                             (lambda ()
+                               (md-refresh-unit-cache (current-buffer) 'md-symbols-cache 'symbol)
+                               (md-refresh-unit-cache (current-buffer) 'md-word-cache 'word)
+                               ) 0.5 nil)))
 (byte-compile 'md-refresh-symbols)
 
 (add-hook 'after-change-functions #'md-refresh-symbols)
@@ -314,7 +341,7 @@
           (md-list-less-p a-rest b-rest reverse)
         ;; equal all the way through, so not less
         nil)))))
-  
+
 (defun md-buffer-priority-key (x proj-buffers)
   (let* ((w (window-buffer (selected-window)))
          (modes-in-common (length (md-modes-in-common x w)))
@@ -371,7 +398,7 @@ of buffers are part of the project that are not..."
     (-filter (lambda (x) (or (and (buffer-file-name x)
                                   (md-file-inside-folder (buffer-file-name x) proot))
                              (get-buffer-process x))) (projectile-project-buffers))))
-  
+
 
 (require 'f)
 (defun md-file-inside-folder (f dir)
@@ -422,7 +449,7 @@ on the ends. Also we want to store as lowercase."
 (defun md-refresh-global-caches-impl ()
   ;; (message "md-refresh-global-caches-impl run")
   (let ((buffers (md-get-prioritized-buffer-list)))
-    (with-current-buffer (window-buffer (selected-window)) 
+    (with-current-buffer (window-buffer (selected-window))
       (setq md-global-word-cache (md-refresh-global-cache-unit
                                   'md-word-cache buffers
                                   (make-hash-table :test 'equal)
@@ -436,13 +463,24 @@ on the ends. Also we want to store as lowercase."
   (md-run-when-idle-once 'md-global-refresh-timer #'md-refresh-global-caches-impl 0.5 nil))
 
 (add-hook 'md-symbols-cache-refresh-hook #'md-refresh-global-caches)
+;; (remove-hook 'md-symbols-cache-refresh-hook #'md-refresh-global-caches)
 (add-hook 'md-window-selection-hook #'md-refresh-global-caches)
+;; (remove-hook 'md-window-selection-hook #'md-refresh-global-caches)
 
+;; TODO: should be an LRU cache of last N regexps, so that people coming
+;; and going don't churn the CPU.
+(defvar-local md-erc-regexp-cache nil)
 (defun md-get-active-erc-nicknames (&optional max-results)
   (when (derived-mode-p 'erc-mode)
-    (let ((candidates (erc-get-channel-nickname-list)))
+    (let ((candidates (cl-sort (erc-get-channel-nickname-list) #'string<)))
       (when candidates
-        (let* ((regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
+        (if (not (equal (car md-erc-regexp-cache) candidates))
+            ;; have to use regexp-opt or the regexes get too big, so we error even
+            ;; before max-results has a chance to kick in.
+            (setq md-erc-regexp-cache
+                  (list candidates (regexp-opt (mapcar (lambda (x) (concat "<" x ">")) candidates)))))
+        (let* ((regex (cadr md-erc-regexp-cache))
+               ;; (regex (concat "\\(" (mapconcat (lambda (x) (concat "\\<" (regexp-quote x) "\\>")) candidates "\\|") "\\)"))
                (scan-limit (max (point-min) (- (point-max) (max md-nick-scan-limit (- (window-end) (window-start))))))
                (scan-start (point-max))
                (presence (make-hash-table :test 'equal))
@@ -501,4 +539,3 @@ on the ends. Also we want to store as lowercase."
 (add-hook 'md-window-selection-hook #'md-update-active-nicks)
 ;;(remove-hook 'erc-insert-post-hook #'md-update-active-nicks)
 ;;(remove-hook 'md-window-selection-hook #'md-update-active-nicks)
-

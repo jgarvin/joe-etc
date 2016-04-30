@@ -28,10 +28,11 @@
       (string-match-p " ?\\*[^*]+\\*" (md-buffer-name x))))
 (byte-compile #'md-special-buffer-p)
 
-(md-special-buffer-p (get-buffer "*Find*"))
+;;(md-special-buffer-p (get-buffer "*Find*"))
 
 (defun md-get-special-buffers ()
-  (-filter #'md-special-buffer-p (buffer-list)))
+  (-filter (lambda (a) (and (not (minibufferp a)) (md-special-buffer-p a)))
+           (buffer-list)))
 
 (defun md-get-buffer-names (lst)
   (mapcar #'buffer-name lst))

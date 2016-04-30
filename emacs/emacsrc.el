@@ -1,3 +1,14 @@
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/packages/") t))
+
+(require 'use-package)
+
+;; for emacsclient
+(server-start)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -57,9 +68,6 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; for emacsclient
-;; (server-start)
-
 (if (< emacs-major-version 24)
     (load-file "~/etc/emacs/cl-lib-0.3.el")
   (require 'cl))
@@ -97,13 +105,6 @@
            (not (memq "/usr/share/emacs/site-lisp" load-path)))
   (add-to-list 'load-path "/usr/share/emacs/site-lisp"))
 
-(when (>= emacs-major-version 24)
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/packages/") t)
-  )
-
 (add-to-list 'load-path "~/etc/dash")
 (require 'dash)
 (eval-after-load "dash" '(dash-enable-font-lock))
@@ -117,7 +118,7 @@
   (message "No ~/.emacspass file found!"))
 
 (load-file "~/etc/emacs/smartparens-custom.el")
-(load-file "~/etc/emacs/ido-custom.el")
+;;(load-file "~/etc/emacs/ido-custom.el")
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
@@ -146,14 +147,17 @@
 (load-file "~/etc/emacs/help-custom.el")
 (load-file "~/etc/emacs/tramp-custom.el")
 
-(load-file "~/etc/emacs/mandimus.el")
-(load-file "~/etc/emacs/md-belt-custom.el")
-(load-file "~/etc/emacs/md-company-custom.el")
-
 (load-file "~/etc/emacs/template-custom.el")
 (load-file "~/etc/emacs/build-custom.el")
 (load-file "~/etc/emacs/midnight-custom.el")
 (load-file "~/etc/emacs/last-change-custom.el")
+(load-file "~/etc/emacs/helm-custom.el")
+(load-file "~/etc/emacs/linum-custom.el")
+(load-file "~/etc/emacs/visual-line-custom.el")
+(load-file "~/etc/emacs/visible-mark-custom.el")
+(load-file "~/etc/emacs/eshell-custom.el")
+(load-file "~/etc/emacs/gc-custom.el")
+(load-file "~/etc/emacs/dabbrev-custom.el")
 
 (delete-selection-mode 1)
 
@@ -164,6 +168,14 @@
   ;; instead we just run it once a minute, blame laziness :p
   (call-process "xset" nil nil nil "r" "rate" "200" "60"))
 (run-with-timer 0 60 #'etc-set-repeat-rate)
+
+(defun etc-translate-hack ()
+  ;; doing this on a timer seems to be the only way to get
+  ;; it to work on startup...  after-init-hook doesn't work,
+  ;; neither does just putting top level in emacsrc
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+(run-with-timer 0 2 #'etc-translate-hack)
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
@@ -182,12 +194,17 @@
 (window-point-remember-mode 1)
 
 (require 'drag-stuff)
-(drag-stuff-global-mode t)
+(drag-stuff-global-mode 1)
 
 
 (require 'undo-tree)
 (global-undo-tree-mode)
-(define-key undo-tree-map (kbd "C-/") nil)
+;;(define-key undo-tree-map (kbd "C-_"))
+(global-unset-key (kbd "C-_"))
+(define-key undo-tree-map (kbd "C-_") nil)
+(define-key undo-tree-map (kbd "C-_") nil)
+(define-key undo-tree-map (kbd "C-/") #'undo-tree-undo)
+(define-key undo-tree-map (kbd "M-/") #'undo-tree-redo)
 (setq-default undo-limit 1000000)
 (setq-default undo-strong-limit 1000000)
 
@@ -217,16 +234,27 @@
   (interactive "P")
   (cond
    ((or (eolp) n)
-    (forward-line (prefix-numeric-value (or n 1)))
-    (end-of-line)
+    (line-move (prefix-numeric-value (or n 1)))
+    (end-of-visual-line)
     (skip-chars-backward "[:space:]"))
    ((save-excursion
       (skip-chars-forward "[:space:]")
       (eolp)) ; At start of trailing whitespace
-    (end-of-line))
+    (end-of-visual-line))
    (t
-    (end-of-line)
+    (end-of-visual-line)
     (skip-chars-backward "[:space:]"))))
+
+(defun back-to-visual-indentation ()
+  "Move point to the first non-whitespace character on this line."
+  (interactive "^")
+  (beginning-of-visual-line 1)
+  (skip-syntax-forward " "
+                       (save-excursion (end-of-visual-line) (point))
+                       ;;(line-end-position)
+                       )
+  ;; Move back over chars that have whitespace syntax but have the p flag.
+  (backward-prefix-chars))
 
 (defun beginning-or-indentation (&optional n)
   "Move cursor to beginning of this line or to its indentation.
@@ -236,14 +264,25 @@
   With arg N, move backward to the beginning of the Nth previous line.
   Interactively, N is the prefix arg."
   (interactive "P")
-  (cond ((or (bolp) n)
-         (forward-line (- (prefix-numeric-value n))))
-        ((save-excursion (skip-chars-backward "[:space:]") (bolp)) ; At indentation.
-         (forward-line 0))
-        (t (back-to-indentation))))
+  (let ((p (point)))
+    (cond
+     ((= p (save-excursion (beginning-of-visual-line) (point)))
+      (line-move -1)
+      (back-to-visual-indentation))
+     ((= p (save-excursion (back-to-visual-indentation) (point)))
+      (beginning-of-visual-line))
+     (t (back-to-visual-indentation)))))
 
-(global-set-key "\C-a" 'beginning-or-indentation)
-(global-set-key "\C-e" 'end-or-trailing)
+;; (global-set-key "\C-a" 'beginning-or-indentation)
+;; (global-set-key "\C-e" 'end-or-trailing)
+(global-unset-key "\C-a")
+(global-unset-key "\C-e")
+
+;; lets try this for awhile
+(global-set-key (kbd "<home>") 'beginning-or-indentation)
+(global-set-key (kbd "<end>") 'end-or-trailing)
+
+
 
 ;; turns out don't want this since i have kinesis, C-backspace
 ;; is better
@@ -302,7 +341,7 @@
 (setq indent-tabs-mode nil)
 
 ;; Most useful binding ever
-(global-set-key (kbd "C-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
 
 ;; By default compilation frame is half the window. Yuck.
 (setq compilation-window-height 8)
@@ -356,7 +395,7 @@
 
 (defun kill-and-indent (&optional ARG)
   (interactive)
-  (kill-line ARG)
+  (kill-visual-line ARG)
   (indent-according-to-mode))
 
 (global-set-key (kbd "RET") #'reindent-then-newline-and-indent)
@@ -378,10 +417,10 @@
   (interactive)
   (if (= (length (frame-list)) 1)
       (save-buffers-kill-emacs)
+(global-set-key "\C-x\C-c" 'close-frame-or-exit)
     (delete-frame)))
 
 ;; Close windows, not emacs.
-(global-set-key "\C-x\C-c" 'close-frame-or-exit)
 
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
@@ -411,6 +450,7 @@
 ;; (global-set-key "\C-s" 'isearch-forward)
 ;; (global-set-key "\C-r" 'isearch-backward)
 
+(global-set-key (kbd "C-%") 'query-replace-regexp)
 (global-set-key "\M-%" 'query-replace)
 
 ;; Threshold after which we consider the file to be large
@@ -446,6 +486,9 @@
     (buffer-disable-undo)
     (fundamental-mode)
     (font-lock-mode -1)
+    (linum-mode 0)
+    (smartparens-mode 0)
+    (setq md-enable-symbol-refresh nil)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -569,7 +612,10 @@
   "Emacs quick move minor mode"
   t)
 ;; you can select the key you prefer to
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+(define-key global-map (kbd "M-RET") 'ace-jump-mode)
+(define-key shell-mode-map (kbd "M-RET") nil)
+(define-key global-map (kbd "S-<return>") 'ace-jump-line-mode)
+;;(global-set-key (kbd "M-RET") 'ace-jump-mode)
 
 ;;
 ;; enable a more powerful jump back function from ace jump mode
@@ -581,7 +627,7 @@
   t)
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
-(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+;;(define-key global-map (kbd "C-x SPC") 'rectangle-mark-mode)
 (setq ace-jump-mode-scope 'window)
 
 (setq find-file-wildcards t)
@@ -618,9 +664,9 @@
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "M-=") 'er/contract-region)
 
-(require 'change-inner)
-(global-set-key (kbd "M-i") 'change-inner)
-(global-set-key (kbd "M-o") 'change-outer)
+;; (require 'change-inner)
+;; (global-set-key (kbd "M-i") 'change-inner)
+;; (global-set-key (kbd "M-o") 'change-outer)
 
 (defun chomp (str)
   "Chomp leading and tailing whitespace from STR."
@@ -635,7 +681,8 @@
 
 (require 'recentf)
 (recentf-mode 1)
-(setq recentf-max-menu-items 100)
+(setq recentf-max-menu-items 500)
+(setq recentf-max-saved-items 500)
 (global-set-key "\C-c\ \C-e" 'recentf-open-files)
 
 ;; never what I want, almost always a typo. Why would you put this
@@ -669,9 +716,12 @@
 (global-set-key "\C-xg" #'magit-status)
 (global-set-key (kbd "C-c i") #'magit-blame-mode)
 
-;;(global-font-lock-mode 1)
-;; (cancel-timer jit-lock-defer-timer)
-;; (setq jit-lock-defer-timer nil)
+;; otherwise big C++ buffers take forever
+(setq font-lock-support-mode 'jit-lock-mode)
+(setq jit-lock-defer-time 0.032) ;; 30fps
+(setq jit-lock-stealth-time 2) ;; wait 2s before lazily doing the rest
+(setq jit-lock-stealth-nice 0.5)
+
 
 (defun etc-shell-command ()
   (interactive)
@@ -688,7 +738,7 @@
 
 ;; much more convenient to reach
 (global-set-key (kbd "C-]") #'etc-delete-other-windows)
-(global-set-key (kbd "M-]") #'abort-recursive-edit)
+(global-set-key (kbd "M-]") #'abort-edit-recursive)
 (global-unset-key (kbd "C-x 1"))
 
 (global-set-key (kbd "C-<return>") #'find-file-at-point)
@@ -716,10 +766,27 @@
 ;; constantly recenter the window around point, so
 ;; we actually *want* jumpy scrolling rather than
 ;; smooth
-(setq scroll-step 0)
-(setq scroll-conservatively 0)
-(setq scroll-margin 6)
+(setq scroll-step 10)
+(setq scroll-margin 0)
 (setq auto-window-vscroll nil)
+
+(defun etc-maybe-recenter ()
+  (unless (or (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
+              (equal (window-point) (point-max)))
+    ;; don't interfere with erc scroll-to-bottom
+    (recenter)))
+
+;; setting to zero makes scrolling downwards slow,
+;; according to profiler because of line-move-partial
+(setq scroll-conservatively 1)
+;; so instead we setup on an idle timer
+(defvar etc-recenter-timer nil)
+(progn
+  (when etc-recenter-timer
+    (cancel-timer etc-recenter-timer))
+  (setq etc-recenter-timer nil)
+  (setq etc-recenter-timer (run-with-idle-timer 0.25 t #'etc-maybe-recenter)))
+;; (cancel-timer etc-recenter-timer)
 
 ;; Without an active region, assume we want to copy/paste
 ;; symbols, unless we're on a opener/closer in which case
@@ -754,5 +821,50 @@
   (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
-(require 'linum-relative)
-(global-linum-mode)
+(require 'string-inflection)
+(global-set-key (kbd "C-c y") #'string-inflection-cycle)
+(global-set-key (kbd "C-c m s") #'string-inflection-underscore)
+(global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
+(global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
+(global-set-key (kbd "C-c m u") #'string-inflection-upcase)
+
+;; force myself to use C-i so I don't stretch my left pinky
+;;(global-unset-key (kbd "<tab>"))
+
+(global-set-key (kbd "C-M-u") #'other-window)
+(global-set-key (kbd "C-S-M-u") #'etc-delete-other-windows)
+
+(defun etc-prior ()
+  (interactive)
+  (setq unread-command-events (listify-key-sequence "\M-p")))
+
+(defun etc-future ()
+  (interactive)
+  (setq unread-command-events (listify-key-sequence "\M-n")))
+
+;; (global-set-key (kbd "S-<up>") #'etc-prior)
+;; (global-set-key (kbd "S-<down>") #'etc-future)
+;; (global-unset-key (kbd "S-<up>") #'etc-prior)
+;; (global-unset-key (kbd "S-<down>"))
+
+(define-key drag-stuff-mode-map (kbd "M-<right>") nil)
+(define-key drag-stuff-mode-map (kbd "M-<left>") nil)
+(global-set-key (kbd "M-<left>") #'beginning-or-indentation)
+(global-set-key (kbd "M-<right>") #'end-or-trailing)
+(global-set-key (kbd "C-M-<left>") #'sp-beginning-of-sexp)
+(global-set-key (kbd "C-M-<right>") #'sp-end-of-sexp)
+
+(global-set-key (kbd "M-;") #'comment-or-uncomment-region)
+
+;; image mode crashes in Motif mode
+;; Can't use GTK/Athena because they randomly lockup
+;; ... I hate you emacs
+(setq auto-mode-alist (rassq-delete-all 'image-mode auto-mode-alist))
+(setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
+(setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
+
+;; at the bottom so it has best chance of getting in hooks
+(load-file "~/etc/emacs/mandimus.el")
+(load-file "~/etc/emacs/md-belt-custom.el")
+(load-file "~/etc/emacs/md-company-custom.el")
+(put 'dired-find-alternate-file 'disabled nil)

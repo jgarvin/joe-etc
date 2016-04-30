@@ -294,3 +294,6 @@ watch-build() {
     done
 }
 
+if [ -d /home/btt/nfs/users/$LOGNAME/scripts ]; then
+    source /home/btt/nfs/users/$LOGNAME/scripts/custom.zsh 
+fi

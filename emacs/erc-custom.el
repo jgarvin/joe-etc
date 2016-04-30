@@ -2,14 +2,15 @@
 (erc-services-mode 1)
 (setq erc-prompt-for-nickserv-password nil)
 (setq erc-nickserv-passwords
-      `((freenode     ((,freenode-nick . ,freenode-nick-pass)))))
+      `((freenode     ((,freenode-nick . ,freenode-nick-pass)))
+        (oftc  ((,freenode-nick . ,freenode-nick-pass)))))
 
 ;; without this will autojoin channels before identifying
 (setq erc-autojoin-timing 'ident)
 
 ;; auto-resize the text wrapping based on frame size
 (make-variable-buffer-local 'erc-fill-column)
-(add-hook 'window-configuration-change-hook 
+(add-hook 'window-configuration-change-hook
           '(lambda ()
              (save-excursion
                (walk-windows
@@ -36,16 +37,16 @@
 
 (defadvice erc-display-prompt (after conversation-erc-display-prompt activate)
   "Insert last recipient after prompt."
-  (let ((previous 
-         (save-excursion 
+  (let ((previous
+         (save-excursion
            (if (and (search-backward-regexp (concat "^[^<]*<" erc-nick ">") nil t)
-                    (search-forward-regexp (concat "^[^<]*<" erc-nick ">" 
+                    (search-forward-regexp (concat "^[^<]*<" erc-nick ">"
                                                    " *\\([^:]*: ?\\)") nil t))
                (match-string 1)))))
     ;; when we got something, and it was in the last 3 mins, put it in
-    (when (and 
-           previous 
-           (> 180 (time-to-seconds 
+    (when (and
+           previous
+           (> 180 (time-to-seconds
                    (time-since (get-text-property 0 'timestamp previous)))))
       (set-text-properties 0 (length previous) nil previous)
       (insert previous))))
@@ -56,7 +57,8 @@
 
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
-      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux")))
+      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux")
+        ("oftc.net" "#perf")))
 
 ;; don't automatically switch to joined channels, that's just annoying
 (setq erc-join-buffer 'bury)
@@ -65,7 +67,8 @@
   "Connect to IRC."
   (interactive)
   (when t ;; (y-or-n-p "IRC? ")
-    (erc :server "irc.freenode.net" :port 6667 :nick freenode-nick)))
+    (erc :server "irc.freenode.net" :port 6667 :nick freenode-nick)
+    (erc :server "irc.oftc.net" :port 6667 :nick freenode-nick)))
 
 (defun filter-server-buffers ()
   (delq nil

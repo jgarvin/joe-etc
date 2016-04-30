@@ -164,15 +164,15 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     [((m .|. modMask, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-        ++
+    --     ++
 
-    -- --
-    -- -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
-    -- -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
-    -- --
-    [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_Left, xK_Right, xK_Up] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    -- -- --
+    -- -- -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
+    -- -- -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
+    -- -- --
+    -- [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_Left, xK_Right, xK_Up] [0..]
+    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -215,6 +215,9 @@ myManageHook = composeAll
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
     , className =? "Do"             --> doIgnore
+--    , className =? "Steam"            --> doIgnore
+    , className =? "Steam"            --> doFloat
+    , className =? "steam"            --> doFullFloat -- big picture mode
     , className =? "gnome-panel"                        --> doFloat
     , (stringProperty "WM_NAME")   =? "VLC"             --> doFullFloat
     , (stringProperty "WM_NAME")   =? "SpreadEditor"    --> doFullFloat
@@ -227,7 +230,7 @@ myManageHook = composeAll
 
 main = do
   home_folder <- getEnv "HOME"
-  editor <- return (home_folder ++ "/etc/bin/launch-emacs")
+  editor <- return (home_folder ++ "/etc/bin/launch-emacs-no-wait")
   browser_name <- return preferred_browser
   xmonad $ defaults editor home_folder ((head . lines) browser_name)
 

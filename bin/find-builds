@@ -56,23 +56,23 @@ if $list; then
     #     key="*"
     # fi
     # find . -maxdepth 1 -name "${key}-*".$mode.sh
-    find . -maxdepth 1 -name "*-*".$mode.sh
+    find "$PWD" -maxdepth 1 -name "*".$mode.sh
 fi
 
-if [ -n "$key" ]; then
-    # should only be one
-    script=$(echo ./$key-*.$mode.sh)
+# if [ -n "$key" ]; then
+#     # should only be one
+#     script=$(echo ./$key-*.$mode.sh)
 
-    # we make a copy and run the copy so that
-    # if we edit the script while the script
-    # is running we don't cause weird errors
-    target=$(mktemp)
-    cp $script $target
-    chmod +x $target
+#     # we make a copy and run the copy so that
+#     # if we edit the script while the script
+#     # is running we don't cause weird errors
+#     target=$(mktemp)
+#     cp $script $target
+#     chmod +x $target
 
-    $target
-    exit $?
-fi
+#     $target
+#     exit $?
+# fi
 
 # cd $projectile_dir
 

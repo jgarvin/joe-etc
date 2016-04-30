@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 (require 'cl)
 (require 'dash)
 (require 'ring)
@@ -49,7 +51,9 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
   ;; what you will get, window-buffer is a better default
   (let ((local (or local (window-buffer (selected-window)))))
     (with-current-buffer local
-      (md--run-timer-func v f args))))
+      (condition-case err
+          (md--run-timer-func v f args)
+        (message "error running timer %S" f)))))
 
 (defun md-run-when-idle-once (v f seconds &optional local &rest args)
   "Setup an idle timer to run F after SECONDS of idle time, passing
@@ -306,6 +310,7 @@ debug mode causing timers to die."
   (interactive)
   (md-open-most-recent-file "~/dragonshare/log" "client-[^.]*.log"))
 
+
 (defun md-open-most-recent-server-log ()
   (interactive)
   (md-open-most-recent-file "/tmp" "server-[^.]*.log"))
@@ -356,8 +361,9 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-min))
-      (while
-          (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
+      (skip-chars-forward "[:space:]")
+      (while (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t)
+        (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
@@ -533,7 +539,6 @@ Ignores CHAR at point."
          (closest-point))
     (save-excursion
       (while (funcall compare (point) end)
-        (message "point %S end %S" (point) end)
         (forward-line direction)
         ;;(beginning-of-line)
         ;;(back-to-indentation)
@@ -657,14 +662,14 @@ Ignores CHAR at point."
   (let ((p (point)))
     (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
                 (not (eobp)))
-      (forward-line 1))))
+      (next-logical-line 1))))
 
 (defun md-up-screenful ()
   (interactive)
   (let ((p (point)))
     (while (and (> (/ (window-body-height) 2) (count-lines (point) p))
                 (not (bobp)))
-      (forward-line -1))))
+      (next-logical-line -1))))
 
 ;; (defun md-wrap-sexp ()
 ;;   (interactive)
@@ -685,6 +690,7 @@ Ignores CHAR at point."
 (load-file "~/etc/emacs/md-homophones.el")
 (load-file "~/etc/emacs/md-navigation.el")
 (load-file "~/etc/emacs/md-edit.el")
+(load-file "~/etc/emacs/md-win.el")
 
 ;; this ended up being more trouble than it's worth, just use visual-line-mode
 ;; (defun md-smallest-multiple-greater-than (x y))

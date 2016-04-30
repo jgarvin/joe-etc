@@ -1,7 +1,7 @@
 (defun md-need-capitalization ()
   (interactive)
   (cond
-   ((derived-mode-p 'prog-mode 'comint-mode) nil)
+   ((derived-mode-p 'prog-mode 'comint-mode 'eshell-mode) nil)
    ((md-beginning-of-input) t)
    ((md-likely-preceded-by-opener (point)) t)
    ((save-excursion
@@ -23,7 +23,7 @@
 
 (defun md-char-regex (l)
   (regexp-opt-group (sort (mapcar #'char-to-string l) 'string=)))
-  
+
 (defun md-get-matching-opening-regexp ()
   (regexp-opt (md-matching-pairs)))
 
@@ -33,7 +33,7 @@ where the opening and closing delimeters differ, then we can know
 with certainty that the character is an opener and return t.
 
 When the delimeter is part of a pair where the opening and closing
-strings are the same, like quotes, We use a heuristic to decide 
+strings are the same, like quotes, We use a heuristic to decide
 if a delimeter is an opener or a closer. If the character prior is
 whitespace, then it's probably an opener. If the string prior
 is an opener, then we're likely an opener too.
@@ -74,7 +74,7 @@ where the opening and closing delimeters differ, then we can know
 with certainty that the character is an opener and return t.
 
 When the delimeter is part of a pair where the opening and closing
-strings are the same, like quotes, We use a heuristic to decide 
+strings are the same, like quotes, We use a heuristic to decide
 if a delimeter is an opener or a closer. If the character prior is
 whitespace, then it's probably an opener. If the string prior
 is an opener, then we're likely an opener too.
@@ -119,21 +119,31 @@ If the string preceeding pos isn't part of any pair, then returns nil."
       (push ?: l))
     (when (derived-mode-p 'c++-mode 'c-mode)
       (push ?: l)
-      (push ?< l))
+      (push ?< l)
+      (push ?> l)
+      (push ?~ l))
     (when (derived-mode-p 'python-mode 'inferior-python-mode)
       (setq l (delq ?\# l)))
     ;; (when (derived-mode-p 'sh-mode 'shell-mode)
       ;; (push ?\> l))
     (md-char-regex l)))
 
+
+;; TODO: need to switch to regular expressions
+;; so in C++ mode can inhibit after ->
 (defun md-space-inhibiting-after-chars ()
-  (let ((l (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?! ?\, ?:)))  
+  (let ((l (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?! ?\, ?:)))
+    (when (and (not (derived-mode-p 'emacs-lisp-mode))
+               (derived-mode-p 'prog-mode))
+      (push ?\( l)
+      (push ?\[ l))
     (when (derived-mode-p 'emacs-lisp-mode)
       (setq l (delq ?\, l))
       (setq l (delq ?: l)))
     (when (derived-mode-p 'c++-mode 'c-mode)
       (push ?\; l)
-      (push ?> l))
+      (push ?> l)
+      (push ?* l))
     (when (derived-mode-p 'sh-mode 'shell-mode)
       (push ?\; l))
     (md-char-regex l)))
@@ -146,6 +156,8 @@ If the string preceeding pos isn't part of any pair, then returns nil."
      ((and (derived-mode-p 'erc-mode) (md-at-start-of-erc-input-line)) nil)
      (isearch-mode nil)
      ((md-likely-preceded-by-opener (point)) nil)
+     ((and (or (equal str "0") (not (equal (string-to-number str) 0)))
+           (derived-mode-p 'prog-mode 'shell-mode)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str 0))) nil)
      ((save-excursion
         (re-search-backward space-inhibiting-before-characters (1- (point)) t)) nil)
@@ -158,7 +170,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
      ((eobp) nil)
      ((eolp) nil)
      (isearch-mode nil)
-     ;; we don't need to insert a space in front of the snippet character 
+     ;; we don't need to insert a space in front of the snippet character
      ((and (boundp 'md-placeholder) (equal (char-after) md-placeholder)) nil)
      ((md-likely-followed-by-closer (point)) nil)
      ((string-match space-inhibiting-characters (char-to-string (aref str (1- (length str))))) nil)
@@ -170,7 +182,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (interactive "*")
   (assert (stringp text))
   ;; we may be inserting text that originally came from a read
-  ;; only portion of the buffer,for example using the symbol picker 
+  ;; only portion of the buffer,for example using the symbol picker
   (remove-text-properties 0 (length text) (list 'read-only nil) text)
   (when (and check-capitals
              (md-need-capitalization))
@@ -181,11 +193,13 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (ring-insert md-recent-ring text)
   (when (and check-spaces
              (md-need-space text))
-    (setq text (concat " " text)))
+    (setq text (concat " " text))
+    )
   (when (and check-spaces
              (md-need-space-after text))
     ;; (message "appending space")
-    (setq text (concat text " ")))
+    (setq text (concat text " "))
+    )
   (let ((p (point)))
     (insert text)
     (save-excursion

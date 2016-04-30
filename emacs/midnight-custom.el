@@ -16,3 +16,7 @@
 
 (add-to-list 'clean-buffer-list-kill-regexps "compile|.*?|.*")
 (add-to-list 'clean-buffer-list-kill-regexps "run|.*?|.*")
+
+;; found emacs crashing thousands of frames deep inside
+;; collection, so try collecting eagerly to avoid in the future
+(add-hook 'midnight-hook #'garbage-collect)

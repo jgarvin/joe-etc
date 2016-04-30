@@ -1,10 +1,14 @@
 echo \nReading ~/.gdbinit...\n\n
 set print asm-demangle on
+set print pretty on
+set print object on
+set print static-members on
+set print vtbl on
+set print demangle on
+set demangle-style gnu-v3
 
 # this helps emacs know where we are 
 set annotate 1 
-
-source ~/etc/gdb/stl-views-1.0.3.gdb
 
 set history size 9999999
 set history filename ~/.gdbhistory
@@ -19,24 +23,13 @@ quit
 end
 
 set script-extension soft
-source ~/etc/rwtime.py
-
-echo Turning off listening for SIGUSR1...\n
-handle SIGUSR1 nostop
-
-
-python
-import sys
-import os
-import os.path as op
-sys.path.insert(0, op.join(os.environ["HOME"], 'etc/gdb/boostpp'))
-from boost.v1_40.printers import register_boost_printers
-register_boost_printers(None)
-end
 
 # to prevent other threads from being able to run
 # when you are stepping 
 #set scheduler-locking on
 
-break main
-delete 1
+# disable paging since eshell handles for us
+set height 0
+
+# annoying to remember
+alias -a exit = quit
