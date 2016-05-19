@@ -10,8 +10,7 @@
              "*magit-diff*"
              "*magit-log*"
              "*Backtrace*"
-             "*grep*"
-             "*Completions*"))
+             "*grep*"))
   (add-to-list 'clean-buffer-list-kill-never-buffer-names i))
 
 (add-to-list 'clean-buffer-list-kill-regexps "compile|.*?|.*")

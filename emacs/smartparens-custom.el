@@ -56,3 +56,7 @@
 ;; but python has a bug: https://github.com/Fuco1/smartparens/issues/473
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'python-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'inferior-python-mode)
+
+(defadvice sp-show--pair-function (around sp-show--pair-function-disable-large activate)
+  (unless (> (buffer-size) (* 1 1024 1024))
+    ad-do-it))

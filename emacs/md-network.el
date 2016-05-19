@@ -54,7 +54,8 @@
   (when md-server-execute-pending-timer
     (cancel-timer md-server-execute-pending-timer))
   (setq md-server-pending-actions nil)
-  (delete-process "mandimus-eval-server"))
+  (delete-process "mandimus-eval-server")
+  (kill-buffer "*mandimus-server*"))
 
 (defun md-server-restart ()
   (message "restarting mandimus server")

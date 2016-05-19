@@ -412,7 +412,7 @@ go to the highest slot (most recent)."
   (md-add-snippet
    :name (format "%s" sym)
    :contents (md-gen-elisp-snippet-contents sym)
-   :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode)))
+   :context '(derived-mode-p 'emacs-lisp-mode)))
 
 (defun md-insert-call-snippet (n)
   (interactive)

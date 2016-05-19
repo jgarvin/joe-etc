@@ -36,18 +36,16 @@ execute after every command."
   (define-key eshell-mode-map (kbd "M-RET") #'ace-jump-mode)
   ;; smartparens ignores special buffers by default
   (smartparens-mode 1)
-  (push "htop" eshell-visual-commands)
-  (push "nethack" eshell-visual-commands)
-  (push "perf report" eshell-visual-commands)
-  (push "iotop" eshell-visual-commands)
-  (push "watch" eshell-visual-commands)
-  (push "ssh" eshell-visual-commands)
+  (add-to-list 'eshell-visual-commands "htop")
+  (add-to-list 'eshell-visual-commands "nethack")
+  (add-to-list 'eshell-visual-commands "iotop")
+  (add-to-list 'eshell-visual-commands "watch")
   (setenv "PAGER" "cat")
   ;; apparently have to add this locally to get it to work
   (add-hook 'eshell-post-command-hook #'etc-eshell-append-history nil t))
-
 (add-hook 'eshell-mode-hook #'etc-eshell-mode-hook)
 
+;; (setq eshell-visual-commands (delq "top" 'eshell-visual-commands))
 ;;*--- track cd history ------------------------------------------------*/
 (defvar-local eshell-hist-dirs nil)
 (defvar-local eshell-hist-index 0)

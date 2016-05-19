@@ -564,13 +564,17 @@ Ignores CHAR at point."
       (goto-char closest-point))))
 
 (defun md-move-up-to-symbol-starting-with-char (arg char)
-  (interactive "p\ncMove up to symbol starting with char: ")
-  (let ((direction (if (>= arg 0) 1 -1)))
+  (interactive "P\ncMove up to symbol starting with char: ")
+  (let ((direction (if (not arg) 1 -1)))
     (forward-symbol direction)
     (unwind-protect
-        (re-search-forward (concat "\\_<" (regexp-quote (char-to-string char))) nil nil arg)
+        (if arg
+            (re-search-backward (concat "\\_<" (regexp-quote (char-to-string char))) nil nil 1)
+          (re-search-forward (concat "\\_<" (regexp-quote (char-to-string char))) nil nil 1))
       (forward-symbol (* -1 direction)))
     (point)))
+
+(global-set-key (kbd "C-c s s") #'md-move-up-to-symbol-starting-with-char)
 
 (defun md-move-up-to-char (arg char)
   (interactive "p\ncMove up to char: ")

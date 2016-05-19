@@ -13,7 +13,7 @@
 ;; check if any buffers need saving before actually
 ;; saving them, to avoid spurious messages.
 (defun etc-save-if-necessary ()
-  (with-demoted-errors
+  (ignore-errors
       (when (reduce (lambda (a b) (or a b))
                     (remove-if-not #'etc-buffer-needs-saving (buffer-list))
                     :initial-value nil)

@@ -114,4 +114,5 @@
    ("with" "with $1:\n    $2")
    ("with as" "with $1 as $2:\n    $3")
    ("as" "$1 as $2")
+   ("not" "not $1")
    ))
