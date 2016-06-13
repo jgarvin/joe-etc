@@ -24,4 +24,6 @@
    ("cut" "cut -d' ' -f$1")
    ("bash" "bash -c \"$1\"")
    ("sudo" "sudo $1")
+   ("which" "which $1")
+   ("cat" "cat $1")
    ))

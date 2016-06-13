@@ -84,18 +84,26 @@ same folder. If given prefix argument always make a new shell."
   (interactive "P")
   (let* ((dir (file-truename default-directory))
          (existing (sort (-filter (lambda (x)
-                                    (with-current-buffer x
-                                      (and (equal dir (file-truename default-directory))
-                                      (derived-mode-p 'eshell-mode))))
+                                    ;; had to insert some extra conditions
+                                    ;; before the with-current-buffer call,
+                                    ;; because sometimes it can cause tramp
+                                    ;; to try and ask for passwords to nonexistent buffers
+                                    ;; that I think might have been minibuffers based
+                                    ;; on the output before crashing.
+                                    ;; ... probably some very weird emacs bug
+                                    (and (equal dir (file-truename default-directory))
+                                         (not (minibufferp x))
+                                         (with-current-buffer x
+                                           (derived-mode-p 'eshell-mode))))
                                   (buffer-list))
                          (lambda (x y)
                            (string< (buffer-name x)
                                     (buffer-name y))))))
-    (message "%S" existing)
     (if (and existing (not arg))
         (let ((pos (position (current-buffer) existing)))
           (if pos
-              (switch-to-buffer (nth (% (1+ pos) (length existing)) existing))
+              (progn
+                (switch-to-buffer (nth (% (1+ pos) (length existing)) existing)))
             (switch-to-buffer (car existing))))
       (eshell (generate-new-buffer-name "eshell-")))))
 

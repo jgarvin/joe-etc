@@ -154,4 +154,6 @@
    ("memory set" "std::memset($1, $2, $3);")
    ("system error" "throw std::system_error(errno, std::system_category());")
    ("go to" "goto $1;")
+   ("size" "$1.size()")
+   ("empty" "$1.empty()")
    ))
