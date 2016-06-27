@@ -1,4 +1,4 @@
-(helm-flx-mode +1)
+;; (helm-flx-mode +1)
 
 (require 'helm-config)
 
@@ -9,6 +9,8 @@
 ;; (global-set-key (kbd "C-x C-f") 'helm-find-files)
 ;; (global-set-key (kbd "C-c h o") 'helm-occur)
 (setq projectile-completion-system 'helm)
+
+(require 'helm-projectile)
 (helm-projectile-on)
 
 (global-set-key (kbd "C-x b") #'helm-mini)
@@ -74,3 +76,9 @@
 (global-set-key (kbd "C-c m x") #'etc-no-helm-M-x)
 
 (setq helm-buffer-max-length 30)
+
+;; for some reason in your home versions they changed the default,
+;; restore the default here.
+;; https://github.com/emacs-helm/helm/commit/1de1701c73b15a86e99ab1c5c53bd0e8659d8ede
+(assq-delete-all 'find-file helm-completing-read-handlers-alist)
+(assq-delete-all 'execute-extended-command helm-completing-read-handlers-alist)
