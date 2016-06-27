@@ -91,10 +91,10 @@ same folder. If given prefix argument always make a new shell."
                                     ;; that I think might have been minibuffers based
                                     ;; on the output before crashing.
                                     ;; ... probably some very weird emacs bug
-                                    (and (equal dir (file-truename default-directory))
-                                         (not (minibufferp x))
+                                    (and (not (minibufferp x))
                                          (with-current-buffer x
-                                           (derived-mode-p 'eshell-mode))))
+                                           (and (equal dir (file-truename default-directory))
+                                                (derived-mode-p 'eshell-mode)))))
                                   (buffer-list))
                          (lambda (x y)
                            (string< (buffer-name x)
