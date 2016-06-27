@@ -158,6 +158,7 @@
 (load-file "~/etc/emacs/eshell-custom.el")
 (load-file "~/etc/emacs/gc-custom.el")
 (load-file "~/etc/emacs/dabbrev-custom.el")
+(load-file "~/etc/emacs/hide-show-custom.el")
 
 (delete-selection-mode 1)
 

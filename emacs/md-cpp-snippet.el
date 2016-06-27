@@ -129,6 +129,7 @@
    ("to do" "// TODO: $1")
    ("to string" "std::to_string($1)")
    ("trace" "std::cout << __FILE__ << \":\" << __LINE__ << std::endl;")
+   ("err trace" "std::cerr << __FILE__ << \":\" << __LINE__ << std::endl;")
    ("try" "try {\n    $1;\n} catch($2) {\n    $3;\n}")
    ("tuple" "std::tuple<$1>")
    ("type def" "typedef $1 $2;")
@@ -156,4 +157,5 @@
    ("go to" "goto $1;")
    ("size" "$1.size()")
    ("empty" "$1.empty()")
+   ("bool" "bool($1)")
    ))

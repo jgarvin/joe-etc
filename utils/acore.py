@@ -79,7 +79,7 @@ if len(sys.argv) > 2:
     print >> sys.stderr, "Only takes one argument, the application name."
     sys.exit(1)
 
-coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*") + glob.glob("/tmp/cores/core.*")
+coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*") + glob.glob("/tmp/cores/core.*") + glob.glob("./core")
 
 if len(coreList) == 0:
     print >> sys.stderr, "Found no cores in /tmp or current directory."
@@ -139,7 +139,7 @@ def findBinaryForCore(coreName):
     binary names, then picks the one with the most
     recent mtime, since we assume these cores are from
     development."""
-    
+
     strings = sh.strings(coreName).split("\n")
     strings = [s for s in strings if s]
     candidate = ("", 0)
@@ -152,7 +152,7 @@ def findBinaryForCore(coreName):
                     candidate = (s, mtime)
 
     return candidate[0]
-    
+
 chosenBinary = findBinaryForCore(chosenCore)
 if not chosenBinary:
     print >>sys.stderr, "Couldn't find binary for core: " + chosenBinary
