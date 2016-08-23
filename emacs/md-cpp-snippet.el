@@ -158,4 +158,5 @@
    ("size" "$1.size()")
    ("empty" "$1.empty()")
    ("bool" "bool($1)")
+   ("placement new" "new($1) $2($3)")
    ))

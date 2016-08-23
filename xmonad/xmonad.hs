@@ -215,6 +215,8 @@ myManageHook = composeAll
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
     , className =? "Do"             --> doIgnore
+    , className =? "sun-awt-X11-XFramePeer" --> doIgnore
+    , className =? "com-sun-javaws-Main" --> doIgnore
 --    , className =? "Steam"            --> doIgnore
     , className =? "Steam"            --> doFloat
     , className =? "steam"            --> doFullFloat -- big picture mode
@@ -288,6 +290,7 @@ defaults editor home_folder browser_name = gnomeConfig {
                              $ simpleDeco shrinkText myTheme
                              $ layoutHook gnomeConfig,
         handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
-        manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
+        -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
+        manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
         logHook            = ewmhDesktopsLogHook >> updatePointer (Relative 0.5 0.5)
     }
