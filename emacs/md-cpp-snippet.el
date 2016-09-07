@@ -158,4 +158,6 @@
    ("size" "$1.size()")
    ("empty" "$1.empty()")
    ("bool" "bool($1)")
+   ("block" "{\n    $1;\n}")
    ))
+

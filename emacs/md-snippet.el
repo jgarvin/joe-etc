@@ -302,6 +302,8 @@
             (goto-char (marker-position start))
             (when (re-search-forward (char-to-string md-placeholder) (marker-position end) 1)
               (goto-char (1- (point)))))
+          (when (derived-mode-p 'perl6-mode)
+            (save-excursion (while (re-search-forward "[;,][[:space:]\n]*;" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match ";" nil t))))
           (when (derived-mode-p 'c++-mode)
             (save-excursion (while (re-search-forward "[;,][[:space:]\n]*;" (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match ";" nil t)))
             (save-excursion (while (re-search-forward "[;,][[:space:]\n]*," (+ md-snippet-collapse-lookahead (marker-position end)) t) (replace-match "," nil t)))

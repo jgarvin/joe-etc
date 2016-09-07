@@ -864,6 +864,14 @@
 (setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
 (setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
 
+(use-package
+  perl6-mode
+  :ensure t)
+
+(use-package
+  racket-mode
+  :ensure t)
+
 ;; at the bottom so it has best chance of getting in hooks
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")

@@ -1,3 +1,5 @@
+(require 'hideshow)
+
 (add-hook 'prog-mode-hook
           (lambda () (hs-minor-mode)))
 
