@@ -486,7 +486,7 @@ go to the highest slot (most recent)."
 ;; like infix operators
 (defun generic-programming-context ()
   (when (and (derived-mode-p 'prog-mode 'inferior-python-mode)
-             (not (derived-mode-p 'emacs-lisp-mode 'eshell-mode))) t))
+             (not (derived-mode-p 'emacs-lisp-mode 'eshell-mode 'racket-mode))) t))
 
 
 (md-make-snippets
@@ -538,6 +538,8 @@ go to the highest slot (most recent)."
 ;;(md-snippet-mode-activate 0)
 
 (load-file "~/etc/emacs/md-cpp-snippet.el")
+(load-file "~/etc/emacs/md-perl6.el")
+(load-file "~/etc/emacs/md-racket.el")
 (load-file "~/etc/emacs/md-python-snippet.el")
 (load-file "~/etc/emacs/md-shell-snippet.el")
 (load-file "~/etc/emacs/md-eshell-snippet.el")
