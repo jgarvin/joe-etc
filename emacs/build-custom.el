@@ -177,7 +177,7 @@
          ;; this makes sure we can have multiple compiles going
          (default-directory (file-name-directory comp-command))
          (buf-name (etc-build-buffer-name 'build comp-command))
-         (compilation-buffer-name-function (lambda (mode) buf-name)) 
+         (compilation-buffer-name-function (lambda (mode) buf-name))
         ;; Pass info on for how to run things from the buffer we invoke in, which
          ;; in turn could be getting from project or elsewhere.
          (runc run-command)
@@ -238,7 +238,10 @@
 (defun etc-interrupt-subjob ()
   (interactive)
   (let ((inhibit-read-only t))
-    (comint-interrupt-subjob)))
+    ;; (comint-interrupt-subjob) ;; not strong enough sometimes
+    ;; TODO: resort to killing on a timer
+    (comint-kill-subjob)
+    ))
 
 (global-set-key (kbd "C-c b") #'etc-compile)
 (global-set-key (kbd "C-c s b") #'etc-stop-most-recent-build)

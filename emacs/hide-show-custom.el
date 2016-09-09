@@ -8,4 +8,3 @@
 (define-key hs-minor-mode-map (kbd "C-c u") #'hs-hide-level)
 (define-key hs-minor-mode-map (kbd "C-c H") #'hs-hide-all)
 (define-key hs-minor-mode-map (kbd "C-c U") #'hs-show-all)
-

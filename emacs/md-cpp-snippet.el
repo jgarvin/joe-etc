@@ -159,5 +159,6 @@
    ("empty" "$1.empty()")
    ("bool" "bool($1)")
    ("block" "{\n    $1;\n}")
+   ("placement new" "new($1) $2($3)")
    ))
 
