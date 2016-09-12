@@ -18,6 +18,10 @@ if [[ -d "$HOME/opt/bin" ]]; then
         export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
+if [[ -d "$HOME/opt/share/perl6/site/bin" ]]; then
+    export PATH=$(path_prepend "$HOME/opt/share/perl6/site/bin")
+fi
+
 if [[ -d "$HOME/opt/lib" ]]; then
     export LD_LIBRARY_PATH=$(path_append "$HOME/opt/lib")
 fi

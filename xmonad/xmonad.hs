@@ -149,11 +149,16 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     , ((modMask .|. shiftMask, xK_q     ),
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
+    -- -- Move screens
+    -- , ((modMask               , xK_BackSpace ), prevScreen)
+    -- , ((modMask .|. shiftMask , xK_BackSpace ), shiftPrevScreen >> prevScreen)
+    -- , ((modMask               , xK_space     ), nextScreen)
+    -- , ((modMask .|. shiftMask , xK_space     ), shiftNextScreen >> nextScreen)
     -- Move screens
-    , ((modMask               , xK_BackSpace ), prevScreen)
-    , ((modMask .|. shiftMask , xK_BackSpace ), shiftPrevScreen >> prevScreen)
-    , ((modMask               , xK_space     ), nextScreen)
-    , ((modMask .|. shiftMask , xK_space     ), shiftNextScreen >> nextScreen)
+    , ((modMask               , xK_space ), prevScreen)
+    , ((modMask .|. shiftMask , xK_space ), shiftPrevScreen >> prevScreen)
+    , ((modMask               , xK_BackSpace     ), nextScreen)
+    , ((modMask .|. shiftMask , xK_BackSpace     ), shiftNextScreen >> nextScreen)
     ]
     ++
 

@@ -57,7 +57,8 @@
 
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
-      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux")
+      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
+         "#perl6" "#racket")
         ("oftc.net" "#perf")))
 
 ;; don't automatically switch to joined channels, that's just annoying
