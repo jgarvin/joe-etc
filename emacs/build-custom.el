@@ -127,12 +127,12 @@
           (if existing-window
               (cons (cons (regexp-quote buff-real-name) (cons #'display-buffer-no-window '())) display-buffer-alist)
             display-buffer-alist)))
-    (message "%S %S %S" buff-name (get-buffer buff-name) (and (get-buffer buff-name) (with-current-buffer (get-buffer buff-name))))
+    ;; (message "%S %S %S" buff-name (get-buffer buff-name) (and (get-buffer buff-name) (with-current-buffer (get-buffer buff-name))))
     (when (get-buffer buff-real-name)
       (kill-buffer buff-real-name))
     (let ((default-directory (file-name-directory cmd))
-          (temp-file (make-temp-file "run.")))
-      (message "directory: %S" default-directory)
+          (temp-file (make-temp-file (concat cmd "."))))
+      ;; (message "directory: %S" default-directory)
       (copy-file cmd temp-file t nil nil t)
       (async-shell-command temp-file buff-real-name))
     (if existing-window
