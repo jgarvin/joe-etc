@@ -44,6 +44,10 @@
 
 (setq image-dired-external-viewer "/usr/bin/xdg-open")
 
+;; only need one prompt asking if I'm sure I want to delete everything
+;; instead of being asked once per folder
+(setq dired-recursive-deletes 'always)
+
 ;; going all the way to the real/top bottom of buffer in dired
 ;; is almost never what you want.
 (define-key dired-mode-map
