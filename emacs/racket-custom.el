@@ -6,6 +6,8 @@
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
   (setq indent-tabs-mode nil)
   (etc-set-indent-preference 4)
+  (sp-pair "'" nil :actions :rem)
+  (sp-pair "`" nil :actions :rem)
   ;; (define-key racket-mode-map (kbd "C-c ") nil)
   )
 
