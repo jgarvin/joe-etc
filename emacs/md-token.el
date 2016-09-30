@@ -493,11 +493,12 @@ on the ends. Also we want to store as lowercase."
                         (re-search-backward regex scan-limit 1))
               (when (md-string-contains-faces (match-beginning 0) (match-end 0) '(erc-nick-default-face))
                 (let* ((match (match-string-no-properties 0))
+                       (without-angle-brackets (substring match 1 -1))
                        (entry (gethash match presence))
                        (cur-distance (- scan-start (point))))
                   (unless entry
                     (puthash match 1 presence)
-                    (push match results))))))
+                    (push without-angle-brackets results))))))
           (nreverse results))))))
 
 (defun md-channel-buffer-p ()
