@@ -38,14 +38,18 @@
 (define-key smartparens-mode-map (kbd "C-S-d") 'sp-backward-down-sexp)
 (define-key smartparens-mode-map (kbd "C-M-o") 'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-S-u") 'sp-backward-up-sexp)
-(define-key smartparens-mode-map (kbd "C-M-n") 'sp-split-sexp)
-;;(define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)
+(define-key smartparens-mode-map (kbd "C-M-n") 'sp-next-sexp)
+(define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)
 (define-key smartparens-mode-map (kbd "C-<home>") 'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-<end>") 'sp-end-of-sexp)
-(define-key smartparens-mode-map (kbd "C-M-t") 'sp-transpose-sexp)
+(define-key smartparens-mode-map (kbd "C-M-x") 'sp-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") 'sp-forward-slurp-sexp)
-(define-key smartparens-mode-map (kbd "C-M-g") 'sp-splice-sexp)
-
+(define-key smartparens-mode-map (kbd "C-M-g") 'sp-backward-slurp-sexp)
+(define-key smartparens-mode-map (kbd "C-M-v") 'sp-forward-barf-sexp)
+(define-key smartparens-mode-map (kbd "C-M-k") 'sp-backward-barf-sexp)
+(define-key smartparens-mode-map (kbd "C-M-j") 'sp-splice-sexp)
+(define-key smartparens-mode-map (kbd "C-M-i") 'sp-split-sexp)
+(define-key smartparens-mode-map (kbd "C-M-z") 'sp-rewrap-sexp)
 
 ;; without these you can't dive into a string
 (add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
