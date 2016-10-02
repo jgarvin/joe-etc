@@ -1,13 +1,89 @@
 (when (>= emacs-major-version 24)
   (require 'package)
   (package-initialize)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("marmelade" . "http://marmalade-repo.org/packages/") t))
+  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                           ("marmalade" . "https://marmalade-repo.org/packages/")
+                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("melpa" . "https://melpa.org/packages/")))
+  (when (not (package-installed-p 'use-package))
+    (package-refresh-contents)
+    (package-install 'use-package)))
 
 (require 'use-package)
 
-;; for emacsclient
-(server-start)
+(use-package
+  dash
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  perl6-mode
+  :ensure t)
+
+(use-package
+  racket-mode
+  :ensure t)
+
+(use-package
+  haskell-mode
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  magit
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  projectile
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  helm-projectile
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  erc-hl-nicks
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  realgud
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  goto-chg
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  helm-swoop
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  undo-tree
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  expand-region
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  string-inflection
+  :ensure t)
+
+(use-package
+  f
+  :ensure t
+  :pin melpa-stable)
+
+(load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -126,7 +202,6 @@
 (load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/perl6-custom.el")
-(load-file "~/etc/emacs/racket-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
@@ -824,12 +899,12 @@
   (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
-(require 'string-inflection)
-(global-set-key (kbd "C-c y") #'string-inflection-cycle)
-(global-set-key (kbd "C-c m s") #'string-inflection-underscore)
-(global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
-(global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
-(global-set-key (kbd "C-c m u") #'string-inflection-upcase)
+;; (require 'string-inflection)
+;; (global-set-key (kbd "C-c y") #'string-inflection-cycle)
+;; (global-set-key (kbd "C-c m s") #'string-inflection-underscore)
+;; (global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
+;; (global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
+;; (global-set-key (kbd "C-c m u") #'string-inflection-upcase)
 
 ;; force myself to use C-i so I don't stretch my left pinky
 ;;(global-unset-key (kbd "<tab>"))
@@ -866,16 +941,13 @@
 (setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
 (setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
 
-(use-package
-  perl6-mode
-  :ensure t)
-
-(use-package
-  racket-mode
-  :ensure t)
+;;(load-file "~/etc/emacs/etc-racket-custom.el")
 
 ;; at the bottom so it has best chance of getting in hooks
 (load-file "~/etc/emacs/mandimus.el")
 (load-file "~/etc/emacs/md-belt-custom.el")
 (load-file "~/etc/emacs/md-company-custom.el")
 (put 'dired-find-alternate-file 'disabled nil)
+
+;; for emacsclient
+(server-start)

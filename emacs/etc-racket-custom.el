@@ -1,3 +1,5 @@
+(require 'racket-mode)
+
 (defun etc-racket-mode-hook ()
   (subword-mode 1)
   (setq c-hungry-delete-key t)

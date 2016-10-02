@@ -1,7 +1,11 @@
-(add-to-list 'load-path "~/etc/smartparens")
+(use-package
+  smartparens
+  :ensure t)
+
+;; (add-to-list 'load-path "~/etc/smartparens")
 (require 'smartparens-config)
 (smartparens-global-mode 1)
-(show-smartparens-global-mode t)
+(show-smartparens-global-mode 1)
 
 ;; Commented out hotkeys need free keyboard shortcuts not taken
 ;; by XMonad.
@@ -28,9 +32,9 @@
 ;; C-M-up
 ;; C-M-down
 
-;; TODO: figure out what to change xmonad binds to for next/prev window
-;; freeing up e and i
-;; TODO: add split, rewrap
+;; ;; TODO: figure out what to change xmonad binds to for next/prev window
+;; ;; freeing up e and i
+;; ;; TODO: add split, rewrap
 
 (define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)

@@ -297,5 +297,5 @@ defaults editor home_folder browser_name = gnomeConfig {
         handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
         -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
         manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
-        logHook            = ewmhDesktopsLogHook >> updatePointer (Relative 0.5 0.5)
+        logHook            = ewmhDesktopsLogHook >> updatePointer (0.5, 0.5) (0, 0)
     }
