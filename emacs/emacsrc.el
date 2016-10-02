@@ -567,6 +567,8 @@
     (linum-mode 0)
     (smartparens-mode 0)
     (setq md-enable-symbol-refresh nil)
+    (auto-revert-mode 0)
+    (setq global-auto-revert-ignore-buffer t)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -577,6 +579,10 @@
     (if (not (bolp)) (forward-line 1))
     (delete-whitespace-rectangle (point) end nil)))
 (global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
+
+(add-to-list 'global-auto-revert-ignore-modes 'special-mode)
+(setq global-auto-revert-non-file-buffers nil)
+(global-auto-revert-mode 1)
 
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
