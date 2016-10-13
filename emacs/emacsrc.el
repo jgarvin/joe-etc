@@ -14,7 +14,7 @@
 (use-package
   dash
   :ensure t
-  :pin melpa-stable)
+  )
 
 (use-package
   perl6-mode
@@ -33,6 +33,13 @@
   magit
   :ensure t
   :pin melpa-stable)
+
+(use-package
+  magit-gerrit
+  :ensure t
+  :pin melpa
+  )
+(require 'magit-gerrit)
 
 (use-package
   projectile
@@ -57,7 +64,7 @@
 (use-package
   goto-chg
   :ensure t
-  :pin melpa-stable)
+)
 
 (use-package
   helm-swoop
@@ -67,7 +74,7 @@
 (use-package
   undo-tree
   :ensure t
-  :pin melpa-stable)
+)
 
 (use-package
   expand-region
@@ -580,7 +587,7 @@
     (delete-whitespace-rectangle (point) end nil)))
 (global-set-key "\C-x\C-h" 'my-delete-leading-whitespace)
 
-(add-to-list 'global-auto-revert-ignore-modes 'special-mode)
+;;(add-to-list 'global-auto-revert-ignore-modes 'special-mode)
 (setq global-auto-revert-non-file-buffers nil)
 (global-auto-revert-mode 1)
 

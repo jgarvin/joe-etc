@@ -39,7 +39,7 @@
   (let ((o (make-overlay (point) (point))))
     (overlay-put o 'after-string text)
     (overlay-put o 'window (minibuffer-window))))
-  
+
 (defun md-truncate-string (x max-length)
   (if (null x)
       "nil"
@@ -47,7 +47,7 @@
     ;; we could shorten to max length here but then we may make
     ;; some strings needlessly short that would have fit
     ;; once spaces were squeezed
-    (setq x (substring x 0 (min (length x) 100))) 
+    (setq x (substring x 0 (min (length x) 100)))
     (setq x (replace-regexp-in-string "[\\\n[:space:]]+" " " x))
     (let ((trailing ".."))
       (if (< (string-width x) max-length)
@@ -180,7 +180,7 @@
       (apply original-function args)
     (let ((formatted-string (apply #'format args)))
       (if (or (stringp formatted-string))
-          (progn 
+          (progn
             (setq md-current-message formatted-string)
             (md-bt-schedule-update))
         (apply original-function args)))))
@@ -213,14 +213,13 @@
   (let ((md-updating-belts t))
     (dolist (belt md-belt-list)
       (when (md-belt-construct belt)
-        (funcall (md-belt-construct belt))))  
+        (funcall (md-belt-construct belt))))
     (setq resize-mini-windows nil)
     (add-hook 'post-command-hook #'md-save-message t)
     (add-hook 'post-command-hook #'md-bt-update-post-command t)
     (add-hook 'window-configuration-change-hook #'md-bt-update-window t)
     (add-hook 'focus-in-hook #'md-bt-update-focus t)
     (advice-add #'message :around #'md-belt-message-advice)
-    (ad-enable-advice 'message 'around 'md-message-save-to-var)
     (setq md-belt-mode t))
   (md-update-belts))
 
@@ -233,8 +232,7 @@
     (remove-hook 'post-command-hook #'md-bt-update-post-command)
     (remove-hook 'window-configuration-change-hook #'md-bt-update-window)
     (remove-hook 'focus-in-hook #'md-bt-update-focus)
-    ;; TODO: disable doesn't work wtf?
-    (ad-disable-advice 'message 'around 'md-message-save-to-var)
+    (advice-remove 'message #'md-belt-message-advice)
     (dolist (frame (frame-list))
       (with-selected-frame frame
         (with-selected-window (minibuffer-window frame)
@@ -265,4 +263,3 @@
 ;;(md-toggle-belt-mode)
 
 (provide 'md-belt-impl)
-
