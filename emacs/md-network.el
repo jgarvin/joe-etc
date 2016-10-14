@@ -10,6 +10,13 @@
 (defvar md-server-pending-actions nil)
 (defvar md-server-execute-pending-timer nil)
 
+;; Yes this is a mutex,
+;; necessary because if executing any actions
+;; causes more IO the server filter may run again,
+;; causing us to process more input,
+;; causing more actions to execute!
+(defvar md-executing-actions-p nil)
+
 ;; hacked around this for now
 ;; ;; You are rightly wondering why this is here. The reason
 ;; ;; is that both emacs and mandimus are single threaded,
@@ -26,13 +33,16 @@
  (setq ring-bell-function #'ignore)
 
 (defun md-execute-pending ()
-  (unwind-protect
-      (while md-server-pending-actions
-        (funcall (pop md-server-pending-actions)))
-    (setq md-server-pending-actions nil)
-    (when md-server-execute-pending-timer
-      (cancel-timer md-server-execute-pending-timer))
-    (setq md-server-execute-pending-timer nil)))
+  (unless md-executing-actions-p
+    (let ((md-executing-actions-p t))
+      (unwind-protect
+          (while md-server-pending-actions
+            (funcall (pop md-server-pending-actions)))
+        (setq md-server-pending-actions nil)
+        ;; (when md-server-execute-pending-timer
+          ;; (cancel-timer md-server-execute-pending-timer))
+        ;; (setq md-server-execute-pending-timer nil)
+        ))))
 
 (defun md-server-start nil
   (interactive)
@@ -55,7 +65,8 @@
     (cancel-timer md-server-execute-pending-timer))
   (setq md-server-pending-actions nil)
   (delete-process "mandimus-eval-server")
-  (kill-buffer "*mandimus-server*"))
+  (kill-buffer "*mandimus-server*")
+  (setq md-executing-actions-p nil))
 
 (defun md-server-restart ()
   (message "restarting mandimus server")
@@ -101,15 +112,16 @@
                                           (md-server-log command proc))
                                       ;; not really user error but don't want back traces
                                       (user-error "Couldn't run command, server status: %S" status)))))))
-            (unless md-server-execute-pending-timer
-              ;; (message "scheduling")
-              (setq md-server-execute-pending-timer
-                    ;; you don't want to do this on idle timer,
-                    ;; because then you can't to do C-c commands
-                    ;; when shell output is scrolling by
-                   (run-with-timer 0 1 #'md-execute-pending)
-                      ;; (run-with-idle-timer 0 t #'md-execute-pending)
-                    ))
+            (md-execute-pending)
+            ;; (unless md-server-execute-pending-timer
+            ;;   ;; (message "scheduling")
+            ;;   (setq md-server-execute-pending-timer
+            ;;         ;; you don't want to do this on idle timer,
+            ;;         ;; because then you can't to do C-c commands
+            ;;         ;; when shell output is scrolling by
+            ;;        (run-with-timer 0 1 #'md-execute-pending)
+            ;;           ;; (run-with-idle-timer 0 t #'md-execute-pending)
+            ;;         ))
             (unwind-protect
                 (setq message (substring message index))
               (setcdr pending message)))
