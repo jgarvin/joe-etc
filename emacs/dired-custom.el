@@ -24,7 +24,10 @@
 (defun dired-xdg-open-file ()
   "Opens the current file in a Dired buffer."
   (interactive)
-  (xdg-open-file (dired-get-file-for-visit)))
+  (if (string= (file-name-extension (dired-get-file-for-visit))
+               "data")
+      (async-shell-command (format "gnome-terminal -e \"perf report -i %s\"" (dired-get-file-for-visit)))
+    (xdg-open-file (dired-get-file-for-visit))))
 
 (defun xdg-open-file (filename)
   "xdg-opens the specified file."

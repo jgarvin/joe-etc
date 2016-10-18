@@ -8,7 +8,7 @@
   "Align elements in the python dictionary cursor is inside of around colon."
   (interactive)
   (undo-boundary)
-  (save-excursion 
+  (save-excursion
     (single-pair-only-sexp "{" 'sp-select-next-thing)
     (align-regexp (region-beginning) (region-end) "\\(\\s-*\\):")))
 
@@ -16,7 +16,7 @@
   "Align elements in the python list."
   (interactive)
   (undo-boundary)
-  (save-excursion 
+  (save-excursion
     (single-pair-only-sexp "[" 'sp-select-next-thing)
     (align-regexp (region-beginning) (region-end) "\\(\\s-*\\),")))
 
@@ -122,3 +122,10 @@
 
 (add-hook 'python-mode-hook 'etc-python-setup)
 
+;; enable for typeshed files
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("\\.pyi\\'" . python-mode)
+         ("\\.py\\'" . python-mode))
+       auto-mode-alist))
