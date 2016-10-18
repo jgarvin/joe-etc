@@ -131,7 +131,7 @@
     (when (get-buffer buff-real-name)
       (kill-buffer buff-real-name))
     (let ((default-directory (file-name-directory cmd))
-          (temp-file (make-temp-file (concat cmd "."))))
+          (temp-file (make-temp-file (concat "/tmp/" (file-name-nondirectory cmd) "."))))
       ;; (message "directory: %S" default-directory)
       (copy-file cmd temp-file t nil nil t)
       (async-shell-command temp-file buff-real-name))

@@ -1,3 +1,4 @@
+
 (defvar md-utterance-changed-buffers nil)
 (defvar-local md-collapse-undo-marker nil)
 

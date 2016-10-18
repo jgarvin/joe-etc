@@ -1,5 +1,5 @@
 (md-make-snippets
- '(derived-mode-p 'c++-mode)
+ '(derived-mode-p 'c++-mode 'c-mode)
  '(
    ("C array" "$1[$2]")
    ("align as" "alignas($1)")
@@ -160,5 +160,6 @@
    ("bool" "bool($1)")
    ("block" "{\n    $1;\n}")
    ("placement new" "new($1) $2($3)")
+   ("print F" "printf(\"$1\");")
    ))
 
