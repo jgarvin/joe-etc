@@ -243,6 +243,8 @@
 (load-file "~/etc/emacs/gc-custom.el")
 (load-file "~/etc/emacs/dabbrev-custom.el")
 (load-file "~/etc/emacs/hide-show-custom.el")
+(load-file "~/etc/emacs/magit-custom.el")
+(load-file "~/etc/emacs/diff-custom.el")
 
 (delete-selection-mode 1)
 
