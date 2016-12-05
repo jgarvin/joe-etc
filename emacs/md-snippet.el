@@ -11,10 +11,11 @@
 (defvar md-sn-timer nil)
 
 ;; purposefully omitting backslash because it can confuse some functions
+;; also omitting backquote because it's harder to say and removing gives us a prime length (67)
 (defconst md-glyphs
   '(?A ?B ?C ?D ?E ?F ?G ?H ?I ?J ?K ?L ?M ?N ?O ?P ?Q ?R ?S ?T ?U ?V ?W ?X ?Y ?Z
        ?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9
-       ?^ ?\# ?\ ?> ?\; ?\" ?* ?\' ?% ?\` ?$ ?[ ?_ ?\, ?{ ?:
+       ?^ ?\# ?\ ?> ?\; ?\" ?* ?\' ?% ?$ ?[ ?_ ?\, ?{ ?:
        ?! ?- ?\( ?\| ?~ ?\. ?? ?= ?\) ?< ?} ?& ?/ ?@ ?+ ?]))
 
 (defvar-local md-glyphs-in-use nil)
@@ -445,7 +446,8 @@ go to the highest slot (most recent)."
  '(derived-mode-p 'emacs-lisp-mode 'eshell-mode)
  '(("conned" "(cond\n($1)\n($2))")
    ("defun" "(defun $1 ($2) $3)")
-   ("comment" ";; $1")))
+   ("comment" ";; $1")
+   ("todo" ";; TODO: $1")))
 
 (md-replace-snippet
  :name "let"

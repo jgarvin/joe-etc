@@ -26,8 +26,8 @@
    ("debug block" "if(DEBUG_OUTPUT) {\n    $1;\n}")
    ("debug see err" "if(DEBUG_OUTPUT) {\n    std::cerr << $1 << std::endl;\n}")
    ("debug see out" "if(DEBUG_OUTPUT) {\n    std::out << $1 << std::endl;\n}")
-   ("decl type" "decltype($1)")
-   ("decl val" "std::declval<$1>()")
+   ("deckel type" "decltype($1)")
+   ("deckel val" "std::declval<$1>()")
    ("delete" "delete $1;")
    ("decay" "std::decay_t<$1>")
    ("deque" "std::deque<$1>")
@@ -161,5 +161,6 @@
    ("block" "{\n    $1;\n}")
    ("placement new" "new($1) $2($3)")
    ("print F" "printf(\"$1\");")
+   ("atomic" "std::atomic<$1>")
    ))
 
