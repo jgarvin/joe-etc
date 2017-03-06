@@ -127,4 +127,5 @@
    ("arrow" "$1 -> $2")
    ("annotate" "$1: $2")
    ("help" "help($1)")
+   ("range" "range($1)")
    ))

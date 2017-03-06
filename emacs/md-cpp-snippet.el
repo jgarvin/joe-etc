@@ -162,5 +162,6 @@
    ("placement new" "new($1) $2($3)")
    ("print F" "printf(\"$1\");")
    ("atomic" "std::atomic<$1>")
+   ("float" "float($1)")
+   ("double" "double($1)")
    ))
-

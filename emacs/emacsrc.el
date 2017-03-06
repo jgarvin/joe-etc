@@ -95,6 +95,11 @@
   :ensure t
   :pin melpa-stable)
 
+(use-package
+  helm-gtags
+  :ensure t
+  :pin melpa-stable)
+
 (load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
