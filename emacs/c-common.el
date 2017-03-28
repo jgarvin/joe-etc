@@ -52,6 +52,9 @@
              ("H"   . ("cpp" "c" "C" "cc" "CC"))
              ("C"   . ("hpp" "h" "H"))))
 
+(defun replace-in-string (s find-this replace-with-this)
+  (replace-regexp-in-string s (regexp-quote find-this) replace-with-this))
+
 ;; Process the association list of extensions and find the last file
 ;; that exists
 (defun find-other-file (fname fext)
