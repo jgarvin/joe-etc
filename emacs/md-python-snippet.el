@@ -127,4 +127,8 @@
    ("arrow" "$1 -> $2")
    ("annotate" "$1: $2")
    ("help" "help($1)")
+   ("range" "range($1)")
+   ("I D" "id($1)")
+   ("list" "list($1)")
+   ("nonlocal" "nonlocal $1")
    ))
