@@ -26,7 +26,7 @@
   (interactive)
   (if (string= (file-name-extension (dired-get-file-for-visit))
                "data")
-      (async-shell-command (format "gnome-terminal -e \"perf report -i %s\"" (dired-get-file-for-visit)))
+      (async-shell-command (format "xfce4-terminal -e \"zsh -ic \\\"perf report -g graph -i %s\\\"\"" (dired-get-file-for-visit)))
     (xdg-open-file (dired-get-file-for-visit))))
 
 (defun xdg-open-file (filename)

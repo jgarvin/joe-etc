@@ -2,37 +2,22 @@
 
 (defvar-local run-command nil)
 
-(if (file-directory-p "~/opt/share/gtags")
-    (add-to-list 'load-path "~/opt/share/gtags"))
-(require 'gtags)
-(gtags-mode t)
+;; Enable helm-gtags-mode
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
 
-;; In later gtags versions these aren't set by default.
-(define-key gtags-select-mode-map "\e*" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\^?" 'scroll-down)
-(define-key gtags-select-mode-map " " 'scroll-up)
-(define-key gtags-select-mode-map "\C-b" 'scroll-down)
-(define-key gtags-select-mode-map "\C-f" 'scroll-up)
-(define-key gtags-select-mode-map "k" 'previous-line)
-(define-key gtags-select-mode-map "j" 'next-line)
-(define-key gtags-select-mode-map "p" 'previous-line)
-(define-key gtags-select-mode-map "n" 'next-line)
-(define-key gtags-select-mode-map "q" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "u" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\C-t" 'gtags-pop-stack)
-(define-key gtags-select-mode-map "\C-m" 'gtags-select-tag)
-(define-key gtags-select-mode-map "\C-o" 'gtags-select-tag-other-window)
-
-;; (defun gtags-select-tag-and-kill-buffer ()
-;;   (interactive)
-;;   (let ((buf (current-buffer)))
-;;     (gtags-select-tag)
-;;     (kill-buffer buf)))
-
-;; (defun etc-setup-gtags ()
-;;   (define-key gtags-select-mode-map (kbd "<return>") #'gtags-select-tag))
-
-;; (remove-hook 'gtags-select-mode-hook 'etc-setup-gtags)
+;; Set key bindings
+(eval-after-load "helm-gtags"
+  '(progn
+     (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-find-tag)
+     (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-find-rtag)
+     ;; (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
+     ;; (define-key helm-gtags-mode-map (kbd "M-g M-p") 'helm-gtags-parse-file)
+     (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+     (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+     ;; (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+     ))
 
 ;; Run makefile, or if there isn't one
 (defun smart-compile()
@@ -67,6 +52,9 @@
              ("H"   . ("cpp" "c" "C" "cc" "CC"))
              ("C"   . ("hpp" "h" "H"))))
 
+(defun replace-in-string (s find-this replace-with-this)
+  (replace-regexp-in-string s (regexp-quote find-this) replace-with-this))
+
 ;; Process the association list of extensions and find the last file
 ;; that exists
 (defun find-other-file (fname fext)
@@ -95,35 +83,6 @@
 (defun etc-compilation-finished (buffer finished-status)
   (message "Result: [%S] [%S]" buffer finished-status))
 
-;; (defun etc-gtags-find-tag ()
-;;   (interactive)
-;;   ;; (message "%S" default-directory)
-;;   ;; (gtags-find-tag)
-;;   (let* ((project-root (projectile-project-root))
-;;          (default-directory
-;;            (cond
-;;             ((file-exists-p (concat project-root "source"))
-;;              (concat project-root "source"))
-;;             (t project-root))))
-;;     (message "%S" default-directory)
-;;     (gtags-find-tag)))
-
-;; (defun etc-gtags-find-rtag ()
-;;   (interactive)
-;;   (let* ((project-root (projectile-project-root))
-;;          (default-directory
-;;            (cond
-;;             ((file-exists-p (concat project-root "source"))
-;;              (concat project-root "source"))
-;;             (t project-root))))
-;;     (gtags-find-rtag)))
-
-;; (global-set-key (kbd "M-.") #'etc-gtags-find-tag)
-;; (global-set-key (kbd "M-,") #'etc-gtags-find-rtag)
-
-(global-set-key (kbd "M-.") #'gtags-find-tag)
-(global-set-key (kbd "M-,") #'gtags-find-rtag)
-
 (defun etc-setup-c-common ()
   (local-set-key "\M-t" 'toggle-header-buffer)
 
@@ -138,10 +97,6 @@
   (setq whitespace-style '(face lines))
   (whitespace-mode t)
   (setq whitespace-line-column 100)
-
-  ;; Rebind the normal find tag functions to use the GNU global versions
-  (local-set-key (kbd "M-.") 'gtags-find-tag)   ; find a tag, also M-.
-  (local-set-key (kbd "M-,") 'gtags-find-rtag)  ; reverse tag
 
   ;;(setq require-final-newline t)
 

@@ -52,9 +52,9 @@
     (if scripts
         (progn
           (setq scripts (cl-sort scripts #'string< :key))
-          (dotimes (ii (min 26 (length scripts)))
+          (dotimes (ii  (length scripts))
             (let ((script (file-truename (nth ii scripts)))
-                  (letter (format "%c" (+ 97 ii))))
+                  (letter (downcase (char-to-string (nth ii md-glyphs)))))
               (when (not (equal letter "q")) ;; used for quitting
                     (push (list letter
                                 (file-name-sans-extension

@@ -90,6 +90,16 @@
   :ensure t
   :pin melpa-stable)
 
+(use-package
+  protobuf-mode
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  helm-gtags
+  :ensure t
+  :pin melpa-stable)
+
 (load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
@@ -268,6 +278,7 @@
   ;; Make emacs use the normal clipboard
   (setq x-select-enable-clipboard t)
   (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+  (setq x-selection-timeout 300)
   ;; When remotely logging in, need to remap alt for emacs keybindings to work
   (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
     (setq x-alt-keysym 'meta)))
@@ -865,7 +876,8 @@
 
 (defun etc-maybe-recenter ()
   (unless (or (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
-              (equal (window-point) (point-max)))
+              (equal (window-point) (point-max))
+              (region-active-p))
     ;; don't interfere with erc scroll-to-bottom
     (recenter)))
 

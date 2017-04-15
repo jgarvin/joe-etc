@@ -12,6 +12,8 @@ http://emacs.stackexchange.com/a/7560/2301
 "
   (push marker buffer-undo-list))
 
+;; TODO: this should not modify the list
+;; when the marker can't be found!
 (defun md-undo-collapse-end (marker)
   "Collapse undo history until a matching marker.
 
