@@ -29,7 +29,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Util.EZConfig
 import XMonad.Hooks.ManageHelpers
-import XMonad.Actions.UpdatePointer
+import XMonad.Actions.UpdatePointer (updatePointer, PointerPosition(Relative))
 
 -- For sawfish'esq jump-or-exec functionality
 import XMonad.ManageHook
@@ -297,5 +297,5 @@ defaults editor home_folder browser_name = gnomeConfig {
         handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
         -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
         manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
-        logHook            = ewmhDesktopsLogHook -- >> updatePointer (0.5, 0.5) (0, 0)
+        logHook            = ewmhDesktopsLogHook  >> updatePointer (Relative 0.5 0.5)
     }

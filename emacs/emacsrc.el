@@ -90,10 +90,10 @@
   :ensure t
   :pin melpa-stable)
 
-(use-package
-  protobuf-mode
-  :ensure t
-  :pin melpa-stable)
+;;(use-package
+;;  protobuf-mode
+;;  :ensure t
+;;  :pin melpa-stable)
 
 (use-package
   helm-gtags
@@ -119,6 +119,9 @@
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
+ '(package-selected-packages
+   (quote
+    (magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode helm-swoop helm-projectile helm-gtags haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook

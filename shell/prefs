@@ -131,7 +131,9 @@ then
     fi
 
     which gdb > $HOME/etc/real_locations/$(hostname)/gdb
-    which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
+    if which svcadm &> /dev/null; then
+       which svcadm > $HOME/etc/real_locations/$(hostname)/svcadm
+    fi
 
     # OK, now put it back in.
     if [[ -d $ZDOTDIR/etc/bin ]]; then
