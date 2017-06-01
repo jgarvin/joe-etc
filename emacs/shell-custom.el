@@ -11,7 +11,21 @@
       (setq name (match-string 1 name)))
     (concat "$" name)))
 
-(setq shell-prompt-pattern "\\[.*?@.*?:<.*?>\\]")
+;; emacs default
+;; (setq shell-prompt-pattern "^[^#$%>\n]*[#$%>] *")
+
+;; (setq fedora-shell-pattern "\\(\\[.+?@.+? .+?\\] *\\)")
+
+;; (setq ubuntu-shell-pattern "\\[.*?@.*?:<.*?>\\]")
+
+;; (setq shell-prompt-pattern
+;;       (concat
+;;        "\\(" fedora-shell-pattern "\\)"
+;;        "\\|"
+;;        "\\(" ubuntu-shell-pattern "\\)"
+;;        "\\|"
+;;        "\\(" shell-prompt-pattern "\\)"
+;;        ))
 
 ;; (let ((s "[jgarvin@jgarvin:<~/etc/emacs>]$"))
 ;;   (string-match shell-prompt-pattern s))
@@ -41,7 +55,7 @@
 (advice-add #'comint-write-input-ring :around #'etc-write-shell-history-advice)
 
 ;;(let ((s "[</ssh:prophet@panopticon:/home/prophet>]$ "))
-;; (let ((s "[prophet@panopticon:<~/etc/shell>]$ "))  
+;; (let ((s "[prophet@panopticon:<~/etc/shell>]$ "))
 ;;   (string-match "^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" s)
 ;;   (match-string-no-properties 1 s))
 
