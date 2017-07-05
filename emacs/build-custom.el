@@ -140,6 +140,10 @@
     (with-current-buffer buff-real-name
       (setq etc-most-recent-run-buffer (current-buffer))
       (local-set-key (kbd "C-c C-k") #'etc-interrupt-subjob)
+      ;; didn't work
+      ;; (buffer-disable-undo (current-buffer))
+      ;; trying this instead
+      (setq buffer-undo-list t)
       (if debugging
           (progn
             (realgud-track-mode))

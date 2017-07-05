@@ -644,6 +644,7 @@ Ignores CHAR at point."
                 (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
                 (active-minibuffer-window)
                 (minibufferp real-buffer)
+                (not (buffer-live-p real-buffer))
                 ;; (md-special-buffer-p real-buffer)
                 ;;(not (memq (selected-window) (window-list (selected-frame) 0)))
                 )

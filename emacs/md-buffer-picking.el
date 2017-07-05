@@ -31,7 +31,9 @@
 ;;(md-special-buffer-p (get-buffer "*Find*"))
 
 (defun md-get-special-buffers ()
-  (-filter (lambda (a) (and (not (minibufferp a)) (md-special-buffer-p a)))
+  (-filter (lambda (a) (and (not (minibufferp a))
+                            (buffer-live-p a)
+                            (md-special-buffer-p a)))
            (buffer-list)))
 
 (defun md-get-buffer-names (lst)
@@ -40,6 +42,7 @@
 
 (defun md-all-buffers-except (bufs)
   (-filter (lambda (x) (and (not (memq x bufs))
+                            (buffer-live-p x)
                             (not (minibufferp x)))) (buffer-list)))
 (byte-compile #'md-all-buffers-except)
 

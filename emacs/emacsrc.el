@@ -265,6 +265,8 @@
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
 
+(setq-default indent-tabs-mode nil)
+
 (delete-selection-mode 1)
 
 (defun etc-set-repeat-rate ()
