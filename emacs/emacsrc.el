@@ -630,6 +630,8 @@
 
 (defvar-local mandimus-last-word-event "")
 
+(defvar-local etc-had-process nil)
+
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
               (list
@@ -677,6 +679,15 @@
                                                   'face 'font-lock-type-face
                                                   'help-echo "Buffer is read-only"))))
                "] "
+               '(:eval
+                 (let ((p (get-buffer-process (current-buffer))))
+                   (when (or p etc-had-process)
+                     (setq etc-had-process t)
+                     (concat " ["  (propertize (if (process-live-p p) "Running." "Stopped.")
+                                               'face
+                                               (if (process-live-p p) 'font-lock-string-face 'info-menu-star)
+                                               'help-echo "Buffer has a process associated with it.")
+                             "] "))))
 
                ;; add the time, with the date and the emacs uptime in the tooltip
                '(:eval (propertize (format-time-string "%H:%M")
