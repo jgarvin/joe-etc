@@ -116,6 +116,12 @@
   (setq indent-tabs-mode nil)
   (etc-set-indent-preference 4)
   (setq c-indent-comments-syntactically-p t)
+
+  ;; public void veryLongMethodNameHereWithArgs(
+  ;;         String arg1,
+  ;;         String arg2,
+  ;;         int arg3)
+  (c-set-offset 'arglist-intro '+)
   )
 
 (defun etc-toggle-namespace-indent ()

@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 typeset -a binary_list
+typeset -a file_list
 local copy_path=""
 
 while [ "$#" -gt "0" ]
@@ -11,11 +12,7 @@ do
 			shift
 			;;
 		-p)
-			bin_copy_path="$2"
-			shift
-			;;
-		-l)
-			lib_copy_path="$2"
+			copy_path="$2"
 			shift
 			;;
     esac
@@ -34,20 +31,21 @@ fi
 
 for i in $binary_list; do
 	bin_loc="$(which $i)"
+    file_list+="$bin_loc"
 
 	# Need to copy any non-system libs with the binaries
 	for lib in $(ldd $bin_loc | grep -vE '( /lib)|( /usr/lib)|(/lib64)|(linux-vdso)' | awk '{ print $3 }'); do
-		binary_list+="$lib"
+		file_list+="$lib"
 		if [ -h "$lib" ]; then
-			binary_list+="$(readlink -f "$lib")"
+			file_list+="$(readlink -f "$lib")"
 		fi
 	done
 done
 
 cmd="rsync -az"
-for i in $binary_list; do
-	echo "Command so far: $cmd"
-	cmd="$cmd $i" 
+for i in $file_list; do
+	# echo "Command so far: $cmd"
+	cmd="$cmd $i"
 done
 cmd="$cmd $copy_path"
 echo "Running: $cmd"

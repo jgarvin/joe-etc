@@ -225,7 +225,6 @@
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
 
-(load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/perl6-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
@@ -264,6 +263,9 @@
 (load-file "~/etc/emacs/hide-show-custom.el")
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
+
+(load-file "~/etc/emacs/gui.el")
+
 
 (setq-default indent-tabs-mode nil)
 
@@ -624,6 +626,7 @@
 ;;       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
+(add-hook 'js-mode-hook #'subword-mode)
 (subword-mode t)
 ;; for consistency have in minibuffer too
 ;;(add-hook 'minibuffer-setup-hook #'subword-mode)
