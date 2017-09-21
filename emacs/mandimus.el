@@ -331,7 +331,9 @@ debug mode causing timers to die."
   (while (and (md-likely-preceded-by-opener (point))
               (md-likely-followed-by-closer (point)))
     (sp-splice-sexp))
-  (let ((p (point))
+  (let ((p (if (and (point-at-eol) (= (char-before) ?,))
+               (1- (point)) ;; ignore trailing commas at the end of the line
+             (point)))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
                   (re-search-backward subword-backward-regexp)
@@ -341,7 +343,8 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-max))
-      (while (re-search-backward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
+      (while (re-search-backward "[-_,A-Za-Z0-9[:space:]]" nil t)
+        (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
       (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
@@ -351,7 +354,9 @@ debug mode causing timers to die."
   (while (and (md-likely-preceded-by-opener (point))
               (md-likely-followed-by-closer (point)))
     (sp-splice-sexp))
-  (let ((p (point))
+  (let ((p (if (and (point-at-bol) (= (char-after) ?,))
+               (1+ (point)) ;; ignore leading commas at the beginning of the line
+             (point)))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
                   (re-search-forward subword-forward-regexp)
