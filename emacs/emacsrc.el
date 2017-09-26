@@ -276,7 +276,8 @@
   ;; technically this should be triggered by some sort of udev
   ;; event because this resets if you unplug and replug in the kbd.
   ;; instead we just run it once a minute, blame laziness :p
-  (call-process "xset" nil nil nil "r" "rate" "200" "60"))
+  (let ((default-directory "/")) ;; guaranteed to exist so I don't get an error, xset doesn't touch current directory anyway
+    (call-process "xset" nil nil nil "r" "rate" "200" "60")))
 (run-with-timer 0 60 #'etc-set-repeat-rate)
 
 (defun etc-translate-hack ()
