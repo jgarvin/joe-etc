@@ -146,7 +146,7 @@ debug mode causing timers to die."
           (goto-char found)
           (beginning-of-line)
           (back-to-indentation))
-      (error "No line found"))))
+      (user-error "No line found"))))
 
 (defun mandimus-word-event (words)
   (setq mandimus-last-word-event words)
@@ -331,9 +331,7 @@ debug mode causing timers to die."
   (while (and (md-likely-preceded-by-opener (point))
               (md-likely-followed-by-closer (point)))
     (sp-splice-sexp))
-  (let ((p (if (and (point-at-eol) (= (char-before) ?,))
-               (1- (point)) ;; ignore trailing commas at the end of the line
-             (point)))
+  (let ((p (point))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
                   (re-search-backward subword-backward-regexp)
@@ -343,7 +341,9 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-max))
-      (while (re-search-backward "[-_,A-Za-Z0-9[:space:]]" nil t)
+      ;; (while (re-search-backward "\\([-_A-Za-Z0-9[:space:]]\\)\\|\\(,[^\n]\\)" nil t)
+      ;; (while (re-search-backward "\\([-_A-Za-Z0-9]\\)\\|\\(,[^\n]\\)" nil t)
+      (while (re-search-backward "[-_A-Za-Z0-9]" nil t)
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
@@ -354,9 +354,7 @@ debug mode causing timers to die."
   (while (and (md-likely-preceded-by-opener (point))
               (md-likely-followed-by-closer (point)))
     (sp-splice-sexp))
-  (let ((p (if (and (point-at-bol) (= (char-after) ?,))
-               (1+ (point)) ;; ignore leading commas at the beginning of the line
-             (point)))
+  (let ((p (point))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
                   (re-search-forward subword-forward-regexp)
@@ -367,7 +365,7 @@ debug mode causing timers to die."
       (narrow-to-region p p2)
       (goto-char (point-min))
       (skip-chars-forward "[:space:]")
-      (while (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t)
+      (while (re-search-forward "[-_A-Za-Z0-9]" nil t)
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
