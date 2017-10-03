@@ -627,8 +627,8 @@
 ;;       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
-(add-hook 'js-mode-hook #'subword-mode)
-(subword-mode t)
+;; (add-hook 'js-mode-hook #'subword-mode)
+(global-subword-mode)
 ;; for consistency have in minibuffer too
 ;;(add-hook 'minibuffer-setup-hook #'subword-mode)
 
