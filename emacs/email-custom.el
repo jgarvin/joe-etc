@@ -1,3 +1,20 @@
+(use-package
+  bbdb
+  :ensure t
+  :pin melpa)
+
+(use-package
+  helm-bbdb
+  :ensure t
+  :pin melpa)
+
+;; see the documentation for the package to generate the file for importing
+(use-package
+  gmail2bbdb
+  :ensure t
+  :pin melpa-stable)
+(autoload 'gmail2bbdb-import-file "gmail2bbdb" nil t nil)
+
 (setq gnus-select-method '(nnimap "gmail"
                                   (nnimap-address "imap.gmail.com")
                                   (nnimap-server-port 993)
@@ -11,43 +28,46 @@
 (setq smftpmail-smtp-service 587)
 (setq smtpmail-smtp-server "smtp.gmail.com")
 
-;; (require 'bbdb)
-;; (bbdb-initialize)
-;; (setq
-;;  bbdb-offer-save 1                        ;; 1 means save-without-asking
+;; I never seem to exit emacs cleanly, just always use the autosave file
+(setq gnus-always-read-dribble-file t)
 
-;;  bbdb-use-pop-up t                        ;; allow popups for addresses
-;;  bbdb-electric-p t                        ;; be disposable with SPC
-;;  bbdb-popup-target-lines  1               ;; very small
+(require 'bbdb)
+(bbdb-initialize)
+(setq
+ bbdb-offer-save 1                        ;; 1 means save-without-asking
 
-;;  bbdb-dwim-net-address-allow-redundancy t ;; always use full name
-;;  bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
+ bbdb-use-pop-up t                        ;; allow popups for addresses
+ bbdb-electric-p t                        ;; be disposable with SPC
+ bbdb-popup-target-lines  1               ;; very small
 
-;;  bbdb-always-add-address t                ;; add new addresses to existing...
-;;  ;; ...contacts automatically
-;;  bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
+ bbdb-dwim-net-address-allow-redundancy t ;; always use full name
+ bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
 
-;;  bbdb-completion-type nil                 ;; complete on anything
+ bbdb-always-add-address t                ;; add new addresses to existing...
+ ;; ...contacts automatically
+ bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
 
-;;  bbdb-complete-name-allow-cycling t       ;; cycle through matches
-;;  ;; this only works partially
+ bbdb-completion-type nil                 ;; complete on anything
 
-;;  bbbd-message-caching-enabled t           ;; be fast
-;;  bbdb-use-alternate-names t               ;; use AKA
+ bbdb-complete-name-allow-cycling t       ;; cycle through matches
+ ;; this only works partially
+
+ bbbd-message-caching-enabled t           ;; be fast
+ bbdb-use-alternate-names t               ;; use AKA
 
 
-;;  bbdb-elided-display t                    ;; single-line addresses
+ bbdb-elided-display t                    ;; single-line addresses
 
-;;  ;; auto-create addresses from mail
-;;  bbdb/mail-auto-create-p 'bbdb-ignore-some-messages-hook
-;;  bbdb-ignore-some-messages-alist ;; don't ask about fake addresses
-;;  ;; NOTE: there can be only one entry per header (such as To, From)
-;;  ;; http://flex.ee.uec.ac.jp/texi/bbdb/bbdb_11.html
+ ;; auto-create addresses from mail
+ bbdb/mail-auto-create-p 'bbdb-ignore-some-messages-hook
+ bbdb-ignore-some-messages-alist ;; don't ask about fake addresses
+ ;; NOTE: there can be only one entry per header (such as To, From)
+ ;; http://flex.ee.uec.ac.jp/texi/bbdb/bbdb_11.html
 
-;;  '(( "From" . "no.?reply\\|DAEMON\\|daemon\\|facebookmail\\|twitter"))
-;; )
+ '(( "From" . "no.?reply\\|DAEMON\\|daemon\\|facebookmail\\|twitter"))
+)
 
-;; (add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
+(add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
 
 ;; (defun etc-summary-mode-setup ()
 ;;   (gnus-summary-sort-by-date)
@@ -164,6 +184,3 @@
 ;; ;;           '(lambda ()
 ;; ;;              (flyspell-mode t)
 ;; ;;              (local-set-key "<TAB>" 'bbdb-complete-name)))
-
-;; ;; I never seem to exit emacs cleanly, just always use the autosave file
-;; (setq gnus-always-read-dribble-file t)
