@@ -106,6 +106,9 @@
   :ensure t
   :pin melpa-stable)
 
+
+
+
 (load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
@@ -127,41 +130,43 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
-		      (buffer-file-name)
-		      (getenv "HOME"))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
+                      (buffer-file-name)
+                      (getenv "HOME"))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
-		      (getenv "HOME"))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
+                      (getenv "HOME"))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-		      (buffer-file-name)
-		      (getenv "HOME")
-		      (buffer-name))))
-	   nil t)
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name))))
+           nil t)
      (eval add-hook
-	   (quote after-save-hook)
-	   (lambda nil
-	     (shell-command
-	      (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-		      (buffer-file-name)
-		      (getenv "HOME")
-		      (buffer-name)))))))))
+           (quote after-save-hook)
+           (lambda nil
+             (shell-command
+              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+                      (buffer-file-name)
+                      (getenv "HOME")
+                      (buffer-name))))))))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(tramp-syntax (quote default) nil (tramp)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
