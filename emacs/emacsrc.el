@@ -268,6 +268,7 @@
 (load-file "~/etc/emacs/hide-show-custom.el")
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
+(load-file "~/etc/emacs/jabber-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
