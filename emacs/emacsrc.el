@@ -130,7 +130,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -269,6 +269,7 @@
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
 (load-file "~/etc/emacs/jabber-custom.el")
+(load-file "~/etc/emacs/julia-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
