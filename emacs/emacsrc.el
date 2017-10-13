@@ -445,6 +445,12 @@
          ("\\.incl$'" . c++-mode))
        auto-mode-alist))
 
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("\\.bzl\\'" . python-mode))
+       auto-mode-alist))
+
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
 
