@@ -584,7 +584,7 @@
 
 ;; Make more notepad like out of the box
 (setq default-major-mode 'text-mode)
-(setq text-mode-hook        ; Enable auto-fill-mode
+(setq text-mode-hook
       '(lambda ()
          (when (buffer-file-name)
            (let ((ext (file-name-extension (buffer-file-name))))
@@ -593,6 +593,9 @@
                                  (string-equal ext "tmp")
                                  (string-equal ext "log")))
                         (< (buffer-size) uncomfortable-buffer-size))
+               ;; make text automatically wrap when the line gets too long
+               (refill-mode 1)
+               ;; render long lines of text by wrapping them
                (visual-line-mode 1))))))
 
 ;; Taken from Trey Jackson's answer on superuser.com
