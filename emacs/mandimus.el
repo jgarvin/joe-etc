@@ -39,9 +39,6 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
 
 (defun md--run-timer-func (v f args)
   (unwind-protect
-      ;; as far as I can tell (current-buffer)
-      ;; is not reliable from an idle timer, you never know
-      ;; what you will get, this is a better default
       (apply f args)
     (md-safe-cancel-timer v)))
 
