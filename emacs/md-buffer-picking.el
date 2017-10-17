@@ -9,8 +9,8 @@
 (defun md-update-buffer-lists-impl ()
     (let ((list-changes (-difference (buffer-list) md-cached-buffer-list)))
       (when list-changes
-        (message "testing thing %S %S" (length (buffer-list))
-                 (-difference (buffer-list) md-cached-buffer-list))
+        ;; (message "testing thing %S %S" (length (buffer-list))
+                 ;; (-difference (buffer-list) md-cached-buffer-list))
         (setq md-cached-special-buffer-list (md-get-special-buffers-impl))
         (setq md-cached-buffers-by-mode (md-build-mode-cache))
         )
