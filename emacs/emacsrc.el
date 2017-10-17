@@ -352,7 +352,7 @@
   Interactively, N is the prefix arg."
   (interactive "P")
   (cond
-   ((or (eolp) n)
+   (n
     (line-move (prefix-numeric-value (or n 1)))
     (end-of-visual-line)
     (skip-chars-backward "[:space:]"))
@@ -383,12 +383,17 @@
   With arg N, move backward to the beginning of the Nth previous line.
   Interactively, N is the prefix arg."
   (interactive "P")
-  (let ((p (point)))
+  (let ((p (point))
+        (begin-line (save-excursion (beginning-of-visual-line) (point))))
     (cond
-     ((= p (save-excursion (beginning-of-visual-line) (point)))
-      (line-move -1)
-      (back-to-visual-indentation))
+     ((= p begin-line)
+      nil
+      ;; (line-move -1)
+      ;; (back-to-visual-indentation)
+      )
      ((= p (save-excursion (back-to-visual-indentation) (point)))
+      (beginning-of-visual-line))
+     ((= begin-line (save-excursion (skip-chars-backward "[:space:]" begin-line) (point)))
       (beginning-of-visual-line))
      (t (back-to-visual-indentation)))))
 
