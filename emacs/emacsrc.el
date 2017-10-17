@@ -502,12 +502,18 @@
 (global-set-key "\M-k" 'next-buffer)
 
 ;; In programming modes indent when yanking
-(dolist (command '(yank yank-pop))
+(dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
    (eval `(defadvice ,command (after indent-region activate)
             (and (not current-prefix-arg)
                  (derived-mode-p 'prog-mode)
                  (let ((mark-even-if-inactive transient-mark-mode))
-                   (indent-region (region-beginning) (region-end) nil))))))
+                   (if (not (= (region-beginning) (region-end)))
+                       (indent-region (region-beginning) (region-end) nil)
+                     ;; when we have just cut a region the region beginning and end are the same,
+                     ;; in this case just indents the surrounding paragraph the wherever we are
+                     (save-excursion
+                       (mark-paragraph)
+                       (indent-region (region-beginning) (region-end) nil))))))))
 
 (defun open-line-and-indent ()
   (interactive)
