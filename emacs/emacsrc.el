@@ -595,7 +595,9 @@
                                  (string-equal ext "log")))
                         (< (buffer-size) uncomfortable-buffer-size))
                ;; make text automatically wrap when the line gets too long
-               (refill-mode 1)
+               ;; -- disabled because it's not intelligent enough to understand when text is an emacs interface element
+               ;; (refill-mode 1)
+               (auto-fill-mode 1)
                ;; render long lines of text by wrapping them
                (visual-line-mode 1))))))
 
