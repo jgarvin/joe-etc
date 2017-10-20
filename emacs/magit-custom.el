@@ -8,3 +8,10 @@
   ?h
   "Push to gerrit"
   'magit-push-to-gerrit)
+
+(defun etc-show-origin-master ()
+  (interactive)
+  (magit-find-file-other-window "origin/master" (buffer-file-name)))
+
+(global-set-key (kbd "C-c m h") #'magit-find-file)
+(global-set-key (kbd "C-c m o") #'etc-show-origin-master)
