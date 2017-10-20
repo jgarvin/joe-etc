@@ -1037,5 +1037,8 @@
 (load-file "~/etc/emacs/md-company-custom.el")
 (put 'dired-find-alternate-file 'disabled nil)
 
+;; if I kill the same thing three times only put one entry in the kill ring
+(setq kill-do-not-save-duplicates t)
+
 ;; for emacsclient
 (server-start)
