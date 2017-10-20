@@ -95,8 +95,8 @@
   (subword-mode 1)
   (require 'whitespace)
   (setq whitespace-style '(face lines))
+  (setq whitespace-line-column 300)
   (whitespace-mode t)
-  (setq whitespace-line-column 100)
 
   ;;(setq require-final-newline t)
 
