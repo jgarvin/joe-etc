@@ -535,9 +535,12 @@
   (kill-visual-line ARG)
   (indent-according-to-mode))
 
-(global-set-key (kbd "RET") #'reindent-then-newline-and-indent)
-(global-set-key (kbd "C-o") #'open-line-and-indent)
-(global-set-key (kbd "C-k") #'kill-and-indent)
+(defun etc-prog-mode-hook ()
+  (local-set-key (kbd "RET") #'reindent-then-newline-and-indent)
+  (local-set-key (kbd "C-o") #'open-line-and-indent)
+  (local-set-key (kbd "C-k") #'kill-and-indent))
+
+(add-hook 'prog-mode-hook #'etc-prog-mode-hook)
 
 (setq auto-mode-alist
       (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
