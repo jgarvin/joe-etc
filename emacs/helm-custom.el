@@ -85,3 +85,5 @@
 
 ;; I never want to toggle auto updating and this interferes with the normal binding for control backspace
 (define-key helm-projectile-find-file-map (kbd "C-<backspace>") nil)
+
+(setq helm-candidate-number-limit 500)
