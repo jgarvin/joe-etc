@@ -344,7 +344,8 @@ debug mode causing timers to die."
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
+      (unless (derived-mode-p 'eshell-mode)
+        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
 
 (defun md-forward-kill-word ()
   (interactive)
@@ -366,7 +367,8 @@ debug mode causing timers to die."
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
+      (unless (derived-mode-p 'eshell-mode)
+        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
 
 (defun md-copy-word ()
   (interactive)
