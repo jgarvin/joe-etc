@@ -232,7 +232,6 @@
 
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/perl6-custom.el")
-(load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
@@ -271,6 +270,7 @@
 (load-file "~/etc/emacs/jabber-custom.el")
 (load-file "~/etc/emacs/julia-custom.el")
 (load-file "~/etc/emacs/helm-ag-custom.el")
+(load-file "~/etc/emacs/dired-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
@@ -517,9 +517,10 @@
                        (indent-region (region-beginning) (region-end) nil)
                      ;; when we have just cut a region the region beginning and end are the same,
                      ;; in this case just indents the surrounding paragraph the wherever we are
-                     (save-excursion
-                       (mark-paragraph)
-                       (indent-region (region-beginning) (region-end) nil))))))))
+                     (unless (derived-mode-p 'python-mode)
+                       (save-excursion
+                         (mark-paragraph)
+                         (indent-region (region-beginning) (region-end) nil)))))))))
 
 (defun open-line-and-indent ()
   (interactive)
@@ -636,6 +637,7 @@
     (setq md-enable-symbol-refresh nil)
     (auto-revert-mode 0)
     (setq global-auto-revert-ignore-buffer t)
+    (display-line-numbers-mode 0)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 

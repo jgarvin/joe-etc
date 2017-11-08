@@ -5,6 +5,7 @@
    ("stood err" "$1 2> $2")
    ("stood both" "$1 &> $2")
    ("comment" "# $1")
+   ("export" "export $1=$2")
    ))
 
 (md-make-snippets
