@@ -370,33 +370,6 @@ debug mode causing timers to die."
       (unless (derived-mode-p 'eshell-mode)
         (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
 
-(defun md-copy-word ()
-  (interactive)
-  (save-excursion
-    (forward-word)
-    (backward-word)
-    (set-mark (point))
-    (forward-word)
-    (kill-ring-save (region-beginning) (region-end))))
-
-(defun md-copy-paragraph ()
-  (interactive)
-  (save-excursion
-    (forward-paragraph)
-    (backward-paragraph)
-    (set-mark (point))
-    (forward-paragraph)
-    (kill-ring-save (region-beginning) (region-end))))
-
-(defun md-cut-paragraph ()
-  (interactive)
-  (save-excursion
-    (forward-paragraph)
-    (backward-paragraph)
-    (set-mark (point))
-    (forward-paragraph)
-    (kill-region (region-beginning) (region-end))))
-
 (defun md-pair-bounds (opener)
   (let ((r (sp-restrict-to-pairs opener 'sp-get-enclosing-sexp)))
     (cons (plist-get r :beg)
