@@ -509,18 +509,16 @@
 
 ;; In programming modes indent when yanking
 (dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
-   (eval `(defadvice ,command (after indent-region activate)
-            (and (not current-prefix-arg)
-                 (derived-mode-p 'prog-mode)
-                 (let ((mark-even-if-inactive transient-mark-mode))
-                   (if (not (= (region-beginning) (region-end)))
-                       (indent-region (region-beginning) (region-end) nil)
-                     ;; when we have just cut a region the region beginning and end are the same,
-                     ;; in this case just indents the surrounding paragraph the wherever we are
-                     (unless (derived-mode-p 'python-mode)
-                       (save-excursion
-                         (mark-paragraph)
-                         (indent-region (region-beginning) (region-end) nil)))))))))
+  (eval `(defadvice ,command (after indent-region activate)
+           (and (not current-prefix-arg)
+                (derived-mode-p 'prog-mode)
+                (let ((mark-even-if-inactive transient-mark-mode))
+                  (if (not (= (region-beginning) (region-end)))
+                      (indent-region (region-beginning) (region-end) nil)
+                    ;; when we have just cut a region the region beginning and end are the same,
+                    ;; in this case just indents the current line wherever we are
+                    (unless (derived-mode-p 'python-mode)
+                      (indent-region (line-beginning-position) (line-end-position) nil))))))))
 
 (defun open-line-and-indent ()
   (interactive)
@@ -936,12 +934,21 @@
 (setq scroll-margin 0)
 (setq auto-window-vscroll nil)
 
+;; (defun mouse-button-pressed-p ()
+;;   "Return non-nil if last event is a mouse-button down event."
+;;   (run-hooks 'mouse-leave-buffer-hook)
+;;   (and (consp last-input-event)
+;;        (string-match-p "down-mouse-" (format "%s" (car last-input-event)))))
+
 (defun etc-maybe-recenter ()
-  (unless (or (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
-              (not (eq (get-buffer-window (current-buffer) t) (selected-window)))
-              (equal (window-point) (point-max))
-              (region-active-p))
-    ;; don't interfere with erc scroll-to-bottom
+  (unless (or
+           ;; don't interfere with erc scroll-to-bottom
+           (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
+           (not (eq (get-buffer-window (current-buffer) t) (selected-window)))
+           (equal (window-point) (point-max))
+           (region-active-p)
+           ;; (mouse-button-pressed-p) ;; doesn't work
+           )
     (recenter)))
 
 ;; setting to zero makes scrolling downwards slow,
