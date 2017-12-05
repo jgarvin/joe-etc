@@ -548,3 +548,4 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-shell-snippet.el")
 (load-file "~/etc/emacs/md-eshell-snippet.el")
 (load-file "~/etc/emacs/md-shell-program-snippets.el")
+(load-file "~/etc/emacs/md-sql-snippet.el")
