@@ -271,6 +271,7 @@
 (load-file "~/etc/emacs/julia-custom.el")
 (load-file "~/etc/emacs/helm-ag-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
+(load-file "~/etc/emacs/sql-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
@@ -513,12 +514,12 @@
            (and (not current-prefix-arg)
                 (derived-mode-p 'prog-mode)
                 (let ((mark-even-if-inactive transient-mark-mode))
-                  (if (not (= (region-beginning) (region-end)))
-                      (indent-region (region-beginning) (region-end) nil)
-                    ;; when we have just cut a region the region beginning and end are the same,
+                  (if (and (region-active-p) (not (= (region-beginning) (region-end))))
+                      ;; when we have just cut a region the region beginning and end are the same,
                     ;; in this case just indents the current line wherever we are
-                    (unless (derived-mode-p 'python-mode)
-                      (indent-region (line-beginning-position) (line-end-position) nil))))))))
+                    (if (derived-mode-p 'python-mode)
+                        (indent-region (line-beginning-position) (line-end-position) nil)
+                      (indent-region (region-beginning) (region-end) nil))))))))
 
 (defun open-line-and-indent ()
   (interactive)
@@ -1051,3 +1052,6 @@
 
 ;; for emacsclient
 (server-start)
+
+(when (file-exists-p "~/radix-jhg/main.el")
+  (load-file "~/radix-jhg/main.el"))
