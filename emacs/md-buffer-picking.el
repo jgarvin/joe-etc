@@ -1,5 +1,47 @@
 (require 'dash)
 
+(defvar md-cached-buffer-list nil)
+(defvar md-cached-special-buffer-list nil)
+(defvar md-cached-buffer-time '(0 0 0 0))
+(defvar md-cached-buffers-by-mode (make-hash-table :test 'equal))
+(defvar md-cached-buffers-timer nil)
+
+(defun md-update-buffer-lists-impl ()
+    (let ((list-changes (-difference (buffer-list) md-cached-buffer-list)))
+      (when list-changes
+        ;; (message "testing thing %S %S" (length (buffer-list))
+                 ;; (-difference (buffer-list) md-cached-buffer-list))
+        (setq md-cached-special-buffer-list (md-get-special-buffers-impl))
+        (setq md-cached-buffers-by-mode (md-build-mode-cache))
+        )
+      (setq md-cached-buffer-list (buffer-list))
+      ))
+
+(defun derived-mode-parents (mode)
+  (and mode
+       (cons mode (derived-mode-parents
+                   (get mode 'derived-mode-parent)))))
+
+(defun md-build-mode-cache ()
+  (let ((cache (make-hash-table :test 'equal)))
+    (dolist (buffer (buffer-list))
+      (dolist (mode (derived-mode-parents (buffer-mode buffer)))
+        (let ((buffers-in-mode (gethash mode cache)))
+          (if buffers-in-mode
+              (puthash mode (append buffers-in-mode (list buffer)) cache)
+            (puthash mode (list buffer) cache))
+          ))
+      )
+    cache))
+;; (md-build-mode-cache)
+
+(defun md-update-buffer-lists ()
+  (md-run-when-idle-once 'md-cached-buffers-timer #'md-update-buffer-lists-impl 0.75 nil))
+
+(add-hook 'buffer-list-update-hook #'md-update-buffer-lists)
+
+
+
 (defun md-strip-text-properties (txt)
   (set-text-properties 0 (length txt) nil txt)
   txt)
@@ -7,9 +49,10 @@
 (defun md-get-buffers-in-modes (modes)
   (unless (listp modes)
     (setq modes (list modes)))
-  (-filter (lambda (x)
-             (with-current-buffer x
-               (apply #'derived-mode-p modes))) (buffer-list)))
+  (let ((buffers))
+    (dolist (mode modes)
+      (setq buffers (append buffers (gethash mode md-cached-buffers-by-mode))))
+    buffers))
 (byte-compile #'md-get-buffers-in-modes)
 
 (defun md-get-buffers-not-in-modes (modes)
@@ -31,15 +74,21 @@
 ;;(md-special-buffer-p (get-buffer "*Find*"))
 
 (defun md-get-special-buffers ()
-  (-filter (lambda (a) (and (not (minibufferp a)) (md-special-buffer-p a)))
+  md-cached-special-buffer-list)
+
+(defun md-get-special-buffers-impl ()
+  (-filter (lambda (a) (and (not (minibufferp a))
+                            (buffer-live-p a)
+                            (md-special-buffer-p a)))
            (buffer-list)))
 
 (defun md-get-buffer-names (lst)
   (mapcar #'buffer-name lst))
-(byte-compile #'md-get-buffer-names)
+(byte-compile #'md-get-buffer-names-impl)
 
 (defun md-all-buffers-except (bufs)
   (-filter (lambda (x) (and (not (memq x bufs))
+                            (buffer-live-p x)
                             (not (minibufferp x)))) (buffer-list)))
 (byte-compile #'md-all-buffers-except)
 

@@ -20,7 +20,7 @@
 # remoting into another machine and setting environment variables.
 # Likewise we alias ssh so that this trick will propogate to other
 # machines.
-if [[ "$TERM" = "dumb-emacs" ]]; then
+if [[ "$TERM" = "dumb-emacs" || -n "$INSIDE_EMACS" ]]; then
     # this should be nicely idempotent as regards exec zsh
     export TERM="dumb"
     export EMACS="t"

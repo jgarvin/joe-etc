@@ -39,9 +39,6 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
 
 (defun md--run-timer-func (v f args)
   (unwind-protect
-      ;; as far as I can tell (current-buffer)
-      ;; is not reliable from an idle timer, you never know
-      ;; what you will get, this is a better default
       (apply f args)
     (md-safe-cancel-timer v)))
 
@@ -146,7 +143,7 @@ debug mode causing timers to die."
           (goto-char found)
           (beginning-of-line)
           (back-to-indentation))
-      (error "No line found"))))
+      (user-error "No line found"))))
 
 (defun mandimus-word-event (words)
   (setq mandimus-last-word-event words)
@@ -341,10 +338,14 @@ debug mode causing timers to die."
     (save-restriction
       (narrow-to-region p p2)
       (goto-char (point-max))
-      (while (re-search-backward "[-_,A-Za-Z0-9[:space:]]" nil t) (replace-match "" nil t)))
+      ;; (while (re-search-backward "\\([-_A-Za-Z0-9[:space:]]\\)\\|\\(,[^\n]\\)" nil t)
+      ;; (while (re-search-backward "\\([-_A-Za-Z0-9]\\)\\|\\(,[^\n]\\)" nil t)
+      (while (re-search-backward "[-_A-Za-Z0-9]" nil t)
+        (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
+      (unless (derived-mode-p 'eshell-mode)
+        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
 
 (defun md-forward-kill-word ()
   (interactive)
@@ -362,38 +363,12 @@ debug mode causing timers to die."
       (narrow-to-region p p2)
       (goto-char (point-min))
       (skip-chars-forward "[:space:]")
-      (while (re-search-forward "[-_,A-Za-Z0-9[:space:]]" nil t)
+      (while (re-search-forward "[-_A-Za-Z0-9]" nil t)
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))
-
-(defun md-copy-word ()
-  (interactive)
-  (save-excursion
-    (forward-word)
-    (backward-word)
-    (set-mark (point))
-    (forward-word)
-    (kill-ring-save (region-beginning) (region-end))))
-
-(defun md-copy-paragraph ()
-  (interactive)
-  (save-excursion
-    (forward-paragraph)
-    (backward-paragraph)
-    (set-mark (point))
-    (forward-paragraph)
-    (kill-ring-save (region-beginning) (region-end))))
-
-(defun md-cut-paragraph ()
-  (interactive)
-  (save-excursion
-    (forward-paragraph)
-    (backward-paragraph)
-    (set-mark (point))
-    (forward-paragraph)
-    (kill-region (region-beginning) (region-end))))
+      (unless (derived-mode-p 'eshell-mode)
+        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
 
 (defun md-pair-bounds (opener)
   (let ((r (sp-restrict-to-pairs opener 'sp-get-enclosing-sexp)))
@@ -644,6 +619,7 @@ Ignores CHAR at point."
                 (and (boundp 'md-updating-projectile-files) md-updating-projectile-files)
                 (active-minibuffer-window)
                 (minibufferp real-buffer)
+                (not (buffer-live-p real-buffer))
                 ;; (md-special-buffer-p real-buffer)
                 ;;(not (memq (selected-window) (window-list (selected-frame) 0)))
                 )

@@ -364,6 +364,8 @@ go to the highest slot (most recent)."
   (interactive)
   (md-insert-text (char-to-string md-placeholder) t nil))
 
+(require 'eldoc)
+
 ;; this is the most horrible code ever, forgive me sexp gods
 (defun md-gen-elisp-snippet-contents (sym)
   (let ((doc (substring-no-properties

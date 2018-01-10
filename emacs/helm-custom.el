@@ -82,3 +82,8 @@
 ;; https://github.com/emacs-helm/helm/commit/1de1701c73b15a86e99ab1c5c53bd0e8659d8ede
 (assq-delete-all 'find-file helm-completing-read-handlers-alist)
 (assq-delete-all 'execute-extended-command helm-completing-read-handlers-alist)
+
+;; I never want to toggle auto updating and this interferes with the normal binding for control backspace
+(define-key helm-projectile-find-file-map (kbd "C-<backspace>") nil)
+
+(setq helm-candidate-number-limit 500)

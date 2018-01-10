@@ -92,6 +92,7 @@ same folder. If given prefix argument always make a new shell."
                                     ;; on the output before crashing.
                                     ;; ... probably some very weird emacs bug
                                     (and (not (minibufferp x))
+                                         (not (buffer-live-p x))
                                          (with-current-buffer x
                                            (and (equal dir (file-truename default-directory))
                                                 (derived-mode-p 'eshell-mode)))))

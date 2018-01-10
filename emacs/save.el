@@ -3,6 +3,8 @@
 ;disable auto save
 (setq auto-save-default nil)
 
+(defvar etc-already-saving nil)
+
 (defun etc-buffer-needs-saving (&optional b)
   (unless b
     (setq b (current-buffer)))
@@ -13,11 +15,14 @@
 ;; check if any buffers need saving before actually
 ;; saving them, to avoid spurious messages.
 (defun etc-save-if-necessary ()
-  (ignore-errors
-      (when (reduce (lambda (a b) (or a b))
-                    (remove-if-not #'etc-buffer-needs-saving (buffer-list))
-                    :initial-value nil)
-        (save-some-buffers t #'etc-buffer-needs-saving))))
+  (unless (or etc-already-saving
+              (minibufferp))
+    (let ((etc-already-saving t))
+      (ignore-errors
+        (when (reduce (lambda (a b) (or a b))
+                      (remove-if-not #'etc-buffer-needs-saving (buffer-list))
+                      :initial-value nil)
+          (save-some-buffers t #'etc-buffer-needs-saving))))))
 
 ;; autosave under all these circumstances too, never want to save
 ;; manually

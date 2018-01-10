@@ -17,6 +17,11 @@
   )
 
 (use-package
+  helm
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
   perl6-mode
   :ensure t)
 
@@ -45,6 +50,7 @@
   projectile
   :ensure t
   :pin melpa-stable)
+
 
 (use-package
   helm-projectile
@@ -100,6 +106,9 @@
   :ensure t
   :pin melpa-stable)
 
+
+
+
 (load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
@@ -121,7 +130,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode helm-swoop helm-projectile helm-gtags haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -155,7 +164,9 @@
               (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
                       (buffer-file-name)
                       (getenv "HOME")
-                      (buffer-name)))))))))
+                      (buffer-name))))))))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(tramp-syntax (quote default) nil (tramp)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -219,10 +230,8 @@
 (load-file "~/etc/emacs/save.el")
 (load-file "~/etc/emacs/pair.el")
 
-(load-file "~/etc/emacs/gui.el")
 (load-file "~/etc/emacs/python-custom.el")
 (load-file "~/etc/emacs/perl6-custom.el")
-(load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/erc-custom.el")
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
@@ -258,6 +267,16 @@
 (load-file "~/etc/emacs/hide-show-custom.el")
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
+(load-file "~/etc/emacs/jabber-custom.el")
+(load-file "~/etc/emacs/julia-custom.el")
+(load-file "~/etc/emacs/helm-ag-custom.el")
+(load-file "~/etc/emacs/dired-custom.el")
+(load-file "~/etc/emacs/sql-custom.el")
+
+(load-file "~/etc/emacs/gui.el")
+
+
+(setq-default indent-tabs-mode nil)
 
 (delete-selection-mode 1)
 
@@ -266,7 +285,8 @@
   ;; technically this should be triggered by some sort of udev
   ;; event because this resets if you unplug and replug in the kbd.
   ;; instead we just run it once a minute, blame laziness :p
-  (call-process "xset" nil nil nil "r" "rate" "200" "60"))
+  (let ((default-directory "/")) ;; guaranteed to exist so I don't get an error, xset doesn't touch current directory anyway
+    (call-process "xset" nil nil nil "r" "rate" "200" "60")))
 (run-with-timer 0 60 #'etc-set-repeat-rate)
 
 (defun etc-translate-hack ()
@@ -334,7 +354,7 @@
   Interactively, N is the prefix arg."
   (interactive "P")
   (cond
-   ((or (eolp) n)
+   (n
     (line-move (prefix-numeric-value (or n 1)))
     (end-of-visual-line)
     (skip-chars-backward "[:space:]"))
@@ -365,12 +385,17 @@
   With arg N, move backward to the beginning of the Nth previous line.
   Interactively, N is the prefix arg."
   (interactive "P")
-  (let ((p (point)))
+  (let ((p (point))
+        (begin-line (save-excursion (beginning-of-visual-line) (point))))
     (cond
-     ((= p (save-excursion (beginning-of-visual-line) (point)))
-      (line-move -1)
-      (back-to-visual-indentation))
+     ((= p begin-line)
+      nil
+      ;; (line-move -1)
+      ;; (back-to-visual-indentation)
+      )
      ((= p (save-excursion (back-to-visual-indentation) (point)))
+      (beginning-of-visual-line))
+     ((= begin-line (save-excursion (skip-chars-backward "[:space:]" begin-line) (point)))
       (beginning-of-visual-line))
      (t (back-to-visual-indentation)))))
 
@@ -428,6 +453,12 @@
          ("\\.incl$'" . c++-mode))
        auto-mode-alist))
 
+(setq auto-mode-alist
+      (append
+       ;; File name (within directory) starts with a dot.
+       '(("\\.bzl\\'" . python-mode))
+       auto-mode-alist))
+
 ;; For most modes I'm coding, I don't want line wrap
 (setq-default truncate-lines t)
 
@@ -478,12 +509,17 @@
 (global-set-key "\M-k" 'next-buffer)
 
 ;; In programming modes indent when yanking
-(dolist (command '(yank yank-pop))
-   (eval `(defadvice ,command (after indent-region activate)
-            (and (not current-prefix-arg)
-                 (derived-mode-p 'prog-mode)
-                 (let ((mark-even-if-inactive transient-mark-mode))
-                   (indent-region (region-beginning) (region-end) nil))))))
+(dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
+  (eval `(defadvice ,command (after indent-region activate)
+           (and (not current-prefix-arg)
+                (derived-mode-p 'prog-mode)
+                (let ((mark-even-if-inactive transient-mark-mode))
+                  (if (and (region-active-p) (not (= (region-beginning) (region-end))))
+                      ;; when we have just cut a region the region beginning and end are the same,
+                    ;; in this case just indents the current line wherever we are
+                    (if (derived-mode-p 'python-mode)
+                        (indent-region (line-beginning-position) (line-end-position) nil)
+                      (indent-region (region-beginning) (region-end) nil))))))))
 
 (defun open-line-and-indent ()
   (interactive)
@@ -499,9 +535,12 @@
   (kill-visual-line ARG)
   (indent-according-to-mode))
 
-(global-set-key (kbd "RET") #'reindent-then-newline-and-indent)
-(global-set-key (kbd "C-o") #'open-line-and-indent)
-(global-set-key (kbd "C-k") #'kill-and-indent)
+(defun etc-prog-mode-hook ()
+  (local-set-key (kbd "RET") #'reindent-then-newline-and-indent)
+  (local-set-key (kbd "C-o") #'open-line-and-indent)
+  (local-set-key (kbd "C-k") #'kill-and-indent))
+
+(add-hook 'prog-mode-hook #'etc-prog-mode-hook)
 
 (setq auto-mode-alist
       (cons '("\\.make\\'" . makefile-gmake-mode) auto-mode-alist))
@@ -561,7 +600,7 @@
 
 ;; Make more notepad like out of the box
 (setq default-major-mode 'text-mode)
-(setq text-mode-hook        ; Enable auto-fill-mode
+(setq text-mode-hook
       '(lambda ()
          (when (buffer-file-name)
            (let ((ext (file-name-extension (buffer-file-name))))
@@ -570,6 +609,11 @@
                                  (string-equal ext "tmp")
                                  (string-equal ext "log")))
                         (< (buffer-size) uncomfortable-buffer-size))
+               ;; make text automatically wrap when the line gets too long
+               ;; -- disabled because it's not intelligent enough to understand when text is an emacs interface element
+               ;; (refill-mode 1)
+               (auto-fill-mode 1)
+               ;; render long lines of text by wrapping them
                (visual-line-mode 1))))))
 
 ;; Taken from Trey Jackson's answer on superuser.com
@@ -592,6 +636,7 @@
     (setq md-enable-symbol-refresh nil)
     (auto-revert-mode 0)
     (setq global-auto-revert-ignore-buffer t)
+    (display-line-numbers-mode 0)
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
@@ -616,11 +661,14 @@
 ;;       (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
 ;; lets you delete camelcase words one at a time
-(subword-mode t)
+;; (add-hook 'js-mode-hook #'subword-mode)
+(global-subword-mode)
 ;; for consistency have in minibuffer too
 ;;(add-hook 'minibuffer-setup-hook #'subword-mode)
 
 (defvar-local mandimus-last-word-event "")
+
+(defvar-local etc-had-process nil)
 
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
@@ -669,6 +717,15 @@
                                                   'face 'font-lock-type-face
                                                   'help-echo "Buffer is read-only"))))
                "] "
+               '(:eval
+                 (let ((p (get-buffer-process (current-buffer))))
+                   (when (or p etc-had-process)
+                     (setq etc-had-process t)
+                     (concat " ["  (propertize (if (process-live-p p) "Running." "Stopped.")
+                                               'face
+                                               (if (process-live-p p) 'font-lock-string-face 'info-menu-star)
+                                               'help-echo "Buffer has a process associated with it.")
+                             "] "))))
 
                ;; add the time, with the date and the emacs uptime in the tooltip
                '(:eval (propertize (format-time-string "%H:%M")
@@ -721,6 +778,7 @@
 ;; you can select the key you prefer to
 (define-key global-map (kbd "M-RET") 'ace-jump-mode)
 (define-key shell-mode-map (kbd "M-RET") nil)
+(define-key message-mode-map (kbd "M-RET") nil)
 (define-key global-map (kbd "S-<return>") 'ace-jump-line-mode)
 ;;(global-set-key (kbd "M-RET") 'ace-jump-mode)
 
@@ -877,11 +935,21 @@
 (setq scroll-margin 0)
 (setq auto-window-vscroll nil)
 
+;; (defun mouse-button-pressed-p ()
+;;   "Return non-nil if last event is a mouse-button down event."
+;;   (run-hooks 'mouse-leave-buffer-hook)
+;;   (and (consp last-input-event)
+;;        (string-match-p "down-mouse-" (format "%s" (car last-input-event)))))
+
 (defun etc-maybe-recenter ()
-  (unless (or (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
-              (equal (window-point) (point-max))
-              (region-active-p))
-    ;; don't interfere with erc scroll-to-bottom
+  (unless (or
+           ;; don't interfere with erc scroll-to-bottom
+           (derived-mode-p 'erc-mode 'term-mode 'shell-mode 'eshell-mode)
+           (not (eq (get-buffer-window (current-buffer) t) (selected-window)))
+           (equal (window-point) (point-max))
+           (region-active-p)
+           ;; (mouse-button-pressed-p) ;; doesn't work
+           )
     (recenter)))
 
 ;; setting to zero makes scrolling downwards slow,
@@ -979,5 +1047,11 @@
 (load-file "~/etc/emacs/md-company-custom.el")
 (put 'dired-find-alternate-file 'disabled nil)
 
+;; if I kill the same thing three times only put one entry in the kill ring
+(setq kill-do-not-save-duplicates t)
+
 ;; for emacsclient
 (server-start)
+
+(when (file-exists-p "~/radix-jhg/main.el")
+  (load-file "~/radix-jhg/main.el"))

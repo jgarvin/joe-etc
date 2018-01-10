@@ -156,5 +156,8 @@
     (md-server-start)
   (file-error (message "ERROR: Mandimus server already running!")))
 
+;; (md-server-start)
+;; (md-server-stop)
+
 (require 'buffer-tail)
 (toggle-buffer-tail "*mandimus-server*" "on")

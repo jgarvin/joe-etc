@@ -66,6 +66,6 @@
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'inferior-python-mode)
 
 (defadvice sp-show--pair-function (around sp-show--pair-function-disable-large activate)
-  (unless (or (> (buffer-size) (* 1 1024 1024))
+  (unless (or (> (buffer-size) (* 1 256 1024))
               (not smartparens-mode)) ;; why is this necessary? strangely is.
     ad-do-it))
