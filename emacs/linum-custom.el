@@ -5,7 +5,7 @@
   (with-eval-after-load "linum"
     ;; set `linum-delay' so that linum uses `linum-schedule' to update linums.
     (setq linum-delay t)
-
+    
     ;; create a new var to keep track of the current update timer.
     (defvar-local my-linum-current-timer nil)
 
