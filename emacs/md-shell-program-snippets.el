@@ -7,7 +7,6 @@
    ("line count" "wc -l")
    ("move" "mv $1 $2")
    ("copy" "cp $1 $2")
-   ("see D" "cd $1")
    ("GDB" "gdb --args $1")
    ("diff" "diff -u $1 $2")
    ("man" "man $1")
@@ -26,4 +25,5 @@
    ("sudo" "sudo $1")
    ("which" "which $1")
    ("cat" "cat $1")
+   ("head" "$1 | head")
    ))

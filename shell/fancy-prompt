@@ -56,11 +56,11 @@ function fancy_precmd {
     ###
     # Get APM info.
 
-    if which ibam &> /dev/null; then
-	PR_APM_RESULT=`ibam --percentbattery`
-    elif which apm &> /dev/null; then
-	PR_APM_RESULT=`apm 2>&1`
-    fi
+    # if which ibam &> /dev/null; then
+	# PR_APM_RESULT=`ibam --percentbattery`
+    # elif which apm &> /dev/null; then
+	# PR_APM_RESULT=`apm 2>&1`
+    # fi
 }
 
 precmd_functions+='fancy_precmd'

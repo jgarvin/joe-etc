@@ -39,12 +39,12 @@
   :ensure t
   :pin melpa-stable)
 
-(use-package
-  magit-gerrit
-  :ensure t
-  :pin melpa
-  )
-(require 'magit-gerrit)
+;; (use-package
+;;   magit-gerrit
+;;   :ensure t
+;;   :pin melpa
+;;   )
+;; (require 'magit-gerrit)
 
 (use-package
   projectile
@@ -106,7 +106,22 @@
   :ensure t
   :pin melpa-stable)
 
+(use-package smart-hungry-delete
+  :ensure t
+  :bind (("<backspace>" . smart-hungry-delete-backward-char)
+		 ("C-d" . smart-hungry-delete-forward-char))
+  :defer nil ;; dont defer so we can add our functions to hooks
+  :config (smart-hungry-delete-add-default-hooks)
+  )
 
+(defun etc-fix-snippet-backtrace (orig-fun &rest args)
+  "Freezes when run in sql-interactive-mode!"
+  (condition-case nil
+      (apply orig-fun args)
+    (error (message "ignoring the problem"))))
+
+(advice-add 'c-forward-sws :around #'etc-fix-snippet-backtrace)
+(advice-add 'c-font-lock-enum-body :around #'etc-fix-snippet-backtrace)
 
 
 (load-file "~/etc/emacs/smartparens-custom.el")
@@ -130,7 +145,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit-gerrit magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
