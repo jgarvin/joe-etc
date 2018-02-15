@@ -114,14 +114,14 @@
   :config (smart-hungry-delete-add-default-hooks)
   )
 
-(defun etc-fix-snippet-backtrace (orig-fun &rest args)
-  "Freezes when run in sql-interactive-mode!"
-  (condition-case nil
-      (apply orig-fun args)
-    (error (message "ignoring the problem"))))
+(defun etc-ignore-bug (orig-fun &rest args)
+  (with-demoted-errors "Ignoring the problem: %s"
+    (apply orig-fun args)))
 
-(advice-add 'c-forward-sws :around #'etc-fix-snippet-backtrace)
-(advice-add 'c-font-lock-enum-body :around #'etc-fix-snippet-backtrace)
+(advice-add 'c-forward-sws :around #'etc-ignore-bug)
+(advice-add 'c-font-lock-enum-body :around #'etc-ignore-bug)
+(advice-add 'python-shell-comint-end-of-output-p :around #'etc-ignore-bug)
+(advice-add 'python-shell-output-filter :around #'etc-ignore-bug)
 
 
 (load-file "~/etc/emacs/smartparens-custom.el")
