@@ -43,7 +43,7 @@
   (let* ((cmd (gensym))
          (scripts)
          (flag (if (eq type 'build) "b" "r"))
-         (choice-sym (if (eq type 'build) 'etc-build-choice 'etc-run-choice))
+         (original-buffer (current-buffer)) ;; because the pop-up menu creates its own
          (actions))
     (with-temp-buffer
       (shell-command (format "find-builds -%s -l" flag) (current-buffer))
@@ -61,7 +61,8 @@
                                  (file-name-sans-extension
                                   (file-name-nondirectory script)))
                                 (lambda ()
-                                  (set choice-sym script))) actions))))
+                                  (with-current-buffer original-buffer
+                                    (etc-set-build-cmd type script)))) actions))))
           (setq actions (cl-sort actions #'string< :key (lambda (x) (cadr x))))
           (popup-keys:new
            cmd
@@ -71,7 +72,30 @@
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
-  (if (eq type 'build) etc-build-choice etc-run-choice))
+  (let ((default-directory (file-name-directory (buffer-file-name)))
+        (project-name (etc-get-project)))
+    (if (eq type 'build)
+        (alist-get project-name etc-build-choice nil nil #'equal)
+      (alist-get project-name etc-run-choice nil nil #'equal))))
+
+(defun etc-update-or-add-alist (alist-var key value)
+  ;; taken from: https://gist.github.com/j8takagi/aef5115954d40341996d7caa5a19b2d3
+  "If KEY in ALIST, update VALUE of the KEY.
+Unless, cons cell (KEY . VALUE) is added."
+  (interactive)
+  (let (aconscell (alist (symbol-value alist-var)))
+   (if (setq aconscell (assoc key alist))
+       (unless (equal (cdr aconscell) value)
+         (setf (cdr aconscell) value))
+     (set alist-var (push (cons key value) alist)))
+   alist))
+
+(defun etc-set-build-cmd (type script)
+  (let ((default-directory (file-name-directory (buffer-file-name)))
+        (project-name (etc-get-project)))
+    (if (eq type 'build)
+        (etc-update-or-add-alist 'etc-build-choice project-name script)
+      (etc-update-or-add-alist 'etc-run-choice project-name script))))
 
 (defun etc-compile (&optional arg)
   (interactive "P")
@@ -233,11 +257,11 @@
 
 (defun etc-open-build-script ()
   (interactive)
-  (find-file etc-build-choice))
+  (find-file (etc-build-cmd 'build)))
 
 (defun etc-open-run-script ()
   (interactive)
-  (find-file etc-run-choice))
+  (find-file (etc-build-cmd 'run)))
 
 (defun etc-interrupt-subjob ()
   (interactive)
