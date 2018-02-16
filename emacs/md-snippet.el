@@ -449,6 +449,7 @@ go to the highest slot (most recent)."
  '(("conned" "(cond\n($1)\n($2))")
    ("defun" "(defun $1 ($2) $3)")
    ("comment" ";; $1")
+   ("if" "(if $1\n    $2\n  $3)")
    ("todo" ";; TODO: $1")))
 
 (md-replace-snippet

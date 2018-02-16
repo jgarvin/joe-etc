@@ -237,9 +237,12 @@ Unless, cons cell (KEY . VALUE) is added."
 (defun etc-get-project ()
   (if (projectile-project-p)
       (projectile-project-name)
-    (if (buffer-file-name)
-        (file-name-directory (buffer-file-name))
-      (default-directory))))
+    (if-let* ((last-project-buffer (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))))
+        (with-current-buffer last-project-buffer
+          (projectile-project-name))
+      (if (buffer-file-name)
+          (file-name-directory (buffer-file-name))
+        (default-directory)))))
 
 (defun etc-compile-and-run-impl (comp-command run-command &optional arg)
   (unless comp-command
