@@ -4,11 +4,11 @@
 ;; for builds and such
 (add-to-list 'load-path "~/etc/popup-keys")
 (require 'popup-keys)
-
+(require 'dash)
 (require 'realgud)
 
-(defvar etc-build-choice nil)
-(defvar etc-run-choice nil)
+(defvar etc-build-choice nil) ;; maps project name to build choice
+(defvar etc-run-choice nil) ;; maps project name to run choice
 (defvar etc-run-debug nil)
 (defvar etc-run-valgrind nil)
 (defvar-local etc-compilation-run-command nil)
@@ -16,18 +16,63 @@
 (defvar-local etc-compilation-compile-command nil)
 (defvar-local etc-compilation-invoking-buffer nil)
 (defvar-local etc-run-finished-status nil)
-(defvar etc-most-recent-build-buffer nil)
-(defvar etc-most-recent-run-buffer nil)
+(defvar etc-most-recent-build-buffer nil) ;; maps project name to stack of build jobs
+(defvar etc-most-recent-run-buffer nil) ;; maps project name to stack of run jobs
 
-(defun etc-stop-most-recent-build ()
-  (interactive)
-  (with-current-buffer etc-most-recent-build-buffer
-    (kill-compilation)))
+(defun etc-stop-most-recent-impl (type)
+  "Stop the most recent one or build associated with this project, keeping a stack."
+  (let* ((build-buffer-list-symbol (if (eq type 'build)
+                                       'etc-most-recent-build-buffer
+                                     'etc-most-recent-run-buffer))
+         (project-name (etc-get-project))
+         (build-buffer-list (alist-get project-name (symbol-value build-buffer-list-symbol) nil nil #'equal))
+         (found nil)
+         )
+    ;; (message "==========================")
+    ;; (message "%S %S %S %S " (symbol-value build-buffer-list-symbol) project-name build-buffer-list found)
+    (setf build-buffer-list
+         (-filter (lambda (buffer)
+                    ;; (message "**************************")
+                    ;; (message "%S" (list buffer
+                    ;;                     (buffer-live-p buffer)
+                    ;;                     (get-buffer-process buffer)
+                    ;;                     (not found)))
+                    (if (and (buffer-live-p buffer)
+                             (get-buffer-process buffer)
+                             (not found))
+                        (progn
+                          (setq found t)
+                          (condition-case e
+                              (with-current-buffer buffer
+                                (if (eq type 'build)
+                                    (kill-compilation)
+                                  (etc-interrupt-subjob)))
+                            (error (user-error "%s" e)))
+                          nil)
+                      (and (buffer-live-p buffer) (get-buffer-process buffer))))
+                  build-buffer-list))
+    )
+  )
 
 (defun etc-stop-most-recent-run ()
   (interactive)
-  (with-current-buffer etc-most-recent-run-buffer
-    (etc-interrupt-subjob)))
+  (etc-stop-most-recent-impl 'run))
+
+(defun etc-stop-most-recent-build ()
+  (interactive)
+  (etc-stop-most-recent-impl 'build)
+  )
+
+(defun etc-push-recent-buffer (type buffer)
+  (let* ((build-buffer-list-symbol (if (eq type 'build)
+                                      'etc-most-recent-build-buffer
+                                    'etc-most-recent-run-buffer))
+         (project-name (etc-get-project))
+         (existing (alist-get project-name (symbol-value build-buffer-list-symbol) nil nil #'equal))
+         )
+    (setf (alist-get project-name (symbol-value build-buffer-list-symbol) nil nil #'equal)
+          (cons buffer existing))
+    ))
 
 (defun etc-toggle-debug ()
   (interactive)
@@ -72,8 +117,7 @@
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
-  (let ((default-directory (file-name-directory (buffer-file-name)))
-        (project-name (etc-get-project)))
+  (let ((project-name (etc-get-project)))
     (if (eq type 'build)
         (alist-get project-name etc-build-choice nil nil #'equal)
       (alist-get project-name etc-run-choice nil nil #'equal))))
@@ -162,7 +206,7 @@ Unless, cons cell (KEY . VALUE) is added."
     (if existing-window
         (set-window-buffer existing-window buff-real-name))
     (with-current-buffer buff-real-name
-      (setq etc-most-recent-run-buffer (current-buffer))
+      (etc-push-recent-buffer 'run (current-buffer))
       (local-set-key (kbd "C-c C-k") #'etc-interrupt-subjob)
       ;; didn't work
       ;; (buffer-disable-undo (current-buffer))
@@ -213,7 +257,7 @@ Unless, cons cell (KEY . VALUE) is added."
          (proj (etc-get-project))
          (invoking (current-buffer))
          (compilation-mode-hook (cons (lambda (&rest unused)
-                                        (setq etc-most-recent-build-buffer (current-buffer))
+                                        (etc-push-recent-buffer 'build (current-buffer))
                                         (font-lock-mode 0)
                                         (setq etc-compilation-comp-command comc)
                                         (setq etc-compilation-project proj)
