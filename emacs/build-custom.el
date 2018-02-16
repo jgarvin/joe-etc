@@ -135,8 +135,7 @@ Unless, cons cell (KEY . VALUE) is added."
    alist))
 
 (defun etc-set-build-cmd (type script)
-  (let ((default-directory (file-name-directory (buffer-file-name)))
-        (project-name (etc-get-project)))
+  (let ((project-name (etc-get-project)))
     (if (eq type 'build)
         (etc-update-or-add-alist 'etc-build-choice project-name script)
       (etc-update-or-add-alist 'etc-run-choice project-name script))))
@@ -196,7 +195,7 @@ Unless, cons cell (KEY . VALUE) is added."
     ;; (message "%S %S %S" buff-name (get-buffer buff-name) (and (get-buffer buff-name) (with-current-buffer (get-buffer buff-name))))
     (when (get-buffer buff-real-name)
       (kill-buffer buff-real-name))
-    (let ((default-directory (file-name-directory cmd))
+    (let ((default-directory (etc-get-project-root))
           (temp-file (make-temp-file (concat "/tmp/" (file-name-nondirectory cmd) "."))))
       ;; (message "directory: %S" default-directory)
       (copy-file cmd temp-file t nil nil t)
@@ -233,14 +232,18 @@ Unless, cons cell (KEY . VALUE) is added."
 (add-hook 'compilation-finish-functions #'etc-post-compile-run)
 
 (defun etc-get-project ()
-  (if (projectile-project-p)
-      (projectile-project-name)
-    (if-let* ((last-project-buffer (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))))
-        (with-current-buffer last-project-buffer
-          (projectile-project-name))
-      (if (buffer-file-name)
-          (file-name-directory (buffer-file-name))
-        (default-directory)))))
+  (with-current-buffer (etc-get-project-buffer)
+    (projectile-project-name)))
+
+(defun etc-get-project-root ()
+  (with-current-buffer (etc-get-project-buffer)
+    (projectile-project-root)))
+
+(defun etc-get-project-buffer ()
+  (or
+   (and (projectile-project-p) (current-buffer))
+   (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))
+   (current-buffer)))
 
 (defun etc-compile-and-run-impl (comp-command run-command &optional arg)
   (unless comp-command
@@ -248,7 +251,7 @@ Unless, cons cell (KEY . VALUE) is added."
   (etc-save-if-necessary)
   (let* (;; make the compilaton buffer depend on the command name and the project,
          ;; this makes sure we can have multiple compiles going
-         (default-directory (file-name-directory comp-command))
+         (default-directory (etc-get-project-root))
          (buf-name (etc-build-buffer-name 'build comp-command))
          (compilation-buffer-name-function (lambda (mode) buf-name))
         ;; Pass info on for how to run things from the buffer we invoke in, which
@@ -264,7 +267,6 @@ Unless, cons cell (KEY . VALUE) is added."
                                         (setq etc-compilation-project proj)
                                         (setq etc-compilation-run-command runc)
                                         (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook))
-         (default-directory (file-name-directory comp-command))
          (temp-file (make-temp-file "bld.")))
     (message "directory: %S" default-directory)
     (copy-file comp-command temp-file t nil nil t)

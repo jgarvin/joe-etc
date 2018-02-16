@@ -56,7 +56,7 @@ if $list; then
     #     key="*"
     # fi
     # find . -maxdepth 1 -name "${key}-*".$mode.sh
-    find "$PWD" -maxdepth 1 -name "*".$mode.sh
+    find -L "${PWD}/${mode}_scripts" -maxdepth 1 -name "*".$mode.sh
 fi
 
 # if [ -n "$key" ]; then
