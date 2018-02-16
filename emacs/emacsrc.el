@@ -688,8 +688,14 @@
 ;; use setq-default to set it for /all/ modes
 (setq-default mode-line-format
               (list
+               ;; name of the current project
+               '(:eval (when (projectile-project-p)
+                         (concat (propertize (projectile-project-name)
+                                                  'face 'font-lock-doc-string-face
+                                                  'help-echo "Name of current project."))))
+
                ;; the buffer name; the file name as a tool tip
-               '(:eval (propertize "%b " 'face 'font-lock-warning-face
+               '(:eval (propertize " %b " 'face 'font-lock-warning-face
                                    'help-echo (buffer-file-name)))
 
                ;; line and column

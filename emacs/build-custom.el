@@ -172,11 +172,9 @@ Unless, cons cell (KEY . VALUE) is added."
   (quit-window kill-buffer (selected-window)))
 
 (defun etc-build-buffer-name (type cmd)
-  (format "*%s,%s,%s*"
+  (format "*%s,%s*"
           (if (eq type 'build) "compile" "run")
-          (let ((default-directory (file-name-directory cmd)))
-               (etc-get-project))
-          cmd))
+          (file-name-base cmd)))
 
 (defun etc-run-impl (cmd &optional debugging)
   (etc-save-if-necessary)
