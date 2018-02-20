@@ -231,20 +231,6 @@ Unless, cons cell (KEY . VALUE) is added."
 
 (add-hook 'compilation-finish-functions #'etc-post-compile-run)
 
-(defun etc-get-project ()
-  (with-current-buffer (etc-get-project-buffer)
-    (projectile-project-name)))
-
-(defun etc-get-project-root ()
-  (with-current-buffer (etc-get-project-buffer)
-    (projectile-project-root)))
-
-(defun etc-get-project-buffer ()
-  (or
-   (and (projectile-project-p) (current-buffer))
-   (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))
-   (current-buffer)))
-
 (defun etc-compile-and-run-impl (comp-command run-command &optional arg)
   (unless comp-command
     (user-error "No compile command set."))

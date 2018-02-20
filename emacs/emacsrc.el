@@ -927,7 +927,27 @@
 (global-set-key (kbd "M-]") #'abort-edit-recursive)
 (global-unset-key (kbd "C-x 1"))
 
-(global-set-key (kbd "C-<return>") #'find-file-at-point)
+(defun etc-smart-find-file-at-point ()
+  "Uses projectile find file at point unless not in a project."
+  (interactive)
+  (let ((guess (thing-at-point 'filename)))
+    (if (and guess (file-exists-p guess))
+        (progn
+          (message "guess: %s" guess)
+          (find-file guess))
+      (with-most-recent-project
+          (message "testing two")
+        (if (projectile-project-p) ;; can be false if there is no most recent project
+            (let* ((project-files (projectile-current-project-files))
+                   (files (projectile-select-files project-files)))
+              (message "files: %s" files)
+              (if files
+                  (find-file (concat (projectile-project-root) (car files)))
+                (user-error "Couldn't find file relative to current buffer or in most recent project.")))
+          (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
+        ))))
+
+(global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
 
 ;; enables focus follows mouse, needed for head tracking
 ;; FIXME: disabled for now, when not using head tracking

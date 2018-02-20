@@ -4,6 +4,29 @@
 
 (projectile-global-mode 1)
 
+(defun etc-get-project ()
+  (with-most-recent-project
+    (projectile-project-name)))
+
+(defun etc-get-project-root ()
+  (with-most-recent-project
+      (projectile-project-root)))
+
+(defun etc-get-project-buffer ()
+  (or
+   (and (projectile-project-p) (current-buffer))
+   (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))
+   (current-buffer)))
+
+(defmacro with-most-recent-project (&rest body)
+  "Execute the forms in BODY with most recently visited project current.
+The value returned is the value of the last form in BODY."
+  (declare (indent 1) (debug t))
+  `(let ((default-directory (with-current-buffer (etc-get-project-buffer) (file-name-directory (buffer-file-name)))))
+    ,@body))
+
+
+
 ;; ;; allow projectile to use external utils to speed up indexing
 ;; (setq projectile-indexing-method 'alien)
 
