@@ -5,12 +5,16 @@
 (projectile-global-mode 1)
 
 (defun etc-get-project ()
-  (with-most-recent-project
-    (projectile-project-name)))
+  (if (projectile-project-p)
+      (projectile-project-name)
+    (with-current-buffer (etc-get-project-buffer)
+      (projectile-project-name))))
 
 (defun etc-get-project-root ()
-  (with-most-recent-project
-      (projectile-project-root)))
+  (if (projectile-project-p)
+      (projectile-project-root)
+    (with-current-buffer (etc-get-project-buffer)
+      (projectile-project-root))))
 
 (defun etc-get-project-buffer ()
   (or
@@ -22,8 +26,11 @@
   "Execute the forms in BODY with most recently visited project current.
 The value returned is the value of the last form in BODY."
   (declare (indent 1) (debug t))
-  `(let ((default-directory (with-current-buffer (etc-get-project-buffer) (file-name-directory (buffer-file-name)))))
-    ,@body))
+  `(if (projectile-project-p)
+       (progn
+         ,@body)
+     (let ((default-directory (with-current-buffer (etc-get-project-buffer) (file-name-directory (buffer-file-name)))))
+       ,@body)))
 
 
 

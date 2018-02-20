@@ -115,8 +115,11 @@
   )
 
 (defun etc-ignore-bug (orig-fun &rest args)
-  (with-demoted-errors "Ignoring the problem: %s"
-    (apply orig-fun args)))
+  (condition-case e
+      (apply orig-fun args)
+    (error
+     (user-error "Ignoring the problem: %s" e)
+     nil)))
 
 (advice-add 'c-forward-sws :around #'etc-ignore-bug)
 (advice-add 'c-font-lock-enum-body :around #'etc-ignore-bug)
@@ -930,22 +933,24 @@
 (defun etc-smart-find-file-at-point ()
   "Uses projectile find file at point unless not in a project."
   (interactive)
-  (let ((guess (thing-at-point 'filename)))
-    (if (and guess (file-exists-p guess))
+  (let ((guess (string-trim (thing-at-point 'filename) nil ":[0-9]+:?"))) ;; remove trailing line numbers and ":"
+    (message "guess: %s" guess)
+    (if (and guess (file-exists-p guess)) 
         (progn
-          (message "guess: %s" guess)
           (find-file guess))
-      (with-most-recent-project
-          (message "testing two")
-        (if (projectile-project-p) ;; can be false if there is no most recent project
-            (let* ((project-files (projectile-current-project-files))
-                   (files (projectile-select-files project-files)))
-              (message "files: %s" files)
-              (if files
-                  (find-file (concat (projectile-project-root) (car files)))
-                (user-error "Couldn't find file relative to current buffer or in most recent project.")))
-          (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
-        ))))
+      (if (and (projectile-project-p)
+               (file-exists-p (concat (projectile-project-root) guess)))
+          (find-file (concat (projectile-project-root) guess))
+        (with-most-recent-project
+            (message "testing two")
+          (if (projectile-project-p) ;; can be false if there is no most recent project
+              (let* ((project-files (projectile-current-project-files))
+                     (files (projectile-select-files project-files)))
+                (if files
+                    (find-file (concat (projectile-project-root) (car files)))
+                  (user-error "Couldn't find file relative to current buffer or in most recent project.")))
+            (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
+          )))))
 
 (global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
 
