@@ -171,9 +171,10 @@ Unless, cons cell (KEY . VALUE) is added."
   (quit-window kill-buffer (selected-window)))
 
 (defun etc-build-buffer-name (type cmd)
-  (format "*%s,%s*"
+  (format "*%s,%s,%s*"
           (if (eq type 'build) "compile" "run")
-          (file-name-base cmd)))
+          (file-name-base cmd)
+          (etc-get-project))) ;; project name must be included to make buffer name unique
 
 (defun etc-run-impl (cmd &optional debugging)
   (etc-save-if-necessary)

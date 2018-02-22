@@ -29,7 +29,8 @@ The value returned is the value of the last form in BODY."
   `(if (projectile-project-p)
        (progn
          ,@body)
-     (let ((default-directory (with-current-buffer (etc-get-project-buffer) (file-name-directory (buffer-file-name)))))
+     (when-let* ((filename (with-current-buffer (etc-get-project-buffer) (buffer-file-name)))
+                 (default-directory (file-name-directory filename)))
        ,@body)))
 
 
