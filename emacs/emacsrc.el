@@ -125,6 +125,8 @@
 (advice-add 'c-font-lock-enum-body :around #'etc-ignore-bug)
 (advice-add 'python-shell-comint-end-of-output-p :around #'etc-ignore-bug)
 (advice-add 'python-shell-output-filter :around #'etc-ignore-bug)
+(advice-add 'helm-projectile-find-file :around #'etc-ignore-bug)
+(advice-add 'c-state-balance-parens-backwards :around #'etc-ignore-bug)
 
 
 (load-file "~/etc/emacs/smartparens-custom.el")
@@ -474,7 +476,8 @@
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
-       '(("\\.bzl\\'" . python-mode))
+       '(("\\.bzl\\'" . python-mode)
+         ("BUILD" . python-mode))
        auto-mode-alist))
 
 ;; For most modes I'm coding, I don't want line wrap
@@ -692,8 +695,10 @@
 (setq-default mode-line-format
               (list
                ;; name of the current project
-               '(:eval (when (projectile-project-p)
-                         (concat (propertize (projectile-project-name)
+               '(:eval (when  (and (or (not default-directory)
+                                       (not (file-remote-p default-directory)))
+                                   (etc-projectile-project-p))
+                         (concat (propertize (etc-get-project)
                                                   'face 'font-lock-doc-string-face
                                                   'help-echo "Name of current project."))))
 
@@ -770,6 +775,7 @@
                ;; i don't want to see minor-modes; but if you want, uncomment this:
                ;;minor-mode-alist  ;; list of minor modes
                " %-" ;; fill with '-'
+
                ))
 
 
@@ -933,24 +939,28 @@
 (defun etc-smart-find-file-at-point ()
   "Uses projectile find file at point unless not in a project."
   (interactive)
-  (let ((guess (string-trim (thing-at-point 'filename) nil ":[0-9]+:?"))) ;; remove trailing line numbers and ":"
+  (let ((guess (string-trim (thing-at-point 'filename) nil ":?\\([0-9]+:\\)?\\([0-9]+:\\)?"))) ;; remove trailing line numbers and ":"
     (message "guess: %s" guess)
-    (if (and guess (file-exists-p guess)) 
+    ;; (message "better guess: %s" (concat (projectile-project-root) "/source/" guess))
+    (if (and guess (file-exists-p guess))
         (progn
           (find-file guess))
       (if (and (projectile-project-p)
                (file-exists-p (concat (projectile-project-root) guess)))
           (find-file (concat (projectile-project-root) guess))
-        (with-most-recent-project
-            (message "testing two")
-          (if (projectile-project-p) ;; can be false if there is no most recent project
-              (let* ((project-files (projectile-current-project-files))
-                     (files (projectile-select-files project-files)))
-                (if files
-                    (find-file (concat (projectile-project-root) (car files)))
-                  (user-error "Couldn't find file relative to current buffer or in most recent project.")))
-            (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
-          )))))
+        (if (and (projectile-project-p)
+                 (file-exists-p (concat (projectile-project-root) "/source/" guess)))
+            (find-file (concat (projectile-project-root) "/source/" guess))
+          (with-most-recent-project
+              (message "testing two")
+            (if (projectile-project-p) ;; can be false if there is no most recent project
+                (let* ((project-files (projectile-current-project-files))
+                       (files (projectile-select-files project-files)))
+                  (if files
+                      (find-file (concat (projectile-project-root) (car files)))
+                    (user-error "Couldn't find file relative to current buffer or in most recent project.")))
+              (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
+            ))))))
 
 (global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
 

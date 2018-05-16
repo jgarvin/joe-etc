@@ -4,29 +4,48 @@
 
 (projectile-global-mode 1)
 
+(defvar-local etc-projectile-project-name-cached nil)
+(defvar-local etc-projectile-project-root-cached nil)
+
+(defun etc-projectile-project-p ()
+  (cond
+   ((eq etc-projectile-project-name-cached 'none) nil)
+   ((eq etc-projectile-project-root-cached 'none) nil)
+   (etc-projectile-project-name-cached t)
+   (etc-projectile-project-root-cached t)
+   (t (condition-case nil
+          (let ((project-name (projectile-project-name))
+                (project-root (projectile-project-root)))
+            (setq etc-projectile-project-name-cached (if project-name project-name 'none))
+            (setq etc-projectile-project-root-cached (if project-root project-root 'none))
+            (or etc-projectile-project-name-cached etc-projectile-project-root-cached))
+        (error nil)))))
+
 (defun etc-get-project ()
-  (if (projectile-project-p)
-      (projectile-project-name)
+  (if (etc-projectile-project-p) ;; updates cache
+      etc-projectile-project-name-cached
     (with-current-buffer (etc-get-project-buffer)
-      (projectile-project-name))))
+      (etc-projectile-project-p) ;; updates cache
+      etc-projectile-project-name-cached)))
 
 (defun etc-get-project-root ()
-  (if (projectile-project-p)
-      (projectile-project-root)
+  (if (etc-projectile-project-p) ;; updates cache
+      etc-projectile-project-root-cached
     (with-current-buffer (etc-get-project-buffer)
-      (projectile-project-root))))
+      (etc-projectile-project-p) ;; updates cache
+      etc-projectile-project-root-cached)))
 
 (defun etc-get-project-buffer ()
   (or
-   (and (projectile-project-p) (current-buffer))
-   (-any (lambda (x) (with-current-buffer x (and (projectile-project-p) x))) (buffer-list))
+   (and (etc-projectile-project-p) (current-buffer))
+   (-any (lambda (x) (with-current-buffer x (and (etc-projectile-project-p) x))) (buffer-list))
    (current-buffer)))
 
 (defmacro with-most-recent-project (&rest body)
   "Execute the forms in BODY with most recently visited project current.
 The value returned is the value of the last form in BODY."
   (declare (indent 1) (debug t))
-  `(if (projectile-project-p)
+  `(if (etc-projectile-project-p)
        (progn
          ,@body)
      (when-let* ((filename (with-current-buffer (etc-get-project-buffer) (buffer-file-name)))

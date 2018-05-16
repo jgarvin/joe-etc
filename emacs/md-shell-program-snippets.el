@@ -4,6 +4,7 @@
    ("said" "sed 's/$1/$2/g' $3")
    ("tee" "tee $1")
    ("grep" "grep \"$1\"")
+   ("link" "ln -s $1 $2")
    ("line count" "wc -l")
    ("move" "mv $1 $2")
    ("copy" "cp $1 $2")

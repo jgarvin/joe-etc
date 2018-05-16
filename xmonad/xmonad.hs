@@ -29,7 +29,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Util.EZConfig
 import XMonad.Hooks.ManageHelpers
-import XMonad.Actions.UpdatePointer (updatePointer, PointerPosition(Relative))
+import XMonad.Actions.UpdatePointer (updatePointer)
 
 -- For sawfish'esq jump-or-exec functionality
 import XMonad.ManageHook
@@ -287,15 +287,18 @@ defaults editor home_folder browser_name = gnomeConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = smartBorders
-                             $ MultiToggle.mkToggle (MultiToggle.single REFLECTX)
+        layoutHook         = MultiToggle.mkToggle (MultiToggle.single REFLECTX)
                              $ MultiToggle.mkToggle (MultiToggle.single REFLECTY)
-                             $ avoidStruts
-                             -- $ myDeco,
-                             $ simpleDeco shrinkText myTheme
-                             $ layoutHook gnomeConfig,
-        handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
-        -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
-        manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
-        logHook            = ewmhDesktopsLogHook  >> updatePointer (Relative 0.5 0.5)
+                             $ layoutHook gnomeConfig
+        -- layoutHook         = smartBorders
+        --                      $ MultiToggle.mkToggle (MultiToggle.single REFLECTX)
+        --                      $ MultiToggle.mkToggle (MultiToggle.single REFLECTY)
+        --                      $ avoidStruts
+        --                      -- $ myDeco,
+        --                      $ simpleDeco shrinkText myTheme
+        --                      $ layoutHook gnomeConfig,
+        -- handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
+        -- -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
+        -- manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
+        -- logHook            = ewmhDesktopsLogHook  >> updatePointer (0.5, 0.5) (0, 0)
     }

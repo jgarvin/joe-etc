@@ -2,14 +2,14 @@ echo \nReading ~/.gdbinit...\n\n
 set print asm-demangle on
 set print pretty on
 set print object on
-set print static-members on
+# set print static-members on # makes printing objects too verbose!
 set print vtbl on
 #set print demangle on
 #set demangle-style gnu-v3
 set demangle-style none
 
-# this helps emacs know where we are 
-set annotate 1 
+# this helps emacs know where we are
+set annotate 1
 
 set history size 9999999
 set history filename ~/.gdbhistory
@@ -26,7 +26,7 @@ end
 set script-extension soft
 
 # to prevent other threads from being able to run
-# when you are stepping 
+# when you are stepping
 #set scheduler-locking on
 
 # disable paging since eshell handles for us

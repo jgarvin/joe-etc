@@ -18,6 +18,10 @@ if [[ -d "$HOME/opt/bin" ]]; then
         export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
+if [[ -d "$HOME/.cabal/bin" ]]; then
+    export PATH="$HOME/.cabal/bin:$PATH"
+fi
+
 if [[ -d "$HOME/work/llvm/bin" ]]; then
     export PATH=$(path_prepend "$HOME/work/llvm/bin")
 fi
@@ -27,7 +31,7 @@ if [[ -d "$HOME/opt/share/perl6/site/bin" ]]; then
 fi
 
 if [[ -d "$HOME/opt/lib" ]]; then
-    export LD_LIBRARY_PATH=$(path_append "$HOME/opt/lib")
+    export LD_LIBRARY_PATH="$HOME/opt/lib:$HOME/.cabal/lib:$LD_LIBRARY_PATH"
 fi
 
 if [ -d $HOME/opt/lib/python2.6/site-packages ]; then
@@ -142,6 +146,7 @@ then
             mkdir -p "$os_bin"
             PATH=$(path_prepend "$os_bin")
     fi
+
 fi
 
 sshmount() {

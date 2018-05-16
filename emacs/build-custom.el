@@ -291,11 +291,15 @@ Unless, cons cell (KEY . VALUE) is added."
 
 (defun etc-open-build-script ()
   (interactive)
-  (find-file (etc-build-cmd 'build)))
+  (if-let ((script (etc-build-cmd 'build)))
+      (find-file script)
+    (user-error "No build script found!")))
 
 (defun etc-open-run-script ()
   (interactive)
-  (find-file (etc-build-cmd 'run)))
+  (if-let ((script (etc-build-cmd 'run)))
+      (find-file script)
+    (user-error "No run script found!")))
 
 (defun etc-interrupt-subjob ()
   (interactive)
