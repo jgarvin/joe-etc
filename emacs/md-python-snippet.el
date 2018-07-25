@@ -133,4 +133,5 @@
    ("nonlocal" "nonlocal $1")
    ("integer" "int($1)")
    ("float" "float($1)")
+   ("items" "$1.items()")
    ))

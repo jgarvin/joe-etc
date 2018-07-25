@@ -7,6 +7,7 @@
 ;; make sure to also save the kill ring and the search ring
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (savehist-mode t)
+;; (savehist-uninstall)
 
 (require 'desktop)
 (setq desktop-restore-eager t)

@@ -10,6 +10,8 @@
 (defvar md-server-pending-actions nil)
 (defvar md-server-execute-pending-timer nil)
 
+(defvar-local md-server-log-count 10000)
+
 ;; Yes this is a mutex,
 ;; necessary because if executing any actions
 ;; causes more IO the server filter may run again,
@@ -140,16 +142,21 @@
 ;;from server.el
 (defun md-server-log (string &optional client)
   "If a *mandimus-server* buffer exists, write STRING to it for logging purposes."
-  (if (get-buffer "*mandimus-server*")
-      (with-current-buffer "*mandimus-server*"
-        (unless buffer-read-only
-          (read-only-mode t))
-        (let ((inhibit-read-only t))
-          (goto-char (point-max))
-          (insert (current-time-string)
-                  (if client (format " %s:" client) " ")
-                  string)
-          (or (bolp) (newline))))))
+  ;; (if (get-buffer "*mandimus-server*")
+  ;;     (with-current-buffer "*mandimus-server*"
+  ;;       (unless buffer-read-only
+  ;;         (read-only-mode t))
+  ;;       (let ((inhibit-read-only t))
+  ;;         (setq md-server-log-count (1+ md-server-log-count))
+  ;;         (when (> md-server-log-count 10000)
+  ;;             (goto-char (point-min))
+  ;;             (delete-region (point-min) (save-excursion (end-of-line))))
+  ;;         (goto-char (point-max))
+  ;;         (insert (current-time-string)
+  ;;                 (if client (format " %s:" client) " ")
+  ;;                 string)
+  ;;         (or (bolp) (newline)))))
+  )
 
 ;; always run so mandimus can hook up
 (condition-case nil

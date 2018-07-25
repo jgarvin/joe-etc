@@ -5,8 +5,8 @@ set print object on
 # set print static-members on # makes printing objects too verbose!
 set print vtbl on
 #set print demangle on
-#set demangle-style gnu-v3
-set demangle-style none
+set demangle-style gnu-v3
+# set demangle-style none
 
 # this helps emacs know where we are
 set annotate 1
@@ -34,3 +34,5 @@ set height 0
 
 # annoying to remember
 alias -a exit = quit
+
+add-auto-load-safe-path /usr/lib64/libthread_db-1.0.so
