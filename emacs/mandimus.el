@@ -331,8 +331,12 @@ debug mode causing timers to die."
   (let ((p (point))
         (p2 (if subword-mode
                 (let ((case-fold-search nil))
-                  (re-search-backward subword-backward-regexp)
-                  (1+ (point)))
+                  (condition-case err
+                      (progn (re-search-backward subword-backward-regexp)
+                             (1+ (point)))
+                    (error 
+                     (backward-word)
+                     (point))))
               (backward-word)
               (point))))
     (save-restriction
@@ -344,8 +348,9 @@ debug mode causing timers to die."
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (unless (derived-mode-p 'eshell-mode)
-        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
+      (unless (derived-mode-p 'eshell-mode 'erc-mode)
+        (unless (get-buffer-process (current-buffer))
+          (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))))
 
 (defun md-forward-kill-word ()
   (interactive)
@@ -367,8 +372,9 @@ debug mode causing timers to die."
         (replace-match "" nil t)))
     (save-excursion
       (at-most-one-space)
-      (unless (derived-mode-p 'eshell-mode)
-        (delete-trailing-whitespace (beginning-of-line) (end-of-line))))))
+      (unless (derived-mode-p 'eshell-mode 'erc-mode)
+        (unless (get-buffer-process (current-buffer))
+          (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))))
 
 (defun md-pair-bounds (opener)
   (let ((r (sp-restrict-to-pairs opener 'sp-get-enclosing-sexp)))

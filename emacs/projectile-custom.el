@@ -19,7 +19,8 @@
             (setq etc-projectile-project-name-cached (if project-name project-name 'none))
             (setq etc-projectile-project-root-cached (if project-root project-root 'none))
             (or etc-projectile-project-name-cached etc-projectile-project-root-cached))
-        (error nil)))))
+        (error nil))))
+  )
 
 (defun etc-get-project ()
   (if (etc-projectile-project-p) ;; updates cache

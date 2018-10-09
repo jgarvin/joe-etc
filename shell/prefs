@@ -204,7 +204,7 @@ export PATH
 alias gdb='gdb --quiet'
 alias -g L='| /usr/bin/less -X -a -R'
 alias -r l='/usr/bin/less -X -a -R'
-less() {
-    echo "Use L or l!!!!" >&2
-    return 1
-}
+# less() {
+#     echo "Use L or l!!!!" >&2
+#     return 1
+# }

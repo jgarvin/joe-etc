@@ -3,10 +3,12 @@ set print asm-demangle on
 set print pretty on
 set print object on
 # set print static-members on # makes printing objects too verbose!
+set print static-members off
 set print vtbl on
 #set print demangle on
 set demangle-style gnu-v3
 # set demangle-style none
+
 
 # this helps emacs know where we are
 set annotate 1

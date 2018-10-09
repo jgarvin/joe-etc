@@ -123,6 +123,7 @@
    ("stir" "$1.str()")
    ("C stir" "$1.c_str()")
    ("switch" "switch($1) {\n    case $2:\n        $3;\n        break;\n}")
+   ("swap" "std::swap($1, $2)")
    ("ternary" "$1 ? $2 : $3")
    ("template class" "template<$0>\nclass $1 : $2\n{\npublic:\n\nprivate:\n\n};")
    ("template function deaf" "template<$0>\n$1 $2($3)\n{\n    $4;\n}")

@@ -106,13 +106,29 @@
   :ensure t
   :pin melpa-stable)
 
-(use-package smart-hungry-delete
-  :ensure t
-  :bind (("<backspace>" . smart-hungry-delete-backward-char)
-		 ("C-d" . smart-hungry-delete-forward-char))
-  :defer nil ;; dont defer so we can add our functions to hooks
-  :config (smart-hungry-delete-add-default-hooks)
-  )
+;; (use-package smart-hungry-delete
+;;   :ensure t
+;;   :bind (("<backspace>" . smart-hungry-delete-backward-char)
+;; 		 ("C-d" . smart-hungry-delete-forward-char))
+;;   :defer nil ;; dont defer so we can add our functions to hooks
+;;   :config (smart-hungry-delete-add-default-hooks)
+;;   )
+
+;;(global-set-key (kbd "<backspace>") #'delete-backward-char)
+;;(global-set-key (kbd "C-d") #'delete-forward-char)
+
+;; (defun etc-disable-smart-hungry-backward (orig-fun &rest args)
+;;   (if (get-buffer-process (current-buffer))
+;;       (apply #'delete-backward-char args)
+;;     (apply orig-fun args)))
+
+;; (defun etc-disable-smart-hungry-forward (orig-fun &rest args)
+;;   (if (get-buffer-process (current-buffer))
+;;       (apply #'delete-forward-char args)
+;;     (apply orig-fun args)))
+
+;; (advice-remove 'smart-hungry-delete-backward-char #'etc-disable-smart-hungry-backward)
+;; (advice-remove 'smart-hungry-delete-forward-char #'etc-disable-smart-hungry-forward)
 
 (defun etc-ignore-bug (orig-fun &rest args)
   (condition-case e
@@ -912,10 +928,10 @@
 (global-set-key (kbd "C-c i") #'magit-blame-mode)
 
 ;; otherwise big C++ buffers take forever
-(setq font-lock-support-mode 'jit-lock-mode)
-(setq jit-lock-defer-time 0.032) ;; 30fps
-(setq jit-lock-stealth-time 2) ;; wait 2s before lazily doing the rest
-(setq jit-lock-stealth-nice 0.5)
+;;(setq font-lock-support-mode 'jit-lock-mode)
+;;(setq jit-lock-defer-time 0.032) ;; 30fps
+;;(setq jit-lock-stealth-time 2) ;; wait 2s before lazily doing the rest
+;;(setq jit-lock-stealth-nice 0.5)
 
 
 (defun etc-shell-command ()
