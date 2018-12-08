@@ -56,10 +56,10 @@
 (define-key smartparens-mode-map (kbd "C-M-z") 'sp-rewrap-sexp)
 
 ;; without these you can't dive into a string
-(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
-(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
-(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)
-(add-to-list 'sp-navigate-consider-stringlike-sexp 'shell-mode)
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)
+;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'shell-mode)
 
 ;; but python has a bug: https://github.com/Fuco1/smartparens/issues/473
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'python-mode)

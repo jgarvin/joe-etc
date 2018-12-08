@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Activate workman layout
+Exec=bash -c "$HOME/etc/autostart/activate-workman.sh"
+Terminal=false
+StartupNotify=false
+Type=Application
+
+Name[en_US]=activate-workman
+
