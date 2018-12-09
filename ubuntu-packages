@@ -65,7 +65,6 @@ doxygen-doc
 rlwrap
 libnss3-tools
 synergy
-gnome-do
 graphviz
 texlive-font-utils # for epstopdf, needed by doxygen to do graphviz class diagrams
 mesa-utils
