@@ -6,6 +6,7 @@ chromium-browser
 htop
 iotop
 lsof
+xterm
 
 # Revision control
 cvs

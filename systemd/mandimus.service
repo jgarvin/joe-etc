@@ -1,0 +1,10 @@
+[Unit]
+Description=mandimus
+
+[Service]
+ExecStart=/usr/bin/xterm -e "~/mandimus/mainloop.sh" 
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=user-graphical-login.target

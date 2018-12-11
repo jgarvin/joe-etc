@@ -26,6 +26,8 @@ ln -sf $HOME/etc/systemd user
 cd -
 systemctl --user daemon-reload
 systemctl --user enable dragon.service
+systemctl --user enable mandimus.service
+systemctl --user enable emacs.service
 
 if which git &> /dev/null; then
     if [[ ! -a ~/.gitconfig ]]; then
