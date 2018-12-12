@@ -169,6 +169,7 @@
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
+ '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
     (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
@@ -308,7 +309,7 @@
 (load-file "~/etc/emacs/hide-show-custom.el")
 (load-file "~/etc/emacs/magit-custom.el")
 (load-file "~/etc/emacs/diff-custom.el")
-(load-file "~/etc/emacs/jabber-custom.el")
+;;(load-file "~/etc/emacs/jabber-custom.el")
 (load-file "~/etc/emacs/julia-custom.el")
 (load-file "~/etc/emacs/helm-ag-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
@@ -384,7 +385,8 @@
 (setq ring-bell-function 'ding)
 
 ;; should get used to using delete key on kineses
-(global-unset-key "\C-d")
+(when (not (string= (system-name) "eruv"))
+  (global-unset-key "\C-d"))
 (global-set-key [delete] 'delete-char)
 
 (defun end-or-trailing (&optional n)
@@ -442,8 +444,10 @@
 
 ;; (global-set-key "\C-a" 'beginning-or-indentation)
 ;; (global-set-key "\C-e" 'end-or-trailing)
-(global-unset-key "\C-a")
-(global-unset-key "\C-e")
+
+(when (not (string= (system-name) "eruv"))
+  (global-unset-key "\C-a")
+  (global-unset-key "\C-e"))
 
 ;; lets try this for awhile
 (global-set-key (kbd "<home>") 'beginning-or-indentation)

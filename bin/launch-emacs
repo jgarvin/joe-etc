@@ -18,4 +18,4 @@ fi
 # By launching emacsclient through an interactive zsh,
 # we know we get the emacsclient from the $PATH we want.
 # echo wat4 >> /tmp/debug
-zsh -i -c "emacsclient --alternate-editor=\"\" $arg"
+SKIP_KEYBOARD_SETUP=1 zsh -i -c "emacsclient --alternate-editor=\"\" $arg"

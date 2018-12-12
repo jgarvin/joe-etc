@@ -60,9 +60,6 @@
 (require 'cc-mode)
 (dolist (key '("(" ")" "{" "}")) (define-key c-mode-base-map (kbd key) nil) )
 
-
-
-;; without these you can't dive into a string -- allegedly obsolete in newer smartparens versions
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)

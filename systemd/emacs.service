@@ -1,0 +1,10 @@
+[Unit]
+Description=emacs
+
+[Service]
+ExecStart=/bin/bash -c "~/etc/bin/launch-emacs"
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=user-graphical-login.target

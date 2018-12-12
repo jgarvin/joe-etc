@@ -9,7 +9,7 @@
 (defvar md-server-disconnect-hook nil)
 (defvar md-server-pending-actions nil)
 (defvar md-server-execute-pending-timer nil)
-
+(defvar md-server-port 23233)
 (defvar-local md-server-log-count 10000)
 
 ;; Yes this is a mutex,
@@ -51,7 +51,7 @@
   (unless (process-status "mandimus-eval-server")
     (make-network-process :name "mandimus-eval-server"
                           :server t
-                          :service 23233
+                          :service md-server-port
                           :buffer "*mandimus-server*"
                           :family 'ipv4
                           :sentinel 'md-server-sentinel
@@ -168,3 +168,13 @@
 
 (require 'buffer-tail)
 (toggle-buffer-tail "*mandimus-server*" "on")
+
+;; This makes it possible to figure out how to connect emacs just from
+;; looking at the X window properties of the frame.
+(defun md-network-annotate-frames (new-frame)
+  (when (getenv "DISPLAY")
+    (dolist (f (frame-list))
+      (x-change-window-property "mandimus_server_host" (system-name) f nil nil t)
+      (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil t))))
+
+(add-hook 'after-make-frame-functions #'md-network-annotate-frames)
