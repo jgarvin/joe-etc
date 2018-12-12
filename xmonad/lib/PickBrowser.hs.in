@@ -1,2 +1,3 @@
 module PickBrowser(preferred_browser) where
-preferred_browser = --preferred-browser-script-output--
+    preferred_browser = PREFERRED_BROWSER_SCRIPT_OUTPUT
+    preferred_browser_argument = PREFERRED_BROWSER_SCRIPT_ARGUMENT

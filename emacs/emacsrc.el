@@ -677,7 +677,8 @@
     (setq md-enable-symbol-refresh nil)
     (auto-revert-mode 0)
     (setq global-auto-revert-ignore-buffer t)
-    (display-line-numbers-mode 0)
+    (when (fboundp 'display-line-numbers-mode)
+      (display-line-numbers-mode 0))
     (message "Large buffer: Undo disabled, made read only, autosave disabled.")))
 (add-hook 'find-file-hooks 'my-find-file-check-make-large-file-read-only-hook)
 
