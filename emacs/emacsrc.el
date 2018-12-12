@@ -385,8 +385,8 @@
 (setq ring-bell-function 'ding)
 
 ;; should get used to using delete key on kineses
-(when (not (string= (system-name) "eruv"))
-  (global-unset-key "\C-d"))
+
+(global-unset-key "\C-d")
 (global-set-key [delete] 'delete-char)
 
 (defun end-or-trailing (&optional n)
@@ -445,9 +445,9 @@
 ;; (global-set-key "\C-a" 'beginning-or-indentation)
 ;; (global-set-key "\C-e" 'end-or-trailing)
 
-(when (not (string= (system-name) "eruv"))
-  (global-unset-key "\C-a")
-  (global-unset-key "\C-e"))
+;; (when (not (string= (system-name) "eruv"))
+;;   (global-unset-key "\C-a")
+;;   (global-unset-key "\C-e"))
 
 ;; lets try this for awhile
 (global-set-key (kbd "<home>") 'beginning-or-indentation)

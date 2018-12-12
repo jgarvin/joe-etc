@@ -3,7 +3,8 @@
 ;; (require 'color-theme)
 ;; (setq color-theme-is-global t)
 ;; (color-theme-initialize)
-(load-file "~/etc/emacs/cyberpunk-theme.el")
+(when (string= (system-name) "eruv")
+  (load-file "~/etc/emacs/cyberpunk-theme.el"))
 
 ;; starting up in daemon mode without frames will
 ;; crash if we try to set this... maybe set on

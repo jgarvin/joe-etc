@@ -87,5 +87,5 @@ if [[ -n "$EMACS" ]]; then
         PS1='[</ssh:%n@'"$(echo $SSH_CONNECTION | cut -d' ' -f 3)"':%d>]$ '
     fi
     
-    alias ssh="TERM=dumb-emacs ${aliases[ssh]-ssh}"
+    # alias ssh="TERM=dumb-emacs ${aliases[ssh]-ssh}"
 fi
