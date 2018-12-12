@@ -304,9 +304,9 @@ Unless, cons cell (KEY . VALUE) is added."
 (defun etc-interrupt-subjob ()
   (interactive)
   (let ((inhibit-read-only t))
-    ;; (comint-interrupt-subjob) ;; not strong enough sometimes
+    (comint-interrupt-subjob) ;; not strong enough sometimes
     ;; TODO: resort to killing on a timer
-    (comint-kill-subjob)
+    ;; (comint-kill-subjob)
     ))
 
 (global-set-key (kbd "C-c b") #'etc-compile)

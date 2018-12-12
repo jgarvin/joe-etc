@@ -48,6 +48,7 @@
    ("find" "std::find($1, $2, $3)")
    ("for each" "for(auto& $1 : $2) {\n    $3;\n}")
    ("for" "for($1; $2; $3) {\n    $4;\n}")
+   ("for integer" "for(int i = 0; i < $2; ++i) {\n    $4;\n}")
    ("forward" "std::forward<$1>($2)")
    ("forward as tuple" "std::forward_as_tuple($1)")
    ("friend class" "friend class $1;")
