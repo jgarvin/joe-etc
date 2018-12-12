@@ -1,3 +1,6 @@
+(when (file-exists-p "~/gentoo")
+    (load "~/gentoo/usr/share/emacs/site-lisp/site-gentoo"))
+
 (when (>= emacs-major-version 24)
   (require 'package)
   (package-initialize)
@@ -143,6 +146,7 @@
 (advice-add 'python-shell-output-filter :around #'etc-ignore-bug)
 (advice-add 'helm-projectile-find-file :around #'etc-ignore-bug)
 (advice-add 'c-state-balance-parens-backwards :around #'etc-ignore-bug)
+(advice-add 'c-forward-decl-or-cast-1 :around #'etc-ignore-bug)
 
 
 (load-file "~/etc/emacs/smartparens-custom.el")
@@ -159,6 +163,7 @@
      (output-dvi "Evince")
      (output-pdf "Evince")
      (output-html "Evince"))))
+ '(c-noise-macro-names (quote ("constexpr")))
  '(custom-safe-themes
    (quote
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
@@ -167,7 +172,7 @@
  '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
-    (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection smartparens realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -674,6 +679,7 @@
     (font-lock-mode -1)
     (linum-mode 0)
     (smartparens-mode 0)
+    (show-smartparens-mode 0)
     (setq md-enable-symbol-refresh nil)
     (auto-revert-mode 0)
     (setq global-auto-revert-ignore-buffer t)
@@ -1065,6 +1071,7 @@
 ;; Show matching parentheses
 ;; disable, conflicts with smartparens highlighting
 (show-paren-mode 0)
+(electric-pair-mode 0)
 
 ;; Two spaces is heresy! ;)
 (setq sentence-end-double-space nil)

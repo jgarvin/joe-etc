@@ -97,12 +97,12 @@
   (setq whitespace-style '(face lines))
   (setq whitespace-line-column 300)
   (whitespace-mode t)
-
+  
   ;;(setq require-final-newline t)
 
   ;; have a dedicated package for this now
   ;; (setq c-hungry-delete-key t)
-  
+
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
@@ -129,6 +129,7 @@
   ;; (c-set-offset 'statement-cont 0)
   ;; (c-set-offset 'brace-list-open 0)
   ;; (c-set-offset 'brace-list-close 0)
+    (electric-pair-local-mode 0)
   )
 
 (defun etc-toggle-namespace-indent ()
@@ -196,45 +197,49 @@
 ;;             0                           ; no additional indent
 ;;           ad-do-it)))                   ; default behavior
 
-;; This hack fixes indentation for C++11's "enum class" in Emacs.
-;; http://stackoverflow.com/questions/6497374/emacs-cc-mode-indentation-problem-with-c0x-enum-class/6550361#6550361
-(defun inside-class-enum-p (pos)
-  "Checks if POS is within the braces of a C++ \"enum class\"."
-  (ignore-errors
-    (save-excursion
-      (goto-char pos)
-      (up-list -1)
-      (backward-sexp 1)
-      (or (looking-back "enum\\s-+class\\s-+")
-          (looking-back "enum\\s-+class\\s-+\\S-+\\s-*:\\s-*")))))
+;; ;; This hack fixes indentation for C++11's "enum class" in Emacs.
+;; ;; http://stackoverflow.com/questions/6497374/emacs-cc-mode-indentation-problem-with-c0x-enum-class/6550361#6550361
+;; (defun inside-class-enum-p (pos)
+;;   "Checks if POS is within the braces of a C++ \"enum class\"."
+;;   (ignore-errors
+;;     (save-excursion
+;;       (goto-char pos)
+;;       (up-list -1)
+;;       (backward-sexp 1)
+;;       (or (looking-back "enum\\s-+class\\s-+")
+;;           (looking-back "enum\\s-+class\\s-+\\S-+\\s-*:\\s-*")))))
 
-(defun inside-enum-p (pos)
-  "Checks if POS is within the braces of a C++ \"enum\"."
-  (ignore-errors
-    (save-excursion
-      (goto-char pos)
-      (up-list -1)
-      (backward-sexp 1)
-      (or (looking-back "enum\\s-+")
-          (looking-back "enum\\s-+\\S-+\\s-*:\\s-*")))))
+;; (defun inside-enum-p (pos)
+;;   "Checks if POS is within the braces of a C++ \"enum\"."
+;;   (ignore-errors
+;;     (save-excursion
+;;       (goto-char pos)
+;;       (up-list -1)
+;;       (backward-sexp 1)
+;;       (or (looking-back "enum\\s-+")
+;;           (looking-back "enum\\s-+\\S-+\\s-*:\\s-*")))))
 
-(defun align-enum-class (langelem)
-  (if (inside-class-enum-p (c-langelem-pos langelem))
-      0
-    (c-lineup-topmost-intro-cont langelem)))
+;; (defun align-enum-class (langelem)
+;;   (if (inside-class-enum-p (c-langelem-pos langelem))
+;;       0
+;;     (c-lineup-topmost-intro-cont langelem)))
 
-(defun align-enum-class-closing-brace (langelem)
-  (if (or (inside-class-enum-p (c-langelem-pos langelem))
-          (inside-enum-p (c-langelem-pos langelem)))
-      '-
-    '+))
+;; (defun align-enum-class-closing-brace (langelem)
+;;   (if (or (inside-class-enum-p (c-langelem-pos langelem))
+;;           (inside-enum-p (c-langelem-pos langelem)))
+;;       '-
+;;     '+))
 
-(defun fix-enum-class ()
-  "Setup `c++-mode' to better handle \"class enum\"."
-  (add-to-list 'c-offsets-alist '(topmost-intro-cont . align-enum-class))
-  (add-to-list 'c-offsets-alist
-               '(statement-cont . align-enum-class-closing-brace)))
+;; (defun fix-enum-class ()
+;;   "Setup `c++-mode' to better handle \"class enum\"."
+;;   (add-to-list 'c-offsets-alist '(topmost-intro-cont . align-enum-class))
+;;   (add-to-list 'c-offsets-alist
+;;                '(statement-cont . align-enum-class-closing-brace)))
+
+;; hack from here: https://emacs.stackexchange.com/a/36341/2301
+(require 'cc-mode)
+(custom-set-variables '(c-noise-macro-names '("constexpr")))
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
-(add-hook 'c++-mode-hook 'fix-enum-class)
+;;(add-hook 'c++-mode-hook 'fix-enum-class)
 ;; (add-hook 'c++-mode-hook #'etc-c++-mode-hook)

@@ -55,7 +55,11 @@
 (define-key smartparens-mode-map (kbd "C-M-i") 'sp-split-sexp)
 (define-key smartparens-mode-map (kbd "C-M-z") 'sp-rewrap-sexp)
 
-;; without these you can't dive into a string
+;; w/o this highlighting text and pressing parens doesn't wrap in C++
+;; https://github.com/Fuco1/smartparens/issues/840
+(require 'cc-mode)
+(dolist (key '("(" ")" "{" "}")) (define-key c-mode-base-map (kbd key) nil) )
+
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)
@@ -65,7 +69,7 @@
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'python-mode)
 ;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'inferior-python-mode)
 
-(defadvice sp-show--pair-function (around sp-show--pair-function-disable-large activate)
-  (unless (or (> (buffer-size) (* 1 256 1024))
-              (not smartparens-mode)) ;; why is this necessary? strangely is.
-    ad-do-it))
+;; (defadvice sp-show--pair-function (around sp-show--pair-function-disable-large activate)
+;;   (unless (or (> (buffer-size) (* 1 256 1024))
+;;               (not smartparens-mode)) ;; why is this necessary? strangely is.
+;;     ad-do-it))
