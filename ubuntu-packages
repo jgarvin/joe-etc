@@ -89,3 +89,7 @@ realpath
 virtualbox
 dmidecode
 dex
+
+# anki
+texlive-full
+dvipng

@@ -963,10 +963,11 @@
 (global-set-key (kbd "M-]") #'abort-edit-recursive)
 (global-unset-key (kbd "C-x 1"))
 
+;; (string-trim (thing-at-point 'filename) nil ":?\\([0-9]+:\\)?\\([0-9]+:\\)?")
 (defun etc-smart-find-file-at-point ()
   "Uses projectile find file at point unless not in a project."
   (interactive)
-  (let ((guess (string-trim (thing-at-point 'filename) nil ":?\\([0-9]+:\\)?\\([0-9]+:\\)?"))) ;; remove trailing line numbers and ":"
+  (let ((guess (replace-regexp-in-string ":?\\([0-9]+:\\)?\\([0-9]+:\\)?\\'" "" (thing-at-point 'filename)))) ;; remove trailing line numbers and ":"
     (message "guess: %s" guess)
     ;; (message "better guess: %s" (concat (projectile-project-root) "/source/" guess))
     (if (and guess (file-exists-p guess))
