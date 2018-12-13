@@ -3,8 +3,13 @@
 ;; (require 'color-theme)
 ;; (setq color-theme-is-global t)
 ;; (color-theme-initialize)
-(when (string= (system-name) "eruv")
-  (load-file "~/etc/emacs/cyberpunk-theme.el"))
+(if (string= (system-name) "eruv")
+    (load-file "~/etc/emacs/cyberpunk-theme.el")
+  (load-theme 'manoj-dark)
+  (set-face-attribute 'mode-line nil
+                    :foreground (face-attribute 'mode-line-inactive :foreground)
+                    :background (face-attribute 'mode-line-inactive :background)))
+
 
 ;; starting up in daemon mode without frames will
 ;; crash if we try to set this... maybe set on
