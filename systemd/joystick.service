@@ -1,0 +1,10 @@
+[Unit]
+Description=joystick
+
+[Service]
+ExecStart=/bin/bash -c "python ~/mandimus/joystick.py"
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=user-graphical-login.target
