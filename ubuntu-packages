@@ -94,3 +94,5 @@ dex
 texlive-full
 dvipng
 python-pip
+
+curl
