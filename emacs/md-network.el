@@ -186,3 +186,6 @@
         (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil t)))))
 
 (add-hook 'after-make-frame-functions #'md-network-annotate-frames)
+;; only annotating after frame creation doesn't seem to be sufficient
+;; not sure why. observed when using with remote X forwarding
+(add-hook 'focus-out-hook #'md-network-annotate-frames)
