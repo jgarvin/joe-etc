@@ -28,8 +28,15 @@ systemctl --user daemon-reload
 systemctl --user enable dragon.service
 systemctl --user enable mandimus.service
 systemctl --user enable emacs.service
+systemctl --user enable joystick.service
 if [ -f ~/etc/systemd/work.service ]; then
     systemctl --user enable work.service
+fi
+if [ -f ~/etc/systemd/work-files.service ]; then
+    systemctl --user enable work-files.service
+fi
+if [ -f ~/etc/systemd/emacs-remote.service ]; then
+    systemctl --user enable emacs-remote.service
 fi
 
 if which git &> /dev/null; then
