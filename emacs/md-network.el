@@ -171,7 +171,7 @@
 
 ;; This makes it possible to figure out how to connect emacs just from
 ;; looking at the X window properties of the frame.
-(defun md-network-annotate-frames (new-frame)
+(defun md-network-annotate-frames (&optional new-frame)
   (when (getenv "DISPLAY")
     (dolist (f (frame-list))
       (when (window-system f) ;; daemon mode creates frame not associated w/ windowing system!
