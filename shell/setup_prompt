@@ -77,7 +77,7 @@ if [[ -z "$EMACS" ]]; then
 fi
 
 if [[ -n "$EMACS" ]]; then
-    if [ -z $SSH_CLIENT ]; then
+    if [ -z $SSH_CLIENT ] || [[ "$(echo $SSH_CONNECTION | cut -d' ' -f 3)" == "$(hostname -i)" ]]; then
 #        PS1='[/ssh:%n@%m:%d]$ '
         PS1='[%n@%m:<%~>]$ '
     else
