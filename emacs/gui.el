@@ -25,12 +25,6 @@
 (defun etc-customize-frame (new-frame)
   (when (getenv "DISPLAY")
     (when (window-system new-frame) ;; daemon mode creates frame not associated w/ windowing system!
-   ;; (setq etc-font-choice "DejaVu Sans Mono-12")
-    ;; (setq etc-font-choice "Consolas-14")
-
-    ;; and can't call this or emacsclient -c crashes, wtf
-      (set-face-attribute 'default t :font etc-font-choice)
-
       (set-frame-font etc-font-choice t t))))
 
 

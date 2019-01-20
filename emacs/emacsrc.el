@@ -33,6 +33,10 @@
   :ensure t)
 
 (use-package
+  rust-mode
+  :ensure t)
+
+(use-package
   haskell-mode
   :ensure t
   :pin melpa-stable)
@@ -172,7 +176,7 @@
  '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
-    (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -281,7 +285,7 @@
 
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
-(load-file "~/etc/emacs/email-custom.el")
+;;(load-file "~/etc/emacs/email-custom.el")
 (load-file "~/etc/emacs/w3m-custom.el")
 (load-file "~/etc/emacs/c-common.el")
 (load-file "~/etc/emacs/elisp-custom.el")
