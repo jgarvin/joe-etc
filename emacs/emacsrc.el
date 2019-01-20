@@ -59,6 +59,9 @@
   :ensure t
   :pin melpa-stable)
 
+;; binding mysteriously disappeared after some upgrade
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;;(global-set-key (kbd "C-c p p") #'projectile-switch-project)
 
 (use-package
   helm-projectile
