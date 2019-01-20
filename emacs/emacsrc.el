@@ -3,6 +3,7 @@
 
 (when (>= emacs-major-version 24)
   (require 'package)
+  (setq package-user-dir (concat "~/.emacs.d/packages-" (md5 (emacs-version))))
   (package-initialize)
   (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                            ("marmalade" . "https://marmalade-repo.org/packages/")
