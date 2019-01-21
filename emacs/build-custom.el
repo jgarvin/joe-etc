@@ -177,7 +177,8 @@ Unless, cons cell (KEY . VALUE) is added."
           (etc-get-project))) ;; project name must be included to make buffer name unique
 
 (defun etc-run-impl (cmd &optional debugging)
-  (etc-save-if-necessary)
+  (let ((rust-format-on-save t)) 
+    (etc-save-if-necessary))
   (let* ((buff-name (etc-build-buffer-name 'run cmd))
          ;; if there is an existing run buffer and the run has finished
          ;; then recycle it. otherwise generate a new one.
@@ -235,7 +236,8 @@ Unless, cons cell (KEY . VALUE) is added."
 (defun etc-compile-and-run-impl (comp-command run-command &optional arg)
   (unless comp-command
     (user-error "No compile command set."))
-  (etc-save-if-necessary)
+  (let ((rust-format-on-save t)) 
+       (etc-save-if-necessary))
   (let* (;; make the compilaton buffer depend on the command name and the project,
          ;; this makes sure we can have multiple compiles going
          (default-directory (etc-get-project-root))

@@ -1,3 +1,7 @@
+;;; package -- emacs customizations
+;;; commentary:
+;;; Code:
+
 (when (file-exists-p "~/gentoo")
     (load "~/gentoo/usr/share/emacs/site-lisp/site-gentoo"))
 
@@ -31,10 +35,6 @@
 
 (use-package
   racket-mode
-  :ensure t)
-
-(use-package
-  rust-mode
   :ensure t)
 
 (use-package
@@ -138,6 +138,7 @@
 ;;       (apply #'delete-forward-char args)
 ;;     (apply orig-fun args)))
 
+
 ;; (advice-remove 'smart-hungry-delete-backward-char #'etc-disable-smart-hungry-backward)
 ;; (advice-remove 'smart-hungry-delete-forward-char #'etc-disable-smart-hungry-forward)
 
@@ -180,7 +181,7 @@
  '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
-    (rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -322,6 +323,7 @@
 (load-file "~/etc/emacs/helm-ag-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/sql-custom.el")
+(load-file "~/etc/emacs/rust-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
