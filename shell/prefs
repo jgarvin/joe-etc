@@ -18,6 +18,10 @@ if [[ -d "$HOME/opt/bin" ]]; then
         export PATH=$(path_prepend "$HOME/opt/bin")
 fi
 
+if [[ -d "$HOME/gentoo/usr/bin" ]]; then
+        export PATH=$(path_prepend "$HOME/gentoo/usr/bin")
+fi
+
 if [[ -d "$HOME/.cabal/bin" ]]; then
     export PATH="$HOME/.cabal/bin:$PATH"
 fi

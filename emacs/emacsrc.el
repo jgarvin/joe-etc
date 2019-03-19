@@ -1,8 +1,13 @@
+;;; package -- emacs customizations
+;;; commentary:
+;;; Code:
+
 (when (file-exists-p "~/gentoo")
     (load "~/gentoo/usr/share/emacs/site-lisp/site-gentoo"))
 
 (when (>= emacs-major-version 24)
   (require 'package)
+  (setq package-user-dir (concat "~/.emacs.d/packages-" (md5 (emacs-version))))
   (package-initialize)
   (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                            ("marmalade" . "https://marmalade-repo.org/packages/")
@@ -54,6 +59,9 @@
   :ensure t
   :pin melpa-stable)
 
+;; binding mysteriously disappeared after some upgrade
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;;(global-set-key (kbd "C-c p p") #'projectile-switch-project)
 
 (use-package
   helm-projectile
@@ -130,6 +138,7 @@
 ;;       (apply #'delete-forward-char args)
 ;;     (apply orig-fun args)))
 
+
 ;; (advice-remove 'smart-hungry-delete-backward-char #'etc-disable-smart-hungry-backward)
 ;; (advice-remove 'smart-hungry-delete-forward-char #'etc-disable-smart-hungry-forward)
 
@@ -172,7 +181,7 @@
  '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
-    (smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -281,7 +290,7 @@
 
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
-(load-file "~/etc/emacs/email-custom.el")
+;;(load-file "~/etc/emacs/email-custom.el")
 (load-file "~/etc/emacs/w3m-custom.el")
 (load-file "~/etc/emacs/c-common.el")
 (load-file "~/etc/emacs/elisp-custom.el")
@@ -314,6 +323,7 @@
 (load-file "~/etc/emacs/helm-ag-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/sql-custom.el")
+(load-file "~/etc/emacs/rust-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 

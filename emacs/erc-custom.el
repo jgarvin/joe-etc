@@ -3,7 +3,8 @@
 (setq erc-prompt-for-nickserv-password nil)
 (setq erc-nickserv-passwords
       `((freenode     ((,freenode-nick . ,freenode-nick-pass)))
-        (oftc  ((,freenode-nick . ,freenode-nick-pass)))))
+        (oftc  ((,freenode-nick . ,freenode-nick-pass)))
+        (mozilla ((,freenode-nick . ,freenode-nick-pass)))))
 
 ;; without this will autojoin channels before identifying
 (setq erc-autojoin-timing 'ident)
@@ -59,7 +60,8 @@
 (setq erc-autojoin-channels-alist
       '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
          "#perl6" "#racket")
-        ("oftc.net" "#perf")))
+        ("oftc.net" "#perf")
+        ("mozilla.org" "#rust")))
 
 ;; don't automatically switch to joined channels, that's just annoying
 (setq erc-join-buffer 'bury)
@@ -68,8 +70,9 @@
   "Connect to IRC."
   (interactive)
   (when t ;; (y-or-n-p "IRC? ")
-    (erc :server "irc.freenode.net" :port 6667 :nick freenode-nick)
-    (erc :server "irc.oftc.net" :port 6667 :nick freenode-nick)))
+    (erc-tls :server "irc.freenode.net" :port 6697 :nick freenode-nick)
+    (erc-tls :server "irc.oftc.net" :port 6697 :nick freenode-nick)
+    (erc-tls :server "irc.mozilla.org" :port 6697 :nick freenode-nick)))
 
 (defun filter-server-buffers ()
   (delq nil
