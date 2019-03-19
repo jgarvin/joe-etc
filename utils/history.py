@@ -58,7 +58,7 @@ else:
 
 size = safe_getsize(hist_file)
 
-print("Current history file (%s) size: %s bytes, %s lines.\n" % (hist_file,size,readline.get_current_history_length(),))
+print("Current history file (%s) size: %s bytes, %s lines.\n" % (hist_file,size,readline.get_current_history_length(),), file=sys.stderr)
 
 readline.parse_and_bind("tab: complete")
 

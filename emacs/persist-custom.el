@@ -19,7 +19,7 @@
       (cond
        ((derived-mode-p 'special-mode) nil)
        ((get-buffer-process bufname) nil)
-       ((not (buffer-filename bufname)) nil)
+       ((not (buffer-file-name (get-buffer bufname))) nil)
        (t (apply orig-fun args))))))
 
 (advice-add 'desktop-save-buffer-p :around #'etc-filter-saved-buffers)

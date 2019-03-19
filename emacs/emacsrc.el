@@ -967,28 +967,31 @@
 (defun etc-smart-find-file-at-point ()
   "Uses projectile find file at point unless not in a project."
   (interactive)
-  (let ((guess (replace-regexp-in-string ":?\\([0-9]+:\\)?\\([0-9]+:\\)?\\'" "" (thing-at-point 'filename)))) ;; remove trailing line numbers and ":"
+  (let* ((filename-at-point (thing-at-point 'filename))
+        (guess (replace-regexp-in-string ":?\\([0-9]+:\\)?\\([0-9]+:\\)?\\'" "" filename-at-point))) ;; remove trailing line numbers and ":"
     (message "guess: %s" guess)
     ;; (message "better guess: %s" (concat (projectile-project-root) "/source/" guess))
-    (if (and guess (file-exists-p guess))
-        (progn
-          (find-file guess))
-      (if (and (projectile-project-p)
-               (file-exists-p (concat (projectile-project-root) guess)))
-          (find-file (concat (projectile-project-root) guess))
+    (if (and filename-at-point (file-exists-p filename-at-point))
+        (find-file filename-at-point)
+      (if (and guess (file-exists-p guess))
+          (progn
+            (find-file guess))
         (if (and (projectile-project-p)
-                 (file-exists-p (concat (projectile-project-root) "/source/" guess)))
-            (find-file (concat (projectile-project-root) "/source/" guess))
-          (with-most-recent-project
-              (message "testing two")
-            (if (projectile-project-p) ;; can be false if there is no most recent project
-                (let* ((project-files (projectile-current-project-files))
-                       (files (projectile-select-files project-files)))
-                  (if files
-                      (find-file (concat (projectile-project-root) (car files)))
-                    (user-error "Couldn't find file relative to current buffer or in most recent project.")))
-              (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
-            ))))))
+                 (file-exists-p (concat (projectile-project-root) guess)))
+            (find-file (concat (projectile-project-root) guess))
+          (if (and (projectile-project-p)
+                   (file-exists-p (concat (projectile-project-root) "/source/" guess)))
+              (find-file (concat (projectile-project-root) "/source/" guess))
+            (with-most-recent-project
+                (message "testing two")
+              (if (projectile-project-p) ;; can be false if there is no most recent project
+                  (let* ((project-files (projectile-current-project-files))
+                         (files (projectile-select-files project-files)))
+                    (if files
+                        (find-file (concat (projectile-project-root) (car files)))
+                      (user-error "Couldn't find file relative to current buffer or in most recent project.")))
+                (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
+              )))))))
 
 (global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
 

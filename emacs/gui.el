@@ -16,7 +16,7 @@
 ;; creation of first frame?
 
 (defvar etc-font-choice nil)
-(setq etc-font-choice "DejaVu Sans Mono-9")
+(setq etc-font-choice "DejaVu Sans Mono-7")
 
 (require 'faces)
 (require 'frame)
