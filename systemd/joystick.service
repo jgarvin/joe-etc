@@ -2,9 +2,9 @@
 Description=joystick
 
 [Service]
-ExecStart=/bin/bash -c "python ~/mandimus/joystick.py"
+ExecStart=/bin/bash -c "~/mandimus/joystick.py"
 Restart=always
-RestartSec=1
+RuntimeMaxSec=60
 
 [Install]
 WantedBy=user-graphical-login.target

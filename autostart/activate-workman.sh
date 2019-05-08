@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 # thinkpad built in keyboard only
 #DEVICE="AT Translated Set 2 keyboard"

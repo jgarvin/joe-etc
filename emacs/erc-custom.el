@@ -6,6 +6,8 @@
         (oftc  ((,freenode-nick . ,freenode-nick-pass)))
         (mozilla ((,freenode-nick . ,freenode-nick-pass)))))
 
+(add-to-list 'erc-nickserv-alist (list 'mozilla "NickServ!services@ircservices.mozilla.org" "This\\s-nickname\\s-is\\s-registered\\s-and\\s-protected" "NickServ" "IDENTIFY" nil nil "Password\\s-accepted"))
+
 ;; without this will autojoin channels before identifying
 (setq erc-autojoin-timing 'ident)
 
