@@ -26,7 +26,7 @@
   (interactive)
   (if (string= (file-name-extension (dired-get-file-for-visit))
                "data")
-      (async-shell-command (format "gnome-terminal -e \"zsh -ic \\\"perf report -g graph -i %s\\\"\"" (dired-get-file-for-visit)))
+      (async-shell-command (format "xterm -e perf report -g graph -i %s" (dired-get-file-for-visit)))
     (xdg-open-file (dired-get-file-for-visit))))
 
 (defun xdg-open-file (filename)
@@ -76,3 +76,6 @@
        (interactive "MList lines matching regexp: ")
        (require 'dired)
        (multi-occur (mapcar 'find-file (dired-get-marked-files)) string))))
+
+;; human readable file sizes
+(setq dired-listing-switches "-alh")

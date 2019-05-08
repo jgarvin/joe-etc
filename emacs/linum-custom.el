@@ -5,7 +5,7 @@
   (with-eval-after-load "linum"
     ;; set `linum-delay' so that linum uses `linum-schedule' to update linums.
     (setq linum-delay t)
-    
+
     ;; create a new var to keep track of the current update timer.
     (defvar-local my-linum-current-timer nil)
 
@@ -19,5 +19,5 @@
   (global-linum-mode))
 
 (when (>= emacs-major-version 26)
-  (global-display-line-numbers-mode)
+  (global-display-line-numbers-mode nil)
   (setq display-line-numbers-type 'visual))
