@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import sys
 import os
 import grp
@@ -47,7 +49,7 @@ def run(command, clear_ld_env=True):
     old_env_vars = {}
     def backup_env_var(var):
         if os.environ.has_key(var):
-            print >>sys.stderr, "Warning: Unsetting %s for invoking %s" % (var, command)
+            print("Warning: Unsetting %s for invoking %s" % (var, command), file=sys.stderr)
             old_env_vars[var] = os.environ[var]
             os.environ[var] = ''
 
@@ -68,21 +70,21 @@ def time_str(timestamp):
     return core_time.strftime("%c")
 
 if "-h" in sys.argv or "--help" in sys.argv:
-    print "Automatically finds the most recent core and opens it in gdb."
-    print "Usage: acore [-r] [appname]"
-    print
-    print "-h, --help\t Print this help"
-    print "-r, --recent\t Choose most recent core without asking."
+    print("Automatically finds the most recent core and opens it in gdb.")
+    print("Usage: acore [-r] [appname]")
+    print()
+    print("-h, --help\t Print this help")
+    print("-r, --recent\t Choose most recent core without asking.")
     sys.exit(0)
 
 if len(sys.argv) > 2:
-    print >> sys.stderr, "Only takes one argument, the application name."
+    print("Only takes one argument, the application name.", file=sys.stderr)
     sys.exit(1)
 
 coreList = glob.glob("/tmp/core.*") + glob.glob("./core.*") + glob.glob("/var/core.*") + glob.glob("/tmp/cores/core.*") + glob.glob("./core") + glob.glob("/var/tmp/*core*")
 
 if len(coreList) == 0:
-    print >> sys.stderr, "Found no cores in /tmp or current directory."
+    print("Found no cores in /tmp or current directory.", file=sys.stderr)
     sys.exit(1)
 
 if len(sys.argv) != 1:
@@ -94,7 +96,7 @@ if len(sys.argv) != 1:
 possibleCores = coreList
 
 if len(possibleCores) == 0:
-    print >> sys.stderr, "No core for %s was found." % sys.argv[1]
+    print("No core for %s was found." % sys.argv[1], file=sys.stderr)
     sys.exit(1)
 elif len(possibleCores) == 1:
     chosenCore = possibleCores[0]
@@ -105,13 +107,13 @@ else:
     if "-r" in sys.argv or "--recent" in sys.argv:
         choice = 0
     else:
-        print "Multiple cores were found. Which do you want?"
-        print "(Just press enter for the most recent)"
+        print("Multiple cores were found. Which do you want?")
+        print("(Just press enter for the most recent)")
 
         while 1:
             for i, (core, timestamp) in enumerate(possibleCores):
-                print "%d. %s (%s)" % (len(possibleCores)-1-i, core, time_str(timestamp))
-            print "> ",
+                print("%d. %s (%s)" % (len(possibleCores)-1-i, core, time_str(timestamp)))
+            print("> ",end='')
 
             choice = raw_input()
 
@@ -121,13 +123,13 @@ else:
                 try:
                     choice = len(possibleCores)-1-int(choice)
                 except ValueError:
-                    print >> sys.stderr, ("'%s' is not an integer. Enter a number "
-                                          "from the list." % choice)
+                    print("'%s' is not an integer. Enter a number "
+                          "from the list." % choice, file=sys.stderr)
                     continue
 
                 if choice < 0 or choice > len(possibleCores) - 1:
-                    print >> sys.stderr, ("Please enter a choice between %d and "
-                                          "%d." % (0, len(possibleCores) - 1))
+                    print("Please enter a choice between %d and "
+                          "%d." % (0, len(possibleCores) - 1), file=sys.stderr)
                     continue
 
             break
@@ -163,16 +165,16 @@ def findBinaryForCore(coreName):
 
 chosenBinary = findBinaryForCore(chosenCore)
 if not chosenBinary:
-    print >>sys.stderr, "Couldn't find binary for core: " + chosenBinary
+    print("Couldn't find binary for core: " + chosenBinary, file=sys.stderr)
     sys.exit(1)
 
-print "Core timestamp: " + time_str(op.getmtime(chosenCore))
-print "Binary timestamp: " + time_str(op.getmtime(chosenBinary))
+print("Core timestamp: " + time_str(op.getmtime(chosenCore)))
+print("Binary timestamp: " + time_str(op.getmtime(chosenBinary)))
 
-print "Chosen core: " + chosenCore
-print "Chosen binary: " + chosenBinary
+print("Chosen core: " + chosenCore)
+print("Chosen binary: " + chosenBinary)
 
 gdb_command = "gdb " + chosenBinary + " " + chosenCore
-print "Running: " + gdb_command
+print("Running: " + gdb_command)
 
 sys.exit(os.WEXITSTATUS(os.system(gdb_command)))
