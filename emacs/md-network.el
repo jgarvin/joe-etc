@@ -169,6 +169,14 @@
 (require 'buffer-tail)
 (toggle-buffer-tail "*mandimus-server*" "on")
 
+;; get the information into the window title where xpra can find it
+;; (setq-default frame-title-format "%b")
+(when (stringp (default-value 'frame-title-format)) ;; if it's a string turn it into a list
+  (setq-default frame-title-format (list (default-value 'frame-title-format))))
+(let ((new-list (copy-tree (default-value 'frame-title-format))))
+  (add-to-list 'new-list '(:eval (list " mandimus[" (system-name) ":" (number-to-string  md-server-port) "]")) t)
+  (setq-default frame-title-format new-list))
+
 ;; This makes it possible to figure out how to connect emacs just from
 ;; looking at the X window properties of the frame.
 (defun md-network-annotate-frames (&optional new-frame)
