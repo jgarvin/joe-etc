@@ -710,7 +710,10 @@
 (setq global-auto-revert-non-file-buffers nil)
 (global-auto-revert-mode 1)
 
-(modify-frame-parameters nil '((wait-for-wm . nil)))
+;; I don't know how this first made it into my config, but I can't
+;; imagine it is necessary anymore. Apparently was a hack for very old
+;; window managers.
+;; (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 ;; Can enable again once I reinstall markdown mode, marmelade is down...
 ;; (autoload 'markdown-mode "markdown-mode.el"
