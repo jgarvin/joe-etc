@@ -6,12 +6,10 @@
 
 (advice-add 'url-http-user-agent-string :around #'etc-mobile-browser)
 
-(make-variable-buffer-local 'frame-title-format)
 
 (require 'load-theme-buffer-local)
 
 (defun etc-eww-mode-hook ()
-  (setq frame-title-format "web: %b")
   ;; so we have white background color
   ;; (load-theme-buffer-local 'tango (current-buffer))
   )

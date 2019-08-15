@@ -29,9 +29,7 @@
 (defun etc-erc-mode-hook ()
   (set (make-local-variable 'scroll-step) 1)
   (set (make-local-variable 'scroll-conservatively) 1)
-  (set (make-local-variable 'scroll-margin) 0)
-  ;; make it easy to use mandimus to jump to chat window
-  (set (make-local-variable 'frame-title-format) "chat: %b"))
+  (set (make-local-variable 'scroll-margin) 0))
 
 (add-hook 'erc-mode-hook #'etc-erc-mode-hook)
 

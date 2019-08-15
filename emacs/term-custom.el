@@ -125,7 +125,6 @@
 
 ;; (defun etc-term-mode-setup ()
 ;;   ;; make the frames with terminals easy to select
-;;   (setq frame-title-format "term: %b")
 ;;   ;; without this you can overwrite the prompt and emacs doesn't know where
 ;;   ;; the home key should take you
 ;;   ;;(setq term-prompt-regexp "^--(\\(.+?:.+?:.+?\\))-- ")

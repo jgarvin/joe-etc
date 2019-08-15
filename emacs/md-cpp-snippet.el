@@ -176,4 +176,5 @@
    ("atomic" "std::atomic<$1>")
    ("float" "float($1)")
    ("double" "double($1)")
+   ("once" "static bool once = true;\nif(once) {\n    $1\n    once = false;\n}")
    ))

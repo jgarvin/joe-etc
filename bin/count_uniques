@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import fileinput
 import signal
 import sys
+
+
 
 global countmap
 countmap = {}
 
 def print_countmap():
     global countmap
-    countmap = countmap.items()
-    countmap.sort(key=lambda x: x[1])    
+    countmap = list(countmap.items())
+    countmap.sort(key=lambda x: x[1])
     for line, count in countmap:
-        print "Line: %s Count: %s" % (line[:-1], count)
-    
+        print("Line: %s Count: %s" % (line[:-1], count))
+
 def sigint_handler(signal, frame):
     print_countmap()
     sys.exit(0)

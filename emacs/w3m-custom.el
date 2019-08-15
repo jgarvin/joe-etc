@@ -3,11 +3,6 @@
 
 (setq w3m-use-cookies t)
 
-(make-variable-buffer-local 'frame-title-format)
-(add-hook 'w3m-mode-hook
-          (lambda ()
-            (setq frame-title-format "web: %b")))
-
 ;;change default browser for 'browse-url'  to w3m
 (setq browse-url-browser-function 'w3m-goto-url-new-session)
  

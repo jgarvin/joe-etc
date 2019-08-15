@@ -29,6 +29,11 @@
       (async-shell-command (format "xterm -e perf report -g graph -i %s" (dired-get-file-for-visit)))
     (xdg-open-file (dired-get-file-for-visit))))
 
+(defun dired-less-open-file ()
+  "Opens the current file in a Dired buffer."
+  (interactive)
+  (async-shell-command (format "xterm -e less -f -R -S %s" (dired-get-file-for-visit))))
+
 (defun xdg-open-file (filename)
   "xdg-opens the specified file."
   (interactive "fFile to open: ")
@@ -44,6 +49,7 @@
 (global-set-key (kbd "C-x C-j") #'etc-open-dired)
 
 (define-key dired-mode-map (kbd "e") 'dired-xdg-open-file)
+(define-key dired-mode-map (kbd "b") 'dired-less-open-file)
 
 (setq image-dired-external-viewer "/usr/bin/xdg-open")
 
