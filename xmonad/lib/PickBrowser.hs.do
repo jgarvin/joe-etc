@@ -9,6 +9,6 @@ redo-ifchange $pick_best_script
 preference=$($pick_best_script -n)
 argument=""
 if [ "chromium-browser" = "$preference" ] && [ -f ~/.ssh/proxy.pac ]; then
-    argument="--proxy-pac-url=file:\/\/\/home\/$LOGNAME\/.ssh\/proxy.pac"
+    argument=" --proxy-pac-url=data:application\/x-javascript-config;base64,$(base64 -w0 \/home\/$LOGNAME\/.ssh\/proxy.pac)"
 fi
 sed -e "s/PREFERRED_BROWSER_SCRIPT_OUTPUT/\"$preference\"/g" -e "s/PREFERRED_BROWSER_SCRIPT_ARGUMENT/\"$argument\"/g" PickBrowser.hs.in > $3
