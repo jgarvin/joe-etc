@@ -169,13 +169,9 @@
 (require 'buffer-tail)
 (toggle-buffer-tail "*mandimus-server*" "on")
 
-;; get the information into the window title where xpra can find it
-;; (setq-default frame-title-format "%b")
-(when (stringp (default-value 'frame-title-format)) ;; if it's a string turn it into a list
-  (setq-default frame-title-format (list (default-value 'frame-title-format))))
-(let ((new-list (copy-tree (default-value 'frame-title-format))))
-  (add-to-list 'new-list '(:eval (list " mandimus[" (system-name) ":" (number-to-string  md-server-port) "]")) t)
-  (setq-default frame-title-format new-list))
+(defun etc-check-substring (a b)
+  (string-match-p (regexp-quote a) b))
+
 
 ;; This makes it possible to figure out how to connect emacs just from
 ;; looking at the X window properties of the frame.
@@ -183,6 +179,17 @@
   (when (getenv "DISPLAY")
     (dolist (f (frame-list))
       (when (window-system f) ;; daemon mode creates frame not associated w/ windowing system!
+        (unless (etc-check-substring "mandimus[" (format "%s" frame-title-format))
+          ;; get the information into the window title where xpra can find it
+          ;; (setq-default frame-title-format "%b")
+          (when (stringp (default-value 'frame-title-format)) ;; if it's a string turn it into a list
+            (setq-default frame-title-format (list (default-value 'frame-title-format)))
+            (message "setting default frame title format %s" frame-title-format))
+          (let ((new-list (copy-tree (default-value 'frame-title-format))))
+            (message "trying to add to title format " (list " mandimus[" (system-name) ":" (number-to-string  md-server-port) "]"))
+            (add-to-list 'new-list '(:eval (list " mandimus[" (system-name) ":" (number-to-string  md-server-port) "]")) t)
+            (setq-default frame-title-format new-list))
+          )
         ;; these are the ones that matter if you ask xdotool for the
         ;; currently selected window
         (x-change-window-property "mandimus_server_host" (system-name) f nil nil nil)

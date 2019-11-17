@@ -18,6 +18,14 @@
             (run-with-idle-timer 0.1 nil #'linum-update-current))))
   (global-linum-mode))
 
-(when (>= emacs-major-version 26)
-  (global-display-line-numbers-mode nil)
-  (setq display-line-numbers-type 'visual))
+(defun etc-enable-line-numbers ()
+  (when (>= emacs-major-version 26)
+    (setq-default display-line-numbers-type 'visual)
+    (setq display-line-numbers-type 'visual)
+    (global-display-line-numbers-mode 1)
+    ))
+
+(etc-enable-line-numbers)
+;; without this magit-status for some unknown reason won't display why numbers...
+;; you have to toggle the mode after the buffer is created for them to show up
+(add-hook 'buffer-list-update-hook #'etc-enable-line-numbers)

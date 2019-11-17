@@ -112,6 +112,7 @@
    ("see log" "std::clog << $1 << std::endl;")
    ("set" "std::set<$1>")
    ("shared pointer" "std::shared_ptr<$1>")
+   ("weak pointer" "std::weak_ptr<$1>")
    ("size of" "sizeof($1)")
    ("sort" "std::sort($1, $2)")
    ("static assert" "static_assert($1, $2);")
