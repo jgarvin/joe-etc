@@ -5,7 +5,8 @@ Description=DragonVm
 ExecStart=/usr/bin/VirtualBox --startvm "Dragon Resized"
 Restart=always
 RestartSec=1
-WatchdogSec=86400 # restart once every twenty four hours
+# restart once every twenty four hours
+WatchdogSec=86400
 
 [Install]
 WantedBy=user-graphical-login.target
