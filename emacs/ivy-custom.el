@@ -20,6 +20,7 @@
 
 (use-package counsel :ensure t)
 (use-package counsel-projectile :ensure t)
+(use-package counsel-gtags :ensure t)
 
 (setq projectile-completion-system 'ivy)
 
@@ -51,3 +52,17 @@
 
 (define-key projectile-mode-map (kbd "C-c p s s") nil)
 (global-set-key (kbd "C-c p s s") #'etc-ivy-search-source-only)
+
+
+(add-hook 'c-mode-hook 'counsel-gtags-mode)
+(add-hook 'c++-mode-hook 'counsel-gtags-mode)
+
+(with-eval-after-load 'counsel-gtags
+  (define-key counsel-gtags-mode-map (kbd "M-.") 'counsel-gtags-find-definition)
+  (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-find-reference)
+  ;;(define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
+  ;;(define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)
+  )
+
+;; without this color codes show up in gtags
+(setq counsul-grep-command "grep --color=never")
