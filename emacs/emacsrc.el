@@ -9,9 +9,10 @@
   (require 'package)
   (setq package-user-dir (concat "~/.emacs.d/packages-" (md5 (emacs-version))))
   (package-initialize)
-  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+  (setq package-archives '(
+                           ;;("gnu" . "https://elpa.gnu.org/packages/")
                            ("marmalade" . "https://marmalade-repo.org/packages/")
-                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("melpa-stable" . "https://stable.melpa.org/packages/")
                            ("melpa" . "https://melpa.org/packages/")))
   (when (not (package-installed-p 'use-package))
     (package-refresh-contents)
@@ -23,11 +24,6 @@
   dash
   :ensure t
   )
-
-(use-package
-  helm
-  :ensure t
-  :pin melpa-stable)
 
 (use-package
   perl6-mode
@@ -64,11 +60,6 @@
 ;;(global-set-key (kbd "C-c p p") #'projectile-switch-project)
 
 (use-package
-  helm-projectile
-  :ensure t
-  :pin melpa-stable)
-
-(use-package
   erc-hl-nicks
   :ensure t
   :pin melpa-stable)
@@ -82,11 +73,6 @@
   goto-chg
   :ensure t
 )
-
-(use-package
-  helm-swoop
-  :ensure t
-  :pin melpa-stable)
 
 (use-package
   undo-tree
@@ -111,11 +97,6 @@
 ;;  protobuf-mode
 ;;  :ensure t
 ;;  :pin melpa-stable)
-
-(use-package
-  helm-gtags
-  :ensure t
-  :pin melpa-stable)
 
 ;; (use-package smart-hungry-delete
 ;;   :ensure t
@@ -153,7 +134,6 @@
 (advice-add 'c-font-lock-enum-body :around #'etc-ignore-bug)
 (advice-add 'python-shell-comint-end-of-output-p :around #'etc-ignore-bug)
 (advice-add 'python-shell-output-filter :around #'etc-ignore-bug)
-(advice-add 'helm-projectile-find-file :around #'etc-ignore-bug)
 (advice-add 'c-state-balance-parens-backwards :around #'etc-ignore-bug)
 (advice-add 'c-forward-decl-or-cast-1 :around #'etc-ignore-bug)
 
@@ -178,10 +158,9 @@
     ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
- '(helm-ag-base-command "ag --nocolor --nogroup")
  '(package-selected-packages
    (quote
-    (flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -254,8 +233,8 @@
      (call-interactively #'profiler-stop)))
 
 ;; Enable debugging
-(setq-default debug-on-error t)
-(setq message-log-max t)
+;;(setq-default debug-on-error t)
+(setq message-log-max 100000)
 
 ;; When running a local install of emacs, still pull in officially
 ;; installed packages.
@@ -274,6 +253,11 @@
 (if (file-exists-p "~/.emacspass")
     (load "~/.emacspass")
   (message "No ~/.emacspass file found!"))
+
+(when nil
+  (load-file "~/etc/emacs/helm-custom.el")
+  (load-file "~/etc/emacs/helm-ag-custom.el"))
+(load-file "~/etc/emacs/ivy-custom.el")
 
 (load-file "~/etc/emacs/smartparens-custom.el")
 ;;(load-file "~/etc/emacs/ido-custom.el")
@@ -308,7 +292,6 @@
 (load-file "~/etc/emacs/build-custom.el")
 (load-file "~/etc/emacs/midnight-custom.el")
 (load-file "~/etc/emacs/last-change-custom.el")
-(load-file "~/etc/emacs/helm-custom.el")
 (load-file "~/etc/emacs/linum-custom.el")
 (load-file "~/etc/emacs/visual-line-custom.el")
 (load-file "~/etc/emacs/visible-mark-custom.el")
@@ -320,7 +303,6 @@
 (load-file "~/etc/emacs/diff-custom.el")
 ;;(load-file "~/etc/emacs/jabber-custom.el")
 (load-file "~/etc/emacs/julia-custom.el")
-(load-file "~/etc/emacs/helm-ag-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/sql-custom.el")
 (load-file "~/etc/emacs/rust-custom.el")
@@ -482,7 +464,7 @@
    (interactive)
    (call-interactively
     (intern
-     (ido-completing-read
+     (completing-read-default
       "M-x "
       (all-completions "" obarray 'commandp))))))
 

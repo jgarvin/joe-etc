@@ -6,6 +6,7 @@
 
 pick_best_script=$HOME/etc/utils/pick_best_browser
 redo-ifchange $pick_best_script
+redo-ifchange /home/$LOGNAME/.ssh/proxy.pac
 preference=$($pick_best_script -n)
 argument=""
 if [ "chromium-browser" = "$preference" ] && [ -f ~/.ssh/proxy.pac ]; then

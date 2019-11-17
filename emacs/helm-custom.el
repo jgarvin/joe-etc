@@ -1,3 +1,26 @@
+(use-package
+  helm
+  :ensure t
+  :pin melpa-stable)
+
+
+(use-package
+  helm-projectile
+  :ensure t
+  :pin melpa-stable)
+
+
+(use-package
+  helm-swoop
+  :ensure t
+  :pin melpa-stable)
+
+(use-package
+  helm-gtags
+  :ensure t
+  :pin melpa-stable)
+
+
 ;; (helm-flx-mode +1)
 
 (require 'helm-config)
@@ -87,3 +110,79 @@
 (define-key helm-projectile-find-file-map (kbd "C-<backspace>") nil)
 
 (setq helm-candidate-number-limit 500)
+
+(advice-add 'helm-projectile-find-file :around #'etc-ignore-bug)
+
+(setq helm-ag-base-command "ag --nocolor --nogroup")
+
+;; Set key bindings
+(eval-after-load "helm-gtags"
+  '(progn
+     (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-find-tag)
+     (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-find-rtag)
+     ;; (define-key helm-gtags-mode-map (kbd "M-s") 'helm-gtags-find-symbol)
+     ;; (define-key helm-gtags-mode-map (kbd "M-g M-p") 'helm-gtags-parse-file)
+     (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+     (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+     ;; (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+     ))
+
+
+;; Enable helm-gtags-mode
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+
+(when (< emacs-major-version 26)
+
+;;;; helm support
+  (defvar helm-buffer)
+  (defvar helm-candidate-separator)
+  (defvar helm-alive-p)
+  (declare-function with-helm-buffer "ext:helm-lib.el" (&rest body))
+  (declare-function helm-candidate-number-at-point "ext:helm.el")
+  (declare-function helm-pos-header-line-p "ext:helm.el")
+
+  (defun linum-relative-for-helm ()
+    (with-helm-buffer
+      (make-local-variable 'linum-relative-last-pos))
+    (linum-update helm-buffer))
+
+  (add-hook 'helm-move-selection-after-hook 'linum-relative-for-helm)
+
+;;;; Advices
+  (defadvice linum-update (before relative-linum-update activate)
+    "This advice get the last position of linum."
+    (if (and (boundp 'helm-alive-p) helm-alive-p)
+        (setq linum-relative-last-pos (helm-candidate-number-at-point))
+      (setq linum-relative-last-pos (line-number-at-pos))))
+
+;;;; Functions
+  (defun linum-relative (line-number)
+    (when (and (boundp 'helm-alive-p) helm-alive-p)
+      (with-helm-buffer
+        (if (looking-at helm-candidate-separator)
+            (setq line-number (save-excursion
+                                (forward-line 1) (helm-candidate-number-at-point)))
+          (setq line-number (helm-candidate-number-at-point)))))
+    (let* ((diff1 (abs (- line-number linum-relative-last-pos)))
+           (diff (if (minusp diff1)
+                     diff1
+                   (+ diff1 linum-relative-plusp-offset)))
+           (current-p (= diff linum-relative-plusp-offset))
+           (current-symbol (if (and linum-relative-current-symbol current-p)
+                               (if (string= "" linum-relative-current-symbol)
+                                   (number-to-string line-number)
+                                 linum-relative-current-symbol)
+                             (number-to-string diff)))
+           (face (if current-p 'linum-relative-current-face 'linum)))
+      (if (and (boundp 'helm-alive-p)
+               helm-alive-p
+               (with-helm-buffer
+                 (or (looking-at helm-candidate-separator)
+                     (eq (point-at-bol) (point-at-eol))
+                     (helm-pos-header-line-p))))
+          (propertize (format linum-relative-format current-symbol) 'invisible t)
+        (propertize (format linum-relative-format current-symbol) 'face face))))
+  )
