@@ -17,6 +17,8 @@
 (defvar md-last-value-pair nil)
 (defvar md-inhibit-window-selection-hooks nil)
 (defvar md-last-selected-window nil)
+(defvar md-already-canceling-timer nil)
+
 
 (global-set-key '[md-dummy-event] 'md-ignore)
 
@@ -46,7 +48,8 @@ inserted text will fire, e.g. company-mode putting the pop-up away."
   ;; as far as I can tell (current-buffer)
   ;; is not reliable from an idle timer, you never know
   ;; what you will get, window-buffer is a better default
-  (let ((local (or local (window-buffer (selected-window)))))
+  (let ((md-already-canceling-timer t) ;; somehow got in an infinite loop once protect against it
+        (local (or local (window-buffer (selected-window)))))
     (with-current-buffer local
       (condition-case err
           (md--run-timer-func v f args)
@@ -334,7 +337,7 @@ debug mode causing timers to die."
                   (condition-case err
                       (progn (re-search-backward subword-backward-regexp)
                              (1+ (point)))
-                    (error 
+                    (error
                      (backward-word)
                      (point))))
               (backward-word)
