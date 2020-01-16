@@ -160,7 +160,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -306,6 +306,7 @@
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/sql-custom.el")
 (load-file "~/etc/emacs/rust-custom.el")
+(load-file "~/etc/emacs/vhdl-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
