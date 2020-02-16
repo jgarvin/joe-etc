@@ -22,6 +22,9 @@
 (use-package counsel-projectile :ensure t)
 (use-package counsel-gtags :ensure t)
 
+;; needed to not get variable is void error...
+(setq ivy-regex nil)
+
 (setq projectile-completion-system 'ivy)
 
 (global-set-key (kbd "C-s") 'swiper-isearch)

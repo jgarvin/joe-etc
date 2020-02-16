@@ -10,10 +10,15 @@
   (setq package-user-dir (concat "~/.emacs.d/packages-" (md5 (emacs-version))))
   (package-initialize)
   (setq package-archives '(
-                           ;;("gnu" . "https://elpa.gnu.org/packages/")
-                           ("marmalade" . "https://marmalade-repo.org/packages/")
-                           ("melpa-stable" . "https://stable.melpa.org/packages/")
-                           ("melpa" . "https://melpa.org/packages/")))
+                           ("gnu" . "http://elpa.gnu.org/packages/")
+                           ;;("marmalade" . "https://marmalade-repo.org/packages/")
+;;                           ("melpa-stable" . "https://stable.melpa.org/packages/")
+                           ("melpa" . "https://melpa.org/packages/")
+                           )
+        package-archive-priorities
+      '(;;("melpa-stable" . 10)
+        ("gnu"     . 0)
+        ("melpa"        . 5)))
   (when (not (package-installed-p 'use-package))
     (package-refresh-contents)
     (package-install 'use-package)))
@@ -26,22 +31,27 @@
   )
 
 (use-package
-  perl6-mode
-  :ensure t)
+    ein
+  :ensure t
+  )
 
-(use-package
-  racket-mode
-  :ensure t)
+;; (use-package
+;;   perl6-mode
+;;   :ensure t)
+
+;; (use-package
+;;   racket-mode
+;;   :ensure t)
 
 (use-package
   haskell-mode
   :ensure t
-  :pin melpa-stable)
+  )
 
 (use-package
   magit
   :ensure t
-  :pin melpa-stable)
+  )
 
 ;; (use-package
 ;;   magit-gerrit
@@ -53,7 +63,7 @@
 (use-package
   projectile
   :ensure t
-  :pin melpa-stable)
+  )
 
 ;; binding mysteriously disappeared after some upgrade
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
@@ -62,12 +72,12 @@
 (use-package
   erc-hl-nicks
   :ensure t
-  :pin melpa-stable)
+  )
 
-(use-package
-  realgud
-  :ensure t
-  :pin melpa-stable)
+ (use-package
+   realgud
+   :ensure t
+   )
 
 (use-package
   goto-chg
@@ -82,7 +92,7 @@
 (use-package
   expand-region
   :ensure t
-  :pin melpa-stable)
+  )
 
 (use-package
   string-inflection
@@ -91,12 +101,12 @@
 (use-package
   f
   :ensure t
-  :pin melpa-stable)
+  )
 
 ;;(use-package
 ;;  protobuf-mode
 ;;  :ensure t
-;;  :pin melpa-stable)
+;;  )
 
 ;; (use-package smart-hungry-delete
 ;;   :ensure t
@@ -160,7 +170,7 @@
  '(haskell-mode-hook (quote (turn-on-haskell-indent)))
  '(package-selected-packages
    (quote
-    (counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+    (ein lsp-mode counsel-projectile counsel counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
  '(safe-local-variable-values
    (quote
     ((eval add-hook
@@ -203,7 +213,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((((class color) (min-colors 89)) (:foreground "#d3d3d3" :background "#000000")))))
 
 (if (< emacs-major-version 24)
     (load-file "~/etc/emacs/cl-lib-0.3.el")
@@ -307,6 +317,7 @@
 (load-file "~/etc/emacs/sql-custom.el")
 (load-file "~/etc/emacs/rust-custom.el")
 (load-file "~/etc/emacs/vhdl-custom.el")
+(load-file "~/etc/emacs/ein-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 

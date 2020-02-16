@@ -26,4 +26,7 @@
    ("comment" "// $1")
    ("as" "$1 as $2")
    ("derive" "#[derive($1)]")
+   ("use" "use $1::$2;")
+   ("format" "format!($1)")
+   ("match" "match $1 {\n    $2 => $3;\n    _ => $4;\n}")
 ))

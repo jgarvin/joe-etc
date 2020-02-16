@@ -13,12 +13,12 @@
   toml-mode
   :ensure t)
 
-(use-package
-  flycheck-rust
-  :ensure t)
+;; (use-package
+;;   flycheck-rust
+;;   :ensure t)
 
-(with-eval-after-load 'rust-mode
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+;; (with-eval-after-load 'rust-mode
+;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 ;; display compile errors under the code where they happen
 (use-package
@@ -28,9 +28,11 @@
 (with-eval-after-load 'flycheck
   (add-hook 'flycheck-mode-hook #'flycheck-inline-mode))
 
+;;(remove-hook 'flycheck-mode-hook #'flycheck-inline-mode)
+
 ;; (global-flycheck-mode 0)
 ;; alternatively to enable only for rust:
-(add-hook 'rust-mode-hook #'flycheck-mode)
+;;(add-hook 'rust-mode-hook #'flycheck-mode)
 
 
 ;; Hook up the rust language server which enables code completion and
@@ -41,7 +43,12 @@
   lsp-mode
   :ensure t)
 
+;; (use-package
+;;   lsp-ui
+;;   :ensure t)
+
 (add-hook 'rust-mode-hook #'lsp)
+;;(remove-hook 'lsp-mode-hook #'lsp-ui-mode)
 
 (define-key rust-mode-map (kbd "M-.") 'lsp-find-definition)
 (define-key rust-mode-map (kbd "M-,") 'lsp-find-references)
@@ -59,3 +66,9 @@
   )
 
 (add-hook 'rust-mode-hook #'etc-rust-misc)
+
+(setq lsp-enable-snippet nil)
+
+;; hack to workaround https://github.com/flycheck/flycheck-inline/issues/7
+(defun flycheck-relevant-error-other-file-p (x)
+  nil)

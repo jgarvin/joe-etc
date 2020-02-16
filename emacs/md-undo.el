@@ -37,6 +37,31 @@ http://emacs.stackexchange.com/a/7560/2301"
 (defmacro md-with-undo-collapse (&rest body)
   "Execute body, then collapse any resulting undo boundaries.
 
+Taken from ideasman42's stackoverflow answer here:
+https://emacs.stackexchange.com/a/54412/2301"
+  (declare (indent 0) (debug t))
+  (let ((handle (make-symbol "--change-group-handle--"))
+        (success (make-symbol "--change-group-success--")))
+    `(let ((,handle (prepare-change-group))
+            ;; Don't truncate any undo data in the middle of this.
+            (undo-outer-limit nil)
+            (undo-limit most-positive-fixnum)
+            (undo-strong-limit most-positive-fixnum)
+            (,success nil))
+       (unwind-protect
+         (progn
+           (activate-change-group ,handle)
+           (prog1 ,(macroexp-progn body)
+             (setq ,success t)))
+         (if ,success
+           (progn
+             (accept-change-group ,handle)
+             (undo-amalgamate-change-group ,handle))
+           (cancel-change-group ,handle))))))
+
+(defmacro md-with-undo-collapse (&rest body)
+  "Execute body, then collapse any resulting undo boundaries.
+
 Taken from jch's stackoverflow answer here:
 http://emacs.stackexchange.com/a/7560/2301"
   (declare (indent 0))
@@ -50,27 +75,27 @@ http://emacs.stackexchange.com/a/7560/2301"
          (with-current-buffer ,buffer-var
            (md-undo-collapse-end ',marker))))))
 
-(defun md-check-undo-before-change (beg end)
-  "When a modification is detected, we push the current buffer
-onto a list of buffers modified this utterance."
-  (unless (or
-           ;; undo itself causes buffer modifications, we
-           ;; don't want to trigger on those
-           undo-in-progress
-           ;; we only collapse utterances, not general actions
-           (not md-in-utterance)
-           ;; ignore undo disabled buffers
-           (eq buffer-undo-list t)
-           ;; ignore read only buffers
-           buffer-read-only
-           ;; ignore buffers we already marked
-           (memq (current-buffer) md-utterance-changed-buffers)
-           ;; ignore buffers that have been killed
-           (not (buffer-name)))
-    (push (current-buffer) md-utterance-changed-buffers)
-    (setq md-collapse-undo-marker (list 'apply 'identity nil))
-    (undo-boundary)
-    (md-undo-collapse-begin md-collapse-undo-marker)))
+;; (defun md-check-undo-before-change (beg end)
+;;   "When a modification is detected, we push the current buffer
+;; onto a list of buffers modified this utterance."
+;;   (unless (or
+;;            ;; undo itself causes buffer modifications, we
+;;            ;; don't want to trigger on those
+;;            undo-in-progress
+;;            ;; we only collapse utterances, not general actions
+;;            (not md-in-utterance)
+;;            ;; ignore undo disabled buffers
+;;            (eq buffer-undo-list t)
+;;            ;; ignore read only buffers
+;;            buffer-read-only
+;;            ;; ignore buffers we already marked
+;;            (memq (current-buffer) md-utterance-changed-buffers)
+;;            ;; ignore buffers that have been killed
+;;            (not (buffer-name)))
+;;     (push (current-buffer) md-utterance-changed-buffers)
+;;     (setq md-collapse-undo-marker (list 'apply 'identity nil))
+;;     (undo-boundary)
+;;     (md-undo-collapse-begin md-collapse-undo-marker)))
 
 (defun md-pre-utterance-undo-setup ()
   (setq md-utterance-changed-buffers nil)
