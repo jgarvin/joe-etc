@@ -1,3 +1,5 @@
+(defvar-local etc-enabled-line-numbers nil)
+
 ;; before we had native line numbering
 (when (< emacs-major-version 26)
   (load-file "~/etc/emacs/linum-relative-custom.el")
@@ -19,10 +21,12 @@
   (global-linum-mode))
 
 (defun etc-enable-line-numbers ()
-  (when (>= emacs-major-version 26)
+  (when (and (>= emacs-major-version 26)
+             (not etc-enabled-line-numbers)) ;; was seeing weird 100% cpu usage w/o this
     (setq-default display-line-numbers-type 'visual)
     (setq display-line-numbers-type 'visual)
     (global-display-line-numbers-mode 1)
+    (setq etc-enabled-line-numbers t)
     ))
 
 (etc-enable-line-numbers)
