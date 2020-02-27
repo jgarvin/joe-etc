@@ -21,24 +21,38 @@
 (use-package counsel :ensure t)
 (use-package counsel-projectile :ensure t)
 (use-package counsel-gtags :ensure t)
+(use-package counsel-tramp :ensure t)
+
+;;(setq tramp-default-method "ssh")
+(define-key global-map (kbd "C-c s t") 'counsel-tramp)
+;;(setq counsel-tramp-custom-connections '(/ssh:domain|sudo:user@localhost:/))
+
+(let ((connections-file (format "/home/%s/.emacs.connections" (user-login-name))))
+  (when (file-exists-p connections-file)
+    (load-file connections-file)
+  ))
 
 (setq projectile-completion-system 'ivy)
 
+(global-set-key (kbd "C-r") 'swiper-isearch-backward)
 (global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-S-y") 'counsel-yank-pop)
 
-(setq counsel-ag-base-command "pt -e --nocolor --nogroup %s")
+(setq counsel-ag-base-command
+      ;;"pt -e --nocolor --nogroup %s"
+      "ag --nocolor --nogroup %s" ;; works better, counsel-ag support for pt has issues
+      )
 
 (defun etc-ivy-search-project-root ()
   (interactive)
-  (counsel-ag "" (etc-get-project-root)))
+  (counsel-ag (thing-at-point 'symbol) (etc-get-project-root)))
 
 (define-key projectile-mode-map (kbd "C-c p s g") nil)
 (global-set-key (kbd "C-c p s g") #'etc-ivy-search-project-root)
 
 (defun etc-ivy-search-current-dir ()
   (interactive)
-  (counsel-ag "" default-directory))
+  (counsel-ag (thing-at-point 'symbol) default-directory))
 
 (define-key projectile-mode-map (kbd "C-c p s d") nil)
 (global-set-key (kbd "C-c p s d") #'etc-ivy-search-current-dir)
@@ -47,7 +61,7 @@
   (interactive)
   (let ((helm-ag-ignore-buffer-patterns '("\\.txt\\'" "\\.mkd\\'" "\\.json\\'"))
         (source-directory (file-name-as-directory (projectile-project-root))))
-    (counsel-ag "" (concat source-directory "source"))
+    (counsel-ag (thing-at-point 'symbol) (concat source-directory "source"))
     ))
 
 (define-key projectile-mode-map (kbd "C-c p s s") nil)
@@ -65,4 +79,6 @@
   )
 
 ;; without this color codes show up in gtags
-(setq counsul-grep-command "grep --color=never")
+(setq grep-command "grep --color=never")
+;;(setq grep-find-command "grep --color=never")
+;;(setq counsul-grep-command "grep --color=never")
