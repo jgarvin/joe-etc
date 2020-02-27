@@ -173,6 +173,7 @@
               (not (= 0 (recursion-depth)))
               (not (eq (current-buffer) (window-buffer)))
               buffer-read-only
+              (not (derived-mode-p 'prog-mode 'text-mode))
               (minibufferp))
     (let ((w (selected-window)))
       (let ((win-check-closure

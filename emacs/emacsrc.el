@@ -1130,9 +1130,9 @@
 ;; image mode crashes in Motif mode
 ;; Can't use GTK/Athena because they randomly lockup
 ;; ... I hate you emacs
-(setq auto-mode-alist (rassq-delete-all 'image-mode auto-mode-alist))
-(setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
-(setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
+;;(setq auto-mode-alist (rassq-delete-all 'image-mode auto-mode-alist))
+;;(setq magic-mode-alist (rassq-delete-all 'image-mode magic-mode-alist))
+;;(setq magic-fallback-mode-alist (rassq-delete-all 'image-mode magic-fallback-mode-alist))
 
 ;;(load-file "~/etc/emacs/etc-racket-custom.el")
 
