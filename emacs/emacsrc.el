@@ -1150,3 +1150,11 @@
 
 (when (file-exists-p "~/radix-jhg/main.el")
   (load-file "~/radix-jhg/main.el"))
+
+(defvar etc-auto-revert-buffers-running nil)
+(defadvice auto-revert-buffers (around etc-auto-revert-dont-recurse)
+  (unless etc-auto-revert-buffers-running
+    (let ((etc-auto-revert-buffers-running t))
+      ad-do-it)))
+
+(ad-activate 'auto-revert-buffers)
