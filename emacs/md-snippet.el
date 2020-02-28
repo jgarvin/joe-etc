@@ -173,6 +173,7 @@
               (not (= 0 (recursion-depth)))
               (not (eq (current-buffer) (window-buffer)))
               buffer-read-only
+              (not (derived-mode-p 'prog-mode 'text-mode))
               (minibufferp))
     (let ((w (selected-window)))
       (let ((win-check-closure
@@ -550,4 +551,6 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-shell-snippet.el")
 (load-file "~/etc/emacs/md-eshell-snippet.el")
 (load-file "~/etc/emacs/md-shell-program-snippets.el")
+(load-file "~/etc/emacs/md-vhdl-snippet.el")
 (load-file "~/etc/emacs/md-sql-snippet.el")
+(load-file "~/etc/emacs/md-verilog-snippet.el")

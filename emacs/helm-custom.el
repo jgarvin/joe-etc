@@ -1,24 +1,24 @@
 (use-package
   helm
   :ensure t
-  :pin melpa-stable)
+  )
 
 
 (use-package
   helm-projectile
   :ensure t
-  :pin melpa-stable)
+  )
 
 
 (use-package
   helm-swoop
   :ensure t
-  :pin melpa-stable)
+  )
 
 (use-package
   helm-gtags
   :ensure t
-  :pin melpa-stable)
+  )
 
 
 ;; (helm-flx-mode +1)

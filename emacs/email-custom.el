@@ -12,7 +12,7 @@
 (use-package
   gmail2bbdb
   :ensure t
-  :pin melpa-stable)
+  )
 (autoload 'gmail2bbdb-import-file "gmail2bbdb" nil t nil)
 
 (setq gnus-select-method '(nnimap "gmail"

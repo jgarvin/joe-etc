@@ -1,7 +1,7 @@
 (use-package
   sqlup-mode
   :ensure t
-  :pin melpa-stable)
+  )
 
 ;; don't ask to confirm user password etc.
 (require 'sql)

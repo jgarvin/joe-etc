@@ -32,6 +32,9 @@
     (load-file connections-file)
   ))
 
+;; needed to not get variable is void error...
+(setq ivy-regex nil)
+
 (setq projectile-completion-system 'ivy)
 
 (global-set-key (kbd "C-r") 'swiper-isearch-backward)

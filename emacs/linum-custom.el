@@ -29,6 +29,16 @@
     (setq etc-enabled-line-numbers t)
     ))
 
+;; exceeded eval depth once somehow because of this
+(defvar etc-global-display-line-numbers-mode-check-buffers-running nil)
+(defadvice global-display-line-numbers-mode-check-buffers
+    (around etc-global-display-line-numbers-mode-check-buffers-dont-recurse)
+  (unless etc-global-display-line-numbers-mode-check-buffers-running
+    (let ((etc-global-display-line-numbers-mode-check-buffers-running t))
+      ad-do-it)))
+(ad-activate 'global-display-line-numbers-mode-check-buffers)
+
+
 (etc-enable-line-numbers)
 ;; without this magit-status for some unknown reason won't display why numbers...
 ;; you have to toggle the mode after the buffer is created for them to show up

@@ -1,7 +1,7 @@
 (use-package
   helm-ag
   :ensure t
-  :pin melpa-stable)
+  )
 
 (setq helm-ag-base-command "pt -e --nocolor --nogroup")
 
