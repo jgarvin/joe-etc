@@ -30,11 +30,6 @@
   :ensure t
   )
 
-(use-package
-    ein
-  :ensure t
-  )
-
 ;; (use-package
 ;;   perl6-mode
 ;;   :ensure t)
@@ -156,40 +151,33 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(TeX-view-program-selection
-   (quote
-    (((output-dvi style-pstricks)
+   '(((output-dvi style-pstricks)
       "Evince")
      (output-dvi "Evince")
      (output-pdf "Evince")
-     (output-html "Evince"))))
- '(c-noise-macro-names (quote ("constexpr")))
+     (output-html "Evince")))
+ '(c-noise-macro-names '("constexpr"))
  '(custom-safe-themes
-   (quote
-    ("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
- '(ediff-split-window-function (quote split-window-horizontally))
- '(haskell-mode-hook (quote (turn-on-haskell-indent)))
+   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
+ '(ediff-split-window-function 'split-window-horizontally)
+ '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   (quote
-    (ein lsp-mode counsel-projectile counsel counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+   '(ein lsp-mode counsel-projectile counsel counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
-   (quote
-    ((eval add-hook
-           (quote after-save-hook)
+   '((eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
               (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
                       (buffer-file-name)
                       (getenv "HOME"))))
            nil t)
-     (eval add-hook
-           (quote after-save-hook)
+     (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
               (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
                       (getenv "HOME"))))
            nil t)
-     (eval add-hook
-           (quote after-save-hook)
+     (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
               (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
@@ -197,16 +185,15 @@
                       (getenv "HOME")
                       (buffer-name))))
            nil t)
-     (eval add-hook
-           (quote after-save-hook)
+     (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
               (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
                       (buffer-file-name)
                       (getenv "HOME")
-                      (buffer-name))))))))
- '(send-mail-function (quote smtpmail-send-it))
- '(tramp-syntax (quote default) nil (tramp)))
+                      (buffer-name)))))))
+ '(send-mail-function 'smtpmail-send-it)
+ '(tramp-syntax 'default nil (tramp)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
