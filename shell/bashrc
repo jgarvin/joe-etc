@@ -4,6 +4,9 @@ case $- in
       *) return;;
 esac
 
+export PATH=$HOME/opt/bin:$PATH
+export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
+
 # Keep distinct from zsh history so they don't corrupt one another.
 export HISTFILE=~/.bash_history
 
