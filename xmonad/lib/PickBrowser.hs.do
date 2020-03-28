@@ -13,4 +13,8 @@ argument=""
 if ( [ "chromium-browser" = "$preference_base" ] || [ "google-chrome" = "$preference_base" ] ) && [ -f ~/.ssh/proxy.pac ]; then
     argument=" --proxy-pac-url=data:application\/x-javascript-config;base64,$(base64 -w0 \/home\/$LOGNAME\/.ssh\/proxy.pac)"
 fi
-sed -e "s/PREFERRED_BROWSER_SCRIPT_OUTPUT/\"$preference\"/g" -e "s/PREFERRED_BROWSER_SCRIPT_ARGUMENT/\"$argument\"/g" PickBrowser.hs.in > $3
+class="$(echo $preference | sed 's/-//g' | sed 's/browser//g')"
+sed -e "s/PREFERRED_BROWSER_SCRIPT_OUTPUT/\"$preference\"/g" \
+    -e "s/PREFERRED_BROWSER_SCRIPT_ARGUMENT/\"$argument\"/g" \
+    -e "s/PREFERRED_BROWSER_CLASS/\"$class\"/g" \
+    PickBrowser.hs.in > $3
