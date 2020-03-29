@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=User Graphical Login
+Exec=bash -c "systemctl --user import-environment && systemctl --user start user-graphical-login.target"
+Terminal=false
+StartupNotify=false
+Type=Application
+
+Name[en_US]=user-graphical-login

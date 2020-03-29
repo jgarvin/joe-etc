@@ -4,11 +4,17 @@
 ;; (setq color-theme-is-global t)
 ;; (color-theme-initialize)
 (if (string= (system-name) "eruv")
-    (load-file "~/etc/emacs/cyberpunk-theme.el")
+    (progn
+      (load-file "~/etc/emacs/cyberpunk-theme.el")
+      (set-face-attribute 'mode-line nil
+                          :foreground "white"
+                          :background "grey20"))
   (load-theme 'manoj-dark)
   (set-face-attribute 'mode-line nil
                     :foreground (face-attribute 'mode-line-inactive :foreground)
-                    :background (face-attribute 'mode-line-inactive :background)))
+                    :background (face-attribute 'mode-line-inactive :background))
+  )
+
 
 ;; (load-theme)
 

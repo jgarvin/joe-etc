@@ -7,7 +7,9 @@ setopt chasedots
 setup_symlink $HOME/etc/shell/zshrc $HOME/.zshrc
 setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
+setup_symlink $HOME/etc/shell/bash_profile $HOME/.bash_profile
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
+setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 
 # SuSE insists on there being a fonts directory.
 mkdir -p $HOME/.fonts
@@ -52,3 +54,7 @@ if which git &> /dev/null; then
         git config --global color.branch auto
     fi
 fi
+
+cd ~/.config/autostart
+ln -s ~/etc/systemd/user-graphical-login.desktop user-graphical-login.desktop
+cd -

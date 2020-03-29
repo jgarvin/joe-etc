@@ -1,3 +1,4 @@
-module PickBrowser(preferred_browser, preferred_browser_argument) where
+module PickBrowser(preferred_browser_class, preferred_browser, preferred_browser_argument) where
+    preferred_browser_class = PREFERRED_BROWSER_CLASS
     preferred_browser = PREFERRED_BROWSER_SCRIPT_OUTPUT
     preferred_browser_argument = PREFERRED_BROWSER_SCRIPT_ARGUMENT

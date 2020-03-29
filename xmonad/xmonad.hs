@@ -88,7 +88,12 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- launch emacs
     , ((modMask .|. shiftMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))
 
-    , ((modMask .|. shiftMask,  xK_b), raiseNextMaybe (spawn $ preferred_browser ++ " " ++ preferred_browser_argument) (className =? browser_name <||> className =? (capitalizeWord browser_name)))
+    , ((modMask .|. shiftMask,  xK_b), raiseNextMaybe
+                                         (spawn $ preferred_browser ++ " " ++ preferred_browser_argument)
+                                         (className =? browser_name
+                                                       <||> className =? (capitalizeWord browser_name)
+                                                                         <||> className =? preferred_browser_class
+                                                                                           <||> className =? (capitalizeWord preferred_browser_class)))
 
     -- close focused window
     , ((modMask , xK_x     ), kill)
