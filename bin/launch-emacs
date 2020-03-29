@@ -1,21 +1,11 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
-if [ -n "$DISPLAY" ]; then
-    # echo wat >> /tmp/debug
-    arg="-c"
+#export PATH=$HOME/opt/bin:$PATH
+#export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
+
+if [ $# -eq 0 ]; then
+    file=$HOME
 fi
 
-if [ -z "$@" ]; then
-    # emacsclient requires you to run on something, can't just
-    # pop open a window.
-    # echo wat2 >> /tmp/debug
-    arg="$arg $HOME"
-else
-    # echo wat3 >> /tmp/debug
-    arg="$arg $@"
-fi
+emacsclient --alternate-editor="" -c "$@" $file
 
-# By launching emacsclient through an interactive zsh,
-# we know we get the emacsclient from the $PATH we want.
-# echo wat4 >> /tmp/debug
-SKIP_KEYBOARD_SETUP=1 zsh -i -c "emacsclient --alternate-editor=\"\" $arg"
