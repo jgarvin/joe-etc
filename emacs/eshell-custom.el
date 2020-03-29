@@ -25,10 +25,10 @@ execute after every command."
   ;; make sure first folder is in history
   (push (eshell/pwd) eshell-hist-dirs)
   ;; for helm
-  (require 'helm-eshell)
+;;  (require 'helm-eshell)
   (eshell-cmpl-initialize)
-  (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)
-  (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history)
+;;  (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)
+;;  (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history) 
   ;; for me
   (define-key eshell-mode-map (kbd "<home>") #'eshell-bol)
   (define-key eshell-mode-map (kbd "<up>") #'previous-line)

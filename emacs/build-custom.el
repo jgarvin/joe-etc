@@ -216,6 +216,7 @@ Unless, cons cell (KEY . VALUE) is added."
             (realgud-track-mode))
         (goto-char (point-max))
         (font-lock-mode -1)
+        (buffer-disable-undo)
         (setq buffer-read-only t)
         (setq buffer-undo-list t)))))
 
