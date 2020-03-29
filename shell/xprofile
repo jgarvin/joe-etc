@@ -3,9 +3,29 @@
 export PATH=$HOME/opt/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
 
+# gets nice font rendering in xmonad
+# investigate alternative: xsettingsd
+# settings_daemon="/usr/lib/gnome-settings-daemon/gsd-xsettings"
+# if [ -f $settings_daemon ]; then
+#     $settings_daemon &
+#     sleep 1 # don't know if I need this
+# fi
+
+# turn on workman layout if possible, comes with ubuntu nowadays
+#setxkbmap -v us workman -option caps:ctrl_modifier
+# then try to turn on the programer layout
+# first need to run:
+# sudo bash ~/etc/shell/shell/setup_workman_x11.sh
+#setxkbmap -v workman-p -option caps:ctrl_modifier
+
+# autostart activate workman takes care of this instead...
 # this is needed for xdotool to respect your keyboard layout for some reason!
 # https://github.com/jordansissel/xdotool/issues/211
-layout=$(setxkbmap -query | grep layout | cut -d':' -f 2 | sed 's/ //g')
-variant=$(setxkbmap -query | grep variant | cut -d':' -f 2 | sed 's/ //g')
-setxkbmap -synch -v "$layout" "$variant"
+#layout=$(setxkbmap -query | grep layout | cut -d':' -f 2 | sed 's/ //g')
+#variant=$(setxkbmap -query | grep variant | cut -d':' -f 2 | sed 's/ //g')
+#setxkbmap -synch -v "$layout" "$variant"
+
+# lets us use DISPLAY inside systemd user services
+systemctl --user import-environment
+systemctl --user start user-graphical-login.target &
 
