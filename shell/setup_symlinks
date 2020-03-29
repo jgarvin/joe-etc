@@ -20,9 +20,9 @@ setup_symlink $HOME/etc/emacs/emacsrc.el $HOME/.emacs
 setup_symlink $HOME/etc/xmonad $HOME/.xmonad
 setup_symlink $HOME/etc/Xdefaults $HOME/.Xdefaults
 
-#if [ -d $HOME/.config/autostart ]; then
-#    mv $HOME/.config/autostart $HOME/.config/autostart.old
-#fi
+if [ -d $HOME/.config/autostart ]; then
+    mv $HOME/.config/autostart $HOME/.config/autostart.old
+fi
 ln -sf $HOME/etc/autostart/ $HOME/.config/
 
 mkdir -p $HOME/.config/systemd
