@@ -9,6 +9,7 @@ setup_symlink $HOME/etc/shell/kshrc $HOME/.kshrc
 setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
 setup_symlink $HOME/etc/shell/bash_profile $HOME/.bash_profile
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
+setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 
 # SuSE insists on there being a fonts directory.
 mkdir -p $HOME/.fonts

@@ -1,0 +1,6 @@
+#!/bin/bash
+# this is needed for xdotool to respect your keyboard layout for some reason!
+# https://github.com/jordansissel/xdotool/issues/211
+layout=$(setxkbmap -query | grep layout | cut -d':' -f 2 | sed 's/ //g')
+variant=$(setxkbmap -query | grep variant | cut -d':' -f 2 | sed 's/ //g')
+setxkbmap -synch -v "$layout" "$variant"
