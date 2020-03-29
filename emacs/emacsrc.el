@@ -128,6 +128,18 @@
 ;; (advice-remove 'smart-hungry-delete-backward-char #'etc-disable-smart-hungry-backward)
 ;; (advice-remove 'smart-hungry-delete-forward-char #'etc-disable-smart-hungry-forward)
 
+(when (not window-system)
+;;  (load-file "~/etc/emacs/xterm-frobs.el")
+;;  (require 'xterm-frobs)
+;;  (defun my-xterm-title-hook ()
+;;        (xterm-set-window-title (buffer-name)))
+;;  (add-hook 'post-command-hook  'my-xterm-title-hook)
+  ;;(load-file "~/etc/emacs/xterm-title.el")
+;;  (require 'xterm-title)
+;;  (xterm-title-mode 1)
+  ;; allow using the mouse in terminal mode
+  (xterm-mouse-mode))
+
 (defun etc-ignore-bug (orig-fun &rest args)
   (condition-case e
       (apply orig-fun args)
