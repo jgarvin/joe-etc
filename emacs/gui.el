@@ -10,13 +10,14 @@
                     :foreground (face-attribute 'mode-line-inactive :foreground)
                     :background (face-attribute 'mode-line-inactive :background)))
 
+;; (load-theme)
 
 ;; starting up in daemon mode without frames will
 ;; crash if we try to set this... maybe set on
 ;; creation of first frame?
 
 (defvar etc-font-choice nil)
-(setq etc-font-choice "DejaVu Sans Mono-7")
+(setq etc-font-choice "DejaVu Sans Mono-12")
 
 (require 'faces)
 (require 'frame)
@@ -59,3 +60,16 @@
 ;; Highlight current line subtly, makes it easier to find cursor
 (global-hl-line-mode)
 (set-face-background hl-line-face "grey13")
+
+
+;; https://stackoverflow.com/a/49861904/50385
+(setq split-width-threshold nil)
+(setq split-height-threshold (- (window-width) 10))
+(defun count-visible-buffers (&optional frame)
+  "Count how many buffers are currently being shown. Defaults to selected frame."
+  (length (mapcar #'window-buffer (window-list frame))))
+(defun do-not-split-more-than-two-windows (window &optional horizontal)
+  (if (and horizontal (> (count-visible-buffers) 1))
+      nil
+    t))
+(advice-add 'window-splittable-p :before-while #'do-not-split-more-than-two-windows)

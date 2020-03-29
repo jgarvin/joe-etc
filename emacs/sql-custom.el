@@ -32,7 +32,9 @@
 
 (defun etc-delete-trailing-whitespace-bug-workaround (orig-fun &rest args)
   "Freezes when run in sql-interactive-mode!"
-  (unless (derived-mode-p 'sql-interactive-mode 'shell-mode)
+  (unless (derived-mode-p 'sql-interactive-mode 'shell-mode
+                          'eshell-mode # also eshell strangely....
+                          )
     (apply orig-fun args)))
 
 (advice-add 'delete-trailing-whitespace :around #'etc-delete-trailing-whitespace-bug-workaround)

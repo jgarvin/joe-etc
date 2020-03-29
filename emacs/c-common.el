@@ -76,10 +76,10 @@
   (abbrev-mode 0)
 
   (subword-mode 1)
-  (require 'whitespace)
-  (setq whitespace-style '(face lines))
-  (setq whitespace-line-column 300)
-  (whitespace-mode t)
+  ;; (require 'whitespace)
+  ;; (setq whitespace-style '(face lines))
+  ;; (setq whitespace-line-column 300)
+  ;; (whitespace-mode t)
   
   ;;(setq require-final-newline t)
 

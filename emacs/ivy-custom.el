@@ -41,6 +41,11 @@
 (global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-S-y") 'counsel-yank-pop)
 
+(defun etc-set-eshell-keys ()
+  (define-key eshell-mode-map (kbd "M-r") #'counsel-esh-history))
+
+(add-hook 'eshell-mode-hook #'etc-set-eshell-keys)
+
 (setq counsel-ag-base-command
       ;;"pt -e --nocolor --nogroup %s"
       "ag --nocolor --nogroup %s" ;; works better, counsel-ag support for pt has issues
