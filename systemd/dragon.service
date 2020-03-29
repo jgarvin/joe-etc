@@ -2,7 +2,7 @@
 Description=DragonVm
 
 [Service]
-ExecStart=/usr/bin/VirtualBox --startvm "Dragon Resized"
+ExecStart=/usr/bin/VBoxSDL --startvm "Dragon Resized"
 Restart=always
 RestartSec=1
 # restart once every twenty four hours

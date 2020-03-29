@@ -54,3 +54,7 @@ if which git &> /dev/null; then
         git config --global color.branch auto
     fi
 fi
+
+cd ~/.config/autostart
+ln -s ~/etc/systemd/user-graphical-login.desktop user-graphical-login.desktop
+cd -
