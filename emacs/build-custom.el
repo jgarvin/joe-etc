@@ -2,8 +2,6 @@
 
 ;; very useful for defining quick menus
 ;; for builds and such
-(add-to-list 'load-path "~/etc/popup-keys")
-(require 'popup-keys)
 (require 'dash)
 (require 'realgud)
 
@@ -97,23 +95,9 @@
     (if scripts
         (progn
           (setq scripts (cl-sort scripts #'string< :key))
-          (dotimes (ii  (length scripts))
-            (let ((script (file-truename (nth ii scripts)))
-                  (letter (downcase (char-to-string (nth ii md-glyphs)))))
-              (when (not (equal letter "q")) ;; used for quitting
-                    (push (list letter
-                                (file-name-sans-extension
-                                 (file-name-sans-extension
-                                  (file-name-nondirectory script)))
-                                (lambda ()
-                                  (with-current-buffer original-buffer
-                                    (etc-set-build-cmd type script)))) actions))))
-          (setq actions (cl-sort actions #'string< :key (lambda (x) (cadr x))))
-          (popup-keys:new
-           cmd
-           :buf-name (format "*choose %s menu*" (if (eq type 'build) "build" "run"))
-           :actions actions)
-          (funcall cmd))
+          (let ((chosen-script (completing-read "Choose script:" scripts)))
+            (message "Chosen: %s" chosen-script)
+            (etc-set-build-cmd type (file-truename chosen-script))))
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
 
 (defun etc-build-cmd (type)
