@@ -130,6 +130,7 @@
    ("range" "range($1)")
    ("I D" "id($1)")
    ("list" "list($1)")
+   ("set" "set($1)")
    ("nonlocal" "nonlocal $1")
    ("integer" "int($1)")
    ("float" "float($1)")
