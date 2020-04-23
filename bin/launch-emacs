@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# so that emacs has access to what I expect... should group these into something common to source
-export PATH=$HOME/opt/bin:$PATH
-export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
+source $HOME/etc/shell/path_setup
 
 if [ $# -eq 0 ]; then
     file=$HOME
