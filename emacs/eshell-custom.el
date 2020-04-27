@@ -108,7 +108,7 @@ same folder. If given prefix argument always make a new shell."
             (switch-to-buffer (car existing))))
       (eshell (generate-new-buffer-name "eshell-")))))
 
-(global-set-key (kbd "C-z") #'etc-open-eshell)
+(global-set-key (kbd "C-c z") #'etc-open-eshell)
 
 ;; Thanks to 'Ben'
 ;; http://stackoverflow.com/a/28160819/50385
