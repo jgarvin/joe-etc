@@ -98,6 +98,12 @@
   :ensure t
   )
 
+;; example: /ssh:slurm-training|docker:root@docker-scale-out_login_1:/home/fred/ssh:slurm-training|docker:fred@docker-scale-out_login_1:/home/fred
+(use-package
+  docker-tramp
+  :ensure t
+  )
+
 ;;(use-package
 ;;  protobuf-mode
 ;;  :ensure t
