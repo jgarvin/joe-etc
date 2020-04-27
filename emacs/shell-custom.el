@@ -87,7 +87,7 @@ same folder. If given prefix argument always make a new shell."
       (shell (generate-new-buffer-name "$shell")))))
 
 ;; switched to eshell
-;;(global-set-key (kbd "C-z") #'etc-open-shell)
+(global-set-key (kbd "C-z") #'etc-open-shell)
 
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 

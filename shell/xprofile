@@ -28,4 +28,7 @@ source $HOME/etc/shell/path_setup
 systemctl --user import-environment
 systemctl --user start user-graphical-login.target &
 
+# otherwise qt apps look tiny
+export QT_SCALE_FACTOR=1.5
+
 xrdb ~/.Xresources

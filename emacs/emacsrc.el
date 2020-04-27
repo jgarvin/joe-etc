@@ -98,6 +98,12 @@
   :ensure t
   )
 
+;; example: /ssh:slurm-training|docker:root@docker-scale-out_login_1:/home/fred/ssh:slurm-training|docker:fred@docker-scale-out_login_1:/home/fred
+(use-package
+  docker-tramp
+  :ensure t
+  )
+
 ;;(use-package
 ;;  protobuf-mode
 ;;  :ensure t
@@ -174,8 +180,7 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   (quote
-    (ein lsp-mode counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks)))
+   '(docker-tramp ein lsp-mode counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
