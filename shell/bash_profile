@@ -1,5 +1,5 @@
 #source ~/etc/shell/bashrc
 
-export PATH=$HOME/opt/bin:$PATH
-export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
+source $HOME/etc/shell/path_setup
+
 
