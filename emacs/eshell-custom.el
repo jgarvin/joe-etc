@@ -106,7 +106,7 @@ same folder. If given prefix argument always make a new shell."
               (progn
                 (switch-to-buffer (nth (% (1+ pos) (length existing)) existing)))
             (switch-to-buffer (car existing))))
-      (eshell (generate-new-buffer-name "eshell-")))))
+      (eshell (generate-new-buffer-name "*eshell*")))))
 
 (global-set-key (kbd "C-c z") #'etc-open-eshell)
 

@@ -36,10 +36,10 @@
   ;; make it so I can hit enter on error messages from gcc
   ;; to open the file at that location
   ;;(compilation-shell-minor-mode 1)
-  (shell-dirtrack-mode -1)
-  (dirtrack-mode 1)
+;;  (shell-dirtrack-mode -1)
+;;  (dirtrack-mode 1)
   ;;(setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
-  (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
+;;  (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
   ;; (ansi-color-for-comint-mode-on)
   )
 
@@ -84,7 +84,7 @@ same folder. If given prefix argument always make a new shell."
           (if pos
               (switch-to-buffer (nth (% (1+ pos) (length existing)) existing))
             (switch-to-buffer (car existing))))
-      (shell (generate-new-buffer-name "$shell")))))
+      (shell (generate-new-buffer-name "*shell*")))))
 
 ;; switched to eshell
 (global-set-key (kbd "C-z") #'etc-open-shell)
