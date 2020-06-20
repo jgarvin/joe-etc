@@ -93,7 +93,7 @@
     (if scripts
         (progn
           (setq scripts (cl-sort scripts #'string< :key))
-          (let ((chosen-script (completing-read "Choose script:" scripts)))
+          (let ((chosen-script (completing-read "Choose script: " scripts)))
             (message "Chosen: %s" chosen-script)
             (etc-set-build-cmd type (file-truename chosen-script))))
       (user-error "No %s scripts found!" (if (eq type 'build) "build" "run")))))
