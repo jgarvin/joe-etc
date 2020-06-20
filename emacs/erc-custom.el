@@ -8,6 +8,10 @@
 
 (add-to-list 'erc-nickserv-alist (list 'mozilla "NickServ!services@ircservices.mozilla.org" "This\\s-nickname\\s-is\\s-registered\\s-and\\s-protected" "NickServ" "IDENTIFY" nil nil "Password\\s-accepted"))
 
+;; try to prevent disconnects?
+(setq erc-server-send-ping-timeout 240)
+(setq erc-server-send-ping-interval 15)
+
 ;; without this will autojoin channels before identifying
 (setq erc-autojoin-timing 'ident)
 
@@ -59,9 +63,8 @@
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
       '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
-         "#perl6" "#racket")
-        ("oftc.net" "#perf")
-        ("mozilla.org" "#rust")))
+         "#perl6" "#racket" "##rust")
+        ("oftc.net" "#perf")))
 
 ;; don't automatically switch to joined channels, that's just annoying
 (setq erc-join-buffer 'bury)
@@ -71,8 +74,7 @@
   (interactive)
   (when t ;; (y-or-n-p "IRC? ")
     (erc-tls :server "irc.freenode.net" :port 6697 :nick freenode-nick)
-    (erc-tls :server "irc.oftc.net" :port 6697 :nick freenode-nick)
-    (erc-tls :server "irc.mozilla.org" :port 6697 :nick freenode-nick)))
+    (erc-tls :server "irc.oftc.net" :port 6697 :nick freenode-nick)))
 
 (defun filter-server-buffers ()
   (delq nil
@@ -85,8 +87,13 @@
   (interactive)
   (dolist (buffer (filter-server-buffers))
     (message "Server buffer: %s" (buffer-name buffer))
+    (when (get-buffer-process buffer)
+      (with-current-buffer buffer
+        (erc-quit-server "Asta la vista"))))
+  (dolist (buffer (buffer-list))
     (with-current-buffer buffer
-      (erc-quit-server "Asta la vista"))))
+      (when (derived-mode-p 'erc-mode)
+        (kill-buffer buffer)))))
 
 ;; automagic ghosting, assume my nick, and assume I do want to ghost
 (defun erc-ghost-maybe (server nick)

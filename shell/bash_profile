@@ -1,5 +1,4 @@
-#source ~/etc/shell/bashrc
+source /etc/profile
 
 source $HOME/etc/shell/path_setup
-
 

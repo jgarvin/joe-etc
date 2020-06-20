@@ -78,7 +78,7 @@
       (save-excursion
         (goto-char (overlay-start o))
   ;; overlay because old overlays can get left in the
-        (delete-char 1)))
+        (delete-forward-char 1)))
     (md-sn-destroy-overlay o)))
 
 (defun md-sn-destroyed-invalid-overlays ()

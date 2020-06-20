@@ -180,7 +180,7 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   '(docker-tramp ein lsp-mode counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck flycheck-inline rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(docker-tramp ein lsp-mode counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1164,7 +1164,7 @@
 
 (ad-activate 'auto-revert-buffers)
 
-;;; It is the opposite of fill-paragraph    
+;;; It is the opposite of fill-paragraph
 (defun unfill-paragraph ()
   "Takes a multi-line paragraph and makes it into a single line of text."
   (interactive)
@@ -1172,4 +1172,6 @@
     (fill-paragraph nil)))
 
  ;; Handy key definition
- (define-key global-map "\M-Q" 'unfill-paragraph)
+(define-key global-map "\M-Q" 'unfill-paragraph)
+
+(global-set-key (kbd "C-c .") #'completion-at-point)

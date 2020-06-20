@@ -50,16 +50,17 @@
 
 
 ;; https://stackoverflow.com/a/49861904/50385
-(setq split-width-threshold nil)
-(setq split-height-threshold (- (window-width) 10))
-(defun count-visible-buffers (&optional frame)
-  "Count how many buffers are currently being shown. Defaults to selected frame."
-  (length (mapcar #'window-buffer (window-list frame))))
-(defun do-not-split-more-than-two-windows (window &optional horizontal)
-  (if (and horizontal (> (count-visible-buffers) 1))
-      nil
-    t))
-(advice-add 'window-splittable-p :before-while #'do-not-split-more-than-two-windows)
+;;(setq split-width-threshold nil)
+;;(setq split-height-threshold (- (window-width) 10))
+(setq split-height-threshold 80)
+;; (defun count-visible-buffers (&optional frame)
+;;   "Count how many buffers are currently being shown. Defaults to selected frame."
+;;   (length (mapcar #'window-buffer (window-list frame))))
+;; (defun do-not-split-more-than-two-windows (window &optional horizontal)
+;;   (if (and horizontal (> (count-visible-buffers) 1))
+;;       nil
+;;     t))
+;; (advice-add 'window-splittable-p :before-while #'do-not-split-more-than-two-windows)
 
 
 ;; better to do stuff that changes frame size in ~/.Xresources

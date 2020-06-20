@@ -21,12 +21,13 @@
 ;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 ;; display compile errors under the code where they happen
-(use-package
-  flycheck-inline
-  :ensure t)
+;; comment out for now because it has trouble with mandimus snippets
+;;(use-package
+;;  flycheck-inline
+;;  :ensure t)
 
-(with-eval-after-load 'flycheck
-  (add-hook 'flycheck-mode-hook #'flycheck-inline-mode))
+;; (with-eval-after-load 'flycheck
+;;   (add-hook 'flycheck-mode-hook #'flycheck-inline-mode))
 
 ;;(remove-hook 'flycheck-mode-hook #'flycheck-inline-mode)
 
@@ -42,6 +43,8 @@
 (use-package
   lsp-mode
   :ensure t)
+
+(setq lsp-rust-server 'rust-analyzer)
 
 ;; (use-package
 ;;   lsp-ui
@@ -72,3 +75,14 @@
 ;; hack to workaround https://github.com/flycheck/flycheck-inline/issues/7
 (defun flycheck-relevant-error-other-file-p (x)
   nil)
+
+;; otherwise sub crates inside workspaces count as distinct projects
+(setq projectile-project-root-files (delete "Cargo.toml" projectile-project-root-files))
+
+(define-key rust-mode-map (kbd "C-c e") #'lsp-rust-analyzer-expand-macro)
+
+(setq rust-format-on-save nil)
+
+;; disable error underlining because it is always broken
+(setq-default lsp-diagnostic-package nil)
+(setq lsp-diagnostic-package nil)

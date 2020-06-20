@@ -1,6 +1,8 @@
 (md-make-snippets
  '(derived-mode-p 'rust-mode)
  '(
+   ("assert" "assert!($1)")
+   ("assert equal" "assert_eq!($1, $2)")
    ("module" "mod $1 {\n    $2\n}")
    ("function" "fn $1($2) -> $3 {\n    $4\n}")
    ("main" "fn main() {\n    $1\n}")
@@ -28,5 +30,12 @@
    ("derive" "#[derive($1)]")
    ("use" "use $1::$2;")
    ("format" "format!($1)")
-   ("match" "match $1 {\n    $2 => $3;\n    _ => $4;\n}")
+   ("match" "match $1 {\n    $2 => $3,\n    _ => $4\n}")
+   ("unwrap" "$1.unwrap()")
+   ("self" "self.$1")
+   ("clone" "$1.clone()")
+   ("debug" "dbg!($1)")
+   ("equals" "$1 == $2")
+   ("not equal" "$1 != $2")
+   ("trace" "dbg!();")
 ))
