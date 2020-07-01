@@ -30,14 +30,21 @@
 ;; (let ((s "[jgarvin@jgarvin:<~/etc/emacs>]$"))
 ;;   (string-match shell-prompt-pattern s))
 
+;; (progn
+;;   (string-match "^[A-Za-z0-9]+?@[A-Za-z0-9]+?:\\([-/~A-Za-z0-9]+\\)\\$"
+;;                 "user@host:~/miniquad/target/wasm32-unknown-unknown/release$")
+;;   (match-string 1 "user@host:~/miniquad/target/wasm32-unknown-unknown/release$")
+;;   )
+
 (defun etc-shell-mode-hook ()
   ;; (rename-buffer (generate-new-buffer-name (etc-shell-name)))
   ;;(rename-uniquely)
   ;; make it so I can hit enter on error messages from gcc
   ;; to open the file at that location
   ;;(compilation-shell-minor-mode 1)
-;;  (shell-dirtrack-mode -1)
-;;  (dirtrack-mode 1)
+  (shell-dirtrack-mode 0)
+  (setq dirtrack-list '("^[-_A-Za-z0-9]+?@[-_A-Za-z0-9]+?:\\([-_/~A-Za-z0-9]+\\)\\$" 1))
+  (dirtrack-mode 1)
   ;;(setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
 ;;  (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
   ;; (ansi-color-for-comint-mode-on)
@@ -78,7 +85,7 @@ same folder. If given prefix argument always make a new shell."
                          (lambda (x y)
                            (string< (buffer-name x)
                                     (buffer-name y))))))
-    (message "%S" existing)  
+    (message "%S" existing)
     (if (and existing (not arg))
         (let ((pos (position (current-buffer) existing)))
           (if pos

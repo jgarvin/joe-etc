@@ -130,6 +130,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
       (push ?\, l)
       (push ?: l))
     (when (derived-mode-p 'c++-mode 'c-mode 'rust-mode)
+      (push ?' l)
       (push ?: l)
       (push ?< l)
       (push ?> l)

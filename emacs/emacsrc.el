@@ -180,7 +180,7 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   '(docker-tramp ein lsp-mode counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -544,6 +544,8 @@
   (save-excursion
     (set-buffer buffer-or-string)
     major-mode))
+
+(setq compilation-window-height 16)
 
 ;; When compiling, make the compile window go away when finished if there are no errors
 ;; (setq compilation-finish-function

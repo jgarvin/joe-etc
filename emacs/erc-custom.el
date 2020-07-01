@@ -33,7 +33,9 @@
 (defun etc-erc-mode-hook ()
   (set (make-local-variable 'scroll-step) 1)
   (set (make-local-variable 'scroll-conservatively) 1)
-  (set (make-local-variable 'scroll-margin) 0))
+  (set (make-local-variable 'scroll-margin) 0)
+  (visual-line-mode 0) ;; erc does its own wrapping, gets confused
+  )
 
 (add-hook 'erc-mode-hook #'etc-erc-mode-hook)
 
