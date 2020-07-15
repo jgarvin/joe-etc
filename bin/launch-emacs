@@ -7,6 +7,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # always be up to date on resource settings, need for remote emacs
-xrdb ~/.Xresources
+xrdb -merge ~/.Xresources
+xrdb -merge ~/.Xdefaults
 emacsclient --alternate-editor="" -c "$@" $file
 
