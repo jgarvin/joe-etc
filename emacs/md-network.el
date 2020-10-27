@@ -35,7 +35,15 @@
  (setq ring-bell-function #'ignore)
 
 (defun md-execute-pending ()
-  (unless md-executing-actions-p
+  (unless (or md-executing-actions-p
+              ;; try to make sure all pending keystrokes are drained
+              ;; before executing commands. the hope is this will make
+              ;; things less racey when emacs is a remote X11 window,
+              ;; racing between keyboard events from X11 and commands
+              ;; from the mandimus socket.
+              ;; Makes everything hang and timeout terribly.
+;;              (input-pending-p) 
+              )
     (let ((md-executing-actions-p t))
       (unwind-protect
           (while md-server-pending-actions

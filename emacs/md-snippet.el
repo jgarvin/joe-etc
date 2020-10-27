@@ -443,7 +443,7 @@ go to the highest slot (most recent)."
    ("lack" "[$1]")
    ("lace" "{$1}")
    ("quote" "\"$1\"")
-   ("soot" "'$1'")))
+   ("sing" "'$1'")))
 
 (md-make-snippets
  '(derived-mode-p 'emacs-lisp-mode 'eshell-mode)
@@ -451,7 +451,10 @@ go to the highest slot (most recent)."
    ("defun" "(defun $1 ($2) $3)")
    ("comment" ";; $1")
    ("if" "(if $1\n    $2\n  $3)")
-   ("todo" ";; TODO: $1")))
+   ("todo" ";; TODO: $1")
+   ("def var" "(defvar $1 $2)")
+   ("def var local" "(defvar-local $1 $2)")
+   ))
 
 (md-replace-snippet
  :name "let"

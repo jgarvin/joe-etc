@@ -110,10 +110,10 @@ If the string preceeding pos isn't part of any pair, then returns nil."
        ((md-likely-followed-by-closer (point)) t)))))
 
 (defun md-space-inhibiting-before-chars ()
-  (let ((l (if (derived-mode-p 'prog-mode 'comint-mode)
+  (let ((l (if (derived-mode-p 'prog-mode 'comint-mode 'toml-mode)
                (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?! ?\# ?\$ )
              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?\# ?\$))))
-    (when (derived-mode-p 'prog-mode)
+    (when (derived-mode-p 'prog-mode 'toml-mode)
       (push ?0 l)
       (push ?1 l)
       (push ?2 l)
@@ -151,7 +151,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
 ;; so in C++ mode can inhibit after ->
 (defun md-space-inhibiting-after-chars ()
   (let ((l (list ?  ?\n ?\t ?_ ?\] ?\) ?\} ?\/ ?\\ ?- ?. ?? ?! ?\, ?: ?\")))
-    (when (derived-mode-p 'prog-mode)
+    (when (derived-mode-p 'prog-mode 'toml-mode)
       (push ?0 l)
       (push ?1 l)
       (push ?2 l)

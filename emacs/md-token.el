@@ -23,7 +23,7 @@
 (defvar-local md-enable-symbol-refresh t)
 (defvar md-inhibit-refresh-symbol-hooks nil)
 
-(defconst md-max-global-cache-size 400)
+(defconst md-max-global-cache-size 4000)
 (defvar md-global-word-cache nil)
 (defvar md-global-symbol-cache nil)
 (defvar md-global-refresh-timer nil)

@@ -14,6 +14,7 @@
 (defvar-local etc-run-finished-status nil)
 (defvar etc-most-recent-build-buffer nil) ;; maps project name to stack of build jobs
 (defvar etc-most-recent-run-buffer nil) ;; maps project name to stack of run jobs
+(defvar-local etc-interrupted-once nil)
 
 (defun etc-stop-most-recent-impl (type)
   "Stop the most recent one or build associated with this project, keeping a stack."
@@ -191,6 +192,7 @@ Unless, cons cell (KEY . VALUE) is added."
     (if existing-window
         (set-window-buffer existing-window buff-real-name))
     (with-current-buffer buff-real-name
+      (setq etc-interrupted-once nil)
       (etc-push-recent-buffer 'run (current-buffer))
       (local-set-key (kbd "C-c C-k") #'etc-interrupt-subjob)
       ;; didn't work
@@ -290,12 +292,17 @@ Unless, cons cell (KEY . VALUE) is added."
       (find-file script)
     (user-error "No run script found!")))
 
+
+
 (defun etc-interrupt-subjob ()
   (interactive)
   (let ((inhibit-read-only t))
-    (comint-interrupt-subjob) ;; not strong enough sometimes
+    (if etc-interrupted-once
+        (comint-kill-subjob)
+      (comint-interrupt-subjob)
+      (setq etc-interrupted-once t)) ;; not strong enough sometimes
     ;; TODO: resort to killing on a timer
-    ;; (comint-kill-subjob)
+    ;; 
     ))
 
 (global-set-key (kbd "C-c b") #'etc-compile)

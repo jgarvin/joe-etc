@@ -155,15 +155,15 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
           broadcastMessage ReleaseResources >> restart "xmonad" True)
 
     -- -- Move screens
-    , ((modMask               , xK_space ), prevScreen)
-    , ((modMask .|. shiftMask , xK_space ), shiftPrevScreen >> prevScreen)
-    , ((modMask               , xK_BackSpace     ), nextScreen)
-    , ((modMask .|. shiftMask , xK_BackSpace     ), shiftNextScreen >> nextScreen)
+--    , ((modMask               , xK_space ), prevScreen)
+--    , ((modMask .|. shiftMask , xK_space ), shiftPrevScreen >> prevScreen)
+--    , ((modMask               , xK_BackSpace     ), nextScreen)
+--    , ((modMask .|. shiftMask , xK_BackSpace     ), shiftNextScreen >> nextScreen)
     -- Move screens
-    -- , ((modMask               , xK_space ), prevScreen)
-    -- , ((modMask .|. shiftMask , xK_space ), shiftPrevScreen >> prevScreen)
-    -- , ((modMask               , xK_BackSpace     ), nextScreen)
-    -- , ((modMask .|. shiftMask , xK_BackSpace     ), shiftNextScreen >> nextScreen)
+    , ((modMask               , xK_BackSpace ), prevScreen)
+    , ((modMask .|. shiftMask , xK_BackSpace ), shiftPrevScreen >> prevScreen)
+    , ((modMask               , xK_space     ), nextScreen)
+    , ((modMask .|. shiftMask , xK_space     ), shiftNextScreen >> nextScreen)
     ]
     ++
 
@@ -225,10 +225,12 @@ myManageHook = composeAll
     , resource  =? "kdesktop"       --> doIgnore
     , className =? "stalonetray"    --> doIgnore
     , className =? "Do"             --> doIgnore
+    , className =? "game"             --> doFullFloat
     , className =? "sun-awt-X11-XFramePeer" --> doIgnore
     , className =? "com-sun-javaws-Main" --> doIgnore
 --    , className =? "Steam"            --> doIgnore
     , className =? "Steam"            --> doFloat
+    , appName =? "AGame"            --> doFloat
     , className =? "steam"            --> doFullFloat -- big picture mode
     , className =? "gnome-panel"                        --> doFloat
     , (stringProperty "WM_NAME")   =? "VLC"             --> doFullFloat
@@ -292,8 +294,11 @@ defaults editor home_folder browser_name = gnomeConfig {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
+        --manageHook         = myManageHook,
+        manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
         layoutHook         = MultiToggle.mkToggle (MultiToggle.single REFLECTX)
                              $ MultiToggle.mkToggle (MultiToggle.single REFLECTY)
+                               $ smartBorders
                              $ layoutHook gnomeConfig
         -- layoutHook         = smartBorders
         --                      $ MultiToggle.mkToggle (MultiToggle.single REFLECTX)
@@ -303,7 +308,5 @@ defaults editor home_folder browser_name = gnomeConfig {
         --                      $ simpleDeco shrinkText myTheme
         --                      $ layoutHook gnomeConfig,
         -- handleEventHook    = handleEventHook gnomeConfig `mappend` followEventHook,
-        -- -- manageHook         = myManageHook <+> manageDocks <+> manageHook gnomeConfig,
-        -- manageHook         = manageDocks <+> manageHook gnomeConfig <+> myManageHook,
         -- logHook            = ewmhDesktopsLogHook  >> updatePointer (0.5, 0.5) (0, 0)
     }

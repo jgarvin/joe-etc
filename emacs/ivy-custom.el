@@ -37,6 +37,41 @@
 
 (setq projectile-completion-system 'ivy)
 
+;; https://github.com/abo-abo/swiper/issues/2611#issuecomment-675424466
+;; doesn't look quite usable out-of-the-box, need to just override down binding
+;; (defvar swiper-isearch-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (set-keymap-parent map swiper-map)
+;;     (define-key map (kbd "M-n") 'swiper-isearch-thing-at-point)
+;;     (define-key map (kbd "<down>") 'swiper-isearch-next-line)
+;;     map)
+;;   "Keymap for `swiper-isearch'.")
+
+
+(defun swiper-isearch-next-line ()
+  (interactive)
+  (let ((shift 1))
+    (with-ivy-window
+      (let ((ln (line-number-at-pos (ivy-state-current ivy-last))))
+        (while (and (< (+ ivy--index shift) ivy--length)
+                    (= ln (line-number-at-pos (nth (+ ivy--index shift) ivy--all-candidates))))
+          (cl-incf shift))))
+    (ivy-next-line shift)))
+
+(defun swiper-isearch-previous-line ()
+  (interactive)
+  (let ((shift 1))
+    (with-ivy-window
+      (let ((ln (line-number-at-pos (ivy-state-current ivy-last))))
+        (while (and (< (+ ivy--index shift) ivy--length)
+                    (= ln (line-number-at-pos (nth (+ ivy--index shift) ivy--all-candidates))))
+          (cl-incf shift))))
+    (ivy-previous-line shift)))
+
+(define-key swiper-isearch-map (kbd "M-n") 'swiper-isearch-thing-at-point)
+(define-key swiper-isearch-map (kbd "<down>") #'swiper-isearch-next-line)
+(define-key swiper-isearch-map (kbd "<up>") #'swiper-isearch-previous-line)
+
 (global-set-key (kbd "C-r") 'swiper-isearch-backward)
 (global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-S-y") 'counsel-yank-pop)
@@ -85,6 +120,12 @@
   ;;(define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
   ;;(define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)
   )
+
+;; This makes it possible to press up when you are on the top choice
+;; and select what you have typed into the prompt instead of any of
+;; the options. You need this to be able to make new files with names
+;; that are substrings of names of existing files.
+(setq ivy-use-selectable-prompt t)
 
 ;; without this color codes show up in gtags
 (setq grep-command "grep --color=never")
