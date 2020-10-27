@@ -86,6 +86,12 @@
   ;;(define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)
   )
 
+;; This makes it possible to press up when you are on the top choice
+;; and select what you have typed into the prompt instead of any of
+;; the options. You need this to be able to make new files with names
+;; that are substrings of names of existing files.
+(setq ivy-use-selectable-prompt t)
+
 ;; without this color codes show up in gtags
 (setq grep-command "grep --color=never")
 ;;(setq grep-find-command "grep --color=never")
