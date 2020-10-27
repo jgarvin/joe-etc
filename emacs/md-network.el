@@ -41,7 +41,8 @@
               ;; things less racey when emacs is a remote X11 window,
               ;; racing between keyboard events from X11 and commands
               ;; from the mandimus socket.
-              (input-pending-p) 
+              ;; Makes everything hang and timeout terribly.
+;;              (input-pending-p) 
               )
     (let ((md-executing-actions-p t))
       (unwind-protect
