@@ -30,6 +30,11 @@
   :ensure t
   )
 
+(use-package
+  smart-parens
+  :ensure t
+  )
+
 ;; (use-package
 ;;   perl6-mode
 ;;   :ensure t)
@@ -161,7 +166,7 @@
 (advice-add 'c-forward-decl-or-cast-1 :around #'etc-ignore-bug)
 
 
-(load-file "~/etc/emacs/smartparens-custom.el")
+;;(load-file "~/etc/emacs/smartparens-custom.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
