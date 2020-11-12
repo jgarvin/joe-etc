@@ -4,10 +4,9 @@
 (defun magit-push-to-gerrit ()
   (interactive)
   (magit-git-command-topdir "git push origin HEAD:refs/for/master"))
-(magit-define-popup-action 'magit-push-popup
-  ?h
-  "Push to gerrit"
-  'magit-push-to-gerrit)
+
+(transient-append-suffix 'magit-push "p"
+  '("m" "Push to gerrit" magit-push-to-gerrit))
 
 (defun etc-show-origin-master ()
   (interactive)
