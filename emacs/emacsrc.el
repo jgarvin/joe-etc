@@ -1182,3 +1182,6 @@
 (define-key global-map "\M-Q" 'unfill-paragraph)
 
 (global-set-key (kbd "C-c .") #'completion-at-point)
+
+;;(load-file "~/etc/emacs/frame-cmds.el")
+;;(load-file "~/etc/emacs/zoom-frm.el")
