@@ -185,7 +185,7 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   '(counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(visible-mark counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1185,3 +1185,6 @@
 
 ;;(load-file "~/etc/emacs/frame-cmds.el")
 ;;(load-file "~/etc/emacs/zoom-frm.el")
+
+;; w/o this remote X emacs is VERY slow while mark is active, every keystroke sends all the text into the clipboard!
+(setq select-active-regions nil)
