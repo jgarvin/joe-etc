@@ -119,10 +119,11 @@
      ((string-match "[^\t\n\r\f -~]" sym) t)
      ((let ((non-ws-char-count
              (md-how-many-str "[^\\\n[:space:]]" sym
-                              (+ 1 md-min-symbol-length))))
+                              (+ 1 md-max-symbol-length))))
         (or (< non-ws-char-count md-min-symbol-length)
             (and (not dont-check-max) (> non-ws-char-count md-max-symbol-length)))) t)
      ((> (length sym) md-max-symbol-length) t)
+     ((>= (md-how-many-str "/" sym md-max-symbol-length) 2) t) ;; filter file paths out
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
@@ -132,6 +133,7 @@
            (md-string-contains-faces sym-start sym-end md-symbol-filter-faces)) t)
      (t nil))))
 (byte-compile 'md-filter-symbol)
+;; (md-how-many-str "/" "/localdata/jgarvin/gentoo/usr/share" 50)
 
 (defun md-quick-sort (vec p q pred)
   (let ((r)
