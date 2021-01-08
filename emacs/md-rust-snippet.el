@@ -103,4 +103,7 @@
    ("borrow mutt" "$1.borrow_mut()")
    ("R W Lock" "RwLock<$1>")
    ("unsafe cell" "UnsafeCell<$1>")
+   ("dock hidden" "#[doc(hidden)]")
+   ("wrapping" "Wrapping<$1>")
+   ("enumerate" "$1.enumerate()")
 ))
