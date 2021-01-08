@@ -34,3 +34,5 @@
 ;; (string-match-p "\\(TERM = (.*)\\|Terminal type\\? \\[.*\\]\\)\\s-*" "jgarvin@ghost12:/$ ")
 
 ;; (string-match-p "\\[.*?@.*?:<.*?>\\]" "jgarvin@ghost12:/$")
+
+(customize-set-variable 'tramp-save-ad-hoc-proxies t)
