@@ -10,7 +10,6 @@ import os.path as op
 import getpass
 import glob
 import datetime
-import popen2
 import sh
 
 # TODO: -s to just list cores
@@ -57,13 +56,13 @@ def run(command, clear_ld_env=True):
         backup_env_var("LD_PRELOAD")
         backup_env_var("LD_LIBRARY_PATH")
 
-    the_run = popen2.Popen3(command)
-    the_run.wait()
-
+    the_run = sh.Command(command)
+    the_run = the_run()
+    
     for i in old_env_vars:
         os.environ[i] = old_env_vars[i]
 
-    return the_run.fromchild.read()
+    return the_run
 
 def time_str(timestamp):
     core_time = datetime.datetime.fromtimestamp(timestamp)
