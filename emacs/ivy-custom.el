@@ -63,8 +63,8 @@
   (let ((shift 1))
     (with-ivy-window
       (let ((ln (line-number-at-pos (ivy-state-current ivy-last))))
-        (while (and (< (+ ivy--index shift) ivy--length)
-                    (= ln (line-number-at-pos (nth (+ ivy--index shift) ivy--all-candidates))))
+        (while (and (>= (- ivy--index shift) 0)
+                    (= ln (line-number-at-pos (nth (- ivy--index shift) ivy--all-candidates))))
           (cl-incf shift))))
     (ivy-previous-line shift)))
 

@@ -46,9 +46,9 @@
 
 (setq lsp-rust-server 'rust-analyzer)
 
-;; (use-package
-;;   lsp-ui
-;;   :ensure t)
+(use-package
+   lsp-ui
+   :ensure t)
 
 (add-hook 'rust-mode-hook #'lsp)
 ;;(remove-hook 'lsp-mode-hook #'lsp-ui-mode)
@@ -90,3 +90,6 @@
 ;; necessary for analyzer to know about proc macros
 (setq lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
 (setq lsp-rust-analyzer-proc-macro-enable t)
+
+;; don't try to pair squote used for lifetime specifiers
+(sp-local-pair 'rust-mode "'" nil :actions nil)

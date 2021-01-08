@@ -11,6 +11,9 @@
   (cond
    ((eq etc-projectile-project-name-cached 'none) nil)
    ((eq etc-projectile-project-root-cached 'none) nil)
+   ;; without this experience for freezing navigating directories with
+   ;; tramp
+   ((and (buffer-file-name (current-buffer)) (file-remote-p (buffer-file-name (current-buffer)))) nil)
    (etc-projectile-project-name-cached t)
    (etc-projectile-project-root-cached t)
    (t (condition-case nil
