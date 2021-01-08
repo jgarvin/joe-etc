@@ -380,36 +380,58 @@ debug mode causing timers to die."
           (delete-trailing-whitespace (beginning-of-line) (end-of-line)))))))
 
 (defun md-pair-bounds (opener)
-  (let ((r (sp-restrict-to-pairs opener 'sp-get-enclosing-sexp)))
-    (cons (plist-get r :beg)
-          (plist-get r :end))))
+  (let ((r (sp-restrict-to-pairs opener #'md-get-enclosing)))
+    (cons (sp-get r :beg)
+          (sp-get r :end))))
 
-(defun md-mark-thing (thing)
+(defun md-get-enclosing ()
+  (interactive)
+  (sp-get-enclosing-sexp))
+
+(defun md-bounds-of-thing-at-point (thing)
+  (cond
+       ((eq thing 'string)
+        (cons (plist-get (sp-get-string) :beg)
+              (plist-get (sp-get-string) :end)))
+       ((eq thing 'group)
+        (cons (sp-get (sp-get-enclosing-sexp) :beg)
+              (sp-get (sp-get-enclosing-sexp) :end)))
+       ((eq thing 'thesis)
+        (md-pair-bounds "("))
+       ((eq thing 'brackets)
+        (md-pair-bounds "["))
+       ((eq thing 'braces)
+        (md-pair-bounds "{"))
+       ;; need c++ template support first
+       ;; ((eq thing 'angles)
+       ;;  (setq bounds (md-pair-bounds "<")))
+       (t (bounds-of-thing-at-point thing))))
+
+(defun md-mark-thing (thing mode)
   (with-selected-window (if (eq (window-buffer) (current-buffer))
                             (selected-window)
                           (get-buffer-window nil t))
     (let ((bounds))
       (cond
-       ((eq thing 'string)
-        (setq bounds (cons (plist-get (sp-get-string) :beg)
-                           (plist-get (sp-get-string) :end))))
-       ((eq thing 'pair)
-        (setq bounds (cons (plist-get (sp-get-enclosing-sexp) :beg)
-                           (plist-get (sp-get-enclosing-sexp) :end))))
-       ;; sp-restrict-pairs needs to work first
-       ;; ((eq thing 'parens)
-       ;;  (setq bounds (md-pair-bounds "(")))
-       ;; ((eq thing 'brackets)
-       ;;  (setq bounds (md-pair-bounds "[")))
-       ;; ((eq thing 'braces)
-       ;;  (setq bounds (md-pair-bounds "{")))
-       ;; need c++ template support first
-       ;; ((eq thing 'angles)
-       ;;  (setq bounds (md-pair-bounds "<")))
-       (t (setq bounds (bounds-of-thing-at-point thing))))
+       ((eq mode 'regular)
+        (setq bounds (md-bounds-of-thing-at-point thing)))
+       ((eq mode 'rest-of)
+        (setq bounds
+              (cons
+               (point)
+               (cdr (md-bounds-of-thing-at-point thing)))))
+       ((eq mode 'until-here)
+        (setq bounds
+              (cons
+               (car (md-bounds-of-thing-at-point thing))
+               (point))))
+       ((t (error "Unknown mandimus mark mode!"))))
       (set-window-point (get-buffer-window) (car bounds))
       (set-mark (point))
-      (set-window-point (get-buffer-window) (cdr bounds)))))
+      (set-window-point (get-buffer-window) (cdr bounds))
+      )
+    )
+  )
 
 (defun md-copy-line ()
   "Copy the whole line that point is on and move to the beginning of the next line.
