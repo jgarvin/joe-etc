@@ -34,3 +34,7 @@
 ;; (string-match-p "\\(TERM = (.*)\\|Terminal type\\? \\[.*\\]\\)\\s-*" "jgarvin@ghost12:/$ ")
 
 ;; (string-match-p "\\[.*?@.*?:<.*?>\\]" "jgarvin@ghost12:/$")
+
+(setq vc-handled-backends nil)
+(eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-find-file-hook))
+(eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-refresh-state))
