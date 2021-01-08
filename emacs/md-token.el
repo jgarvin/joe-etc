@@ -17,7 +17,7 @@
 (defvar md-symbols-cache-refresh-hook nil)
 (defvar md-mode-keywords nil)
 (defvar md-min-symbol-length 3)
-(defvar md-max-symbol-length 50)
+(defvar md-max-symbol-length 44)
 (defvar md-nick-scan-limit 5000)
 (defvar-local md-active-erc-nicknames nil)
 (defvar-local md-enable-symbol-refresh t)
@@ -123,6 +123,9 @@
         (or (< non-ws-char-count md-min-symbol-length)
             (and (not dont-check-max) (> non-ws-char-count md-max-symbol-length)))) t)
      ((> (length sym) md-max-symbol-length) t)
+
+     ((>= (md-how-many-str "/" sym md-max-symbol-length) 2) t) ;; filter file paths out
+     ((s-contains-p "distcc-centos-" sym) t)
      ((and (setq entry (assoc major-mode md-mode-keywords))
            (member sym (cdr entry))) t)
      ((= (md-how-many-str "[^0-9]" sym 1) 0) t)
