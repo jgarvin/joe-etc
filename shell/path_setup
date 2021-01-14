@@ -1,5 +1,8 @@
 #!/bin/bash
 
 export PATH=$HOME/opt/bin:$HOME/etc/bin:$PATH
+if [ -d $HOME/work-scripts ]; then
+    export PATH=$HOME/work-scripts:$PATH
+fi
 export PATH="$HOME/.cargo/bin:$PATH"
 export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
