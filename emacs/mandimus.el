@@ -382,7 +382,9 @@ debug mode causing timers to die."
 (defun md-pair-bounds (opener)
   (let ((r (sp-restrict-to-pairs opener #'md-get-enclosing)))
     (cons (sp-get r :beg)
-          (sp-get r :end))))
+          (sp-get r :end)
+          ;;(1- )
+          )))
 
 (defun md-get-enclosing ()
   (interactive)
@@ -402,6 +404,9 @@ debug mode causing timers to die."
         (md-pair-bounds "["))
        ((eq thing 'braces)
         (md-pair-bounds "{"))
+;;       ((eq thing 'line)
+;;        (let ((bounds (bounds-of-thing-at-point 'line)))
+;;          (cons (car bounds) (1- (cdr bounds)))))
        ;; need c++ template support first
        ;; ((eq thing 'angles)
        ;;  (setq bounds (md-pair-bounds "<")))
