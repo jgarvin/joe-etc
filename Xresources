@@ -2,3 +2,4 @@ Emacs.font: DejaVu Sans Mono-10
 Emacs.menuBar: off
 Emacs.verticalScrollBars: off
 Emacs.toolBar: off
+URxvt.perl-ext-common:  resize-font

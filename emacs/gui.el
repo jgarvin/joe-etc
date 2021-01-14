@@ -66,22 +66,21 @@
 ;; better to do stuff that changes frame size in ~/.Xresources
 
 
-;; (defvar etc-font-choice nil)
-;;(setq etc-font-choice "DejaVu Sans Mono-12")
+(defvar etc-font-choice nil)
+(setq etc-font-choice "DejaVu Sans Mono-12")
 
-;; ;; have to do this as a frame functon or daemon doesn't work
-;; (defun etc-customize-frame (new-frame)
-;;   (when (getenv "DISPLAY")
-;;     (when (window-system new-frame) ;; daemon mode creates frame not associated w/ windowing system!
-;;       (set-frame-font etc-font-choice t t))))
+;; have to do this as a frame functon or daemon doesn't work
+(defun etc-customize-frame (new-frame)
+  (when (getenv "DISPLAY")
+    (when (window-system new-frame) ;; daemon mode creates frame not associated w/ windowing system!
+      (set-frame-font etc-font-choice t t))))
 
-;; (add-hook 'after-make-frame-functions #'etc-customize-frame)
+(add-hook 'after-make-frame-functions #'etc-customize-frame)
 
-;; ;; Turn off GUI parts
-;; (when (functionp 'tool-bar-mode)
-;;   (tool-bar-mode -1))
-;; (when (functionp 'menu-bar-mode)
-;;   (menu-bar-mode -1)) ;; (menu-bar-mode 1)
-;; (when (functionp 'scroll-bar-mode)
-;;   (scroll-bar-mode -1))
-
+;; Turn off GUI parts
+(when (functionp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (functionp 'menu-bar-mode)
+  (menu-bar-mode -1)) ;; (menu-bar-mode 1)
+(when (functionp 'scroll-bar-mode)
+  (scroll-bar-mode -1))

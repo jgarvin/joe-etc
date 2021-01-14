@@ -30,10 +30,10 @@
   :ensure t
   )
 
-(use-package
-  smart-parens
-  :ensure t
-  )
+;;(use-package
+;;  smart-parens
+;;  :ensure t
+;;  )
 
 ;; (use-package
 ;;   perl6-mode
@@ -104,10 +104,10 @@
   )
 
 ;; example: /ssh:slurm-training|docker:root@docker-scale-out_login_1:/home/fred/ssh:slurm-training|docker:fred@docker-scale-out_login_1:/home/fred
-(use-package
-  docker-tramp
-  :ensure t
-  )
+;;(use-package
+;;  docker-tramp
+;;  :ensure t
+;;  )
 
 ;;(use-package
 ;;  protobuf-mode
@@ -1018,7 +1018,7 @@
 ;; FIXME: disabled for now, when not using head tracking
 ;; causes surprising behavior when interacting w/ xmonad
 ;; warping the pointer to the center of the window on focus
-(setq mouse-autoselect-window nil)
+(setq mouse-autoselect-window t)
 ;; makes emacs aware of my window manager behavior, not sure what this gets me
 (setq focus-follows-mouse t)
 
@@ -1158,6 +1158,7 @@
 (setq kill-do-not-save-duplicates t)
 
 ;; for emacsclient
+;;(setenv "XDG_RUNTIME_DIR" "") ;; so server doesn't use it
 (server-start)
 
 (when (file-exists-p "~/radix-jhg/main.el")

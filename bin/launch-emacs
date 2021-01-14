@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source $HOME/etc/shell/path_setup
+#source $HOME/etc/shell/path_setup
+source $HOME/.bash_profile
 
 if [ $# -eq 0 ]; then
     file=$HOME
@@ -9,5 +10,5 @@ fi
 # always be up to date on resource settings, need for remote emacs
 xrdb -merge ~/.Xresources
 xrdb -merge ~/.Xdefaults
-emacsclient --alternate-editor="" -c "$@" $file
+ionice -c 2 -n 0 nice -n 0 emacsclient --alternate-editor="" -c "$@" $file
 
