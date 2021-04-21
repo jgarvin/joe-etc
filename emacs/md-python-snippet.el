@@ -88,6 +88,8 @@
    ("set comp" "{$1 for $2 in $3}")
    ("len" "len($1)")
    ("def" "def $1($2):\n    $3")
+   ("deaf" "def $1($2):\n    $3")
+   ("death" "def $1($2):\n    $3")
    ("method" "def $1(self, $2):\n    $3")
    ("while" "while $1:\n    $2")
    ("and" "$1 and $2")

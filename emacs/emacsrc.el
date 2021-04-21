@@ -216,6 +216,8 @@
                       (getenv "HOME")
                       (buffer-name)))))))
  '(send-mail-function 'smtpmail-send-it)
+ '(tramp-default-proxies-alist nil)
+ '(tramp-save-ad-hoc-proxies t)
  '(tramp-syntax 'default nil (tramp)))
 
 (custom-set-faces
@@ -1189,3 +1191,15 @@
 
 ;; w/o this remote X emacs is VERY slow while mark is active, every keystroke sends all the text into the clipboard!
 (setq select-active-regions nil)
+
+(defun etc-full-profile ()
+  (interactive)
+  (profiler-stop)
+  (profiler-start 'cpu+mem))
+
+(defun etc-full-profile-report ()
+  (interactive)
+  (profiler-report))
+
+(global-set-key (kbd "<f6>") #'etc-full-profile)
+(global-set-key (kbd "<f7>") #'etc-full-profile-report)

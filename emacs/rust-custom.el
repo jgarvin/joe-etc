@@ -46,9 +46,11 @@
 
 (setq lsp-rust-server 'rust-analyzer)
 
-(use-package
-   lsp-ui
-   :ensure t)
+;;(use-package
+;;   lsp-ui
+;;   :ensure t)
+
+;;(global-ls)
 
 (add-hook 'rust-mode-hook #'lsp)
 ;;(remove-hook 'lsp-mode-hook #'lsp-ui-mode)
