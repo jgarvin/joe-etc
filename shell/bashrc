@@ -15,7 +15,10 @@ export HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
 
 # After each command, append to the history file and reread it
-export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+# No, this was too dangerous, kept executing old commands from other terminals!
+#export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
+export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a;"
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -128,4 +131,12 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+if [ -f /etc/bashrc ]; then
+   source /etc/bashrc
+fi
+
+if [ -f "$HOME/.cargo/env" ]; then
+   source "$HOME/.cargo/env"
+fi
 

@@ -15,7 +15,6 @@ git
 gitk
 git-svn
 git-cvs
-git-arch
 magit
 bzr
 darcs
@@ -38,8 +37,6 @@ libtool
 libboost-all-dev
 cmake
 scons
-libqt4-dev
-qt4-doc-html
 global
 
 # Multimedia and ease of use
@@ -65,7 +62,6 @@ doxygen
 doxygen-doc
 rlwrap
 libnss3-tools
-synergy
 graphviz
 texlive-font-utils # for epstopdf, needed by doxygen to do graphviz class diagrams
 mesa-utils
@@ -74,10 +70,10 @@ xfce4-terminal
 valgrind
 units
 manpages-posix
+manpages-posix-dev
+manpages-dev
 apt-file
 python-setuptools
-python-matplotlib
-manpages-posix-dev
 libssl-dev
 zlib1g-dev
 e2fslibs-dev
@@ -85,7 +81,6 @@ xwrits
 moreutils # for sponge
 sox
 libsox-fmt-all
-realpath
 virtualbox
 dmidecode
 dex
@@ -93,6 +88,19 @@ dex
 # anki
 texlive-full
 dvipng
-python-pip
 
 curl
+
+# for capslock as ctrl
+gnome-tweaks
+silversearcher-ag
+wireshark
+jq
+
+# for perf
+linux-tools-common
+linux-tools-generic
+
+# for criterion
+gnuplot-x11
+net-tools

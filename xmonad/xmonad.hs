@@ -230,6 +230,7 @@ myManageHook = composeAll
     , className =? "com-sun-javaws-Main" --> doIgnore
 --    , className =? "Steam"            --> doIgnore
     , className =? "Steam"            --> doFloat
+    , className =? "talon"            --> doFloat
     , appName =? "AGame"            --> doFloat
     , className =? "steam"            --> doFullFloat -- big picture mode
     , className =? "gnome-panel"                        --> doFloat

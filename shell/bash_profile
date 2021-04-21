@@ -35,3 +35,7 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 #         export INFOPATH=/localdata/jgarvin/gentoo/usr/share/gcc-data/x86_64-pc-linux-gnu/10.2.0/info:/localdata/jgarvin/gentoo/usr/share/binutils-data/x86_64-pc-linux-gnu/2.35.1/info:/localdata/jgarvin/gentoo/usr/share/info:/localdata/jgarvin/gentoo/usr/share/info/emacs-27
 #         ;;
 # esac
+
+if [ -f "$HOME/.cargo/env" ]; then
+   source "$HOME/.cargo/env"
+fi
