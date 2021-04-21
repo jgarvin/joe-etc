@@ -11,27 +11,27 @@ export EDITOR=/localdata/jgarvin/gentoo/usr/bin/emacsclient
 # https://askubuntu.com/questions/538416/how-to-set-xdg-runtime-dir
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
-case "$-" in
-    # if you don't check that the shell is interactive, when you run
-    # ssh commands like "ssh host foo" foo will never happen b/c it
-    # will run startprefix and hang instead
-    *i*)
-        export PATH=$(echo $PATH | sed 's@/opt/rh/rh-git218/root/usr/bin:@@g')
-        if [[ ${SHELL#/localdata/jgarvin/gentoo} == ${SHELL} ]]; then
-            # get rid any non standard paths
-            unset PERL5LIB
-            unset LD_LIBRARY_PATH
-            export PATH=/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/opt/ibutils/bin:/opt/rh/devtoolset-8/root/usr/bin:/sbin:/usr/local/bin
-            exec /localdata/jgarvin/gentoo/startprefix
-        fi
-        ;;
-    *)
-        export PATH=/localdata/jgarvin/gentoo/usr/bin:/localdata/jgarvin/gentoo/bin:$PATH
-        export LD_LIBRARY_PATH=/localdata/jgarvin/gentoo/lib:$LD_LIBRARY_PATH
-        export XDG_DATA_DIRS=/localdata/jgarvin/gentoo/usr/share
-        export PAGER=/localdata/jgarvin/gentoo/usr/bin/less
-        export EDITOR=/localdata/jgarvin/gentoo/usr/bin/emacsclient
-        export MANPATH=/localdata/jgarvin/gentoo/usr/share/gcc-data/x86_64-pc-linux-gnu/10.2.0/man:/localdata/jgarvin/gentoo/usr/share/binutils-data/x86_64-pc-linux-gnu/2.35.1/man:/localdata/jgarvin/gentoo/usr/local/share/man:/localdata/jgarvin/gentoo/usr/share/man:/localdata/jgarvin/gentoo/usr/lib/rust/man:/localdata/jgarvin/gentoo/usr/lib/llvm/10/share/man
-        export INFOPATH=/localdata/jgarvin/gentoo/usr/share/gcc-data/x86_64-pc-linux-gnu/10.2.0/info:/localdata/jgarvin/gentoo/usr/share/binutils-data/x86_64-pc-linux-gnu/2.35.1/info:/localdata/jgarvin/gentoo/usr/share/info:/localdata/jgarvin/gentoo/usr/share/info/emacs-27
-        ;;
-esac
+# case "$-" in
+#     # if you don't check that the shell is interactive, when you run
+#     # ssh commands like "ssh host foo" foo will never happen b/c it
+#     # will run startprefix and hang instead
+#     *i*)
+#         export PATH=$(echo $PATH | sed 's@/opt/rh/rh-git218/root/usr/bin:@@g')
+#         if [[ ${SHELL#/localdata/jgarvin/gentoo} == ${SHELL} ]]; then
+#             # get rid any non standard paths
+#             unset PERL5LIB
+#             unset LD_LIBRARY_PATH
+#             export PATH=/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/opt/ibutils/bin:/opt/rh/devtoolset-8/root/usr/bin:/sbin:/usr/local/bin
+#             exec /localdata/jgarvin/gentoo/startprefix
+#         fi
+#         ;;
+#     *)
+#         export PATH=/localdata/jgarvin/gentoo/usr/bin:/localdata/jgarvin/gentoo/bin:$PATH
+#         export LD_LIBRARY_PATH=/localdata/jgarvin/gentoo/lib:$LD_LIBRARY_PATH
+#         export XDG_DATA_DIRS=/localdata/jgarvin/gentoo/usr/share
+#         export PAGER=/localdata/jgarvin/gentoo/usr/bin/less
+#         export EDITOR=/localdata/jgarvin/gentoo/usr/bin/emacsclient
+#         export MANPATH=/localdata/jgarvin/gentoo/usr/share/gcc-data/x86_64-pc-linux-gnu/10.2.0/man:/localdata/jgarvin/gentoo/usr/share/binutils-data/x86_64-pc-linux-gnu/2.35.1/man:/localdata/jgarvin/gentoo/usr/local/share/man:/localdata/jgarvin/gentoo/usr/share/man:/localdata/jgarvin/gentoo/usr/lib/rust/man:/localdata/jgarvin/gentoo/usr/lib/llvm/10/share/man
+#         export INFOPATH=/localdata/jgarvin/gentoo/usr/share/gcc-data/x86_64-pc-linux-gnu/10.2.0/info:/localdata/jgarvin/gentoo/usr/share/binutils-data/x86_64-pc-linux-gnu/2.35.1/info:/localdata/jgarvin/gentoo/usr/share/info:/localdata/jgarvin/gentoo/usr/share/info/emacs-27
+#         ;;
+# esac
