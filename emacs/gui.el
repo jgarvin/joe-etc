@@ -84,3 +84,9 @@
   (menu-bar-mode -1)) ;; (menu-bar-mode 1)
 (when (functionp 'scroll-bar-mode)
   (scroll-bar-mode -1))
+
+
+;; tooltips super slow over remote connections for some reason?
+;; https://stackoverflow.com/questions/12730416/disable-help-when-mouse-hovers-on-modeline
+;;(tooltip-mode nil)                      ; one-line help text in the echo area
+(setq tooltip-use-echo-area t)          ; multi-line help text in the echo area
