@@ -2,7 +2,8 @@
 (erc-services-mode 1)
 (setq erc-prompt-for-nickserv-password nil)
 (setq erc-nickserv-passwords
-      `((freenode     ((,freenode-nick . ,freenode-nick-pass)))
+      `((libera     ((,freenode-nick . ,freenode-nick-pass)))
+        ;;(freenode     ((,freenode-nick . ,freenode-nick-pass)))
         (oftc  ((,freenode-nick . ,freenode-nick-pass)))
         (mozilla ((,freenode-nick . ,freenode-nick-pass)))))
 
@@ -64,8 +65,11 @@
 
 (erc-autojoin-mode 1)
 (setq erc-autojoin-channels-alist
-      '(("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
+      '(
+        ("libera.chat" "#emacs" "#python" "##traders" "##c++" "##linux"
          "#perl6" "#racket" "##rust")
+        ;;("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
+        ;; "#perl6" "#racket" "##rust")
         ("oftc.net" "#perf")))
 
 ;; don't automatically switch to joined channels, that's just annoying
@@ -75,7 +79,8 @@
   "Connect to IRC."
   (interactive)
   (when t ;; (y-or-n-p "IRC? ")
-    (erc-tls :server "irc.freenode.net" :port 6697 :nick freenode-nick)
+    (erc-tls :server "irc.libera.chat" :port 6697 :nick freenode-nick)
+    ;;(erc-tls :server "irc.freenode.net" :port 6697 :nick freenode-nick)
     (erc-tls :server "irc.oftc.net" :port 6697 :nick freenode-nick)))
 
 (defun filter-server-buffers ()

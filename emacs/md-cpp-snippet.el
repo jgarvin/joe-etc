@@ -150,6 +150,7 @@
    ("unordered map" "std::unordered_map<$1, $2>")
    ("using" "using $1 = $2;")
    ("var" "$1 $2;")
+   ("variant" "std::variant<$1>")
    ("variadic class" "class... $1")
    ("variadic type name" "typename... $1")
    ("vector" "std::vector<$1>")

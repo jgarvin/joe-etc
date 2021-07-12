@@ -104,3 +104,6 @@ linux-tools-generic
 # for criterion
 gnuplot-x11
 net-tools
+
+# for auto-activating workman
+inputplug

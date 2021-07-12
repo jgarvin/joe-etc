@@ -66,7 +66,7 @@
 ;; better to do stuff that changes frame size in ~/.Xresources
 
 (defvar etc-font-choice nil)
-(setq etc-font-choice "DejaVu Sans Mono-7")
+(setq etc-font-choice "DejaVu Sans Mono-14")
 
 ;; have to do this as a frame functon or daemon doesn't work
 (defun etc-customize-frame (new-frame)
