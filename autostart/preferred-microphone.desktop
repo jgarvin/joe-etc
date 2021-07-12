@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Activate preferred microphone
+Exec=bash -c "$HOME/etc/autostart/preferred-tbmicrophone.sh"
+Terminal=false
+StartupNotify=false
+Type=Application
+
+Name[en_US]=preferred-microphone
