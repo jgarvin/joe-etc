@@ -9,6 +9,41 @@
 # 12	alsa_input.usb-DPA_Microphones_d_vice_MMA-A_17060A06002B6300-00.iec958-stereo	module-alsa-card.c	s24le 2ch 48000Hz	RUNNING
 # 15	alsa_input.usb-Lenovo_ThinkPad_Thunderbolt_3_Dock_USB_Audio_000000000000-00.mono-fallback	module-alsa-card.c	s16le 1ch 48000Hz	SUSPENDED
 
+
+# muting/unmuting all mics here:
+# https://askubuntu.com/questions/12100/command-to-mute-and-unmute-a-microphone
+
+
 if pactl list short sources | grep DPA_Microphones_d_vice; then
-    pactl set-default-source "$(pactl list short sources | grep DPA_Microphones_d_vice | awk '{ print $2 }')"
+    # mute all microphones!
+    pacmd list-sources | \
+        grep -oP 'index: \d+' | \
+        awk '{ print $2 }' | \
+        xargs -I{} pactl set-source-mute {} true
+    sleep 0.25
+
+    bad_mic="$(pactl list short sources | grep alsa_input | grep analog-stereo | awk '{ print $2 }')"
+    good_mic="$(pactl list short sources | grep DPA_Microphones_d_vice | awk '{ print $2 }')"
+    pactl set-default-source "$bad_mic"
+
+    pactl set-source-mute "$bad_mic" false
+    sleep 0.25
+    pactl set-source-mute "$bad_mic" true
+    sleep 0.25    
+    pactl set-default-source "$good_mic"
+    sleep 0.25
+    pactl set-source-mute "$good_mic" false
+    sleep 0.25
+    pacmd set-source-volume "$good_mic" 60000 # https://askubuntu.com/questions/27021/setting-microphone-input-volume-using-the-command-line
 fi
+
+    # we toggle muting b/c without this sometimes preferred mic acts
+    # muted, kernel or pultseaudio bug?
+
+    # unmute all microphones!
+    # pacmd list-sources | \
+    #     grep -oP 'index: \d+' | \
+    #     awk '{ print $2 }' | \
+    #     xargs -I{} pactl set-source-mute {} false
+
+    # pactl set-source-mute "$good_mic" false

@@ -138,4 +138,5 @@
    ("feature" "#![feature($1)]")
    ("null" "std::ptr::null()")
    ("null mut" "std::ptr::null_mut()")
+   ("type ID of" "TypeId::of::<$1>()")
 ))

@@ -67,7 +67,7 @@
 (setq erc-autojoin-channels-alist
       '(
         ("libera.chat" "#emacs" "#python" "##traders" "##c++" "##linux"
-         "#perl6" "#racket" "##rust")
+         "#perl6" "#racket" "##rust" "#redo")
         ;;("freenode.net" "#emacs" "#python" "##traders" "##c++" "##linux"
         ;; "#perl6" "#racket" "##rust")
         ("oftc.net" "#perf")))
