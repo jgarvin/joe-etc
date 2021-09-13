@@ -34,7 +34,13 @@ if pactl list short sources | grep DPA_Microphones_d_vice; then
     sleep 0.25
     pactl set-source-mute "$good_mic" false
     sleep 0.25
-    pacmd set-source-volume "$good_mic" 60000 # https://askubuntu.com/questions/27021/setting-microphone-input-volume-using-the-command-line
+    # to deterimne this value, open the `pavucontrol` GUI app, and
+    # then each time you run this command you will see the volume in
+    # the input devices tab change. This value corresponds to 153%,
+    # which is the maximum you are able to set in the GUI. Using the
+    # command line you can set it arbitrarily high, but I haven't
+    # needed to do this.
+    pacmd set-source-volume "$good_mic" 100000 # https://askubuntu.com/questions/27021/setting-microphone-input-volume-using-the-command-line
 fi
 
     # we toggle muting b/c without this sometimes preferred mic acts
