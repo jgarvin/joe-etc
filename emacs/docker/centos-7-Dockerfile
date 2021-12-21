@@ -1,0 +1,12 @@
+FROM centos:7
+ENV emacs_version 27.2
+
+RUN yum update -y && yum install -y wget gcc
+RUN wget http://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-${emacs_version}.tar.gz \
+    && tar xvf emacs-${emacs_version}.tar.gz
+
+RUN yum-builddep -y emacs
+
+WORKDIR ./emacs-${emacs_version}
+
+RUN mkdir /emacs-install && ./configure --prefix=/emacs-install && make -j && make install

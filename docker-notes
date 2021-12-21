@@ -1,0 +1,44 @@
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+
+To use the client you either have to be root or be in the docker group
+$ sudo usermod -aG docker username
+You have to relogin for the group changed to take affect
+$ sudo - username
+
+Search for available images
+$ docker search ubuntu
+
+downloaded image without running it
+$ docker pull ubuntu
+
+list downloaded images
+$ docker images
+
+start up a container with a particular image and get a command prompt
+$ docker run -it ubuntu
+
+see active containers
+$ docker ps
+
+see active and inactive containers
+$ docker ps -a
+
+save changes you've made to the container to a dedicated image (Repository is usually docker hub username)
+$ docker commit -m "What you did to the image" -a "Author Name" container_id repository/new_image_name
+
+have docker log into docker hub, necessary before you can push images
+$ docker login -u docker-registry-username
+
+push a local image to the docker repository (Requires logging in first with above command)
+$ docker push docker-registry-username/docker-image-name
+
+build an image from a given docker file, give it a name, used the current directory for the context
+$ docker build -f centos-7-Dockerfile -t ${IMAGE_NAME} .
+
+Create docker volume, will print name as string, specify or randomly generate
+$ docker volume create data_volume
+data_volume
+$ docker volume create
+d7fb659f9b2f6c6fd7b2c796a47441fa77c8580a080e50fb0b1582c8f602ae2f
+
+The difference between “docker run” and “docker exec” is that “docker exec” executes a command on a running container. On the other hand, “docker run” creates a temporary container, executes the command in it and stops the container when it is done.
