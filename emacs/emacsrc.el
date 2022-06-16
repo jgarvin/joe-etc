@@ -2,7 +2,7 @@
 ;;; commentary:
 ;;; Code:
 
-(when (file-exists-p "~/gentoo")
+(when (file-exists-p "~/gentoo/usr/share/emacs/site-lisp/site-gentoo")
     (load "~/gentoo/usr/share/emacs/site-lisp/site-gentoo"))
 
 (when (>= emacs-major-version 24)
@@ -24,6 +24,8 @@
     (package-install 'use-package)))
 
 (require 'use-package)
+
+(load-file "~/etc/emacs/memoize.el")
 
 (use-package
   dash

@@ -7,7 +7,7 @@ set print static-members off
 set print vtbl on
 #set print demangle on
 #set demangle-style gnu-v3
-# set demangle-style none
+set demangle-style none
 
 
 # this helps emacs know where we are

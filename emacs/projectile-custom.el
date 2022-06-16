@@ -4,6 +4,8 @@
 
 (projectile-global-mode 1)
 
+;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
 (defvar-local etc-projectile-project-name-cached nil)
 (defvar-local etc-projectile-project-root-cached nil)
 
@@ -56,7 +58,9 @@ The value returned is the value of the last form in BODY."
                  (default-directory (file-name-directory filename)))
        ,@body)))
 
-
+;; without this projectile became incredibly slow when opening files
+;; might make things slightly incorrect but it expires every two hours
+(memoize 'projectile-project-dirs)
 
 ;; ;; allow projectile to use external utils to speed up indexing
 ;; (setq projectile-indexing-method 'alien)
@@ -65,7 +69,7 @@ The value returned is the value of the last form in BODY."
 ;; (setq projectile-switch-project-action 'projectile-dired)
 
 ;; ;; without this indexing some projects is seriously slow
-;; (setq projectile-enable-caching t)
+(setq projectile-enable-caching t)
 
 ;; ;; without this accessing files via /sudo:: will freeze for some reason.
 ;; ;; see: https://github.com/bbatsov/prelude/issues/594

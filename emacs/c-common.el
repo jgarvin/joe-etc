@@ -93,7 +93,7 @@
   (local-set-key (kbd "C-M-k") #'sp-kill-hybrid-sexp)
   ;; Prefer 4-space tabs
 
-;;  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
+  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
    ;; don't indent top level namespace
   (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
 
@@ -112,7 +112,7 @@
   ;; (c-set-offset 'statement-cont 0)
   ;; (c-set-offset 'brace-list-open 0)
   ;; (c-set-offset 'brace-list-close 0)
-    (electric-pair-local-mode 0)
+  (electric-pair-local-mode 0)
   )
 
 (defun etc-toggle-namespace-indent ()

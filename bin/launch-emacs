@@ -10,5 +10,5 @@ fi
 # always be up to date on resource settings, need for remote emacs
 xrdb -merge ~/.Xresources
 xrdb -merge ~/.Xdefaults
-ionice -c 2 -n 0 nice -n 0 emacsclient --alternate-editor="" -c "$@" $file
+ionice -c 2 -n 0 nice -n 0 $EDITOR --alternate-editor="" -c "$@" $file
 
