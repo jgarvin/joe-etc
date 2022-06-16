@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # directions here:
 # https://makandracards.com/makandra-orga/473864-how-to-set-a-fixed-microphone-source-in-ubuntu-if-it-keeps-changing
 
@@ -15,25 +17,25 @@
 
 
 if pactl list short sources | grep DPA_Microphones_d_vice; then
-    # mute all microphones!
-    pacmd list-sources | \
-        grep -oP 'index: \d+' | \
-        awk '{ print $2 }' | \
-        xargs -I{} pactl set-source-mute {} true
-    sleep 0.25
+    # # mute all microphones!
+    # pacmd list-sources | \
+    #     grep -oP 'index: \d+' | \
+    #     awk '{ print $2 }' | \
+    #     xargs -I{} pactl set-source-mute {} true
+    # sleep 0.5
 
-    bad_mic="$(pactl list short sources | grep alsa_input | grep analog-stereo | awk '{ print $2 }')"
-    good_mic="$(pactl list short sources | grep DPA_Microphones_d_vice | awk '{ print $2 }')"
-    pactl set-default-source "$bad_mic"
+    # bad_mic="$(pactl list short sources | grep alsa_input | grep analog-stereo | awk '{ print $2 }')"
+    # good_mic="$(pactl list short sources | grep DPA_Microphones_d_vice | awk '{ print $2 }')"
+    # pactl set-default-source "$bad_mic"
 
-    pactl set-source-mute "$bad_mic" false
-    sleep 0.25
-    pactl set-source-mute "$bad_mic" true
-    sleep 0.25    
+    # pactl set-source-mute "$bad_mic" false
+    # sleep 0.5
+    # pactl set-source-mute "$bad_mic" true
+    # sleep 0.5    
     pactl set-default-source "$good_mic"
-    sleep 0.25
+    sleep 0.5
     pactl set-source-mute "$good_mic" false
-    sleep 0.25
+    sleep 0.5
     # to deterimne this value, open the `pavucontrol` GUI app, and
     # then each time you run this command you will see the volume in
     # the input devices tab change. This value corresponds to 153%,

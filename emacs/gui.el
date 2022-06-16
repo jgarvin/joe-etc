@@ -66,13 +66,14 @@
 ;; better to do stuff that changes frame size in ~/.Xresources
 
 (defvar etc-font-choice nil)
-(setq etc-font-choice "DejaVu Sans Mono-14")
+(setq etc-font-choice "DejaVu Sans Mono")
 
 ;; have to do this as a frame functon or daemon doesn't work
 (defun etc-customize-frame (new-frame)
   (when (getenv "DISPLAY")
     (when (window-system new-frame) ;; daemon mode creates frame not associated w/ windowing system!
-      (set-frame-font etc-font-choice t t))))
+      (set-frame-font (font-spec :family etc-font-choice) t t)))
+  )
 
 (add-hook 'after-make-frame-functions #'etc-customize-frame)
 
@@ -89,3 +90,35 @@
 ;; https://stackoverflow.com/questions/12730416/disable-help-when-mouse-hovers-on-modeline
 ;;(tooltip-mode nil)                      ; one-line help text in the echo area
 (setq tooltip-use-echo-area t)          ; multi-line help text in the echo area
+
+;; Resize the whole frame, and not only a window
+;; https://stackoverflow.com/a/60641769
+(defun acg/zoom-frame (&optional amt)
+  "Increaze FRAME font size by amount AMT. Defaults to selected
+frame if FRAME is nil, and to 1 if AMT is nil."
+  (interactive "p")
+  (dolist (frame (frame-list))
+    ;; emacs creates a weird extra frame that is never visible but
+    ;; still shows up invisible frame list when you start emacs in
+    ;; daemon mode
+    (unless (string-equal "initial_terminal" (terminal-name frame))
+      (message "%S" frame)
+      (let* ((font (face-attribute 'default :font frame))
+             (size (font-get font :size))
+             (amt (or amt 1))
+             (new-size (+ size amt)))
+        (message "before")
+        (set-frame-font (font-spec :size new-size) t `(,frame))
+        (message "Frame's font new size: %d" new-size)
+        (message "after")
+        ))))
+
+(defun acg/zoom-frame-out (&optional amt)
+  "Call `acg/zoom-frame' with negative argument."
+  (interactive "p")
+  (acg/zoom-frame (- (or amt 1))))
+
+(global-set-key (kbd "C-x C-+") 'acg/zoom-frame)
+(global-set-key (kbd "C-x C--") 'acg/zoom-frame-out)
+(global-set-key (kbd "<C-down-mouse-4>") 'acg/zoom-frame)
+(global-set-key (kbd "<C-down-mouse-5>") 'acg/zoom-frame-out)

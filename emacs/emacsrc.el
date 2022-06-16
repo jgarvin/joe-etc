@@ -30,6 +30,11 @@
   :ensure t
   )
 
+(use-package
+  dockerfile-mode
+  :ensure t
+  )
+
 ;;(use-package
 ;;  smart-parens
 ;;  :ensure t
@@ -185,7 +190,7 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(package-selected-packages
-   '(async smartparens lsp-ui visible-mark counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(dockerfile-mode async smartparens lsp-ui visible-mark counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil

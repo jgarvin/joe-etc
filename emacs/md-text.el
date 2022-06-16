@@ -113,6 +113,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
   (let ((l (if (derived-mode-p 'prog-mode 'comint-mode 'toml-mode)
                (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?. ?! ?\# ?\$ )
              (list ?  ?\n ?\t ?_ ?@ ?\[ ?\{ ?\( ?/ ?\\ ?- ?\] ?\# ?\$))))
+    (push ?\" l)
     (when (derived-mode-p 'prog-mode 'toml-mode)
       (push ?0 l)
       (push ?1 l)

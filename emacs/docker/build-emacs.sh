@@ -3,7 +3,10 @@
 set -x
 set -e
 
+DOCKER_FILE="centos-7-Dockerfile"
 IMAGE_NAME="jgarvin/centos-7-emacs"
+#DOCKER_FILE="ubuntu-Dockerfile"
+#IMAGE_NAME="jgarvin/ubuntu-emacs"
 SCRIPT_INSTALL_DIRECTORY="$HOME/opt2/bin"
 EMACS_INSTALL_DIRECTORY="$HOME/emacs-install"
 
@@ -14,11 +17,10 @@ rm -rf "$HOME/emacs-install"
 mkdir -p ${EMACS_INSTALL_DIRECTORY}
 
 # build the image
-docker build -f centos-7-Dockerfile -t ${IMAGE_NAME} .
+docker build -f $DOCKER_FILE -t ${IMAGE_NAME} .
 
-# TEMPORARY_VOLUME=$(docker volume create)
-
-# copy the install out of the image
+# copy the install out of the image, and run the container as the
+# current user to make sure we will be able to do the copying
 docker run --rm -u $(id -u):$(id -g) -v  $EMACS_INSTALL_DIRECTORY:/emacs-install-out ${IMAGE_NAME} bash -c "cp -r /emacs-install/* /emacs-install-out; mkdir /emacs-install-out/system-lib; cp -r /lib64/*.so* /emacs-install-out/system-lib"
 
 # create a script for running with appropriate paths set...

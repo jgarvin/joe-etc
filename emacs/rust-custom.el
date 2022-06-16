@@ -92,6 +92,7 @@
 ;; necessary for analyzer to know about proc macros
 (setq lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
 (setq lsp-rust-analyzer-proc-macro-enable t)
+(setq lsp-rust-analyzer-cargo-run-build-scripts t)
 
 ;; don't try to pair squote used for lifetime specifiers
 (sp-local-pair 'rust-mode "'" nil :actions nil)
