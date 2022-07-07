@@ -172,7 +172,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     -- mod-shift-[1..9], Move client to workspace N
     --
     [((m .|. modMask, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) ([xK_exclam, xK_at, xK_numbersign, xK_dollar, xK_percent, xK_asciicircum, xK_ampersand, xK_asterisk, xK_parenleft, xK_parenright])
+        | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9])
         , (f, m) <- [(W.shift, shiftMask), (W.greedyView, 0)]]
     --     ++
 
