@@ -33,7 +33,7 @@
   ))
 
 ;; needed to not get variable is void error...
-(setq ivy-regex nil)
+;; (setq ivy-regex nil)
 
 (setq projectile-completion-system 'ivy)
 

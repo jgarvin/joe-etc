@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -x
+set -eEuo pipefail
+
+current=$(git symbolic-ref --short HEAD)
+
+# https://stackoverflow.com/a/34116244/50385
+oldsha=$(git rev-parse -q --verify refs/stash)
+git stash push  # add options as desired here
+newsha=$(git rev-parse -q --verify refs/stash)
+if [ "$oldsha" = "$newsha" ]; then
+    made_stash_entry=false
+else
+    made_stash_entry=true
+fi
+
+trap "git checkout -f \"$current\"; if $made_stash_entry; then git stash pop; fi" EXIT ERR
+
+head=$(git rev-parse HEAD)
+base=$(git merge-base origin/master $head)
+
+echo $head $base
+
+for rev in $(git rev-list --reverse $base..$head); do
+    git checkout -f $base
+    if git rev-parse --verify split_commits_branch > /dev/null 2>&1; then
+        git branch -D split_commits_branch
+    fi
+    git checkout -b split_commits_branch
+    git cherry-pick $rev || continue
+    # git push
+    git push origin HEAD:refs/for/master || continue
+done
