@@ -35,6 +35,12 @@
   :ensure t
   )
 
+;; builtin python mode doesn't support python 3.10 match/case
+;; (use-package
+;;   python-mode
+;;   :ensure t
+;;   )
+
 ;;(use-package
 ;;  smart-parens
 ;;  :ensure t
@@ -92,7 +98,8 @@
 (use-package
   undo-tree
   :ensure t
-)
+  )
+(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
 
 (use-package
   expand-region
@@ -145,15 +152,6 @@
 ;; (advice-remove 'smart-hungry-delete-forward-char #'etc-disable-smart-hungry-forward)
 
 (when (not window-system)
-;;  (load-file "~/etc/emacs/xterm-frobs.el")
-;;  (require 'xterm-frobs)
-;;  (defun my-xterm-title-hook ()
-;;        (xterm-set-window-title (buffer-name)))
-;;  (add-hook 'post-command-hook  'my-xterm-title-hook)
-  ;;(load-file "~/etc/emacs/xterm-title.el")
-;;  (require 'xterm-title)
-;;  (xterm-title-mode 1)
-  ;; allow using the mouse in terminal mode
   (xterm-mouse-mode))
 
 (defun etc-ignore-bug (orig-fun &rest args)
@@ -189,8 +187,12 @@
    '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
+ '(ignored-local-variable-values
+   '((vc-prepare-patches-separately)
+     (diff-add-log-use-relative-names . t)
+     (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(dockerfile-mode async smartparens lsp-ui visible-mark counsel lsp-mode docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -221,7 +223,21 @@
                       (getenv "HOME")
                       (buffer-name)))))))
  '(send-mail-function 'smtpmail-send-it)
- '(tramp-default-proxies-alist nil)
+ '(tramp-default-proxies-alist
+   '(("^192\\.168\\.68\\.65$"
+      #("^root$" 1 5
+        (tramp-default t))
+      #("/sudo:root@192.168.68.65:" 0 6
+        (tramp-ad-hoc t)
+        6 10
+        (tramp-ad-hoc t tramp-default t)
+        10 25
+        (tramp-ad-hoc t)))
+     ("^192\\.168\\.68\\.65$"
+      #("^root$" 1 5
+        (tramp-default t))
+      #("/ssh:teamslice@192.168.68.65:" 0 29
+        (tramp-ad-hoc t)))))
  '(tramp-save-ad-hoc-proxies t)
  '(tramp-syntax 'default nil (tramp))
  '(warning-suppress-log-types '((comp)))
@@ -334,9 +350,10 @@
 (load-file "~/etc/emacs/julia-custom.el")
 (load-file "~/etc/emacs/dired-custom.el")
 (load-file "~/etc/emacs/sql-custom.el")
-(load-file "~/etc/emacs/rust-custom.el")
+(load-file "~/etc/emacs/rust-custom.el") ;; something in here causes 100% load...
 (load-file "~/etc/emacs/vhdl-custom.el")
 (load-file "~/etc/emacs/ein-custom.el")
+(load-file "~/etc/emacs/zig-custom.el")
 
 (load-file "~/etc/emacs/gui.el")
 
@@ -364,12 +381,13 @@
 
 (when (getenv "DISPLAY")
   ;; Make emacs use the normal clipboard
-  (setq x-select-enable-clipboard t)
-  (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
-  (setq x-selection-timeout 300)
+  ;;(setq x-select-enable-clipboard t)
+  ;;(setq interprogram-paste-function 'gui-get-primary-selection)
+  ;;(setq x-selection-timeout 300)
   ;; When remotely logging in, need to remap alt for emacs keybindings to work
   (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
-    (setq x-alt-keysym 'meta)))
+    (setq x-alt-keysym 'meta))
+  )
 
 (setq make-backup-files nil)
 
@@ -465,8 +483,8 @@
       (beginning-of-visual-line))
      (t (back-to-visual-indentation)))))
 
-;; (global-set-key "\C-a" 'beginning-or-indentation)
-;; (global-set-key "\C-e" 'end-or-trailing)
+(global-set-key "\C-a" 'beginning-or-indentation)
+(global-set-key "\C-e" 'end-or-trailing)
 
 ;; (when (not (string= (system-name) "eruv"))
 ;;   (global-unset-key "\C-a")
@@ -929,11 +947,11 @@
       browse-url-generic-program
       (chomp (shell-command-to-string "~/etc/utils/pick_best_browser")))
 
-(require 'recentf)
-(recentf-mode 1)
-(setq recentf-max-menu-items 500)
-(setq recentf-max-saved-items 500)
-(global-set-key "\C-c\ \C-e" 'recentf-open-files)
+;; (require 'recentf)
+;; (recentf-mode 1)
+;; (setq recentf-max-menu-items 500)
+;; (setq recentf-max-saved-items 500)
+;; (global-set-key "\C-c\ \C-e" 'recentf-open-files)
 
 ;; never what I want, almost always a typo. Why would you put this
 ;; right next to the key for a new frame?
@@ -1110,15 +1128,29 @@
 
 (defun etc-reopen-with-sudo ()
   (interactive)
-  (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
+  (find-alternate-file (concat "/sudo::|" buffer-file-name)))
+
+(defun etc-reopen-with-sudo ()
+  (interactive)
+  (let* ((vec (tramp-dissect-file-name (buffer-file-name (current-buffer))))
+       (method (tramp-file-name-method vec))
+       (user (tramp-file-name-user vec))
+       (host (tramp-file-name-host vec))
+       (localname (tramp-file-name-localname vec)))
+    (message "localname=%s" localname)
+    (find-alternate-file
+     (if (tramp-tramp-file-p (buffer-file-name (current-buffer)))
+         (concat (format "/%s:%s@%s|sudo::%s" method user host localname))
+       (concat "/sudo:root@localhost:" buffer-file-name)))))
+
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
-;; (require 'string-inflection)
-;; (global-set-key (kbd "C-c y") #'string-inflection-cycle)
-;; (global-set-key (kbd "C-c m s") #'string-inflection-underscore)
-;; (global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
-;; (global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
-;; (global-set-key (kbd "C-c m u") #'string-inflection-upcase)
+(require 'string-inflection)
+(global-set-key (kbd "C-c y") #'string-inflection-cycle)
+(global-set-key (kbd "C-c m s") #'string-inflection-underscore)
+(global-set-key (kbd "C-c m c") #'string-inflection-camelcase)
+(global-set-key (kbd "C-c m l") #'string-inflection-lower-camelcase)
+(global-set-key (kbd "C-c m u") #'string-inflection-upcase)
 
 ;; force myself to use C-i so I don't stretch my left pinky
 ;;(global-unset-key (kbd "<tab>"))
@@ -1193,8 +1225,6 @@
 
 (global-set-key (kbd "C-c .") #'completion-at-point)
 
-;;(load-file "~/etc/emacs/frame-cmds.el")
-;;(load-file "~/etc/emacs/zoom-frm.el")
 
 ;; w/o this remote X emacs is VERY slow while mark is active, every keystroke sends all the text into the clipboard!
 (setq select-active-regions nil)
@@ -1210,3 +1240,77 @@
 
 (global-set-key (kbd "<f6>") #'etc-full-profile)
 (global-set-key (kbd "<f7>") #'etc-full-profile-report)
+
+(defun delete-trailing-whitespace-except-current-line ()
+    (unless buffer-read-only
+      (delete-trailing-whitespace (point-min) (line-beginning-position))
+      (save-excursion
+        (forward-line)
+        (delete-trailing-whitespace (point) (point-max)))))
+
+;; delete trailing white space on every line but the current line,
+;; which is annoying when you combine automatic saving on window
+;; switch with writing python code
+(add-hook 'write-file-hooks 'delete-trailing-whitespace-except-current-line nil nil)
+
+;; enable color and compilation windows
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+
+(setq-default tab-width 4)
+
+
+
+
+
+
+
+
+
+
+(defcustom tramp-file-name-with-method "sudo"
+  "Which method to be used in `tramp-file-name-with-sudo'."
+  :group 'tramp
+  :type '(choice (const "su")
+                 (const "sudo")
+                 (const "doas")
+                 (const "ksu")))
+
+(defun tramp-file-name-with-sudo (filename)
+  "Convert FILENAME into a multi-hop file name with \"sudo\".
+An alternative method could be chosen with `tramp-file-name-with-method'."
+  (setq filename (expand-file-name filename))
+  (if (tramp-tramp-file-p filename)
+      (with-parsed-tramp-file-name filename nil
+        (if (and (tramp-multi-hop-p v)
+                 (not (string-equal method tramp-file-name-with-method)))
+            (tramp-make-tramp-file-name
+             (make-tramp-file-name
+              :method (tramp-find-method tramp-file-name-with-method nil host)
+              :user (tramp-find-user tramp-file-name-with-method nil host)
+              :host (tramp-find-host tramp-file-name-with-method nil host)
+              :localname localname :hop (tramp-make-tramp-hop-name v)))
+          (tramp-user-error v "Multi-hop with `%s' not applicable" method)))
+    (tramp-make-tramp-file-name
+     (make-tramp-file-name
+      :method tramp-file-name-with-method :localname filename))))
+
+(defun tramp-revert-buffer-with-sudo ()
+  "Revert current buffer to visit with \"sudo\" permissions.
+An alternative method could be chosen with `tramp-file-name-with-method'.
+If the buffer visits a file, the file is replaced.
+If the buffer runs `dired', the buffer is reverted."
+  (interactive)
+  (cond
+   ((buffer-file-name)
+    (find-alternate-file (tramp-file-name-with-sudo (buffer-name))))
+   ((derived-mode-p 'dired-mode)
+    (setq default-directory (tramp-file-name-with-sudo default-directory)
+          list-buffers-directory
+          (tramp-file-name-with-sudo list-buffers-directory))
+    (if (consp dired-directory)
+        (setcar
+         dired-directory (tramp-file-name-with-sudo (car dired-directory)))
+      (setq dired-directory (tramp-file-name-with-sudo dired-directory)))
+    (revert-buffer))))
+
+;;(setq tramp-verbose 3)

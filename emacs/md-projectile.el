@@ -19,7 +19,8 @@
   (when (and (boundp 'projectile-mode) projectile-mode
              ;; doing while minibuffer window is up annoys TRAMP sudo
              (not (active-minibuffer-window))
-             (not md-updating-projectile-files))
+             (not md-updating-projectile-files)
+             (projectile-project-p)) ;; etc-projectile-project-p instead?
     (let ((md-updating-projectile-files t)
           (current-project (etc-get-project)))
       (setq md-projectile-projects (projectile-relevant-known-projects))

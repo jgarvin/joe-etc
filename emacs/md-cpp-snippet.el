@@ -17,6 +17,7 @@
    ("case" "case $1:\n    $2;\n    break;")
    ("class" "class $1 : $2\n{\npublic:\n\nprivate:\n\n};")
    ("comment" "// $1")
+   ("concept" "template<$1>\nconcept $2 = requires($3) {\n    $3\n};")
    ("const cast" "const_cast<$1>($2)")
    ("const method sig" "$1 $1::$2($3) const;")
    ("const ref" "const $1&")

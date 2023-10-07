@@ -1,0 +1,105 @@
+#!/usr/bin/python
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import sys
+import argparse
+import numpy as np
+from math import log
+
+parser = argparse.ArgumentParser(description="Scatter plot a csv file")
+parser.add_argument('-s', '--select', metavar='COLUMN', nargs='+',
+                    dest="columns", help='Specify which columns')
+parser.add_argument('-q', '--filter-query', metavar='QUERY', type=str,
+                    help='Query in pandas query lang, filter out matching rows.')
+parser.add_argument('-k', '--keep-query', metavar='QUERY', type=str,
+                    help='Query in pandas query lang, only keep rows that match.')
+parser.add_argument(metavar='FILE', type=str, dest="file",
+                    help='CSV file location.')
+parser.add_argument('-e', '--equal-space-x-axis', action="store_true", help="Consider all x axis values to be 1 apart. Useful for dates")
+parser.add_argument('-t', '--sort', dest='sort', help="Column to sort by.")
+parser.add_argument('-o', '--output', dest='output', help="File to save plot to instead of using interactive mode.")
+args = parser.parse_args()
+
+# Read the CSV file
+data = pd.read_csv(args.file)
+data = data.dropna()
+
+if args.sort:
+    data.sort_values(by=args.sort, inplace=True)
+
+if args.filter_query:
+    data = data.query(f"not ({args.filter_query})")
+if args.keep_query:
+    data = data.query(f"{args.keep_query}")
+
+# so we can have our own separate index
+data = data.copy()
+
+# after filter and sort the index is no longer in order or contiguous,
+# but we want it to be 0..n when the user selects the special "INDEX"
+# column
+data.reset_index(drop=True, inplace=True)
+
+dcolumns = []
+if args.columns:
+    for column in args.columns:
+        if column == "INDEX":
+            dcolumns.append(data.index)
+        else:
+            dcolumns.append(data[column])
+else:
+    dcolumns = [data[data.columns[0]], data[data.columns[1]]]
+
+if args.equal_space_x_axis:
+    dcolumns[0] = pd.Series(range(len(data)))
+
+#plt.figure(figsize=(100,5))
+
+# Create a scatter plot using the x_value and y_value columns
+if len(dcolumns) > 2:
+    plt.scatter(dcolumns[0], dcolumns[1], c=data[columns[2]], cmap='viridis')
+else:
+    plt.scatter(dcolumns[0], dcolumns[1])
+
+def detect_scale(data):
+    # have to wrap in a new series because diff() doesn't exist on index
+    diff = pd.Series(data).diff().dropna()
+    if diff.nunique() == 1:
+        return "linear"
+    if log(abs(data.mean() - data.median())) > 4:
+        return "symlog"
+    if log(abs(data.max() - data.mean())) > 4:
+        return "symlog"
+    return "linear"
+
+# has to happen before we customize the ticks, this blows them away!
+plt.xscale(detect_scale(dcolumns[0]))
+plt.yscale(detect_scale(dcolumns[1]))
+
+if args.equal_space_x_axis:
+    xticks_locs = np.linspace(0, len(data) - 1, 10).astype(int)
+    print(data)
+    print(xticks_locs)
+    xticks_labels = data[args.columns[0]].iloc[xticks_locs].values
+    print(xticks_labels)
+    plt.xticks(xticks_locs, labels=[str(x) for x in xticks_labels])
+
+# Set the limits after the scale, if the minimum is 0 and then you set
+# log scale afterwards you get a totally broken plot with extreme
+# negative x axis min despite what you passed in.
+plt.xlim(dcolumns[0].min(), dcolumns[0].max())
+plt.ylim(dcolumns[1].min(), dcolumns[1].max())
+
+# Add labels and title
+plt.xlabel(dcolumns[0].name)
+plt.ylabel(dcolumns[1].name)
+plt.title(f"{dcolumns[0].name} vs {dcolumns[1].name}")
+
+#plt.set_aspect(0.5)
+
+# Display the scatter plot
+if args.output:
+    plt.savefig(args.output)
+else:
+    plt.show()

@@ -144,6 +144,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
       (push ?$ l)
       (push ?\: l))
     (when (derived-mode-p 'python-mode 'inferior-python-mode)
+      (push ?\= l)
       (setq l (delq ?\# l)))
     ;; (when (derived-mode-p 'sh-mode 'shell-mode)
       ;; (push ?\> l))
@@ -242,7 +243,7 @@ If the string preceeding pos isn't part of any pair, then returns nil."
         ;;(just-one-space)
         (at-most-one-space)
         ;; if we're just introducing trailing whitespace, delete it
-        (unless (get-buffer-process (current-buffer)) 
+        (unless (get-buffer-process (current-buffer))
           (delete-trailing-whitespace (beginning-of-line) (end-of-line))))
       (goto-char p)
       (when (and (save-excursion

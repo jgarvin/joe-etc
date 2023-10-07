@@ -557,3 +557,4 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-vhdl-snippet.el")
 (load-file "~/etc/emacs/md-sql-snippet.el")
 (load-file "~/etc/emacs/md-verilog-snippet.el")
+(load-file "~/etc/emacs/md-zig-snippet.el")

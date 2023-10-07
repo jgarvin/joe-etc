@@ -1,6 +1,7 @@
 (md-make-snippets
  '(derived-mode-p 'rust-mode)
  '(
+   ("as ref" "$1.as_ref()")
    ("zip" "$1.zip($2)")
    ("unimplemented" "std::unimplemented!($1)")
    ("read write lock" "RwLock<$1>")
@@ -28,7 +29,7 @@
    ("iter mutt" "$1.iter_mut()")
    ("collect" "$1.collect()")
    ("maybe uninit" "MaybeUninit<$1>")
-   ("map" "$1.map(|i| $2)")
+   ("map" "$1.map(|x| $2)")
    ("assert equal" "assert_eq!($1, $2);")
    ("module" "mod $1 {\n    $2\n}")
    ("function" "fn $1($2) -> $3 {\n    $4\n}")
@@ -138,5 +139,6 @@
    ("feature" "#![feature($1)]")
    ("null" "std::ptr::null()")
    ("null mut" "std::ptr::null_mut()")
+   ("transpose" "$1.transpose()")
    ("type ID of" "TypeId::of::<$1>()")
 ))

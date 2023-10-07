@@ -25,6 +25,6 @@ for i in 1 2; do
         # then override the setting to correct it just for the orbitouch
         setxkbmap -device "$CHARACODER_KEYBOARD_ID" us
     fi
-    xset r 66
+    xset r 40
     sleep 5 # sometimes first try doesn't stick because gnome overwrites at startup
 done

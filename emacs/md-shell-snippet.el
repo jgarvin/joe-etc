@@ -8,6 +8,7 @@
    ("export" "export $1=$2")
    ("CD" "cd $1")
    ("case" "case $1 in\n    $2)\n        $3\n        ;;\n    *)\n        echo >&2 $4\n        exit 1\n        ;;\nesac")
+   ("todo" "# TODO: $1")
    ))
 
 (md-make-snippets

@@ -90,10 +90,11 @@ the line, to capture multiline input. (This only has effect if
 `comint-eol-on-send' is non-nil."
   (flet ((end-of-line () (end-of-buffer)))
     ad-do-it))
+
 ;; not sure why, but comint needs to be reloaded from the source (*not*
 ;; compiled) elisp to make the above advise stick
-(load "comint.el.gz" t) ;; breaks on gentoo, can't find it
-(load "comint.el" t) ;; so try uncompressed
+;;(load "comint.el.gz" t) ;; breaks on gentoo, can't find it
+;;(load "comint.el" t) ;; so try uncompresse
 
 ;; comint history code taken from
 ;; https://oleksandrmanzyuk.wordpress.com/2011/10/23/a-persistent-command-history-in-emacs/

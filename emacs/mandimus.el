@@ -110,12 +110,30 @@ debug mode causing timers to die."
         (md-go-to-next sym)
       (user-error "No symbol under point."))))
 
+(defun md-get-next-not-visible-instance-of-symbol ()
+  (interactive)
+  (let ((sym (thing-at-point 'symbol))
+        (starting-window-end (window-end)))
+    (if sym
+        (while (< (point) starting-window-end)
+          (md-go-to-next sym))
+      (user-error "No symbol under point."))))
+
 (defun md-get-previous-instance-of-symbol ()
   (interactive)
   (let ((sym (thing-at-point 'symbol)))
     (if sym
         (progn
           ;; (message "looking for symbol:%s" sym)
+          (md-go-to-previous sym))
+      (user-error "No symbol under point."))))
+
+(defun md-get-previous-not-visible-instance-of-symbol ()
+  (interactive)
+  (let ((sym (thing-at-point 'symbol))
+        (starting-window-start (window-start)))
+    (if sym
+        (while (> (point) starting-window-start)
           (md-go-to-previous sym))
       (user-error "No symbol under point."))))
 

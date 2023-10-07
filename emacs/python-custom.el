@@ -91,7 +91,7 @@
   (if (in-leading-whitespace)
       (let (indent-level needed-indenting)
         (save-excursion
-          (next-line)
+          (line-move 1 t)
           (setq indent-level (current-indentation))
           (setq needed-indenting (line-needs-indenting)))
         (kill-line ARG)
@@ -129,3 +129,10 @@
        '(("\\.pyi\\'" . python-mode)
          ("\\.py\\'" . python-mode))
        auto-mode-alist))
+
+;; prefer backwards kill word behavior... but A-<backspace> does this
+;; already so maybe I should reevaluate. Apparently both kill words by
+;; default!
+(define-key python-mode-map (kbd "C-<backspace>") nil)
+
+(setq py-underscore-word-syntax-p nil)

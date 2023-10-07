@@ -39,3 +39,4 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 if [ -f "$HOME/.cargo/env" ]; then
    source "$HOME/.cargo/env"
 fi
+if [ -e /home/prophet/.nix-profile/etc/profile.d/nix.sh ]; then . /home/prophet/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer

@@ -93,13 +93,13 @@
   (local-set-key (kbd "C-M-k") #'sp-kill-hybrid-sexp)
   ;; Prefer 4-space tabs
 
-;;  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
    ;; don't indent top level namespace
   (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
 
   (setq c-default-style "bsd")
   (setq indent-tabs-mode nil)
   (etc-set-indent-preference 4)
+  (c-set-offset 'innamespace 0) ;; don't indent top level namespace
   (setq c-indent-comments-syntactically-p t)
 
   ;; public void veryLongMethodNameHereWithArgs(
