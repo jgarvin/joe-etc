@@ -83,7 +83,7 @@ myKeys browser browser_name editor conf@(XConfig {XMonad.modMask = modMask}) = M
     [ ((modMask .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
 
     -- toggle gnome panel visibility
-    --, ((modMask,  xK_f), sendMessage ToggleStruts)
+    , ((modMask,  xK_f), sendMessage ToggleStruts)
 
     -- launch emacs
     , ((modMask .|. shiftMask,  xK_w), runOrRaiseNext editor (className =? "Emacs" <||> className =? "emacs" <||> className =? "Emacs23"))

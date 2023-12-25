@@ -194,7 +194,7 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1228,7 +1228,8 @@
 (global-set-key (kbd "C-c .") #'completion-at-point)
 
 
-;; w/o this remote X emacs is VERY slow while mark is active, every keystroke sends all the text into the clipboard!
+;; w/o this remote X emacs is VERY slow while mark is active, every
+;; keystroke sends all the text into the clipboard!
 (setq select-active-regions nil)
 
 (defun etc-full-profile ()
@@ -1256,7 +1257,16 @@
 (add-hook 'write-file-hooks 'delete-trailing-whitespace-except-current-line nil nil)
 
 ;; enable color and compilation windows
-(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+;; https://stackoverflow.com/a/63710493/50385
+(use-package
+  xterm-color
+  :ensure t
+  )
+(require 'xterm-color)
+(setq compilation-environment '("TERM=xterm-256color"))
+(defun my/advice-compilation-filter (f proc string)
+  (funcall f proc (xterm-color-filter string)))
+(advice-add 'compilation-filter :around #'my/advice-compilation-filter)
 
 (setq-default tab-width 4)
 
