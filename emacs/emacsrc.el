@@ -33,7 +33,17 @@
   )
 
 (use-package
+  ace-jump-mode
+  :ensure t
+  )
+
+(use-package
   dockerfile-mode
+  :ensure t
+  )
+
+(use-package
+  drag-stuff
   :ensure t
   )
 
@@ -869,7 +879,7 @@
 ;;
 ;; ace jump mode major function
 ;;
-(add-to-list 'load-path "~/etc/ace-jump-mode")
+;;(add-to-list 'load-path "~/etc/ace-jump-mode")
 (autoload
   'ace-jump-mode
   "ace-jump-mode"
@@ -1203,9 +1213,6 @@
 ;; for emacsclient
 ;;(setenv "XDG_RUNTIME_DIR" "") ;; so server doesn't use it
 (server-start)
-
-(when (file-exists-p "~/radix-jhg/main.el")
-  (load-file "~/radix-jhg/main.el"))
 
 (defvar etc-auto-revert-buffers-running nil)
 (defadvice auto-revert-buffers (around etc-auto-revert-dont-recurse)
