@@ -14,6 +14,9 @@ setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 mkdir -p $HOME/.config/kitty/
 setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
 
+mkdir -p $HOME/.config/sway
+setup_symlink $HOME/etc/sway_config $HOME/.config/sway/config
+
 # SuSE insists on there being a fonts directory.
 mkdir -p $HOME/.fonts
 setup_symlink $HOME/etc/fonts $HOME/.fonts/my-fonts
