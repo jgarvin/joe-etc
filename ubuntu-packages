@@ -9,16 +9,8 @@ lsof
 xterm
 
 # Revision control
-cvs
-subversion
 git
 gitk
-git-svn
-git-cvs
-magit
-bzr
-darcs
-mercurial
 
 # Xmonad
 cabal-install
@@ -48,7 +40,6 @@ pidgin
 xclip
 thunderbird
 sshfs
-haskell-mode
 python-markdown # for building redo docs
 python-beautifulsoup # for building redo docs
 openssh-server
@@ -73,7 +64,6 @@ manpages-posix
 manpages-posix-dev
 manpages-dev
 apt-file
-python-setuptools
 libssl-dev
 zlib1g-dev
 e2fslibs-dev
