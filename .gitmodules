@@ -1,6 +1,3 @@
-[submodule "drag-stuff"]
-	path = drag-stuff
-	url = https://github.com/rejeep/drag-stuff.git
 [submodule "wrap-region"]
 	path = wrap-region
 	url = https://github.com/rejeep/wrap-region.git
@@ -13,15 +10,9 @@
 [submodule "ack"]
 	path = ack
 	url = https://github.com/petdance/ack.git
-[submodule "gdb/boostpp"]
-	path = gdb/boostpp
-	url = git://github.com/ruediger/Boost-Pretty-Printer.git
 [submodule "sh"]
 	path = sh
 	url = https://github.com/amoffat/sh.git
-[submodule "ace-jump-mode"]
-	path = ace-jump-mode
-	url = git@github.com:winterTTr/ace-jump-mode.git
 [submodule "smartparens"]
 	path = smartparens
 	url = git@github.com:Fuco1/smartparens.git
