@@ -252,7 +252,7 @@ main = do
 -- decoFunc = simpleDeco shrinkText (defaultTheme { decoWidth = 9999999, fontName = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" } )
 -- decoFunc = simpleDeco
 
-myTheme = defaultTheme { decoWidth = -1, fontName = "-*-helvetica-bold-r-*-*-18-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" }
+myTheme = def { decoWidth = -1, fontName = "-*-helvetica-bold-r-*-*-18-*-*-*-*-*-*-*", inactiveColor = "black", activeColor = "black", activeTextColor = "red", inactiveTextColor = "green" }
 
 -- myDeco = simpleDeco shrinkText myTheme (layoutHook gnomeConfig)
 

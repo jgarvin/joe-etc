@@ -11,6 +11,9 @@ setup_symlink $HOME/etc/shell/bash_profile $HOME/.bash_profile
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 
+mkdir -p $HOME/.config/kitty/
+setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
+
 # SuSE insists on there being a fonts directory.
 mkdir -p $HOME/.fonts
 setup_symlink $HOME/etc/fonts $HOME/.fonts/my-fonts

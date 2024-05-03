@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-if which xfce4-terminal &> /dev/null; then
-	xfce4-terminal
-else
-	gnome-terminal 
-fi
+for term in kitty xfce4-terminal gnome-terminal xterm; do
+    if which $term &> /dev/null; then
+        exec $term
+    fi
+done
+
+exit 1

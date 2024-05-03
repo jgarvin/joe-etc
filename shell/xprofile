@@ -4,11 +4,11 @@ source $HOME/etc/shell/path_setup
 
 # gets nice font rendering in xmonad
 # investigate alternative: xsettingsd
-# settings_daemon="/usr/lib/gnome-settings-daemon/gsd-xsettings"
-# if [ -f $settings_daemon ]; then
+#settings_daemon="/usr/libexec/gsd-xsettings"
+#if [ -f $settings_daemon ]; then
 #     $settings_daemon &
 #     sleep 1 # don't know if I need this
-# fi
+#fi
 
 # turn on workman layout if possible, comes with ubuntu nowadays
 #setxkbmap -v us workman -option caps:ctrl_modifier
@@ -25,10 +25,12 @@ source $HOME/etc/shell/path_setup
 #setxkbmap -synch -v "$layout" "$variant"
 
 # lets us use DISPLAY inside systemd user services
-systemctl --user import-environment
+systemctl --user import-environment $(env | cut -d'=' -f1)
 systemctl --user start user-graphical-login.target &
+disown
 
 # otherwise qt apps look tiny
 export QT_SCALE_FACTOR=1.5
 
 xrdb ~/.Xresources
+exec xmonad

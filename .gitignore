@@ -30,3 +30,4 @@ massif.out
 .redo
 out
 *.wav
+systemd/*.target.wants/
