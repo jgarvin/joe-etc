@@ -1,11 +1,11 @@
 (require 'erc-services)
 (erc-services-mode 1)
 (setq erc-prompt-for-nickserv-password nil)
-(setq erc-nickserv-passwords
-      `((libera     ((,freenode-nick . ,freenode-nick-pass)))
-        ;;(freenode     ((,freenode-nick . ,freenode-nick-pass)))
-        (oftc  ((,freenode-nick . ,freenode-nick-pass)))
-        (mozilla ((,freenode-nick . ,freenode-nick-pass)))))
+;; (setq erc-nickserv-passwords
+;;       `((libera     ((,freenode-nick . ,freenode-nick-pass)))
+;;         ;;(freenode     ((,freenode-nick . ,freenode-nick-pass)))
+;;         (oftc  ((,freenode-nick . ,freenode-nick-pass)))
+;;         (mozilla ((,freenode-nick . ,freenode-nick-pass)))))
 
 (add-to-list 'erc-nickserv-alist (list 'mozilla "NickServ!services@ircservices.mozilla.org" "This\\s-nickname\\s-is\\s-registered\\s-and\\s-protected" "NickServ" "IDENTIFY" nil nil "Password\\s-accepted"))
 
