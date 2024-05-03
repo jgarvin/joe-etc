@@ -102,3 +102,7 @@ kitty
 sway*
 dmenu
 libgtk-layer-shell-dev
+python3-pip
+wev
+pulseaudio-utils
+pavucontrol
