@@ -200,13 +200,14 @@
           )
         ;; these are the ones that matter if you ask xdotool for the
         ;; currently selected window
-        (x-change-window-property "mandimus_server_host" (system-name) f nil nil nil)
-        (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil nil)
-        ;; these matter if you run xprop on the frame. shouldn't
-        ;; actually matter for mandimus but here just to make things
-        ;; more understandable when debugging.
-        (x-change-window-property "mandimus_server_host" (system-name) f nil nil t)
-        (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil t)))))
+        (when (functionp #'x-change-window-property)
+          (x-change-window-property "mandimus_server_host" (system-name) f nil nil nil)
+          (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil nil)
+          ;; these matter if you run xprop on the frame. shouldn't
+          ;; actually matter for mandimus but here just to make things
+          ;; more understandable when debugging.
+          (x-change-window-property "mandimus_server_host" (system-name) f nil nil t)
+          (x-change-window-property "mandimus_server_port" (number-to-string md-server-port) f nil nil t))))))
 
 (add-hook 'after-make-frame-functions #'md-network-annotate-frames)
 ;; only annotating after frame creation doesn't seem to be sufficient
