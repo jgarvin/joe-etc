@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Qtile (Wayland)
+Comment=Qtile Session
+Exec=/home/$USER/etc/qtile/start_qtile.sh
+Type=Application
+Keywords=wm;tiling

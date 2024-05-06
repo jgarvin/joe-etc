@@ -1,0 +1,19 @@
+# modified version of: https://github.com/qtile/qtile/blob/53f3711866d67d33f38a6e72de37ad857decb1a2/resources/99-qtile.rules
+# copy to: /etc/udev/rules.d/
+
+# for controlling LCD backlight
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/root/change_qtile_perms.sh"
+
+# for keyboard backlight
+ACTION=="add", SUBSYSTEM=="leds", RUN+="/root/change_qtile_perms.sh"
+
+# for battery charge thresholds (assuming similar pattern to Qtile's Python glob usage)
+ACTION=="add", SUBSYSTEM=="power_supply", ATTR{type}=="Battery", RUN+="/root/change_qtile_perms.sh"
+
+ACTION=="add" KERNEL=="asus-wmi" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="huawei-wmi" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="lg-laptop" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="msi-ec" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="thinkpad_acpi" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="system76_acpi" RUN+="/root/change_qtile_perms.sh"
+ACTION=="add" KERNEL=="toshiba_acpi" RUN+="/root/change_qtile_perms.sh"
