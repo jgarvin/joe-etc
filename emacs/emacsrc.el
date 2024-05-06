@@ -204,7 +204,7 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1333,3 +1333,37 @@ If the buffer runs `dired', the buffer is reverted."
     (revert-buffer))))
 
 ;;(setq tramp-verbose 3)
+
+;;;;;;;; wayland stuff ;;;;;;;;;;;;;;;;;;
+
+(when (getenv "WAYLAND_DISPLAY")
+  ;; without this middle click doesn't work
+  ;; https://github.com/doomemacs/doomemacs/issues/5219#issuecomment-877282638
+  (use-package xclip
+    :ensure t
+    :config
+    (setq xclip-program "wl-copy")
+    (setq xclip-select-enable-clipboard t)
+    (setq xclip-mode t)
+    (setq xclip-method (quote wl-copy)))
+  
+  ;; Without this, copy and pasting from other wayland apps into
+  ;; emacs-pgtk doesn't work.
+  ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
+  (setq wl-copy-process nil)
+  (defun wl-copy (text)
+    (setq wl-copy-process (make-process :name "wl-copy"
+                                        :buffer nil
+                                :command '("wl-copy" "-f" "-n")
+                                :connection-type 'pipe
+                                :noquery t))
+    (process-send-string wl-copy-process text)
+    (process-send-eof wl-copy-process))
+  (defun wl-paste ()
+    (if (and wl-copy-process (process-live-p wl-copy-process))
+        nil ; should return nil if we're the current paste owner
+      (shell-command-to-string "wl-paste -n | tr -d \r")))
+  (setq interprogram-cut-function 'wl-copy)
+  (setq interprogram-paste-function 'wl-paste))
+
+
