@@ -108,3 +108,5 @@ pulseaudio-utils
 pavucontrol
 wl-clipboard
 timeshift
+udiskie
+waybar
