@@ -1,0 +1,4 @@
+sudo apt install timeshift
+sudo timeshift-gtk
+
+use gui to configure snapshot interval

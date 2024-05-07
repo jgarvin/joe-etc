@@ -11,4 +11,9 @@
 # replacing $USER appropriately inside.
 
 source ~/opt/qtile/bin/activate
-qtile start -b wayland
+source ~/.xprofile
+
+# Ubuntu puts this in a different location that qtile expects apparently
+export LIBGL_DRIVERS_PATH=/usr/lib/x86_64-linux-gnu/dri/
+
+exec qtile start -b wayland
