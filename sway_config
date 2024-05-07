@@ -30,48 +30,17 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # multimonitor setup
 output DP-6 transform "270"
 output DP-6 position 0 0
-output DP-5 position 1280 0
+output DP-5 position 1440 0
 output eDP-1 position 3840 0
 
 # repeat of setup because input names change for no reason
 output DP-4 transform "270"
 output DP-4 position 0 0
-output DP-3 position 1280 0
+output DP-3 position 1440 0
 output eDP-1 position 3840 0
 
-#
-# Example configuration:
-#
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
-# You can get the names of your outputs by running: swaymsg -t get_outputs
-
-### Idle configuration
-#
-# Example configuration:
-#
-# exec swayidle -w \
-#          timeout 300 'swaylock -f -c 000000' \
-#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-#          before-sleep 'swaylock -f -c 000000'
-#
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
-
-### Input configuration
-#
-# Example configuration:
-#
-#   input "2:14:SynPS/2_Synaptics_TouchPad" {
-#       dwt enabled
-#       tap enabled
-#       natural_scroll enabled
-#       middle_emulation enabled
-#   }
-#
-# You can get the names of your inputs by running: swaymsg -t get_inputs
-# Read `man 5 sway-input` for more information about this section.
+# I don't know why it defaults to 2...
+output eDP-1 scale 1
 
 ### Key bindings
 #
@@ -81,7 +50,7 @@ output eDP-1 position 3840 0
     bindsym $mod+Return exec $term
 
     # Kill focused window
-    bindsym $mod+Shift+q kill
+    bindsym $mod+q kill
 
     # Start your launcher
     bindsym $mod+h exec $menu
@@ -149,6 +118,12 @@ output eDP-1 position 3840 0
     bindsym $mod+Shift+0 move container to workspace number 10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
+
+    bindsym $mod+Control+Shift+Right move workspace to output right
+    bindsym $mod+Control+Shift+Left move workspace to output left
+    bindsym $mod+Control+Shift+Down move workspace to output down
+    bindsym $mod+Control+Shift+Up move workspace to output up
+
 #
 # Layout stuff:
 #
@@ -244,10 +219,52 @@ input "type:keyboard" {
     repeat_rate 100
 }
 
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%    
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%    
-bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle    
-bindsym XF86MonBrightnessDown exec brightnessctl set -5%    
-bindsym XF86MonBrightnessUp exec brightnessctl set +5%
+input "type:touchpad" {
+   tap enabled
+}
+
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# See sh/udev scripts in ~/etc/qtile/ to make these work.
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec brightnessctl set 5%+
 
 include /etc/sway/config.d/*
+
+
+#
+# Example configuration:
+#
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+### Idle configuration
+#
+# Example configuration:
+#
+# exec swayidle -w \
+#          timeout 300 'swaylock -f -c 000000' \
+#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+#          before-sleep 'swaylock -f -c 000000'
+#
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+
+### Input configuration
+#
+# Example configuration:
+#
+#   input "2:14:SynPS/2_Synaptics_TouchPad" {
+#       dwt enabled
+#       tap enabled
+#       natural_scroll enabled
+#       middle_emulation enabled
+#   }
+#
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Read `man 5 sway-input` for more information about this section.
+
