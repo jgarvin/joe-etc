@@ -1346,7 +1346,7 @@ If the buffer runs `dired', the buffer is reverted."
     (setq xclip-select-enable-clipboard t)
     (setq xclip-mode t)
     (setq xclip-method (quote wl-copy)))
-  
+
   ;; Without this, copy and pasting from other wayland apps into
   ;; emacs-pgtk doesn't work.
   ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
@@ -1367,3 +1367,9 @@ If the buffer runs `dired', the buffer is reverted."
   (setq interprogram-paste-function 'wl-paste))
 
 
+;; bizarre issue with emacs-pgtk where shift+space can't be detected
+;; unless you set these.
+;;
+;; https://www.reddit.com/r/emacs/comments/osscfd/pgtk_emacswaylandgnome_no_shiftspace/
+(setq pgtk-use-im-context-on-new-connection nil)
+(pgtk-use-im-context nil)
