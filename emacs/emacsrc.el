@@ -1183,6 +1183,8 @@
 ;; (global-unset-key (kbd "S-<up>") #'etc-prior)
 ;; (global-unset-key (kbd "S-<down>"))
 
+(define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
+(define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
 (define-key drag-stuff-mode-map (kbd "M-<right>") nil)
 (define-key drag-stuff-mode-map (kbd "M-<left>") nil)
 (global-set-key (kbd "M-<left>") #'beginning-or-indentation)
