@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
 # Initialize variables
-log_enabled=false
 log_file=""
 
 # Process script arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --log)
-            log_enabled=true
             log_file="$2"
             shift 2
             ;;
