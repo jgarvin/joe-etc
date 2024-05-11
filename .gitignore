@@ -31,3 +31,4 @@ massif.out
 out
 *.wav
 systemd/*.target.wants/
+bin/async_tail
