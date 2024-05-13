@@ -18,6 +18,8 @@
 
 static void execute_command(char *cmd[], char *log_path)
 {
+    signal(SIGCHLD, SIG_DFL); // undo being set in parent
+
     int log_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (log_fd < 0)
     {
