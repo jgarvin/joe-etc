@@ -18,7 +18,12 @@
 
 static void execute_command(char *cmd[], char *log_path)
 {
-    signal(SIGCHLD, SIG_DFL); // undo being set in parent
+    // undo being set in parent
+    if(signal(SIGCHLD, SIG_DFL) == SIG_ERR)
+    {
+        perror("signal");
+        exit(EXIT_FAILURE);
+    }
 
     int log_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (log_fd < 0)
@@ -141,7 +146,33 @@ static void tail_log_file(char *log_path, pid_t child_pid)
 
 int main(int argc, char *argv[])
 {
-    signal(SIGCHLD, sigchld_handler);
+    struct sigaction sa;
+    sa.sa_handler = &sigchld_handler;
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; // don't notify on stopped child, only on exit
+    sigemptyset(&sa.sa_mask);
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
+    // unblock SIGCHLD in case we inherited it being blocked from parent process
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGCHLD);
+    int result = sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+    if (result == -1) {
+        perror("sigprocmask");
+        exit(EXIT_FAILURE);
+    }
+
+    // Iterate through signal numbers and check if they are in the set
+    for (int i = 1; i < NSIG; ++i) {  // NSIG is the number of signals defined
+        if (sigismember(&sigset, i)) {
+            printf("Signal %d is blocked.\n", i);
+        } else {
+            printf("Signal %d is unblocked.\n", i);
+        }
+    }
 
     if(argc < 5 || strcmp(argv[1], "--log") != 0 || strcmp(argv[3], "--") != 0) {
         fprintf(stderr, "Usage: %s --log <log_path> -- <command>\n", argv[0]);
