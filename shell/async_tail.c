@@ -15,7 +15,9 @@
  * of cmd_a is not throttled by cmd_b's consumption rate. */
 
 #define BUFFER_SIZE 4096
-#define LOG_DEBUG 1
+#define LOG_DEBUG 0
+
+struct timespec g_start, g_end;
 
 static void execute_command(char *cmd[], char *log_path)
 {
@@ -94,13 +96,52 @@ static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_writt
     return bytes_read;
 }
 
-static void tail_log_file(char *log_path, pid_t child_pid)
+int main(int argc, char *argv[])
 {
-    int log_fd = open(log_path, O_RDONLY | O_NONBLOCK);
+    struct sigaction sa;
+    sa.sa_handler = &sigchld_handler;
+    sa.sa_flags = SA_NOCLDSTOP; // don't notify on stopped child, only on exit
+    sigemptyset(&sa.sa_mask);
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
+    // unblock SIGCHLD in case we inherited it being blocked from parent process
+    sigset_t sigset;
+    sigemptyset(&sigset);
+    sigaddset(&sigset, SIGCHLD);
+    int result = sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+    if (result == -1) {
+        perror("sigprocmask");
+        exit(EXIT_FAILURE);
+    }
+
+    if(argc < 5 || strcmp(argv[1], "--log") != 0 || strcmp(argv[3], "--") != 0) {
+        fprintf(stderr, "Usage: %s --log <log_path> -- <command>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    char *log_path = argv[2];
+    char **cmd = &argv[4];
+
+    int log_fd = open(log_path, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
     if (log_fd < 0)
     {
         perror("Failed to open log file for reading");
         exit(EXIT_FAILURE);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &g_start);
+    pid_t pid = fork();
+    if(pid < 0)
+    {
+        perror("Failed to fork");
+        return EXIT_FAILURE;
+    }
+    else if(pid == 0)
+    {
+        execute_command(cmd, log_path);
     }
 
     char buffer[BUFFER_SIZE] = {};
@@ -157,11 +198,12 @@ static void tail_log_file(char *log_path, pid_t child_pid)
 
     if(LOG_DEBUG) fprintf(stderr, "Waiting for child!\n");
 
-    if(waitpid(child_pid, &status, WNOHANG) < 0)
+    if(waitpid(pid, &status, WNOHANG) < 0)
     {
         perror("waitpid");
         exit(EXIT_FAILURE);
     }
+    clock_gettime(CLOCK_MONOTONIC, &g_end);
 
     struct stat buf;
     fstat(log_fd, &buf);
@@ -175,56 +217,11 @@ static void tail_log_file(char *log_path, pid_t child_pid)
 
     if(LOG_DEBUG) fprintf(stderr, "Done!\n");
 
+    double elapsed_time = (g_end.tv_sec - g_start.tv_sec) + (g_end.tv_nsec - g_start.tv_nsec) / 1e9;
+    fprintf(stderr, "Duration: %f\n", elapsed_time);
+
     close(log_fd);
 
     // exit with same code as underlying command
-    exit(WEXITSTATUS(status));
-}
-
-int main(int argc, char *argv[])
-{
-    struct sigaction sa;
-    sa.sa_handler = &sigchld_handler;
-    sa.sa_flags = SA_NOCLDSTOP; // don't notify on stopped child, only on exit
-    sigemptyset(&sa.sa_mask);
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
-
-    // unblock SIGCHLD in case we inherited it being blocked from parent process
-    sigset_t sigset;
-    sigemptyset(&sigset);
-    sigaddset(&sigset, SIGCHLD);
-    int result = sigprocmask(SIG_UNBLOCK, &sigset, NULL);
-    if (result == -1) {
-        perror("sigprocmask");
-        exit(EXIT_FAILURE);
-    }
-
-    if(argc < 5 || strcmp(argv[1], "--log") != 0 || strcmp(argv[3], "--") != 0) {
-        fprintf(stderr, "Usage: %s --log <log_path> -- <command>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    char *log_path = argv[2];
-    char **cmd = &argv[4];
-
-    pid_t pid = fork();
-    if(pid < 0)
-    {
-        perror("Failed to fork");
-        return EXIT_FAILURE;
-    }
-    else if(pid == 0)
-    {
-        execute_command(cmd, log_path);
-    }
-    else
-    {
-        tail_log_file(log_path, pid);
-        wait(NULL);
-    }
-
-    return EXIT_SUCCESS;
+    return WEXITSTATUS(status);
 }
