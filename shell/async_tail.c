@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
                 // If we read no bytes, it's because we've reached
                 // EOF. Unfortunately the semantics of poll() are such
                 // that being at EOF is considered readable, so poll
-                // will return write away. To properly block waiting
+                // will return right away. To properly block waiting
                 // for more data we would need to use inotify, but
                 // we're lazy, so just sleep so we don't burn up a
                 // core while waiting for the other process to log
