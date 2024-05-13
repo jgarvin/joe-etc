@@ -7,6 +7,7 @@
 #include <sys/poll.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <time.h>
 
 /* async_tail is a wrapper that redirects your command to a log and
  * launches a tail that exits only when all output is printed. This
@@ -14,7 +15,7 @@
  * of cmd_a is not throttled by cmd_b's consumption rate. */
 
 #define BUFFER_SIZE 4096
-#define LOG_DEBUG 0
+#define LOG_DEBUG 1
 
 static void execute_command(char *cmd[], char *log_path)
 {
@@ -58,33 +59,39 @@ static void sigchld_handler(int signum)
     child_exited = 1;
 }
 
-static void forward_data(int log_fd, char* buffer, ssize_t* total_bytes_written)
+static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_written)
 {
     ssize_t bytes_read = 0;
-    while((bytes_read = read(log_fd, buffer, BUFFER_SIZE)) > 0)
-    {
-        ssize_t bytes_written_of_this_read = 0;
-        while(bytes_written_of_this_read < bytes_read)
-        {
-            ssize_t bytes_written = write(STDOUT_FILENO, buffer, bytes_read);
-            if (bytes_written < 0)
-            {
-                if(errno != EINTR)
-                {
-                    perror("write");
-                    exit(EXIT_FAILURE);
-                }
-                continue;
-            }
-            bytes_written_of_this_read += bytes_written;
-            *total_bytes_written += bytes_written;
-        }
-    }
-    if(bytes_read < 0 && errno != EINTR)
+
+    do {
+        bytes_read = read(log_fd, buffer, BUFFER_SIZE);
+    } while(bytes_read < 0 && errno != EINTR);
+
+    if(bytes_read < 0)
     {
         perror("Failed to read from log file");
         exit(EXIT_FAILURE);
     }
+
+    //fprintf(stderr, "bytes_read=%ld\n", bytes_read);
+    ssize_t bytes_written_of_this_read = 0;
+    while(bytes_written_of_this_read < bytes_read)
+    {
+        ssize_t bytes_written = write(STDOUT_FILENO, buffer, bytes_read);
+        if (bytes_written < 0)
+        {
+            if(errno != EINTR)
+            {
+                perror("write");
+                exit(EXIT_FAILURE);
+            }
+            continue;
+        }
+        bytes_written_of_this_read += bytes_written;
+        *total_bytes_written += bytes_written;
+    }
+
+    return bytes_read;
 }
 
 static void tail_log_file(char *log_path, pid_t child_pid)
@@ -102,15 +109,45 @@ static void tail_log_file(char *log_path, pid_t child_pid)
 
     struct pollfd pfd = {
         .fd = log_fd,
-        .events = POLLIN
+        .events = POLLIN | POLLERR | POLLHUP
     };
 
     // Continue to read until the process exits
     while(!child_exited)
     {
+        //fprintf(stderr, "poll start\n");
         if(poll(&pfd, 1, -1) > 0)
         {
-            forward_data(log_fd, buffer, &total_bytes_written);
+            //fprintf(stderr, "poll stop\n");
+            if(pfd.revents & POLLIN)
+            {
+                ssize_t forwarded = forward_data(log_fd, buffer, &total_bytes_written);
+                // If we read no bytes, it's because we've reached
+                // EOF. Unfortunately the semantics of poll() are such
+                // that being at EOF is considered readable, so poll
+                // will return write away. To properly block waiting
+                // for more data we would need to use inotify, but
+                // we're lazy, so just sleep so we don't burn up a
+                // core while waiting for the other process to log
+                // more.
+                if(forwarded == 0 && !child_exited)
+                {
+                    struct timespec duration;
+                    duration.tv_sec = 0;
+                    duration.tv_nsec = 10000000; // 10ms
+                    nanosleep(&duration, NULL);
+                }
+            }
+            if(pfd.revents & (POLLERR | POLLHUP))
+            {
+                fprintf(stderr, "Error tailing fd!\n");
+                break;
+            }
+        }
+        else
+        {
+            perror("poll");
+            exit(EXIT_FAILURE);
         }
         if(child_exited)
         {
@@ -148,7 +185,7 @@ int main(int argc, char *argv[])
 {
     struct sigaction sa;
     sa.sa_handler = &sigchld_handler;
-    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; // don't notify on stopped child, only on exit
+    sa.sa_flags = SA_NOCLDSTOP; // don't notify on stopped child, only on exit
     sigemptyset(&sa.sa_mask);
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         perror("sigaction");
