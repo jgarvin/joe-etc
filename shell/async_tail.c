@@ -27,8 +27,16 @@ static void execute_command(char *cmd[], char *log_path)
         exit(EXIT_FAILURE);
     }
 
-    dup2(log_fd, STDOUT_FILENO);
-    dup2(log_fd, STDERR_FILENO);
+    if(dup2(log_fd, STDOUT_FILENO) < 0)
+    {
+        perror("dup2");
+        exit(EXIT_FAILURE);
+    }
+    if(dup2(log_fd, STDERR_FILENO) < 0)
+    {
+        perror("dup2");
+        exit(EXIT_FAILURE);
+    }
     close(log_fd);
 
     execvp(cmd[0], cmd);
