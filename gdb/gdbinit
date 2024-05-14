@@ -34,7 +34,7 @@ set script-extension soft
 # disable paging since eshell handles for us
 set height 0
 
-# annoying to remember
-alias -a exit = quit
+# annoying to remember, not needed on newer gdb versions
+#alias -a exit = quit
 
 source ~/etc/gdb/nopify.py
