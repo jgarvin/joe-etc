@@ -19,55 +19,9 @@
 
 struct timespec g_start, g_end;
 
-static void execute_command(char *cmd[], char *log_path)
-{
-    // undo being set in parent
-    if(signal(SIGCHLD, SIG_DFL) == SIG_ERR)
-    {
-        perror("signal");
-        exit(EXIT_FAILURE);
-    }
-
-    int log_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    if (log_fd < 0)
-    {
-        perror("Failed to open log file");
-        exit(EXIT_FAILURE);
-    }
-
-    if(dup2(log_fd, STDOUT_FILENO) < 0)
-    {
-        perror("dup2");
-        exit(EXIT_FAILURE);
-    }
-    if(dup2(log_fd, STDERR_FILENO) < 0)
-    {
-        perror("dup2");
-        exit(EXIT_FAILURE);
-    }
-    close(log_fd);
-
-    execvp(cmd[0], cmd);
-    perror("Failed to execute command");
-    exit(EXIT_FAILURE);
-}
-
-volatile sig_atomic_t child_exited = 0;
-
-static void sigchld_handler(int signum)
-{
-    // Set the flag to indicate the child has exited
-    if(LOG_DEBUG) fprintf(stderr, "Child exited!\n");
-    child_exited = 1;
-}
-
 static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_written)
 {
-    ssize_t bytes_read = 0;
-
-    do {
-        bytes_read = read(log_fd, buffer, BUFFER_SIZE);
-    } while(bytes_read < 0 && errno != EINTR);
+    ssize_t bytes_read = read(log_fd, buffer, BUFFER_SIZE);
 
     if(bytes_read < 0)
     {
@@ -75,18 +29,14 @@ static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_writt
         exit(EXIT_FAILURE);
     }
 
-    //fprintf(stderr, "bytes_read=%ld\n", bytes_read);
     ssize_t bytes_written_of_this_read = 0;
     while(bytes_written_of_this_read < bytes_read)
     {
         ssize_t bytes_written = write(STDOUT_FILENO, buffer, bytes_read);
         if (bytes_written < 0)
         {
-            if(errno != EINTR)
-            {
-                perror("write");
-                exit(EXIT_FAILURE);
-            }
+            perror("write");
+            exit(EXIT_FAILURE);
             continue;
         }
         bytes_written_of_this_read += bytes_written;
@@ -99,8 +49,8 @@ static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_writt
 int main(int argc, char *argv[])
 {
     struct sigaction sa;
-    sa.sa_handler = &sigchld_handler;
-    sa.sa_flags = SA_NOCLDSTOP; // don't notify on stopped child, only on exit
+    sa.sa_handler = SIG_DFL;
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; // restart syscalls, don't notify on stopped child, only on exit
     sigemptyset(&sa.sa_mask);
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         perror("sigaction");
@@ -132,6 +82,13 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    int pgrp_notify_pipe[2] = {};
+    if(pipe(pgrp_notify_pipe) < 0)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &g_start);
     pid_t pid = fork();
     if(pid < 0)
@@ -141,10 +98,64 @@ int main(int argc, char *argv[])
     }
     else if(pid == 0)
     {
-        execute_command(cmd, log_path);
+        // undo being set in parent
+        if(signal(SIGCHLD, SIG_DFL) == SIG_ERR)
+        {
+            perror("signal");
+            exit(EXIT_FAILURE);
+        }
+
+        // Create a process group so parent can wait on the group. If the
+        // underlying command doesn't try to create any process groups
+        // itself then all its children recursively will belong to the
+        // same group, and we won't assess the file size until they are
+        // all gone.
+        int err = setpgrp();
+        if(write(pgrp_notify_pipe[1], "\0", 1) < 0)
+        {
+            perror("write");
+            exit(EXIT_FAILURE);
+        }
+
+        if(err < 0)
+        {
+            perror("setpgrp");
+            exit(EXIT_FAILURE);
+        }
+
+        int log_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if (log_fd < 0)
+        {
+            perror("Failed to open log file");
+            exit(EXIT_FAILURE);
+        }
+
+        if(dup2(log_fd, STDOUT_FILENO) < 0)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        if(dup2(log_fd, STDERR_FILENO) < 0)
+        {
+            perror("dup2");
+            exit(EXIT_FAILURE);
+        }
+        close(log_fd);
+
+        execvp(cmd[0], cmd);
+        perror("Failed to execute command");
+        exit(EXIT_FAILURE);
     }
 
     char buffer[BUFFER_SIZE] = {};
+
+    // block until we are sure the child has run setpgrp
+    if(read(pgrp_notify_pipe[0], buffer, 1) < 0)
+    {
+        perror("read");
+        exit(EXIT_FAILURE);
+    }
+
     ssize_t total_bytes_written = 0;
     int status = -1;
 
@@ -153,12 +164,34 @@ int main(int argc, char *argv[])
         .events = POLLIN | POLLERR | POLLHUP
     };
 
-    // Continue to read until the process exits
-    while(!child_exited)
+    int exit_code = -1;
+
+    int sleep_on_next = 0;
+    while(1)
     {
         //fprintf(stderr, "poll start\n");
         if(poll(&pfd, 1, -1) > 0)
         {
+            // Check if any processes in the subcommand's process group are left
+            pid_t exited_pid = waitpid(-pid, &status, WNOHANG);
+            if(exited_pid == pid)
+            {
+                exit_code = WEXITSTATUS(status);
+            }
+            if(exited_pid < 0)
+            {
+                break;
+            }
+
+            if(sleep_on_next)
+            {
+                sleep_on_next = 0;
+                struct timespec duration;
+                duration.tv_sec = 0;
+                duration.tv_nsec = 10000000; // 10ms
+                nanosleep(&duration, NULL);
+            }
+
             //fprintf(stderr, "poll stop\n");
             if(pfd.revents & POLLIN)
             {
@@ -171,12 +204,14 @@ int main(int argc, char *argv[])
                 // we're lazy, so just sleep so we don't burn up a
                 // core while waiting for the other process to log
                 // more.
-                if(forwarded == 0 && !child_exited)
+                if(forwarded == 0)
                 {
-                    struct timespec duration;
-                    duration.tv_sec = 0;
-                    duration.tv_nsec = 10000000; // 10ms
-                    nanosleep(&duration, NULL);
+                    // set a flag to sleep next iteration instead of
+                    // sleeping directly here so the code checking if
+                    // the children are still running has a chance to
+                    // run again first
+                    sleep_on_next = 1;
+                    continue;
                 }
             }
             if(pfd.revents & (POLLERR | POLLHUP))
@@ -190,19 +225,10 @@ int main(int argc, char *argv[])
             perror("poll");
             exit(EXIT_FAILURE);
         }
-        if(child_exited)
-        {
-            break;
-        }
     }
 
     if(LOG_DEBUG) fprintf(stderr, "Waiting for child!\n");
 
-    if(waitpid(pid, &status, WNOHANG) < 0)
-    {
-        perror("waitpid");
-        exit(EXIT_FAILURE);
-    }
     clock_gettime(CLOCK_MONOTONIC, &g_end);
 
     struct stat buf;
@@ -223,5 +249,5 @@ int main(int argc, char *argv[])
     close(log_fd);
 
     // exit with same code as underlying command
-    return WEXITSTATUS(status);
+    return exit_code;
 }
