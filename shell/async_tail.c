@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/prctl.h>
 
 /* async_tail is a wrapper that redirects your command to a log and
  * launches a tail that exits only when all output is printed. This
@@ -46,6 +47,14 @@ static ssize_t forward_data(int log_fd, char* buffer, ssize_t* total_bytes_writt
     return bytes_read;
 }
 
+volatile pid_t pid = -1;
+
+static void forward_signal(int signum)
+{
+    kill(-pid, signum);
+    exit(EXIT_FAILURE);
+}
+
 int main(int argc, char *argv[])
 {
     struct sigaction sa;
@@ -53,6 +62,21 @@ int main(int argc, char *argv[])
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; // restart syscalls, don't notify on stopped child, only on exit
     sigemptyset(&sa.sa_mask);
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    sa.sa_handler = forward_signal;
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; // restart syscalls, don't notify on stopped child, only on exit
+    sigemptyset(&sa.sa_mask);
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    if (sigaction(SIGTERM, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    if (sigaction(SIGQUIT, &sa, NULL) == -1) {
         perror("sigaction");
         exit(EXIT_FAILURE);
     }
@@ -90,7 +114,7 @@ int main(int argc, char *argv[])
     }
 
     clock_gettime(CLOCK_MONOTONIC, &g_start);
-    pid_t pid = fork();
+    pid = fork();
     if(pid < 0)
     {
         perror("Failed to fork");
@@ -98,11 +122,20 @@ int main(int argc, char *argv[])
     }
     else if(pid == 0)
     {
+        sa.sa_flags = 0;
+
         // undo being set in parent
-        if(signal(SIGCHLD, SIG_DFL) == SIG_ERR)
+        if (sigaction(SIGCHLD, &sa, NULL) == -1)
         {
             perror("signal");
             exit(EXIT_FAILURE);
+        }
+
+        // if async_tail dies before the child, shut it down
+        if(prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
+        {
+            perror("prctl");
+            abort();
         }
 
         // Create a process group so parent can wait on the group. If the
@@ -169,7 +202,6 @@ int main(int argc, char *argv[])
     int sleep_on_next = 0;
     while(1)
     {
-        //fprintf(stderr, "poll start\n");
         if(poll(&pfd, 1, -1) > 0)
         {
             // Check if any processes in the subcommand's process group are left
@@ -192,7 +224,6 @@ int main(int argc, char *argv[])
                 nanosleep(&duration, NULL);
             }
 
-            //fprintf(stderr, "poll stop\n");
             if(pfd.revents & POLLIN)
             {
                 ssize_t forwarded = forward_data(log_fd, buffer, &total_bytes_written);
