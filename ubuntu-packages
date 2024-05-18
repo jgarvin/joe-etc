@@ -116,3 +116,5 @@ grim
 grimshot
 slurp
 systemd-coredump
+sqlite3
+zathura
