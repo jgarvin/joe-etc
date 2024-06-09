@@ -99,8 +99,16 @@ int main(int argc, char *argv[])
     char *log_path = argv[2];
     char **cmd = &argv[4];
 
-    int log_fd = open(log_path, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
-    if (log_fd < 0)
+    // have to open for writing first to make sure file exists
+    int log_write_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (log_write_fd < 0)
+    {
+        perror("Failed to open log file");
+        exit(EXIT_FAILURE);
+    }
+
+    int log_read_fd = open(log_path, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+    if (log_read_fd < 0)
     {
         perror("Failed to open log file for reading");
         exit(EXIT_FAILURE);
@@ -156,29 +164,26 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
 
-        int log_fd = open(log_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-        if (log_fd < 0)
-        {
-            perror("Failed to open log file");
-            exit(EXIT_FAILURE);
-        }
 
-        if(dup2(log_fd, STDOUT_FILENO) < 0)
+        if(dup2(log_write_fd, STDOUT_FILENO) < 0)
         {
             perror("dup2");
             exit(EXIT_FAILURE);
         }
-        if(dup2(log_fd, STDERR_FILENO) < 0)
+        if(dup2(log_write_fd, STDERR_FILENO) < 0)
         {
             perror("dup2");
             exit(EXIT_FAILURE);
         }
-        close(log_fd);
+        close(log_write_fd);
+        close(log_read_fd);
 
         execvp(cmd[0], cmd);
         perror("Failed to execute command");
         exit(EXIT_FAILURE);
     }
+
+    close(log_write_fd);
 
     char buffer[BUFFER_SIZE] = {};
 
@@ -193,7 +198,7 @@ int main(int argc, char *argv[])
     int status = -1;
 
     struct pollfd pfd = {
-        .fd = log_fd,
+        .fd = log_read_fd,
         .events = POLLIN | POLLERR | POLLHUP
     };
 
@@ -226,7 +231,7 @@ int main(int argc, char *argv[])
 
             if(pfd.revents & POLLIN)
             {
-                ssize_t forwarded = forward_data(log_fd, buffer, &total_bytes_written);
+                ssize_t forwarded = forward_data(log_read_fd, buffer, &total_bytes_written);
                 // If we read no bytes, it's because we've reached
                 // EOF. Unfortunately the semantics of poll() are such
                 // that being at EOF is considered readable, so poll
@@ -263,13 +268,13 @@ int main(int argc, char *argv[])
     clock_gettime(CLOCK_MONOTONIC, &g_end);
 
     struct stat buf;
-    fstat(log_fd, &buf);
+    fstat(log_read_fd, &buf);
     off_t size = buf.st_size;
 
     while(total_bytes_written < size)
     {
         if(LOG_DEBUG) fprintf(stderr, "Getting any bytes left %ld %ld!\n", total_bytes_written, size);
-        forward_data(log_fd, buffer, &total_bytes_written);
+        forward_data(log_read_fd, buffer, &total_bytes_written);
     }
 
     if(LOG_DEBUG) fprintf(stderr, "Done!\n");
@@ -277,7 +282,7 @@ int main(int argc, char *argv[])
     double elapsed_time = (g_end.tv_sec - g_start.tv_sec) + (g_end.tv_nsec - g_start.tv_nsec) / 1e9;
     fprintf(stderr, "Duration: %f\n", elapsed_time);
 
-    close(log_fd);
+    close(log_read_fd);
 
     // exit with same code as underlying command
     return exit_code;
