@@ -51,8 +51,10 @@ volatile pid_t pid = -1;
 
 static void forward_signal(int signum)
 {
-    kill(-pid, signum);
-    exit(EXIT_FAILURE);
+    if(pid != -1)
+    {
+        kill(-pid, signum);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -262,8 +264,6 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
     }
-
-    if(LOG_DEBUG) fprintf(stderr, "Waiting for child!\n");
 
     clock_gettime(CLOCK_MONOTONIC, &g_end);
 
