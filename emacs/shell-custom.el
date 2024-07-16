@@ -96,6 +96,8 @@ same folder. If given prefix argument always make a new shell."
 ;; switched to eshell
 (global-set-key (kbd "C-z") #'etc-open-shell)
 
+(define-key shell-mode-map (kbd "C-c C-z") #'self-insert-command)
+
 (add-hook 'shell-mode-hook #'etc-shell-mode-hook)
 
 
