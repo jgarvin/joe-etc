@@ -1375,3 +1375,5 @@ If the buffer runs `dired', the buffer is reverted."
 ;; https://www.reddit.com/r/emacs/comments/osscfd/pgtk_emacswaylandgnome_no_shiftspace/
 (setq pgtk-use-im-context-on-new-connection nil)
 (pgtk-use-im-context nil)
+
+(add-to-list 'auto-mode-alist '("\\.log\\." . fundamental-mode))
