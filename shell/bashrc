@@ -24,6 +24,11 @@ export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a;"
 HISTSIZE=10000000
 HISTFILESIZE=20000000
 
+# Enable automatic debug symbol downloading on ubuntu
+if [ -f /etc/lsb-release ] && grep "Ubuntu" /etc/lsb-release > /dev/null; then
+   export DEBUGINFOD_URLS="https://debuginfod.ubuntu.com"
+fi
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
