@@ -381,7 +381,6 @@
   ;; instead we just run it once a minute, blame laziness :p
   (let ((default-directory "/")) ;; guaranteed to exist so I don't get an error, xset doesn't touch current directory anyway
     (call-process "xset" nil nil nil "r" "rate" "200" "60")))
-(run-with-timer 0 60 #'etc-set-repeat-rate)
 
 (defun etc-translate-hack ()
   ;; doing this on a timer seems to be the only way to get
@@ -1338,35 +1337,64 @@ If the buffer runs `dired', the buffer is reverted."
 
 ;;;;;;;; wayland stuff ;;;;;;;;;;;;;;;;;;
 
-(when (getenv "WAYLAND_DISPLAY")
-  ;; without this middle click doesn't work
-  ;; https://github.com/doomemacs/doomemacs/issues/5219#issuecomment-877282638
-  (use-package xclip
-    :ensure t
-    :config
-    (setq xclip-program "wl-copy")
-    (setq xclip-select-enable-clipboard t)
-    (setq xclip-mode t)
-    (setq xclip-method (quote wl-copy)))
+(when
+    (and (getenv "DISPLAY")
+         (not (getenv "WAYLAND_DISPLAY")))
+  (run-with-timer 0 60 #'etc-set-repeat-rate))
 
-  ;; Without this, copy and pasting from other wayland apps into
-  ;; emacs-pgtk doesn't work.
-  ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
-  (setq wl-copy-process nil)
-  (defun wl-copy (text)
-    (setq wl-copy-process (make-process :name "wl-copy"
-                                        :buffer nil
-                                :command '("wl-copy" "-f" "-n")
-                                :connection-type 'pipe
-                                :noquery t))
-    (process-send-string wl-copy-process text)
-    (process-send-eof wl-copy-process))
-  (defun wl-paste ()
-    (if (and wl-copy-process (process-live-p wl-copy-process))
-        nil ; should return nil if we're the current paste owner
-      (shell-command-to-string "wl-paste -n | tr -d \r")))
-  (setq interprogram-cut-function 'wl-copy)
-  (setq interprogram-paste-function 'wl-paste))
+;; (when (getenv "WAYLAND_DISPLAY")
+;;  ;; without this middle click doesn't work
+;;  ;; https://github.com/doomemacs/doomemacs/issues/5219#issuecomment-877282638
+;;  ;; (use-package xclip
+;;  ;;   :ensure t
+;;  ;;   :config
+;;  ;;   (setq xclip-program "wl-copy")
+;;  ;;   (setq xclip-select-enable-clipboard t)
+;;  ;;   (setq xclip-mode t)
+;;  ;;   (setq xclip-method (quote wl-copy)))
+
+;;  ;; Without this, copy and pasting from other wayland apps into
+;;  ;; emacs-pgtk doesn't work.
+;;  ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
+;;  (setq wl-copy-process nil)
+;;  (defun wl-copy (text)
+;;    (setq wl-copy-process (make-process :name "wl-copy"
+;;                                        :buffer nil
+;;                                :command '("wl-copy" "-f" "-n")
+;;                                :connection-type 'pipe
+;;                                :noquery t))
+;;    (process-send-string wl-copy-process text)
+;;    (process-send-eof wl-copy-process))
+;;  (defun wl-paste ()
+;;    (if (and wl-copy-process (process-live-p wl-copy-process))
+;;        nil ; should return nil if we're the current paste owner
+;;      (shell-command-to-string "wl-paste -n | tr -d \r")))
+;;  (setq interprogram-cut-function 'wl-copy)
+;;  (setq interprogram-paste-function 'wl-paste))
+
+;; (when (and (getenv "WAYLAND_DISPLAY")
+;;            (not (getenv "DISPLAY"))) ; Only apply this on Wayland without XWayland
+;;   (use-package xclip
+;;     :ensure t
+;;     :config
+;;     (setq xclip-program "wl-copy")
+;;     (setq xclip-select-enable-clipboard t)
+;;     (setq xclip-mode t)
+;;     (setq xclip-method (quote wl-copy)))
+
+;;   (defun wl-copy (text)
+;;     "Copy TEXT to the Wayland clipboard."
+;;     (let ((process-connection-type nil))
+;;       (let ((proc (start-process "wl-copy" "*Messages*" "wl-copy")))
+;;         (process-send-string proc text)
+;;         (process-send-eof proc))))
+
+;;   (defun wl-paste ()
+;;     "Paste text from the Wayland clipboard."
+;;     (shell-command-to-string "wl-paste -n"))
+
+;;   (setq interprogram-cut-function 'wl-copy)
+;;   (setq interprogram-paste-function 'wl-paste))
 
 
 ;; bizarre issue with emacs-pgtk where shift+space can't be detected
