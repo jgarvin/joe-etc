@@ -26,6 +26,7 @@
 (require 'use-package)
 
 (load-file "~/etc/emacs/memoize.el")
+(load-file "~/etc/emacs/window_bind.el")
 
 (use-package
   dash
