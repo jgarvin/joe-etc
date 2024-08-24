@@ -29,6 +29,9 @@
           (setq smallest-window win))))
     smallest-window))
 
+(defvar etc-buffer-window-binding nil
+  "A list of cons cells where each cell contains a buffer name, its associated window, and frame.")
+
 (defun etc-switch-to-bound-window (orig-fun buffer-or-name &rest args)
   "Switch to the window bound to BUFFER-OR-NAME if it is bound."
   (let* ((buffer (get-buffer buffer-or-name))
@@ -49,7 +52,7 @@
                     (setf (cdr binding) (cons new-window frame))
                     (select-window new-window)
                     (set-window-buffer new-window buffer))))
-              (switch-to-buffer buffer))))
+              (apply orig-fun buffer-or-name args))))
       (apply orig-fun buffer-or-name args))))
 
 ;; Remove old advice if it exists
