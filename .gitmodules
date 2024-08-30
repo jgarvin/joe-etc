@@ -13,9 +13,6 @@
 [submodule "sh"]
 	path = sh
 	url = https://github.com/amoffat/sh.git
-[submodule "smartparens"]
-	path = smartparens
-	url = git@github.com:Fuco1/smartparens.git
 [submodule "popup-keys"]
 	path = popup-keys
 	url = git@github.com:QBobWatson/popup-keys.git

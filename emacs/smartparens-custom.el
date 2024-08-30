@@ -2,7 +2,6 @@
   smartparens
   :ensure t)
 
-;; (add-to-list 'load-path "~/etc/smartparens")
 ;;(require 'smartparens-config)
 (smartparens-global-mode 1)
 (show-smartparens-global-mode 1)
