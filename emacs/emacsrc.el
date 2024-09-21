@@ -1,6 +1,99 @@
-;;; package -- emacs customizations
-;;; commentary:
-;;; Code:
+;; MOST ESSENTIAL BINDINGS FIRST IN CASE EXTENSIONS FAIL TO LOAD
+
+(global-set-key (kbd "C-<home>") #'beginning-of-buffer)
+(global-set-key (kbd "C-<end>") #'end-of-buffer)
+
+;; should get used to using delete key
+(global-unset-key "\C-d")
+(global-set-key [delete] 'delete-char)
+
+(global-set-key "\C-a" 'beginning-or-indentation)
+(global-set-key "\C-e" 'end-or-trailing)
+
+(when (not (string= (system-name) "eruv"))
+  (global-unset-key "\C-a")
+  (global-unset-key "\C-e"))
+
+;; lets try this for awhile
+(global-set-key (kbd "<home>") 'beginning-or-indentation)
+(global-set-key (kbd "<end>") 'end-or-trailing)
+
+(global-set-key (kbd "S-SPC") 'dabbrev-expand)
+(global-set-key (kbd "M-SPC") 'dabbrev-expand)
+(setq dabbrev-case-fold-search nil)
+(global-unset-key (kbd "M-/"))
+
+;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
+(global-set-key
+ "\C-x\C-m"
+ (lambda ()
+   (interactive)
+   (call-interactively
+    (intern
+     (completing-read-default
+      "M-x "
+      (all-completions "" obarray 'commandp))))))
+
+;; Most useful binding ever
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
+
+(global-set-key "\M-j" 'previous-buffer)
+(global-set-key "\M-k" 'next-buffer)
+
+(global-set-key (kbd "C-%") 'query-replace-regexp)
+(global-set-key "\M-%" 'query-replace)
+
+;; never what I want, almost always a typo. Why would you put this
+;; right next to the key for a new frame?
+(global-unset-key (kbd "C-x 5 1"))
+
+;; more useful than th default version
+(global-set-key (kbd "M-z") 'zap-up-to-char)
+
+(defun etc-delete-other-windows ()
+  (interactive)
+  (delete-other-windows)
+  (unless (derived-mode-p 'erc-mode)
+    ;; don't interfere with erc scroll-to-bottom
+    (recenter-top-bottom)))
+
+;; much more convenient to reach
+(global-set-key (kbd "C-]") #'etc-delete-other-windows)
+(global-set-key (kbd "M-]") #'abort-edit-recursive)
+(global-unset-key (kbd "C-x 1"))
+
+(defun etc-smart-find-file-at-point ()
+  "Uses projectile find file at point unless not in a project."
+  (interactive)
+  (let* ((filename-at-point (thing-at-point 'filename))
+        (guess (replace-regexp-in-string ":?\\([0-9]+:\\)?\\([0-9]+:\\)?\\'" "" filename-at-point))) ;; remove trailing line numbers and ":"
+    (message "guess: %s" guess)
+    ;; (message "better guess: %s" (concat (projectile-project-root) "/source/" guess))
+    (if (and filename-at-point (file-exists-p filename-at-point))
+        (find-file filename-at-point)
+      (if (and guess (file-exists-p guess))
+          (progn
+            (find-file guess))
+        (if (and (projectile-project-p)
+                 (file-exists-p (concat (projectile-project-root) guess)))
+            (find-file (concat (projectile-project-root) guess))
+          (if (and (projectile-project-p)
+                   (file-exists-p (concat (projectile-project-root) "/source/" guess)))
+              (find-file (concat (projectile-project-root) "/source/" guess))
+            (with-most-recent-project
+                (message "testing two")
+              (if (projectile-project-p) ;; can be false if there is no most recent project
+                  (let* ((project-files (projectile-current-project-files))
+                         (files (projectile-select-files project-files)))
+                    (if files
+                        (find-file (concat (projectile-project-root) (car files)))
+                      (user-error "Couldn't find file relative to current buffer or in most recent project.")))
+                (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
+              )))))))
+
+(global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
+
+(global-set-key (kbd "M-;") #'comment-or-uncomment-region)
 
 (when (file-exists-p "~/gentoo/usr/share/emacs/site-lisp/site-gentoo")
     (load "~/gentoo/usr/share/emacs/site-lisp/site-gentoo"))
@@ -119,6 +212,11 @@
   :ensure t
   )
 
+(require 'expand-region)
+(global-set-key (kbd "C-SPC") #'etc-set-mark-or-expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "M-=") 'er/contract-region)
+
 (use-package
   string-inflection
   :ensure t)
@@ -201,11 +299,18 @@
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(ignored-local-variable-values
-   '((vc-prepare-patches-separately)
+   '((eval font-lock-add-keywords nil
+           `((,(concat "("
+                       (regexp-opt
+                        '("sp-do-move-op" "sp-do-move-cl" "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op" "sp-do-del-cl")
+                        t)
+                       "\\_>")
+              1 'font-lock-variable-name-face)))
+     (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -312,10 +417,17 @@
     (load "~/.emacspass")
   (message "No ~/.emacspass file found!"))
 
+;; Helm had too many performance issues
 (when nil
   (load-file "~/etc/emacs/helm-custom.el")
   (load-file "~/etc/emacs/helm-ag-custom.el"))
-(load-file "~/etc/emacs/ivy-custom.el")
+
+;; Could never get relative line numbers to work with ivy
+(when t
+   (load-file "~/etc/emacs/ivy-custom.el"))
+
+;; vertico indexed mode works great, but eager directory deletion is missing
+;;(load-file "~/etc/emacs/etc-vertico.el")
 
 (load-file "~/etc/emacs/smartparens-custom.el")
 ;;(load-file "~/etc/emacs/ido-custom.el")
@@ -437,11 +549,6 @@
 (setq visible-bell t)
 (setq ring-bell-function 'ding)
 
-;; should get used to using delete key on kineses
-
-(global-unset-key "\C-d")
-(global-set-key [delete] 'delete-char)
-
 (defun end-or-trailing (&optional n)
   "Move cursor to end of this line or to its indentation.
   If in middle of of this line, move to last nonwhitespace character on line.
@@ -495,16 +602,6 @@
       (beginning-of-visual-line))
      (t (back-to-visual-indentation)))))
 
-(global-set-key "\C-a" 'beginning-or-indentation)
-(global-set-key "\C-e" 'end-or-trailing)
-
-;; (when (not (string= (system-name) "eruv"))
-;;   (global-unset-key "\C-a")
-;;   (global-unset-key "\C-e"))
-
-;; lets try this for awhile
-(global-set-key (kbd "<home>") 'beginning-or-indentation)
-(global-set-key (kbd "<end>") 'end-or-trailing)
 
 
 
@@ -512,22 +609,6 @@
 ;; is better
 ;;(global-set-key "\C-w" 'backward-kill-word)
 ;;(global-set-key "\C-x\C-k" 'kill-region)
-
-(global-set-key (kbd "S-SPC") 'dabbrev-expand)
-(global-set-key (kbd "M-SPC") 'dabbrev-expand)
-(setq dabbrev-case-fold-search nil)
-(global-unset-key (kbd "M-/"))
-
-;; Don't use alt-x, use C-x C-m, alt is a pain, and use ido for it
-(global-set-key
- "\C-x\C-m"
- (lambda ()
-   (interactive)
-   (call-interactively
-    (intern
-     (completing-read-default
-      "M-x "
-      (all-completions "" obarray 'commandp))))))
 
 ;; Emacs won't load shell-script-mode for zsh automatically
 (setq auto-mode-alist
@@ -571,9 +652,6 @@
 
 (setq indent-tabs-mode nil)
 
-;; Most useful binding ever
-(global-set-key (kbd "M-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
-
 ;; By default compilation frame is half the window. Yuck.
 (setq compilation-window-height 8)
 
@@ -605,9 +683,6 @@
 ;;             ;;no errors, make the compilation window go away in 0.5 seconds
 ;;             (run-at-time 0.5 nil 'delete-windows-on buf)
 ;;             (message "NO COMPILATION ERRORS!")))))
-
-(global-set-key "\M-j" 'previous-buffer)
-(global-set-key "\M-k" 'next-buffer)
 
 ;; In programming modes indent when yanking
 (dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
@@ -691,8 +766,6 @@
 ;; (global-set-key "\C-s" 'isearch-forward)
 ;; (global-set-key "\C-r" 'isearch-backward)
 
-(global-set-key (kbd "C-%") 'query-replace-regexp)
-(global-set-key "\M-%" 'query-replace)
 
 ;; Threshold after which we consider the file to be large
 ;; and don't want to do anything too expensive.
@@ -939,11 +1012,6 @@
    ((not mark-active) (set-mark-command arg))
    (t (er/expand-region (prefix-numeric-value arg)))))
 
-(require 'expand-region)
-(global-set-key (kbd "C-SPC") #'etc-set-mark-or-expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "M-=") 'er/contract-region)
-
 ;; (require 'change-inner)
 ;; (global-set-key (kbd "M-i") 'change-inner)
 ;; (global-set-key (kbd "M-o") 'change-outer)
@@ -965,12 +1033,6 @@
 ;; (setq recentf-max-saved-items 500)
 ;; (global-set-key "\C-c\ \C-e" 'recentf-open-files)
 
-;; never what I want, almost always a typo. Why would you put this
-;; right next to the key for a new frame?
-(global-unset-key (kbd "C-x 5 1"))
-
-;; more useful than th default version
-(global-set-key (kbd "M-z") 'zap-up-to-char)
 
 (defun macroexpand-point (sexp)
   (interactive (list (sexp-at-point)))
@@ -1009,49 +1071,7 @@
       (call-interactively #'shell-command-on-region)
     (call-interactively #'shell-command)))
 
-(defun etc-delete-other-windows ()
-  (interactive)
-  (delete-other-windows)
-  (unless (derived-mode-p 'erc-mode)
-    ;; don't interfere with erc scroll-to-bottom
-    (recenter-top-bottom)))
-
-;; much more convenient to reach
-(global-set-key (kbd "C-]") #'etc-delete-other-windows)
-(global-set-key (kbd "M-]") #'abort-edit-recursive)
-(global-unset-key (kbd "C-x 1"))
-
 ;; (string-trim (thing-at-point 'filename) nil ":?\\([0-9]+:\\)?\\([0-9]+:\\)?")
-(defun etc-smart-find-file-at-point ()
-  "Uses projectile find file at point unless not in a project."
-  (interactive)
-  (let* ((filename-at-point (thing-at-point 'filename))
-        (guess (replace-regexp-in-string ":?\\([0-9]+:\\)?\\([0-9]+:\\)?\\'" "" filename-at-point))) ;; remove trailing line numbers and ":"
-    (message "guess: %s" guess)
-    ;; (message "better guess: %s" (concat (projectile-project-root) "/source/" guess))
-    (if (and filename-at-point (file-exists-p filename-at-point))
-        (find-file filename-at-point)
-      (if (and guess (file-exists-p guess))
-          (progn
-            (find-file guess))
-        (if (and (projectile-project-p)
-                 (file-exists-p (concat (projectile-project-root) guess)))
-            (find-file (concat (projectile-project-root) guess))
-          (if (and (projectile-project-p)
-                   (file-exists-p (concat (projectile-project-root) "/source/" guess)))
-              (find-file (concat (projectile-project-root) "/source/" guess))
-            (with-most-recent-project
-                (message "testing two")
-              (if (projectile-project-p) ;; can be false if there is no most recent project
-                  (let* ((project-files (projectile-current-project-files))
-                         (files (projectile-select-files project-files)))
-                    (if files
-                        (find-file (concat (projectile-project-root) (car files)))
-                      (user-error "Couldn't find file relative to current buffer or in most recent project.")))
-                (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
-              )))))))
-
-(global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
 
 ;; enables focus follows mouse, needed for head tracking
 ;; FIXME: disabled for now, when not using head tracking
@@ -1192,7 +1212,6 @@
 (global-set-key (kbd "C-M-<left>") #'sp-beginning-of-sexp)
 (global-set-key (kbd "C-M-<right>") #'sp-end-of-sexp)
 
-(global-set-key (kbd "M-;") #'comment-or-uncomment-region)
 
 ;; image mode crashes in Motif mode
 ;; Can't use GTK/Athena because they randomly lockup
@@ -1373,8 +1392,7 @@ If the buffer runs `dired', the buffer is reverted."
 ;;  (setq interprogram-cut-function 'wl-copy)
 ;;  (setq interprogram-paste-function 'wl-paste))
 
-;; (when (and (getenv "WAYLAND_DISPLAY")
-;;            (not (getenv "DISPLAY"))) ; Only apply this on Wayland without XWayland
+;; (when (getenv "WAYLAND_DISPLAY")
 ;;   (use-package xclip
 ;;     :ensure t
 ;;     :config
@@ -1406,3 +1424,4 @@ If the buffer runs `dired', the buffer is reverted."
 (pgtk-use-im-context nil)
 
 (add-to-list 'auto-mode-alist '("\\.log\\." . fundamental-mode))
+
