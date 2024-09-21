@@ -2,49 +2,22 @@
   smartparens
   :ensure t)
 
-;;(require 'smartparens-config)
 (smartparens-global-mode 1)
 (show-smartparens-global-mode 1)
-
-;; Commented out hotkeys need free keyboard shortcuts not taken
-;; by XMonad.
-
-;; Related problem is figuring out how to make pedals useful when using voice
-
-;; my homerow
-;; a
-;; s
-;; h
-;; t
-;; g*
-;; y*
-;; n
-;; e
-;; o
-;; i
-
-;; available keys:
-;; C-M-tab
-;; C-M-]
-;; C-M-left
-;; C-M-right
-;; C-M-up
-;; C-M-down
-
-;; ;; TODO: figure out what to change xmonad binds to for next/prev window
-;; ;; freeing up e and i
-;; ;; TODO: add split, rewrap
 
 (define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
 (define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
+(define-key smartparens-mode-map (kbd "C-M-<down>") 'sp-down-sexp)
 (define-key smartparens-mode-map (kbd "C-S-d") 'sp-backward-down-sexp)
 (define-key smartparens-mode-map (kbd "C-M-o") 'sp-up-sexp)
+(define-key smartparens-mode-map (kbd "C-M-<up>") 'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-S-u") 'sp-backward-up-sexp)
+(define-key smartparens-mode-map (kbd "C-M-u") 'sp-unwrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-n") 'sp-next-sexp)
 (define-key smartparens-mode-map (kbd "C-M-p") 'sp-previous-sexp)
-(define-key smartparens-mode-map (kbd "C-<home>") 'sp-beginning-of-sexp)
-(define-key smartparens-mode-map (kbd "C-<end>") 'sp-end-of-sexp)
+(define-key smartparens-mode-map (kbd "C-M-<home>") 'sp-beginning-of-sexp)
+(define-key smartparens-mode-map (kbd "C-M-<end>") 'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-x") 'sp-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") 'sp-forward-slurp-sexp)
 (define-key smartparens-mode-map (kbd "C-M-g") 'sp-backward-slurp-sexp)
@@ -59,16 +32,3 @@
 (require 'cc-mode)
 (dolist (key '("(" ")" "{" "}")) (define-key c-mode-base-map (kbd key) nil) )
 
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'c++-mode)
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'emacs-lisp-mode)
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'sh-mode)
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'shell-mode)
-
-;; but python has a bug: https://github.com/Fuco1/smartparens/issues/473
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'python-mode)
-;;(add-to-list 'sp-navigate-consider-stringlike-sexp 'inferior-python-mode)
-
-;; (defadvice sp-show--pair-function (around sp-show--pair-function-disable-large activate)
-;;   (unless (or (> (buffer-size) (* 1 256 1024))
-;;               (not smartparens-mode)) ;; why is this necessary? strangely is.
-;;     ad-do-it))
