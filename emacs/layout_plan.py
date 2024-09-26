@@ -37,7 +37,6 @@ actions = [
     'cut $unit',
     'copy $unit',
     'paste over $unit',
-    'select $unit',
     'rewrap $unit', # will just add wrapping if there isn't any
     'barf $unit $dir',
     'slurp $unit $dir',
