@@ -40,10 +40,6 @@
 ;; other nice features.
 ;; note that you first must run the following shell command:
 ;; $ rustup component add rls rust-analysis rust-src
-(use-package
-  lsp-mode
-  :ensure t)
-
 (setq lsp-rust-server 'rust-analyzer)
 
 ;;(use-package
@@ -58,7 +54,9 @@
 (define-key rust-mode-map (kbd "M-.") 'lsp-find-definition)
 (define-key rust-mode-map (kbd "M-,") 'lsp-find-references)
 
-(global-set-key (kbd "C-h g") #'lsp-describe-thing-at-point)
+
+
+
 
 
 ;; some personal preferences

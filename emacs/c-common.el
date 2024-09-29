@@ -1,5 +1,37 @@
 ;; -*- lexical-binding: t -*-
 
+(lsp-register-client
+ (make-lsp-client
+  :new-connection (lsp-stdio-connection `(,(format "%s/opt/bin/ccls" (getenv "HOME"))))
+  :major-modes '(c-mode c++-mode)
+  :server-id 'ccls))
+
+(defun run-with-symbol-at-point (command)
+  "Run COMMAND with the symbol at point pre-filled in the minibuffer."
+  (let ((symbol (thing-at-point 'symbol t)))
+    (if symbol
+        (minibuffer-with-setup-hook
+            (lambda () (insert symbol))
+          (call-interactively command))
+      (call-interactively command))))
+
+;; Example: Wrapping `find-file`
+(defun lsp-find-definition-with-symbol ()
+  "Find symbol, pre-filling with symbol at point if available.
+Unlike `lsp-find-definiton`, `lsp-ivy-workspace-symbol` doesn't
+require the symbol you want to lookup to be under point. But it
+doesn't provide a sane default we fix that here."
+  (interactive)
+  (run-with-symbol-at-point 'lsp-ivy-workspace-symbol))
+
+;; Bind the new command to a key, e.g., C-c f
+(global-set-key (kbd "C-c f") 'find-file-with-symbol)
+
+(define-key c-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
+(define-key c-mode-map (kbd "M-,") 'lsp-find-references)
+(define-key c++-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
+(define-key c++-mode-map (kbd "M-,") 'lsp-find-references)
+
 (defvar-local run-command nil)
 
 ;; Run makefile, or if there isn't one
@@ -67,6 +99,7 @@
   (message "Result: [%S] [%S]" buffer finished-status))
 
 (defun etc-setup-c-common ()
+  (lsp-mode 1)
   (local-set-key "\M-t" 'toggle-header-buffer)
 
   ;; Starting in emacs 23 there's some stupid default abbreviation

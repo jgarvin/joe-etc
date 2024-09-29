@@ -115,8 +115,8 @@
 (add-hook 'c++-mode-hook 'counsel-gtags-mode)
 
 (with-eval-after-load 'counsel-gtags
-  (define-key counsel-gtags-mode-map (kbd "M-.") 'counsel-gtags-find-definition)
-  (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-find-reference)
+  ;;(define-key counsel-gtags-mode-map (kbd "M-.") 'counsel-gtags-find-definition)
+  ;;(define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-find-reference)
   ;;(define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
   ;;(define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward)
   )
@@ -131,3 +131,8 @@
 (setq grep-command "grep --color=never")
 ;;(setq grep-find-command "grep --color=never")
 ;;(setq counsul-grep-command "grep --color=never")
+
+;; provides lsp-ivy-workspace-symbol and lsp-ivy-global-workspace-symbol
+(use-package lsp-ivy :ensure t)
+
+

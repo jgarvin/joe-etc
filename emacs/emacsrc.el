@@ -118,8 +118,12 @@
 
 (require 'use-package)
 
-(load-file "~/etc/emacs/memoize.el")
+(load-file "~/etc/emacs/smartparens-custom.el")
 (load-file "~/etc/emacs/window_bind.el")
+(load-file "~/etc/emacs/unit_layers.el")
+(load-file "~/etc/emacs/lsp-custom.el")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package
   dash
@@ -310,7 +314,7 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(lsp-ivy orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -429,7 +433,6 @@
 ;; vertico indexed mode works great, but eager directory deletion is missing
 ;;(load-file "~/etc/emacs/etc-vertico.el")
 
-(load-file "~/etc/emacs/smartparens-custom.el")
 ;;(load-file "~/etc/emacs/ido-custom.el")
 (load-file "~/etc/emacs/yasnippet-custom.el")
 (load-file "~/etc/emacs/save.el")
@@ -441,7 +444,7 @@
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
 (load-file "~/etc/emacs/shell-custom.el")
-
+(load-file "~/etc/emacs/memoize.el")
 (load-file "~/etc/emacs/projectile-custom.el")
 (load-file "~/etc/emacs/proced-custom.el")
 ;;(load-file "~/etc/emacs/email-custom.el")
@@ -981,7 +984,7 @@
 (eval-after-load "ace-jump-mode"
   '(ace-jump-mode-enable-mark-sync))
 ;;(define-key global-map (kbd "C-x SPC") 'rectangle-mark-mode)
-(setq ace-jump-mode-scope 'window)
+(setq ace-jump-mode-scope 'visible)
 
 (setq find-file-wildcards t)
 
@@ -1424,4 +1427,3 @@ If the buffer runs `dired', the buffer is reverted."
 (pgtk-use-im-context nil)
 
 (add-to-list 'auto-mode-alist '("\\.log\\." . fundamental-mode))
-
