@@ -32,6 +32,6 @@
      ((bounds-of-thing-at-point 'symbol)
       (kill-ring-save (car (bounds-of-thing-at-point 'symbol))
                       (cdr (bounds-of-thing-at-point 'symbol))))
-     (t (user-error "Nothing to copy a point!")))))
+     (t (user-error "Nothing to copy at point!")))))
 
 ;; hello (listp '(3 . 4))

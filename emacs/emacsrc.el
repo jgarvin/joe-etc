@@ -688,17 +688,34 @@
 ;;             (message "NO COMPILATION ERRORS!")))))
 
 ;; In programming modes indent when yanking
-(dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
-  (eval `(defadvice ,command (after indent-region activate)
-           (and (not current-prefix-arg)
-                (derived-mode-p 'prog-mode)
-                (let ((mark-even-if-inactive transient-mark-mode))
-                  (if (and (region-active-p) (not (= (region-beginning) (region-end))))
-                      ;; when we have just cut a region the region beginning and end are the same,
-                    ;; in this case just indents the current line wherever we are
-                    (if (derived-mode-p 'python-mode)
-                        (indent-region (line-beginning-position) (line-end-position) nil)
-                      (indent-region (region-beginning) (region-end) nil))))))))
+;; (dolist (command '(yank yank-pop md-kill-symbol-or-sexp-or-region))
+;;   (eval `(defadvice ,command (after indent-region activate)
+;;            (and (not current-prefix-arg)
+;;                 (derived-mode-p 'prog-mode)
+;;                 (let ((mark-even-if-inactive transient-mark-mode))
+;;                   (if (and (region-active-p) (not (= (region-beginning) (region-end))))
+;;                       ;; when we have just cut a region the region beginning and end are the same,
+;;                       ;; in this case just indents the current line wherever we are
+;;                       (if (derived-mode-p 'python-mode)
+;;                           (indent-region (line-beginning-position) (line-end-position) nil)
+;;                         (indent-region (region-beginning) (region-end) nil))))))))
+
+;;; (advice-remove 'ad-Advice-yank #'yank)
+;; (ad-remove-advice 'yank 'around 'ad-Advice-yank)
+;; (ad-activate 'yank)
+
+(defun indenting-yank (&optional arg)
+  (interactive "*P")
+  (yank arg)
+  (indent-region (region-beginning) (region-end)))
+
+(defun indenting-yank-pop (&optional arg)
+  (interactive "p")
+  (yank-pop arg)
+  (indent-region (region-beginning) (region-end)))
+
+(global-set-key (kbd "C-y") #'indenting-yank)
+(global-set-key (kbd "M-y") #'indenting-yank-pop)
 
 (defun open-line-and-indent ()
   (interactive)

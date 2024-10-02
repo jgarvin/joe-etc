@@ -24,6 +24,14 @@ doesn't provide a sane default we fix that here."
   (interactive)
   (run-with-symbol-at-point 'lsp-ivy-workspace-symbol))
 
+;; (defun lsp-find-references-with-symbol ()
+;;   "Find symbol, pre-filling with symbol at point if available.
+;; Unlike `lsp-find-definiton`, `lsp-ivy-workspace-symbol` doesn't
+;; require the symbol you want to lookup to be under point. But it
+;; doesn't provide a sane default we fix that here."
+;;   (interactive)
+;;   (run-with-symbol-at-point 'lsp-find-references))
+
 ;; Bind the new command to a key, e.g., C-c f
 (global-set-key (kbd "C-c f") 'find-file-with-symbol)
 
@@ -35,16 +43,17 @@ doesn't provide a sane default we fix that here."
 (defvar-local run-command nil)
 
 ;; Run makefile, or if there isn't one
-(defun smart-compile()
-  (compile "bld"))
+;; (defun smart-compile()
+;;   (compile "bld"))
 
-(defun ff/fast-compile ()
-  "Compiles without asking anything."
-  (interactive)
-  (let ((compilation-read-command nil))
-    (smart-compile)))
+;; (defun ff/fast-compile ()
+;;   "Compiles without asking anything."
+;;   (interactive)
+;;   (let ((compilation-read-command nil))
+;;     (smart-compile)))
 
-(define-key global-map [f9] 'ff/fast-compile)
+;; (define-key global-map [f9] 'ff/fast-compile)
+
 (defun list-all-subfolders (folder)
   (let ((folder-list (list folder)))
     (dolist (subfolder (directory-files folder))
