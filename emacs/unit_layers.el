@@ -35,12 +35,21 @@
            (buffer-substring (plist-get (sp-get-thing t) :beg) (plist-get (sp-get-thing t) :end))
            (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))))
 
+(defvar-local etc--debug-overlay nil)
+
+(defun etc-debug-overlay (a b)
+  )
+
 (global-set-key (kbd "C-M-z") #'debug-dump)
-(global-set-key (kbd "C-M-z") #'sp-previous-sexp)
+;;(global-set-key (kbd "C-M-z") #'sp-previous-sexp)
 (defvar-local etc-travel-side t) ;; t is front, nil is back
 
 ;; what happens if you press next or previous from the middle?
 ;; if we wanted to be able to undo it, we would need to remember the jump which will suck
+
+(defun etc-flip-travel-point ()
+  (interactive)
+  )
 
 (defun etc-next-sexp ()
   (interactive)
@@ -49,37 +58,47 @@
          (end (plist-get sexp :end))
          (original-point (point))
          (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-backward-up-sexp) (point))))
-    (if (not (= travel-point (point)))
-        (goto-char travel-point)
+         (up-point (save-excursion (sp-backward-up-sexp) (point)))
+         (end-point (save-excursion (sp-end-of-sexp) (point))))
+    (dh 'up 'b up-point)
+    (cond
+     ((= end-point (point)) nil)
+     ((not (= travel-point (point))) (goto-char travel-point))
+     (t
       (goto-char beg)
       (sp-next-sexp)
       (let* ((sexp (etc-sp-get-thing))
              (beg (plist-get sexp :beg))
              (end (plist-get sexp :end)))
-        (goto-char (if etc-travel-side beg end)))
-      (when (= (point) up-point)
-        (goto-char original-point)))))
+        (goto-char (if etc-travel-side beg end))
+        (when (= (point) up-point)
+          (goto-char end-point)))))))
 
 (defun etc-previous-sexp ()
   (interactive)
-  (let* ((sexp (etc-sp-get-thing))
+  (let* ((sexp (sp-get-thing t))
          (beg (plist-get sexp :beg))
          (end (plist-get sexp :end))
          (original-point (point))
          (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-backward-up-sexp) (point))))
-    (if (not (= travel-point (point)))
-        (goto-char travel-point)
+         (up-point (save-excursion (sp-backward-up-sexp) (point)))
+         (begin-point (save-excursion (sp-beginning-of-sexp) (point))))
+    ;; (dh 'up 'b up-point)
+    ;; (dh 'begin 'y begin-point)
+    ;; (dh 'travel 'g travel-point)
+    (cond
+     ((= begin-point (point)) nil)
+     ((not (= travel-point (point))) (goto-char travel-point))
+     (t
       (goto-char end)
       (sp-previous-sexp)
       (goto-char (1- (point)))
-      (let* ((sexp (etc-sp-get-thing))
+      (let* ((sexp (sp-get-thing))
              (beg (plist-get sexp :beg))
              (end (plist-get sexp :end)))
         (goto-char (if etc-travel-side beg end)))
       (when (= (point) up-point)
-        (goto-char original-point)))))
+        (goto-char original-point))))))
 
 (defun etc-sp-get-thing ()
   (let ((sexp (sp-get-thing t)))
