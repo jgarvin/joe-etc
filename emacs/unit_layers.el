@@ -16,18 +16,17 @@
 (define-key smartparens-mode-map (kbd "C-M-u C-M-'") #'sp-backward-slurp-sexp)
 (define-key smartparens-mode-map (kbd "C-M-,") #'sp-forward-barf-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u C-M-,") #'sp-backward-barf-sexp)
-(define-key smartparens-mode-map (kbd "C-M-k") #'etc-cut-sexp)
-(define-key smartparens-mode-map (kbd "C-M-p") #'sp-split-sexp)
+(define-key smartparens-mode-map (kbd "C-M-k") #'sp-kill-sexp)
+(define-key smartparens-mode-map (kbd "C-M-s") #'sp-split-sexp)
+(define-key smartparens-mode-map (kbd "C-M-p") #'etc-flip-travel-point-sexp)
 (define-key smartparens-mode-map (kbd "C-M-\\") #'sp-splice-sexp)
 (define-key smartparens-mode-map (kbd "C-M-;") #'etc-comment-sexp)
 (define-key smartparens-mode-map (kbd "C-M-j") #'etc-copy-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") #'etc-duplicate-sexp)
 ;; (define-key smartparens-mode-map (kbd "C-M-SPC") #'sp-mark-sexp)
 
-;; should duplicate apply to the containing sexp?
-;; should mark apply to the containing sexp?
-;; forward should go after then to beginning of next, likewise for backwards
-;; up should always go to beginning, not after
+;; what should mark mark?
+;; should we infer travel side from point position? if so we have to prevent moving forward from bringing us to the end
 
 (defun debug-dump ()
   (interactive)
@@ -44,12 +43,20 @@
 ;;(global-set-key (kbd "C-M-z") #'sp-previous-sexp)
 (defvar-local etc-travel-side t) ;; t is front, nil is back
 
-;; what happens if you press next or previous from the middle?
-;; if we wanted to be able to undo it, we would need to remember the jump which will suck
-
 (defun etc-flip-travel-point ()
+  (setq etc-travel-side (not etc-travel-side)))
+
+(defun etc-flip-travel-point-sexp ()
   (interactive)
-  )
+  (etc-flip-travel-point)
+  (let* ((sexp (etc-sp-get-thing))
+         (beg (plist-get sexp :beg))
+         (end (plist-get sexp :end))
+         (travel-point (if etc-travel-side beg end)))
+    (dh 'tr 'y travel-point)
+    (dh 'beg 'g beg)
+    (dh 'end 'r end)
+    (goto-char (if etc-travel-side beg end))))
 
 (defun etc-next-sexp ()
   (interactive)
@@ -68,20 +75,21 @@
       (goto-char beg)
       (sp-next-sexp)
       (let* ((sexp (etc-sp-get-thing))
-             (beg (plist-get sexp :beg))
-             (end (plist-get sexp :end)))
-        (goto-char (if etc-travel-side beg end))
+             (new-beg (plist-get sexp :beg))
+             (new-end (plist-get sexp :end)))
+        (goto-char (if etc-travel-side new-beg new-end))
         (when (= (point) up-point)
-          (goto-char end-point)))))))
+          (goto-char (if etc-travel-side beg end))))))))
 
 (defun etc-previous-sexp ()
   (interactive)
-  (let* ((sexp (sp-get-thing t))
+  (let* ((sexp (etc-sp-get-thing))
          (beg (plist-get sexp :beg))
          (end (plist-get sexp :end))
          (original-point (point))
          (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-backward-up-sexp) (point)))
+         (up-point (save-excursion (sp-up-sexp) (point)))
+         (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
          (begin-point (save-excursion (sp-beginning-of-sexp) (point))))
     ;; (dh 'up 'b up-point)
     ;; (dh 'begin 'y begin-point)
@@ -92,22 +100,22 @@
      (t
       (goto-char end)
       (sp-previous-sexp)
-      (goto-char (1- (point)))
-      (let* ((sexp (sp-get-thing))
+      (let* ((sexp (etc-sp-get-thing))
              (beg (plist-get sexp :beg))
              (end (plist-get sexp :end)))
         (goto-char (if etc-travel-side beg end)))
-      (when (= (point) up-point)
+      (when (or (= (point) up-point) (= (point) up-back-point))
         (goto-char original-point))))))
 
+(defun point-on-whitespace-p ()
+  "Return `t` if the character at point is whitespace, `nil` otherwise."
+  (save-excursion
+    (looking-at "\\s-")))
+
 (defun etc-sp-get-thing ()
-  (let ((sexp (sp-get-thing t)))
-    (if (and (md-likely-followed-by-closer (1- (point)))
-             (not (md-likely-preceded-by-opener (1+ (point)))))
-        (save-excursion
-          (goto-char (1- (point)))
-          (sp-get-thing))
-      (sp-get-thing))))
+  (if (or (point-on-whitespace-p) (md-likely-followed-by-closer (point)))
+      (sp-get-thing t)
+    (sp-get-thing)))
 
 (defun etc-transpose-sexp ()
   (interactive)
