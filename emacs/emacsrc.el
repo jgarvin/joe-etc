@@ -704,14 +704,18 @@
 ;; (ad-remove-advice 'yank 'around 'ad-Advice-yank)
 ;; (ad-activate 'yank)
 
+(delete-selection-mode 1)
+
 (defun indenting-yank (&optional arg)
   (interactive "*P")
-  (yank arg)
+  (if (use-region-p)
+      (delete-region (region-beginning) (region-end)))
+  (call-interactively #'yank)
   (indent-region (region-beginning) (region-end)))
 
 (defun indenting-yank-pop (&optional arg)
   (interactive "p")
-  (yank-pop arg)
+  (call-interactively #'yank-pop)
   (indent-region (region-beginning) (region-end)))
 
 (global-set-key (kbd "C-y") #'indenting-yank)
