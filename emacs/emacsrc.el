@@ -121,6 +121,7 @@
 (load-file "~/etc/emacs/smartparens-custom.el")
 (load-file "~/etc/emacs/window_bind.el")
 (load-file "~/etc/emacs/unit_layers.el")
+(load-file "~/etc/emacs/etc-debug-overlay.el")
 (load-file "~/etc/emacs/lsp-custom.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
