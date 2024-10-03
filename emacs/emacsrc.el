@@ -118,6 +118,8 @@
 
 (require 'use-package)
 
+(global-set-key (kbd "M-,") #'xref-find-references)
+
 (load-file "~/etc/emacs/smartparens-custom.el")
 (load-file "~/etc/emacs/window_bind.el")
 (load-file "~/etc/emacs/unit_layers.el")

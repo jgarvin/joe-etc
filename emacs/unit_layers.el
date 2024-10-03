@@ -25,8 +25,19 @@
 (define-key smartparens-mode-map (kbd "C-M-y") #'etc-duplicate-sexp)
 ;; (define-key smartparens-mode-map (kbd "C-M-SPC") #'sp-mark-sexp)
 
+;; line to the left doesn't make sense, so does that do indentation?
+(global-set-key (kbd "M-L") #'beginning-or-indentation)
+(global-set-key (kbd "M-?") #'end-or-trailing)
 (global-set-key (kbd "M-Y") #'etc-duplicate-line)
+(global-set-key (kbd "M-N") #'etc-previous-less-indented-line)
+(global-set-key (kbd "M-U M-N") #')
+(global-set-key (kbd "M-I") #'etc-next-more-indented-line)
+(global-set-key (kbd "M-E") #'next-line)
+(global-set-key (kbd "M-U M-E") #'drag-stuff-down)
+(global-set-key (kbd "M-O") #'previous-line)
+(global-set-key (kbd "M-U M-O") #'drag-stuff-up)
 
+;; beginning-or-indentation-toggle ??? used to be quite useful
 ;; what should mark mark?
 ;; should we infer travel side from point position? if so we have to prevent moving forward from bringing us to the end
 
@@ -42,6 +53,28 @@
 
 (defun etc-flip-travel-point ()
   (setq etc-travel-side (not etc-travel-side)))
+
+;;;;;;;;;;;;;;;;;;;;;;;; LINE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; line duplicate isn't duplicating from beginning
+
+(defun etc-previous-less-indented-line ()
+  (interactive)
+  (md-find-indentation-change -1 '<))
+
+(defun etc-next-more-indented-line ()
+  (interactive)
+  (md-find-indentation-change 1 '>))
+
+(defun etc-duplicate-line ()
+  (interactive)
+  (beginning-of-line)
+  (etc-kill #'kill-ring-save 'line)
+  (forward-line)
+  (let ((current-prefix-arg '(4)))  ; Simulates pressing C-u
+    (call-interactively 'yank)))
+
+;;;;;;;;;;;;;;;;;;;;;;;; SEXP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun etc-flip-travel-point-sexp ()
   (interactive)
@@ -129,13 +162,6 @@
     (sp-previous-sexp)
     (sp-previous-sexp)
     (sp-next-sexp)))
-
-(defun etc-duplicate-line ()
-  (interactive)
-  (etc-kill #'kill-ring-save 'line)
-  (forward-line)
-  (let ((current-prefix-arg '(4)))  ; Simulates pressing C-u
-    (call-interactively 'yank)))
 
 (defun etc-duplicate-sexp ()
   (interactive)
