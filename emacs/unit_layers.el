@@ -17,6 +17,7 @@
 (define-key smartparens-mode-map (kbd "C-M-,") #'sp-forward-barf-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u C-M-,") #'sp-backward-barf-sexp)
 (define-key smartparens-mode-map (kbd "C-M-k") #'sp-kill-sexp)
+(define-key smartparens-mode-map (kbd "C-M-u C-M-k") #'etc-cut-sexp)
 (define-key smartparens-mode-map (kbd "C-M-s") #'sp-split-sexp)
 (define-key smartparens-mode-map (kbd "C-M-p") #'etc-flip-travel-point-sexp)
 (define-key smartparens-mode-map (kbd "C-M-\\") #'sp-splice-sexp)
@@ -34,13 +35,8 @@
            (buffer-substring (plist-get (sp-get-thing t) :beg) (plist-get (sp-get-thing t) :end))
            (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))))
 
-(defvar-local etc--debug-overlay nil)
-
-(defun etc-debug-overlay (a b)
-  )
-
-(global-set-key (kbd "C-M-z") #'debug-dump)
-;;(global-set-key (kbd "C-M-z") #'sp-previous-sexp)
+;; (global-set-key (kbd "C-M-z") #'debug-dump)
+;; (global-set-key (kbd "C-M-z") #'sp-previous-sexp)
 (defvar-local etc-travel-side t) ;; t is front, nil is back
 
 (defun etc-flip-travel-point ()
@@ -53,9 +49,6 @@
          (beg (plist-get sexp :beg))
          (end (plist-get sexp :end))
          (travel-point (if etc-travel-side beg end)))
-    (dh 'tr 'y travel-point)
-    (dh 'beg 'g beg)
-    (dh 'end 'r end)
     (goto-char (if etc-travel-side beg end))))
 
 (defun etc-next-sexp ()
@@ -91,9 +84,6 @@
          (up-point (save-excursion (sp-up-sexp) (point)))
          (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
          (begin-point (save-excursion (sp-beginning-of-sexp) (point))))
-    ;; (dh 'up 'b up-point)
-    ;; (dh 'begin 'y begin-point)
-    ;; (dh 'travel 'g travel-point)
     (cond
      ((= begin-point (point)) nil)
      ((not (= travel-point (point))) (goto-char travel-point))
@@ -138,12 +128,6 @@
     (sp-previous-sexp)
     (sp-previous-sexp)
     (sp-next-sexp)))
-
-;; how to decide what curren sexp is?
-;; for purposes of (sp-get-thing) symbols count
-;; but moving up doesn't consider a symbol to be one
-
-;; (hello +)
 
 (defun etc-duplicate-sexp ()
   (interactive)
