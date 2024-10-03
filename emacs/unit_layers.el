@@ -1,4 +1,3 @@
-
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
 ;; conventional C-u
@@ -25,6 +24,8 @@
 (define-key smartparens-mode-map (kbd "C-M-j") #'etc-copy-sexp)
 (define-key smartparens-mode-map (kbd "C-M-y") #'etc-duplicate-sexp)
 ;; (define-key smartparens-mode-map (kbd "C-M-SPC") #'sp-mark-sexp)
+
+(global-set-key (kbd "M-Y") #'etc-duplicate-line)
 
 ;; what should mark mark?
 ;; should we infer travel side from point position? if so we have to prevent moving forward from bringing us to the end
@@ -128,6 +129,13 @@
     (sp-previous-sexp)
     (sp-previous-sexp)
     (sp-next-sexp)))
+
+(defun etc-duplicate-line ()
+  (interactive)
+  (etc-kill #'kill-ring-save 'line)
+  (forward-line)
+  (let ((current-prefix-arg '(4)))  ; Simulates pressing C-u
+    (call-interactively 'yank)))
 
 (defun etc-duplicate-sexp ()
   (interactive)
