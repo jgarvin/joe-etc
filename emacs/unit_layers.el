@@ -57,6 +57,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;; LINE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; line duplicate isn't duplicating from beginning
+;; likewise ideally reversing an indentation change would go back to the same line
 
 (defun etc-previous-less-indented-line ()
   (interactive)
@@ -68,11 +69,28 @@
 
 (defun etc-duplicate-line ()
   (interactive)
-  (beginning-of-line)
-  (etc-kill #'kill-ring-save 'line)
-  (forward-line)
-  (let ((current-prefix-arg '(4)))  ; Simulates pressing C-u
-    (call-interactively 'yank)))
+  ;; save-excursion inserts a marker into the text, it doesn't just
+  ;; remember the file offset, so it's important that we move to the
+  ;; next line before we yank, otherwise the line on top will be the
+  ;; duplicate one, and the marker will be pushed down to the next
+  ;; line.
+  ;;
+  ;; Also annoyingly forward-line will not preserve the column, so we
+  ;; have to manually save it.
+  ;;
+  ;; WARNING: if you change this function be sure it behaves the same
+  ;; whether cursor is at the beginning of the line or not, first
+  ;; versions did not.
+  (let ((col (current-column)))
+    (save-excursion
+      (beginning-of-line)
+      (kill-ring-save (line-beginning-position) (line-beginning-position 2))
+      (forward-line)
+      (beginning-of-line)
+      (yank))
+    (forward-line)
+    (move-to-column col)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;; SEXP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
