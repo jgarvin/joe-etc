@@ -462,9 +462,9 @@ debug mode causing timers to die."
     kill-ring."
   (interactive)
   (let ((beg (line-beginning-position 1))
-	(end (line-beginning-position 2)))
-    (if (eq last-command 'quick-copy-line)
-	(kill-append (buffer-substring beg end) (< end beg))
+	    (end (line-beginning-position 2)))
+    (if (eq last-command 'md-copy-line)
+	    (kill-append (buffer-substring beg end) (< end beg))
       (kill-new (buffer-substring beg end))))
   (beginning-of-line 2))
 
@@ -473,12 +473,11 @@ debug mode causing timers to die."
   (interactive)
   (let ((beg (line-beginning-position 1))
 	(end (line-beginning-position 2)))
-    (if (eq last-command 'quick-cut-line)
+    (if (eq last-command 'md-cut-line)
 	(kill-append (buffer-substring beg end) (< end beg))
       (kill-new (buffer-substring beg end)))
     (delete-region beg end))
-  (beginning-of-line 1)
-  (setq this-command 'quick-cut-line))
+  (beginning-of-line 1))
 
 
 ;(mapcar 'buffer-name (buffer-list))

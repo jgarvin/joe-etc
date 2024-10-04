@@ -30,12 +30,14 @@
 (global-set-key (kbd "M-?") #'end-or-trailing)
 (global-set-key (kbd "M-Y") #'etc-duplicate-line)
 (global-set-key (kbd "M-N") #'etc-previous-less-indented-line)
-(global-set-key (kbd "M-U M-N") #')
+;(global-set-key (kbd "M-U M-N") #')
 (global-set-key (kbd "M-I") #'etc-next-more-indented-line)
 (global-set-key (kbd "M-E") #'next-line)
 (global-set-key (kbd "M-U M-E") #'drag-stuff-down)
 (global-set-key (kbd "M-O") #'previous-line)
 (global-set-key (kbd "M-U M-O") #'drag-stuff-up)
+(global-set-key (kbd "M-J") #'md-copy-line)
+(global-set-key (kbd "M-K") #'md-cut-line)
 
 ;; beginning-or-indentation-toggle ??? used to be quite useful
 ;; what should mark mark?
