@@ -479,7 +479,6 @@ debug mode causing timers to die."
     (delete-region beg end))
   (beginning-of-line 1))
 
-
 ;(mapcar 'buffer-name (buffer-list))
 
 (defun md-create-temp-file (prefix)

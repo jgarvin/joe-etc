@@ -28,7 +28,7 @@
 ;; line to the left doesn't make sense, so does that do indentation?
 ;;
 ;; todo: could be nice to have
-;; editing mersions for left/right,
+;; editing versions for left/right,
 ;; to pull the line out or push into
 ;; a block, barf/slurp style? I
 ;; guess those could go on the keys
