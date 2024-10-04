@@ -38,6 +38,7 @@
 (global-set-key (kbd "M-U M-O") #'drag-stuff-up)
 (global-set-key (kbd "M-J") #'md-copy-line)
 (global-set-key (kbd "M-K") #'md-cut-line)
+(global-set-key (kbd "M-:") #'etc-comment-line)
 
 ;; beginning-or-indentation-toggle ??? used to be quite useful
 ;; what should mark mark?
@@ -68,6 +69,10 @@
 (defun etc-next-more-indented-line ()
   (interactive)
   (md-find-indentation-change 1 '>))
+
+(defun etc-comment-line ()
+  (interactive)
+  (etc-kill #'comment-or-uncomment-region 'line))
 
 (defun etc-duplicate-line ()
   (interactive)
@@ -212,6 +217,8 @@
   (save-excursion
     (sp-up-sexp)
     (etc-kill #'kill-region 'sexp)))
+
+;;;;;;;;;;;;;;;;;;;;;;; UTILITY ;;;;;;;;;;;;;;;;;
 
 (defun etc-kill (action thing)
   (let ((bounds (bounds-of-thing-at-point thing)))
