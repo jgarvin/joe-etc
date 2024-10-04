@@ -26,17 +26,24 @@
 ;; (define-key smartparens-mode-map (kbd "C-M-SPC") #'sp-mark-sexp)
 
 ;; line to the left doesn't make sense, so does that do indentation?
+;;
+;; todo: could be nice to have
+;; editing mersions for left/right,
+;; to pull the line out or push into
+;; a block, barf/slurp style? I
+;; guess those could go on the keys
+;; already dedicated to those though
 (global-set-key (kbd "M-L") #'beginning-or-indentation)
 (global-set-key (kbd "M-?") #'end-or-trailing)
 (global-set-key (kbd "M-Y") #'etc-duplicate-line)
 (global-set-key (kbd "M-N") #'etc-previous-less-indented-line)
-;(global-set-key (kbd "M-U M-N") #')
 (global-set-key (kbd "M-I") #'etc-next-more-indented-line)
 (global-set-key (kbd "M-E") #'next-line)
 (global-set-key (kbd "M-U M-E") #'drag-stuff-down)
 (global-set-key (kbd "M-O") #'previous-line)
 (global-set-key (kbd "M-U M-O") #'drag-stuff-up)
 (global-set-key (kbd "M-J") #'md-copy-line)
+(global-set-key (kbd "M-P") #'etc-flip-travel-point-line)
 (global-set-key (kbd "M-K") #'md-cut-line)
 (global-set-key (kbd "M-:") #'etc-comment-line)
 
@@ -98,6 +105,13 @@
     (forward-line)
     (move-to-column col)))
 
+(defun etc-flip-travel-point-line ()
+  (interactive)
+  (etc-flip-travel-point)
+  (let* ((beg (save-excursion (beginning-or-indentation) (point)))
+         (end (line-end-position))
+         (travel-point (if etc-travel-side beg end)))
+    (goto-char travel-point)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; SEXP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
