@@ -60,7 +60,7 @@
 ;; much more convenient to reach
 (global-set-key (kbd "C-]") #'etc-delete-other-windows)
 (global-set-key (kbd "M-]") #'abort-edit-recursive)
-(global-unset-key (kbd "C-x 1"))
+(global-set-key (kbd "C-x 1") #'etc-delete-other-windows)
 
 (defun etc-smart-find-file-at-point ()
   "Uses projectile find file at point unless not in a project."
@@ -125,6 +125,7 @@
 (load-file "~/etc/emacs/unit_layers.el")
 (load-file "~/etc/emacs/etc-debug-overlay.el")
 (load-file "~/etc/emacs/lsp-custom.el")
+(load-file "~/etc/emacs/etc-windmove.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
