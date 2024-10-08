@@ -53,16 +53,18 @@
 
 (defun debug-dump ()
   (interactive)
-  (message "\"%s\" -- \"%s\""
+  (message "\"%s\" -- \"%s\" -- \"%s\""
            (buffer-substring (plist-get (sp-get-thing t) :beg) (plist-get (sp-get-thing t) :end))
-           (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))))
+           (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))
+           (thing-at-point 'symbol)))
 
-;; (global-set-key (kbd "C-M-z") #'debug-dump)
+(global-set-key (kbd "C-M-z") #'debug-dump)
 ;; (global-set-key (kbd "C-M-z") #'sp-previous-sexp)
 (defvar-local etc-travel-side t) ;; t is front, nil is back
 
 (defun etc-flip-travel-point ()
-  (setq etc-travel-side (not etc-travel-side)))
+  (setq etc-travel-side (not etc-travel-side))
+  (message "travel side %s" (if etc-travel-side "begin" "end")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; LINE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -117,11 +119,11 @@
 
 (defun etc-flip-travel-point-sexp ()
   (interactive)
-  (etc-flip-travel-point)
   (let* ((sexp (etc-sp-get-thing))
          (beg (plist-get sexp :beg))
          (end (plist-get sexp :end))
          (travel-point (if etc-travel-side beg end)))
+    (etc-flip-travel-point)
     (goto-char (if etc-travel-side beg end))))
 
 (defun etc-next-sexp ()
@@ -131,21 +133,27 @@
          (end (plist-get sexp :end))
          (original-point (point))
          (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-backward-up-sexp) (point)))
+         (up-point (save-excursion (sp-up-sexp) (point)))
+         (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
          (end-point (save-excursion (sp-end-of-sexp) (point))))
-    (dh 'up 'b up-point)
+    (dh 'up 'r up-point)
     (cond
-     ((= end-point (point)) nil)
-     ((not (= travel-point (point))) (goto-char travel-point))
+     ((= end-point (point)) (message "1") nil)
+     ((not (= travel-point (point))) (message "2") (goto-char travel-point))
      (t
-      (goto-char beg)
+      (message "3")
       (sp-next-sexp)
       (let* ((sexp (etc-sp-get-thing))
              (new-beg (plist-get sexp :beg))
              (new-end (plist-get sexp :end)))
         (goto-char (if etc-travel-side new-beg new-end))
-        (when (= (point) up-point)
-          (goto-char (if etc-travel-side beg end))))))))
+        (when (or (= (point) up-point) (= (point) up-back-point))
+          (goto-char original-point)
+          (when (not etc-travel-side)
+            (sp-end-of-sexp))
+          ))))))
+
+;; travel point pivoting not working in overlap case
 
 (defun etc-previous-sexp ()
   (interactive)
@@ -161,24 +169,46 @@
      ((= begin-point (point)) nil)
      ((not (= travel-point (point))) (goto-char travel-point))
      (t
-      (goto-char end)
+      (dh 'end 'b end)
       (sp-previous-sexp)
+      (dh 'prev 'y (point))
       (let* ((sexp (etc-sp-get-thing))
-             (beg (plist-get sexp :beg))
-             (end (plist-get sexp :end)))
-        (goto-char (if etc-travel-side beg end)))
+             (new-beg (plist-get sexp :beg))
+             (new-end (plist-get sexp :end)))
+        (message (buffer-substring new-beg new-end))
+        (goto-char (if etc-travel-side new-beg new-end))
+        (dh 'tr 'g (point)))
       (when (or (= (point) up-point) (= (point) up-back-point))
-        (goto-char original-point))))))
+        (goto-char original-point)
+        (when etc-travel-side
+          (sp-beginning-of-sexp))
+        )))))
 
 (defun point-on-whitespace-p ()
   "Return `t` if the character at point is whitespace, `nil` otherwise."
   (save-excursion
     (looking-at "\\s-")))
 
+
 (defun etc-sp-get-thing ()
-  (if (or (point-on-whitespace-p) (md-likely-followed-by-closer (point)))
-      (sp-get-thing t)
-    (sp-get-thing)))
+  (cond
+   ((or
+     (and
+      (md-likely-followed-by-closer (1- (point)))
+      (md-likely-preceded-by-opener (1+ (point))))
+     (and
+      ;; we are on an opener right after a symbol with no whitespace inbetween
+      (thing-at-point 'symbol)
+      (md-likely-preceded-by-opener (1+ (point)))))
+    (message "watN")
+    (save-excursion
+      (if etc-travel-side (sp-get-thing) (sp-get-thing t))))
+   ((or (point-on-whitespace-p) (md-likely-followed-by-closer (point)))
+    (message "wat2")
+    (sp-get-thing t))
+   (t
+    (message "wat3")
+    (sp-get-thing))))
 
 (defun etc-transpose-sexp ()
   (interactive)
