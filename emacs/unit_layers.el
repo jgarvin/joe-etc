@@ -101,6 +101,11 @@
     (save-excursion
       (beginning-of-line)
       (kill-ring-save (line-beginning-position) (line-beginning-position 2))
+      (save-excursion
+        (forward-line)
+        (when (eobp)
+          (end-of-line)
+          (insert "\n")))
       (forward-line)
       (beginning-of-line)
       (yank))
