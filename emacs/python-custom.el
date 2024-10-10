@@ -136,3 +136,6 @@
 (define-key python-mode-map (kbd "C-<backspace>") nil)
 
 (setq py-underscore-word-syntax-p nil)
+
+;; without this arguments in multiline argument lists are double indented
+(setq python-indent-def-block-scale 1)
