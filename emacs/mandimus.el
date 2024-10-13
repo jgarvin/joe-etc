@@ -477,7 +477,8 @@ debug mode causing timers to die."
 	(kill-append (buffer-substring beg end) (< end beg))
       (kill-new (buffer-substring beg end)))
     (delete-region beg end))
-  (beginning-of-line 1))
+  (end-of-line)
+  (beginning-or-indentation))
 
 ;(mapcar 'buffer-name (buffer-list))
 
