@@ -53,10 +53,12 @@
 
 (defun debug-dump ()
   (interactive)
-  (message "\"%s\" -- \"%s\" -- \"%s\""
+  (message "\"%s\" -- \"%s\" -- \"%s\" -- \"%s\" -- \"%s\""
+           (buffer-substring (plist-get (sp-get-thing) :beg) (plist-get (sp-get-thing) :end))
            (buffer-substring (plist-get (sp-get-thing t) :beg) (plist-get (sp-get-thing t) :end))
            (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))
-           (thing-at-point 'symbol)))
+           (thing-at-point 'symbol)
+           (thing-at-point 'sexp)))
 
 (global-set-key (kbd "C-M-z") #'debug-dump)
 ;; (global-set-key (kbd "C-M-z") #'sp-previous-sexp)
@@ -141,7 +143,7 @@
          (up-point (save-excursion (sp-up-sexp) (point)))
          (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
          (end-point (save-excursion (sp-end-of-sexp) (point))))
-    (dh 'up 'r up-point)
+    ;; (dh 'up 'r up-point)
     (cond
      ((= end-point (point)) (message "1") nil)
      ((not (= travel-point (point))) (message "2") (goto-char travel-point))
@@ -169,10 +171,26 @@
          (travel-point (if etc-travel-side beg end))
          (up-point (save-excursion (sp-up-sexp) (point)))
          (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
-         (begin-point (save-excursion (sp-beginning-of-sexp) (point))))
+         (begin-point (save-excursion (sp-beginning-of-sexp) (point)))
+         (started-at-up-point (= up-point (point))))
     (cond
-     ((= begin-point (point)) nil)
+     ((and (= begin-point (point)) (not started-at-up-point)) (dh 'up 'm up-point) (message "yeah") nil)
      ((not (= travel-point (point))) (goto-char travel-point))
+     ;; if we can backup one character and be on a different sexp
+     ;; without having gone up a layer, then that should be considered
+     ;; the previous sexp. Sometimes (sp-previous-sexp) goes too far,
+     ;; e.g. if you have `buzz foo|(bar)` with travel point set to
+     ;; begin, it will jump all the way over foo and go straight to
+     ;; buzz for some reason.
+     ((save-excursion
+        (goto-char (1- (point)))
+        (and (not (or (= up-point (point)) (= up-back-point (point))))
+             (not (equal sexp (etc-sp-get-thing)))))
+      (goto-char (1- (point)))
+      (let* ((sexp (etc-sp-get-thing))
+             (new-beg (plist-get sexp :beg))
+             (new-end (plist-get sexp :end)))
+        (goto-char (if etc-travel-side new-beg new-end))))
      (t
       (dh 'end 'b end)
       (sp-previous-sexp)
@@ -183,17 +201,18 @@
         (message (buffer-substring new-beg new-end))
         (goto-char (if etc-travel-side new-beg new-end))
         (dh 'tr 'g (point)))
-      (when (or (= (point) up-point) (= (point) up-back-point))
+      (when (and (not started-at-up-point) (or (= (point) up-point) (= (point) up-back-point)))
+        (dh 'up 'm up-point)
         (goto-char original-point)
         (when etc-travel-side
-          (sp-beginning-of-sexp))
+          (sp-beginning-of-sexp)
+          )
         )))))
 
 (defun point-on-whitespace-p ()
   "Return `t` if the character at point is whitespace, `nil` otherwise."
   (save-excursion
     (looking-at "\\s-")))
-
 
 (defun etc-sp-get-thing ()
   (cond
@@ -208,7 +227,14 @@
     (message "watN")
     (save-excursion
       (if etc-travel-side (sp-get-thing) (sp-get-thing t))))
-   ((or (point-on-whitespace-p) (md-likely-followed-by-closer (point)))
+   ((or (point-on-whitespace-p)
+        (md-likely-followed-by-closer (point))
+        (null (thing-at-point 'sexp)) ;; this is how we detect being
+                                      ;; on trailing punctuation like
+                                      ;; the colon in `fut: bar` in
+                                      ;; which case we consider `fut`
+                                      ;; to be the sexp
+        )
     (message "wat2")
     (sp-get-thing t))
    (t
