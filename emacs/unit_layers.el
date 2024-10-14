@@ -142,10 +142,11 @@
          (travel-point (if etc-travel-side beg end))
          (up-point (save-excursion (sp-up-sexp) (point)))
          (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
-         (end-point (save-excursion (sp-end-of-sexp) (point))))
+         (end-point (save-excursion (sp-end-of-sexp) (point)))
+         (started-at-up-point (= up-point (point))))
     ;; (dh 'up 'r up-point)
     (cond
-     ((= end-point (point)) (message "1") nil)
+     ((and (= end-point (point)) (not started-at-up-point)) (message "1") nil)
      ((not (= travel-point (point))) (message "2") (goto-char travel-point))
      (t
       (message "3")
@@ -175,7 +176,7 @@
          (started-at-up-point (= up-point (point))))
     (cond
      ((and (= begin-point (point)) (not started-at-up-point)) (dh 'up 'm up-point) (message "yeah") nil)
-     ((not (= travel-point (point))) (goto-char travel-point))
+     ((not (= travel-point (point))) (message "nope") (goto-char travel-point))
      ;; if we can backup one character and be on a different sexp
      ;; without having gone up a layer, then that should be considered
      ;; the previous sexp. Sometimes (sp-previous-sexp) goes too far,
@@ -190,8 +191,10 @@
       (let* ((sexp (etc-sp-get-thing))
              (new-beg (plist-get sexp :beg))
              (new-end (plist-get sexp :end)))
+        (message "ah hah")
         (goto-char (if etc-travel-side new-beg new-end))))
      (t
+      (message "work")
       (dh 'end 'b end)
       (sp-previous-sexp)
       (dh 'prev 'y (point))
@@ -227,6 +230,9 @@
     (message "watN")
     (save-excursion
       (if etc-travel-side (sp-get-thing) (sp-get-thing t))))
+   ((and (thing-at-point 'symbol)
+         (not (thing-at-point 'sexp)))
+    (sp-get-thing))
    ((or (point-on-whitespace-p)
         (md-likely-followed-by-closer (point))
         (null (thing-at-point 'sexp)) ;; this is how we detect being
