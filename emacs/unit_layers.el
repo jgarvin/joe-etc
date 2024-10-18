@@ -146,10 +146,12 @@
          (started-at-up-point (= up-point (point))))
     ;; (dh 'up 'r up-point)
     (cond
-     ((and (= end-point (point)) (not started-at-up-point)) (message "1") nil)
-     ((not (= travel-point (point))) (message "2") (goto-char travel-point))
+     ((and (= end-point (point)) (not started-at-up-point)) ;; (message "1")
+      nil)
+     ((not (= travel-point (point))) ;; (message "2")
+      (goto-char travel-point))
      (t
-      (message "3")
+      ;; (message "3")
       (sp-next-sexp)
       (let* ((sexp (etc-sp-get-thing))
              (new-beg (plist-get sexp :beg))
@@ -175,8 +177,11 @@
          (begin-point (save-excursion (sp-beginning-of-sexp) (point)))
          (started-at-up-point (= up-point (point))))
     (cond
-     ((and (= begin-point (point)) (not started-at-up-point)) (dh 'up 'm up-point) (message "yeah") nil)
-     ((not (= travel-point (point))) (message "nope") (goto-char travel-point))
+     ((and (= begin-point (point)) (not started-at-up-point)) ;; (dh 'up 'm up-point)
+      ;; (message "yeah")
+      nil)
+     ((not (= travel-point (point))) ;; (message "nope")
+      (goto-char travel-point))
      ;; if we can backup one character and be on a different sexp
      ;; without having gone up a layer, then that should be considered
      ;; the previous sexp. Sometimes (sp-previous-sexp) goes too far,
@@ -191,13 +196,13 @@
       (let* ((sexp (etc-sp-get-thing))
              (new-beg (plist-get sexp :beg))
              (new-end (plist-get sexp :end)))
-        (message "ah hah")
+        ;; (message "ah hah")
         (goto-char (if etc-travel-side new-beg new-end))))
      (t
-      (message "work")
-      (dh 'end 'b end)
+      ;; (message "work")
+      ;; (dh 'end 'b end)
       (sp-previous-sexp)
-      (dh 'prev 'y (point))
+      ;; (dh 'prev 'y (point))
       (let* ((sexp (etc-sp-get-thing))
              (new-beg (plist-get sexp :beg))
              (new-end (plist-get sexp :end)))
@@ -227,7 +232,7 @@
       ;; we are on an opener right after a symbol with no whitespace inbetween
       (thing-at-point 'symbol)
       (md-likely-preceded-by-opener (1+ (point)))))
-    (message "watN")
+    ;; (message "watN")
     (save-excursion
       (if etc-travel-side (sp-get-thing) (sp-get-thing t))))
    ((and (thing-at-point 'symbol)
@@ -241,10 +246,10 @@
                                       ;; which case we consider `fut`
                                       ;; to be the sexp
         )
-    (message "wat2")
+    ;; (message "wat2")
     (sp-get-thing t))
    (t
-    (message "wat3")
+    ;; (message "wat3")
     (sp-get-thing))))
 
 (defun etc-transpose-sexp ()
