@@ -1128,11 +1128,14 @@
 (setq scroll-margin 0)
 (setq auto-window-vscroll nil)
 
-;; (defun mouse-button-pressed-p ()
-;;   "Return non-nil if last event is a mouse-button down event."
-;;   (run-hooks 'mouse-leave-buffer-hook)
-;;   (and (consp last-input-event)
-;;        (string-match-p "down-mouse-" (format "%s" (car last-input-event)))))
+(defvar etc-last-input-event nil
+  "Stores the last input event for use in `etc-maybe-recenter`.")
+
+(defun etc-store-last-input-event ()
+  "Store the last input event before the command is executed."
+  (setq etc-last-input-event last-input-event))
+
+(add-hook 'pre-command-hook #'etc-store-last-input-event)
 
 (defun etc-maybe-recenter ()
   (unless (or
@@ -1141,7 +1144,8 @@
            (not (eq (get-buffer-window (current-buffer) t) (selected-window)))
            (equal (window-point) (point-max))
            (region-active-p)
-           ;; (mouse-button-pressed-p) ;; doesn't work
+           (memq (event-basic-type etc-last-input-event) ;; don't recenter on scroll wheel
+                 '(wheel-up wheel-down mouse-4 mouse-5))
            )
     (recenter)))
 
