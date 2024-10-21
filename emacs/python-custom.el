@@ -135,6 +135,10 @@
 ;; default!
 (define-key python-mode-map (kbd "C-<backspace>") nil)
 
+;; we setup alt left and right to do this instead, simpler and useful in many modes
+(define-key python-mode-map (kbd "C-c <") nil)
+(define-key python-mode-map (kbd "C-c >") nil)
+
 (setq py-underscore-word-syntax-p nil)
 
 ;; without this arguments in multiline argument lists are double indented

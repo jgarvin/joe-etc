@@ -127,6 +127,17 @@
 (load-file "~/etc/emacs/lsp-custom.el")
 (load-file "~/etc/emacs/etc-windmove.el")
 
+(use-package
+  drag-stuff
+  :ensure t
+  )
+
+(define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
+(define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
+(define-key drag-stuff-mode-map (kbd "M-<right>") #'python-indent-shift-right)
+(define-key drag-stuff-mode-map (kbd "M-<left>") #'python-indent-shift-left)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package
@@ -144,10 +155,7 @@
   :ensure t
   )
 
-(use-package
-  drag-stuff
-  :ensure t
-  )
+
 
 ;; builtin python mode doesn't support python 3.10 match/case
 ;; (use-package
@@ -1234,16 +1242,6 @@
 ;; (global-set-key (kbd "S-<down>") #'etc-future)
 ;; (global-unset-key (kbd "S-<up>") #'etc-prior)
 ;; (global-unset-key (kbd "S-<down>"))
-
-(define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
-(define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
-(define-key drag-stuff-mode-map (kbd "M-<right>") nil)
-(define-key drag-stuff-mode-map (kbd "M-<left>") nil)
-(global-set-key (kbd "M-<left>") #'beginning-or-indentation)
-(global-set-key (kbd "M-<right>") #'end-or-trailing)
-(global-set-key (kbd "C-M-<left>") #'sp-beginning-of-sexp)
-(global-set-key (kbd "C-M-<right>") #'sp-end-of-sexp)
-
 
 ;; image mode crashes in Motif mode
 ;; Can't use GTK/Athena because they randomly lockup
