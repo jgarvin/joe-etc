@@ -83,7 +83,8 @@
 
 (defun etc-comment-line ()
   (interactive)
-  (etc-kill #'comment-or-uncomment-region 'line))
+  (etc-kill #'comment-or-uncomment-region 'line)
+  (forward-line))
 
 (defun etc-duplicate-line ()
   (interactive)
