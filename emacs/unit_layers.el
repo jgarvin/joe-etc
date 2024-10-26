@@ -5,6 +5,9 @@
 
 (global-set-key (kbd "C-<left>") #'etc-backward-symbol)
 (global-set-key (kbd "C-<right>") #'forward-symbol)
+(global-set-key (kbd "C-<next>") #'md-get-next-instance-of-symbol)
+(global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
+
 
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
