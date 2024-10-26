@@ -157,18 +157,6 @@
       (goto-char end)
       (activate-mark))))
 
-(defun etc-indent-shift-left ()
-  (interactive)
-  (expand-region-to-whole-lines)
-  (python-indent-shift-left (region-beginning) (region-end)))
-
-(defun etc-indent-shift-right ()
-  (interactive)
-  (expand-region-to-whole-lines)
-  (python-indent-shift-right (region-beginning) (region-end)))
-
-(define-key drag-stuff-mode-map (kbd "M-<right>") #'etc-indent-shift-right)
-(define-key drag-stuff-mode-map (kbd "M-<left>") #'etc-indent-shift-left)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

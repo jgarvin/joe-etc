@@ -1,24 +1,65 @@
-;; TODO: change to be symbol based instead of word based
+(defun etc-forward-word (arg)
+  (interactive "^p")
+  (let ((p (point))
+        (line (line-number-at-pos)))
+    (forward-word arg)
+    (when (not (= line (line-number-at-pos)))
+      (goto-char p))))
+
+(defun etc-forward-symbol (arg)
+  (interactive "^p")
+  (let ((p (point))
+        (line (line-number-at-pos)))
+    (forward-symbol arg)
+    (when (not (= line (line-number-at-pos)))
+      (goto-char p))))
+
+(defun etc-backward-word ()
+  (interactive)
+  (etc-forward-word -1))
+
 (defun etc-backward-symbol ()
   (interactive)
-  (forward-symbol -1))
+  (etc-forward-symbol -1))
 
-(global-set-key (kbd "C-<left>") #'etc-backward-symbol)
-(global-set-key (kbd "C-<right>") #'forward-symbol)
+(defun etc-indent-shift-left ()
+  (interactive)
+  (expand-region-to-whole-lines)
+  (python-indent-shift-left (region-beginning) (region-end)))
+
+(defun etc-indent-shift-right ()
+  (interactive)
+  (expand-region-to-whole-lines)
+  (python-indent-shift-right (region-beginning) (region-end)))
+
+;; NAVIGATION layer
+(global-set-key (kbd "C-<left>") #'etc-backward-word)
+(global-set-key (kbd "C-M-<left>") #'etc-backward-symbol)
+(global-set-key (kbd "C-<right>") #'etc-forward-word)
+(global-set-key (kbd "C-M-<right>") #'etc-forward-symbol)
 (global-set-key (kbd "C-<next>") #'md-get-next-instance-of-symbol)
 (global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
+(global-set-key (kbd "M-<left>") #'previous-buffer)
+(global-set-key (kbd "M-<right>") #'next-buffer)
+(define-key drag-stuff-mode-map (kbd "M-S-<right>") #'etc-indent-shift-right)
+(define-key drag-stuff-mode-map (kbd "M-S-<left>") #'etc-indent-shift-left)
+(define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
+(define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
+(define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
+(define-key smartparens-mode-map (kbd "C-M-i") #'sp-next-sexp)
+(define-key smartparens-mode-map (kbd "C-M-e") #'sp-down-sexp)
+(define-key smartparens-mode-map (kbd "C-M-d") #'sp-backward-down-sexp)
+(define-key smartparens-mode-map (kbd "C-M-o") #'sp-up-sexp)
+(define-key smartparens-mode-map (kbd "C-M-b") #'sp-backward-up-sexp)
+
+;; EDITING LAYER
 
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
 ;; conventional C-u
-(define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
-(define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
-(define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u C-M-n") #'etc-backward-transpose-sexp)
-(define-key smartparens-mode-map (kbd "C-M-i") #'sp-next-sexp)
+
 (define-key smartparens-mode-map (kbd "C-M-u C-M-i") #'etc-transpose-sexp)
-(define-key smartparens-mode-map (kbd "C-M-e") #'sp-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-o") #'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-c") #'sp-unwrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-r") #'sp-rewrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-'") #'sp-forward-slurp-sexp)
