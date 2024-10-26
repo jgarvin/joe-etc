@@ -1,24 +1,42 @@
 ;; taken from: https://gist.githubusercontent.com/gilbertw1/
 
 (defun counsel-projectile-bookmark ()
-  "Forward to `bookmark-jump' or `bookmark-set' if bookmark doesn't exist."
+  "Jump to a projectile bookmark or create a new one if it doesn't exist."
   (interactive)
   (require 'bookmark)
-  (let ((projectile-bookmarks (projectile-bookmarks)))
+
+  ;; Use a different variable name to avoid shadowing the function
+  (let* ((proj-bookmarks (projectile-bookmarks))
+         ;; Determine if proj-bookmarks is an alist or a list of strings
+         (bookmark-names
+          (if (and (listp proj-bookmarks)
+                   (consp (car proj-bookmarks)))
+              (mapcar #'car proj-bookmarks)  ; Extract names from alist
+            proj-bookmarks)))                ; Assume it's a list of strings
+
+    ;; Debugging: Uncomment the next line to inspect bookmark-names
+    ;; (message "Bookmark Names: %S" bookmark-names)
+
     (ivy-read "Create or jump to bookmark: "
-              projectile-bookmarks
+              bookmark-names
               :action (lambda (x)
-                        (cond ((and counsel-bookmark-avoid-dired
-                                    (member x projectile-bookmarks)
-                                    (file-directory-p (bookmark-location x)))
-                               (with-ivy-window
-                                 (let ((default-directory (bookmark-location x)))
-                                   (counsel-find-file))))
-                              ((member x projectile-bookmarks)
-                               (with-ivy-window
-                                 (bookmark-jump x)))
-                              (t
-                               (bookmark-set x))))
+                        (cond
+                         ;; If avoiding dired and the bookmark is a directory
+                         ((and (bound-and-true-p counsel-bookmark-avoid-dired)
+                               (member x bookmark-names)
+                               (file-directory-p (bookmark-location x)))
+                          (with-ivy-window
+                            (let ((default-directory (bookmark-location x)))
+                              (counsel-find-file))))
+
+                         ;; If the bookmark exists, jump to it
+                         ((member x bookmark-names)
+                          (with-ivy-window
+                            (bookmark-jump x)))
+
+                         ;; Otherwise, create a new bookmark
+                         (t
+                          (bookmark-set x))))
               :caller 'counsel-projectile-bookmark)))
 
 (ivy-set-actions
