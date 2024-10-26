@@ -8,18 +8,17 @@
 (global-set-key (kbd "C-<next>") #'md-get-next-instance-of-symbol)
 (global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
 
-
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
 ;; conventional C-u
 (define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
-(define-key smartparens-mode-map (kbd "C-M-n") #'etc-previous-sexp)
+(define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u C-M-n") #'etc-backward-transpose-sexp)
-(define-key smartparens-mode-map (kbd "C-M-i") #'etc-next-sexp)
+(define-key smartparens-mode-map (kbd "C-M-i") #'sp-next-sexp)
 (define-key smartparens-mode-map (kbd "C-M-u C-M-i") #'etc-transpose-sexp)
 (define-key smartparens-mode-map (kbd "C-M-e") #'sp-down-sexp)
-(define-key smartparens-mode-map (kbd "C-M-o") #'sp-backward-up-sexp)
+(define-key smartparens-mode-map (kbd "C-M-o") #'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-c") #'sp-unwrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-r") #'sp-rewrap-sexp)
 (define-key smartparens-mode-map (kbd "C-M-'") #'sp-forward-slurp-sexp)
