@@ -84,7 +84,7 @@ debug mode causing timers to die."
         (case-fold-search nil))
     (save-excursion
       (ignore-errors (end-of-thing 'symbol))
-      (if (re-search-forward (concat "\\_<" (regexp-quote str) "\\_>"))
+      (if (re-search-forward (concat "\\_<" (regexp-quote str) "\\_>") nil t)
           (setq p (point))
         (user-error "No further instance of string: %s" str)))
     (when p
@@ -97,7 +97,7 @@ debug mode causing timers to die."
         (case-fold-search nil))
     (save-excursion
       (ignore-errors (beginning-of-thing 'symbol))
-      (if (re-search-backward (concat "\\_<" (regexp-quote str) "\\_>"))
+      (if (re-search-backward (concat "\\_<" (regexp-quote str) "\\_>") nil t)
           (setq p (point))
         (user-error "No preceding instance of string: %s" str)))
     (when p
