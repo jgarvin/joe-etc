@@ -1,3 +1,11 @@
+;; TODO: change to be symbol based instead of word based
+(defun etc-backward-symbol ()
+  (interactive)
+  (forward-symbol -1))
+
+(global-set-key (kbd "C-<left>") #'etc-backward-symbol)
+(global-set-key (kbd "C-<right>") #'forward-symbol)
+
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
 ;; conventional C-u
