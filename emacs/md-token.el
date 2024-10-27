@@ -86,12 +86,18 @@
       (setq sym-end i))
     (while (and (< i sym-end) (null result))
       (let ((face-or-faces (get-char-property i 'face)))
-        (if (listp face-or-faces)
-            ;; Sometimes you get a cons cell of face . "color"
-            (when (stringp (cdr face-or-faces))
-              (setq face-or-faces (list (car face-or-faces))))
-          ;; Sometimes you get a single symbol not in a list
-          (setq face-or-faces (list face-or-faces)))
+        (setq face-or-faces
+              (cond
+               ;; ((listp face-or-faces)
+               ;;  ;; Sometimes you get a cons cell of face . "color"
+               ;;  (when (stringp (cdr face-or-faces))
+               ;;    (list (car face-or-faces))))
+
+               ;; sometimes you get a cons cell of annotations and a face
+               ;; ((:foreground "black") (background-color . "#6a3888a1a246") . ivy-minibuffer-match-face-2)
+               ((consp face-or-faces) (cdr face-or-faces))
+               ;; Sometimes you get a single symbol not in a list
+               (t (list face-or-faces))))
         (when (-intersection face-or-faces faces)
           (setq result t)))
       (setq i (next-char-property-change i sym-end)))
