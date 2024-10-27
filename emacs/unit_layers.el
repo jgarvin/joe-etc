@@ -24,13 +24,15 @@
 
 (defun etc-indent-shift-left ()
   (interactive)
-  (expand-region-to-whole-lines)
-  (python-indent-shift-left (region-beginning) (region-end)))
+  (save-excursion
+    (expand-region-to-whole-lines)
+    (python-indent-shift-left (region-beginning) (region-end))))
 
 (defun etc-indent-shift-right ()
   (interactive)
-  (expand-region-to-whole-lines)
-  (python-indent-shift-right (region-beginning) (region-end)))
+  (save-excursion
+    (expand-region-to-whole-lines)
+    (python-indent-shift-right (region-beginning) (region-end))))
 
 ;; NAVIGATION layer
 (global-set-key (kbd "C-<left>") #'etc-backward-word)
