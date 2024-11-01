@@ -34,6 +34,12 @@
     (expand-region-to-whole-lines)
     (python-indent-shift-right (region-beginning) (region-end))))
 
+;; (defun etc-setup-folding ()
+;;   (hs-minor-mode)
+;;   (hs-hide-all))
+
+;; (add-hook 'prog-mode-hook #'etc-setup-folding)
+
 ;; NAVIGATION layer
 (global-set-key (kbd "C-<left>") #'etc-backward-word)
 (global-set-key (kbd "C-M-<left>") #'etc-backward-symbol)
@@ -44,7 +50,6 @@
 (global-set-key (kbd "M-<left>") #'previous-buffer)
 (global-set-key (kbd "M-<right>") #'next-buffer)
 (global-set-key (kbd "M-S-<right>") #'etc-indent-shift-right)
-(global-set-key (kbd "M-S-<left>") #'etc-indent-shift-left)
 (define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
@@ -53,8 +58,55 @@
 (define-key smartparens-mode-map (kbd "C-M-d") #'sp-backward-down-sexp)
 (define-key smartparens-mode-map (kbd "C-M-o") #'sp-up-sexp)
 (define-key smartparens-mode-map (kbd "C-M-b") #'sp-backward-up-sexp)
+;;(global-set-key (kbd "C-M-<left>") #'hs-hide-all)
+;;(global-set-key (kbd "C-M-<right>") #'hs-toggle-hiding)
+
 
 ;; EDITING LAYER
+
+(defun etc-bounds-of-thing-at-point (unit)
+  "Similar to 'thing-at-point except that 'sexp gives the enclosing sexp."
+  (cond
+      ((eq 'sexp unit)
+       (cons
+        (plist-get (sp-get-enclosing-sexp) :beg)
+        (plist-get (sp-get-enclosing-sexp) :end)))
+      (t (bounds-of-thing-at-point unit))))
+
+(defun etc-apply-to-unit (action thing)
+  (let ((bounds (etc-bounds-of-thing-at-point thing)))
+    (funcall action (car bounds) (cdr bounds))))
+
+(defmacro etc-gen-commands (unit)
+  `(progn
+     (defun ,(intern (concat "etc-copy-" (symbol-name (cadr unit)))) ()
+       ,(format "Copy the current %s to kill ring." (symbol-name (cadr unit)))
+       (interactive)
+       (etc-apply-to-unit #'kill-ring-save ',(cadr unit)))
+
+     (defun ,(intern (concat "etc-cut-" (symbol-name (cadr unit)))) ()
+       ,(format "Kill the current %s." (symbol-name (cadr unit)))
+       (interactive)
+       (etc-apply-to-unit #'kill-region ',(cadr unit)))
+
+     (defun ,(intern (concat "etc-comment-" (symbol-name (cadr unit)))) ()
+       ,(format "Comment the current %s." (symbol-name (cadr unit)))
+       (interactive)
+       (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit)))
+
+     (defun ,(intern (concat "etc-select-" (symbol-name (cadr unit)))) ()
+       ,(format "Mark the current %s." (symbol-name (cadr unit)))
+       (interactive)
+       (let ((start (car (etc-bounds-of-thing-at-point ',(cadr unit))))
+             (end (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
+         (goto-char start)
+         (set-mark end)
+         (setq mark-active t)
+         (activate-mark)))))
+
+(dolist (unit '(word line symbol sexp paragraph buffer))
+  (eval `(etc-gen-commands ',unit)))
+
 
 ;; modset-u is like a prefix argument, but without using the actual
 ;; emacs prefix mechanism so that is still available through a
