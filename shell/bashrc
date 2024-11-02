@@ -4,6 +4,9 @@ case $- in
       *) return;;
 esac
 
+# enable ctrl+backspace deleting words
+stty werase \^H
+
 source $HOME/etc/shell/path_setup
 
 # Keep distinct from zsh history so they don't corrupt one another.
