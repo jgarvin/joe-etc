@@ -63,7 +63,8 @@
      (defun ,(intern (concat "etc-copy-" (symbol-name (cadr unit)))) ()
        ,(format "Copy the current %s to kill ring." (symbol-name (cadr unit)))
        (interactive)
-       (etc-apply-to-unit #'kill-ring-save ',(cadr unit)))
+       (etc-apply-to-unit #'kill-ring-save ',(cadr unit))
+       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
 
      (defun ,(intern (concat "etc-cut-" (symbol-name (cadr unit)))) ()
        ,(format "Kill the current %s." (symbol-name (cadr unit)))
@@ -73,7 +74,8 @@
      (defun ,(intern (concat "etc-comment-" (symbol-name (cadr unit)))) ()
        ,(format "Comment the current %s." (symbol-name (cadr unit)))
        (interactive)
-       (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit)))
+       (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit))
+       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
 
      (defun ,(intern (concat "etc-indent-left-" (symbol-name (cadr unit)))) ()
        ,(format "Comment the current %s." (symbol-name (cadr unit)))
@@ -112,8 +114,8 @@
 
 ;; Line finger 1 (Left middle)
 (global-set-key (kbd "M-*") #'etc-indent-left-line) ;; shift override so use *
-(global-set-key (kbd "M-T") #'drag-stuff-up)
-(global-set-key (kbd "M-C") #'drag-stuff-down)
+(global-set-key (kbd "M-H") #'drag-stuff-up)
+(global-set-key (kbd "M-R") #'drag-stuff-down)
 (global-set-key (kbd "M-M") #'etc-indent-rIght-line)
 
 ;; Block finger (Left ring)
@@ -147,85 +149,8 @@
 (global-set-key (kbd "M-<") #'sp-split-sexp)
 
 ;; Sexp finger 3 (Right pinky)
-(global-set-key (kbd "M-\\") #'sp-unwrap-sexp)
+(global-set-key (kbd "M-+") #'sp-unwrap-sexp)
 (global-set-key (kbd "M-I") #'sp-rewrap-sexp)
 (global-set-key (kbd "M-?") #'sp-wrap-round)
 
-
-;; (defun etc-indent-shift-left ()
-;;   (interactive)
-;;   (let ((beg (if (region-active-p) (region-beginning) (line-beginning-position)))
-;;         (end (if (region-active-p) (region-end) (line-end-position))))
-;;     (apply #'python-indent-shift-left
-;;            (adjust-bounds-to-line (region-beginning) (region-end)))))
-
-;; (defun etc-indent-shift-right ()
-;;   (interactive)
-;;   (apply #'python-indent-shift-right
-;;          (adjust-bounds-to-line (region-beginning) (region-end))))
-
-;; (defun adjust-bounds-to-line (beg end)
-;;   "Adjust BEG and END to the beginning and end of their respective lines.
-
-;; If BEG is not at the beginning of a line, move it to the beginning.
-;; If END is not at the end of a line, move it to the end.
-;; Returns a cons cell (NEW-BEG . NEW-END)."
-;;   (let (new-beg new-end)
-;;     ;; Adjust beg
-;;     (save-excursion
-;;       (goto-char beg)
-;;       (setq new-beg (if (bolp)
-;;                         beg
-;;                       (line-beginning-position))))
-;;     ;; Adjust end
-;;     (save-excursion
-;;       (goto-char end)
-;;       (setq new-end (if (eolp)
-;;                         end
-;;                       (line-end-position))))
-;;     ;; Return the new bounds
-;;     (list new-beg new-end)))
-
-
-;; (defun grow-region-to-lines ()
-;;   "Expand the active region to encompass entire lines.
-;; If a region is active, adjust the start to the beginning of the first line
-;; and the end to the end of the last line in the region.
-;; If no region is active, select the entire current line."
-;;   (interactive)
-;;   (if (use-region-p)
-;;       ;; Case 1: Active region exists
-;;       (let (start end)
-;;         ;; Determine the start position: beginning of the first line in the region
-;;         (save-excursion
-;;           (goto-char (region-beginning))
-;;           (setq start (line-beginning-position)))
-
-;;         ;; Determine the end position: end of the last line in the region
-;;         (save-excursion
-;;           (goto-char (region-end))
-;;           ;; If the region ends exactly at the beginning of a line (i.e., between lines),
-;;           ;; adjust to include the previous line's end.
-;;           (when (= (point) (line-beginning-position))
-;;             (forward-line -1))
-;;           (setq end (line-end-position)))
-
-;;         ;; Update the region to the new boundaries
-;;         (set-mark start)
-;;         (goto-char end)
-;;         (activate-mark))
-;;     ;; Case 2: No active region; select the current line
-;;     (let (start end)
-;;       (save-excursion
-;;         (setq start (line-beginning-position))
-;;         (setq end (line-end-position)))
-;;       (set-mark start)
-;;       (goto-char end)
-;;       (activate-mark))))
-
-;; (defun etc-setup-folding ()
-;;   (hs-minor-mode)
-;;   (hs-hide-all))
-
-;; (add-hook 'prog-mode-hook #'etc-setup-folding)
 
