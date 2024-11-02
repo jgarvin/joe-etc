@@ -22,24 +22,6 @@
   (interactive)
   (etc-forward-symbol -1))
 
-(defun etc-indent-shift-left ()
-  (interactive)
-  (save-excursion
-    (expand-region-to-whole-lines)
-    (python-indent-shift-left (region-beginning) (region-end))))
-
-(defun etc-indent-shift-right ()
-  (interactive)
-  (save-excursion
-    (expand-region-to-whole-lines)
-    (python-indent-shift-right (region-beginning) (region-end))))
-
-;; (defun etc-setup-folding ()
-;;   (hs-minor-mode)
-;;   (hs-hide-all))
-
-;; (add-hook 'prog-mode-hook #'etc-setup-folding)
-
 ;; NAVIGATION layer
 (global-set-key (kbd "C-<left>") #'etc-backward-word)
 (global-set-key (kbd "C-M-<left>") #'etc-backward-symbol)
@@ -49,7 +31,6 @@
 (global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
 (global-set-key (kbd "M-<left>") #'previous-buffer)
 (global-set-key (kbd "M-<right>") #'next-buffer)
-(global-set-key (kbd "M-S-<right>") #'etc-indent-shift-right)
 (define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
@@ -94,6 +75,16 @@
        (interactive)
        (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit)))
 
+     (defun ,(intern (concat "etc-indent-left-" (symbol-name (cadr unit)))) ()
+       ,(format "Comment the current %s." (symbol-name (cadr unit)))
+       (interactive)
+       (etc-apply-to-unit #'python-indent-shift-left ',(cadr unit)))
+
+     (defun ,(intern (concat "etc-indent-right-" (symbol-name (cadr unit)))) ()
+       ,(format "Comment the current %s." (symbol-name (cadr unit)))
+       (interactive)
+       (etc-apply-to-unit #'python-indent-shift-right ',(cadr unit)))
+
      (defun ,(intern (concat "etc-select-" (symbol-name (cadr unit)))) ()
        ,(format "Mark the current %s." (symbol-name (cadr unit)))
        (interactive)
@@ -107,311 +98,134 @@
 (dolist (unit '(word line symbol sexp paragraph buffer))
   (eval `(etc-gen-commands ',unit)))
 
-
-;; modset-u is like a prefix argument, but without using the actual
-;; emacs prefix mechanism so that is still available through a
-;; conventional C-u
-(define-key smartparens-mode-map (kbd "C-M-u C-M-n") #'etc-backward-transpose-sexp)
-
-(define-key smartparens-mode-map (kbd "C-M-u C-M-i") #'etc-transpose-sexp)
-(define-key smartparens-mode-map (kbd "C-M-c") #'sp-unwrap-sexp)
-(define-key smartparens-mode-map (kbd "C-M-r") #'sp-rewrap-sexp)
-(define-key smartparens-mode-map (kbd "C-M-'") #'sp-forward-slurp-sexp)
-(define-key smartparens-mode-map (kbd "C-M-u C-M-'") #'sp-backward-slurp-sexp)
-(define-key smartparens-mode-map (kbd "C-M-,") #'sp-forward-barf-sexp)
-(define-key smartparens-mode-map (kbd "C-M-u C-M-,") #'sp-backward-barf-sexp)
-(define-key smartparens-mode-map (kbd "C-M-k") #'sp-kill-sexp)
-(define-key smartparens-mode-map (kbd "C-M-u C-M-k") #'etc-cut-sexp)
-(define-key smartparens-mode-map (kbd "C-M-s") #'sp-split-sexp)
-(define-key smartparens-mode-map (kbd "C-M-p") #'etc-flip-travel-point-sexp)
-(define-key smartparens-mode-map (kbd "C-M-\\") #'sp-splice-sexp)
-(define-key smartparens-mode-map (kbd "C-M-;") #'etc-comment-sexp)
-(define-key smartparens-mode-map (kbd "C-M-j") #'etc-copy-sexp)
-(define-key smartparens-mode-map (kbd "C-M-y") #'etc-duplicate-sexp)
-;; (define-key smartparens-mode-map (kbd "C-M-SPC") #'sp-mark-sexp)
-
-;; line to the left doesn't make sense, so does that do indentation?
-;;
-;; todo: could be nice to have
-;; editing versions for left/right,
-;; to pull the line out or push into
-;; a block, barf/slurp style? I
-;; guess those could go on the keys
-;; already dedicated to those though
-(global-set-key (kbd "M-L") #'beginning-or-indentation)
-(global-set-key (kbd "M-?") #'end-or-trailing)
-(global-set-key (kbd "M-Y") #'etc-duplicate-line)
-(global-set-key (kbd "M-N") #'etc-previous-less-indented-line)
-(global-set-key (kbd "M-I") #'etc-next-more-indented-line)
-(global-set-key (kbd "M-E") #'next-line)
-(global-set-key (kbd "M-U M-E") #'drag-stuff-down)
-(global-set-key (kbd "M-O") #'previous-line)
-(global-set-key (kbd "M-U M-O") #'drag-stuff-up)
-(global-set-key (kbd "M-J") #'md-copy-line)
-(global-set-key (kbd "M-P") #'etc-flip-travel-point-line)
-(global-set-key (kbd "M-K") #'md-cut-line)
-(global-set-key (kbd "M-:") #'etc-comment-line)
-
-;; beginning-or-indentation-toggle ??? used to be quite useful
-;; what should mark mark?
-;; should we infer travel side from point position? if so we have to prevent moving forward from bringing us to the end
-
-(defun debug-dump ()
-  (interactive)
-  (message "\"%s\" -- \"%s\" -- \"%s\" -- \"%s\" -- \"%s\""
-           (buffer-substring (plist-get (sp-get-thing) :beg) (plist-get (sp-get-thing) :end))
-           (buffer-substring (plist-get (sp-get-thing t) :beg) (plist-get (sp-get-thing t) :end))
-           (buffer-substring (plist-get (etc-sp-get-thing) :beg) (plist-get (etc-sp-get-thing) :end))
-           (thing-at-point 'symbol)
-           (thing-at-point 'sexp)))
-
-(global-set-key (kbd "C-M-z") #'debug-dump)
-;; (global-set-key (kbd "C-M-z") #'sp-previous-sexp)
-(defvar-local etc-travel-side t) ;; t is front, nil is back
-
-(defun etc-flip-travel-point ()
-  (setq etc-travel-side (not etc-travel-side))
-  (message "travel side %s" (if etc-travel-side "begin" "end")))
-
-;;;;;;;;;;;;;;;;;;;;;;;; LINE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; line duplicate isn't duplicating from beginning
-;; likewise ideally reversing an indentation change would go back to the same line
-
-(defun etc-previous-less-indented-line ()
-  (interactive)
-  (md-find-indentation-change -1 '<))
-
-(defun etc-next-more-indented-line ()
-  (interactive)
-  (md-find-indentation-change 1 '>))
-
-(defun etc-comment-line ()
-  (interactive)
-  (etc-kill #'comment-or-uncomment-region 'line)
-  (forward-line))
-
-(defun etc-duplicate-line ()
-  (interactive)
-  ;; save-excursion inserts a marker into the text, it doesn't just
-  ;; remember the file offset, so it's important that we move to the
-  ;; next line before we yank, otherwise the line on top will be the
-  ;; duplicate one, and the marker will be pushed down to the next
-  ;; line.
-  ;;
-  ;; Also annoyingly forward-line will not preserve the column, so we
-  ;; have to manually save it.
-  ;;
-  ;; WARNING: if you change this function be sure it behaves the same
-  ;; whether cursor is at the beginning of the line or not, first
-  ;; versions did not.
-  (let ((col (current-column)))
-    (save-excursion
-      (beginning-of-line)
-      (kill-ring-save (line-beginning-position) (line-beginning-position 2))
-      (save-excursion
-        (forward-line)
-        (when (eobp)
-          (end-of-line)
-          (insert "\n")))
-      (forward-line)
-      (beginning-of-line)
-      (yank))
-    (forward-line)
-    (move-to-column col)))
-
-(defun etc-flip-travel-point-line ()
-  (interactive)
-  (etc-flip-travel-point)
-  (let* ((beg (save-excursion (beginning-or-indentation) (point)))
-         (end (line-end-position))
-         (travel-point (if etc-travel-side beg end)))
-    (goto-char travel-point)))
-
-;;;;;;;;;;;;;;;;;;;;;;;; SEXP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun etc-flip-travel-point-sexp ()
-  (interactive)
-  (let* ((sexp (etc-sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end))
-         (travel-point (if etc-travel-side beg end)))
-    (etc-flip-travel-point)
-    (goto-char (if etc-travel-side beg end))))
-
-(defun etc-next-sexp ()
-  (interactive)
-  (let* ((sexp (etc-sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end))
-         (original-point (point))
-         (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-up-sexp) (point)))
-         (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
-         (end-point (save-excursion (sp-end-of-sexp) (point)))
-         (started-at-up-point (= up-point (point))))
-    ;; (dh 'up 'r up-point)
-    (cond
-     ((and (= end-point (point)) (not started-at-up-point)) ;; (message "1")
-      nil)
-     ((not (= travel-point (point))) ;; (message "2")
-      (goto-char travel-point))
-     (t
-      ;; (message "3")
-      (sp-next-sexp)
-      (let* ((sexp (etc-sp-get-thing))
-             (new-beg (plist-get sexp :beg))
-             (new-end (plist-get sexp :end)))
-        (goto-char (if etc-travel-side new-beg new-end))
-        (when (or (= (point) up-point) (= (point) up-back-point))
-          (goto-char original-point)
-          (when (not etc-travel-side)
-            (sp-end-of-sexp))
-          ))))))
-
-;; travel point pivoting not working in overlap case
-
-(defun etc-previous-sexp ()
-  (interactive)
-  (let* ((sexp (etc-sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end))
-         (original-point (point))
-         (travel-point (if etc-travel-side beg end))
-         (up-point (save-excursion (sp-up-sexp) (point)))
-         (up-back-point (save-excursion (sp-backward-up-sexp) (point)))
-         (begin-point (save-excursion (sp-beginning-of-sexp) (point)))
-         (started-at-up-point (= up-point (point))))
-    (cond
-     ((and (= begin-point (point)) (not started-at-up-point)) ;; (dh 'up 'm up-point)
-      ;; (message "yeah")
-      nil)
-     ((not (= travel-point (point))) ;; (message "nope")
-      (goto-char travel-point))
-     ;; if we can backup one character and be on a different sexp
-     ;; without having gone up a layer, then that should be considered
-     ;; the previous sexp. Sometimes (sp-previous-sexp) goes too far,
-     ;; e.g. if you have `buzz foo|(bar)` with travel point set to
-     ;; begin, it will jump all the way over foo and go straight to
-     ;; buzz for some reason.
-     ((save-excursion
-        (goto-char (1- (point)))
-        (and (not (or (= up-point (point)) (= up-back-point (point))))
-             (not (equal sexp (etc-sp-get-thing)))))
-      (goto-char (1- (point)))
-      (let* ((sexp (etc-sp-get-thing))
-             (new-beg (plist-get sexp :beg))
-             (new-end (plist-get sexp :end)))
-        ;; (message "ah hah")
-        (goto-char (if etc-travel-side new-beg new-end))))
-     (t
-      ;; (message "work")
-      ;; (dh 'end 'b end)
-      (sp-previous-sexp)
-      ;; (dh 'prev 'y (point))
-      (let* ((sexp (etc-sp-get-thing))
-             (new-beg (plist-get sexp :beg))
-             (new-end (plist-get sexp :end)))
-        (message (buffer-substring new-beg new-end))
-        (goto-char (if etc-travel-side new-beg new-end))
-        (dh 'tr 'g (point)))
-      (when (and (not started-at-up-point) (or (= (point) up-point) (= (point) up-back-point)))
-        (dh 'up 'm up-point)
-        (goto-char original-point)
-        (when etc-travel-side
-          (sp-beginning-of-sexp)
-          )
-        )))))
-
-(defun point-on-whitespace-p ()
-  "Return `t` if the character at point is whitespace, `nil` otherwise."
-  (save-excursion
-    (looking-at "\\s-")))
-
-(defun etc-sp-get-thing ()
-  (cond
-   ((or
-     (and
-      (md-likely-followed-by-closer (1- (point)))
-      (md-likely-preceded-by-opener (1+ (point))))
-     (and
-      ;; we are on an opener right after a symbol with no whitespace inbetween
-      (thing-at-point 'symbol)
-      (md-likely-preceded-by-opener (1+ (point)))))
-    ;; (message "watN")
-    (save-excursion
-      (if etc-travel-side (sp-get-thing) (sp-get-thing t))))
-   ((and (thing-at-point 'symbol)
-         (not (thing-at-point 'sexp)))
-    (sp-get-thing))
-   ((or (point-on-whitespace-p)
-        (md-likely-followed-by-closer (point))
-        (null (thing-at-point 'sexp)) ;; this is how we detect being
-                                      ;; on trailing punctuation like
-                                      ;; the colon in `fut: bar` in
-                                      ;; which case we consider `fut`
-                                      ;; to be the sexp
-        )
-    ;; (message "wat2")
-    (sp-get-thing t))
-   (t
-    ;; (message "wat3")
-    (sp-get-thing))))
-
-(defun etc-transpose-sexp ()
-  (interactive)
-  (let* ((sexp (etc-sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end)))
-    (when (= (point) beg)
-      (goto-char end))
-    (sp-transpose-sexp)
-    (goto-char (- (point) (- end beg)))))
-
 (defun etc-backward-transpose-sexp ()
   (interactive)
-  (let* ((sexp (etc-sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end)))
-    (when (= (point) end)
-      (goto-char beg))
-    (sp-transpose-sexp)
-    (sp-previous-sexp)
-    (sp-previous-sexp)
-    (sp-next-sexp)))
+  (goto-char (car (bounds-of-thing-at-point 'sexp)))
+  (sp-transpose-sexp)
+  (sp-previous-sexp))
 
-(defun etc-duplicate-sexp ()
-  (interactive)
-  (let* ((sexp (sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end)))
-    (kill-ring-save beg end)
-    (goto-char end)
-    (insert "\n")
-    (let ((current-prefix-arg '(4)))  ; Simulates pressing C-u
-      (call-interactively 'yank))))
+;; Line finger 0 (Left index)
+(global-set-key (kbd "M-B") #'etc-cut-line)
+(global-set-key (kbd "M-T") #'etc-copy-line)
+(global-set-key (kbd "M-C") #'etc-select-line)
+(global-set-key (kbd "M-G") #'etc-comment-line)
 
-(defun etc-comment-sexp ()
-  (interactive)
-  (let* ((sexp (sp-get-thing))
-         (beg (plist-get sexp :beg))
-         (end (plist-get sexp :end)))
-    (comment-or-uncomment-region beg end)))
+;; Line finger 1 (Left middle)
+(global-set-key (kbd "M-*") #'etc-indent-left-line) ;; shift override so use *
+(global-set-key (kbd "M-T") #'drag-stuff-up)
+(global-set-key (kbd "M-C") #'drag-stuff-down)
+(global-set-key (kbd "M-M") #'etc-indent-rIght-line)
 
-(defun etc-copy-sexp ()
-  (interactive)
-  (save-excursion
-    (sp-up-sexp)
-    (etc-kill #'kill-ring-save 'sexp)))
+;; Block finger (Left ring)
+(global-set-key (kbd "M-Q") #'etc-cut-paragraph) ;; no letter bound here so use Q
+(global-set-key (kbd "M-S") #'etc-copy-paragraph)
+(global-set-key (kbd "M-D") #'etc-select-paragraph)
+(global-set-key (kbd "M-V") #'etc-comment-paragraph)
 
-(defun etc-cut-sexp ()
-  (interactive)
-  (save-excursion
-    (sp-up-sexp)
-    (etc-kill #'kill-region 'sexp)))
+;; Buffer finger (Left pinky)
+(global-set-key (kbd "M-#") #'etc-cut-buffer) ;; no letter bound here so use #
+(global-set-key (kbd "M-A") #'etc-copy-buffer)
+(global-set-key (kbd "M-Q") #'etc-select-buffer)
+(global-set-key (kbd "M-Z") #'etc-comment-buffer)
 
-;;;;;;;;;;;;;;;;;;;;;;; UTILITY ;;;;;;;;;;;;;;;;;
+;; Sexp finger 0 (Right index)
+(global-set-key (kbd "M-Y") #'etc-cut-sexp)
+(global-set-key (kbd "M-N") #'etc-copy-sexp)
+(global-set-key (kbd "M-L") #'etc-select-sexp)
+(global-set-key (kbd "M-J") #'etc-comment-sexp)
 
-(defun etc-kill (action thing)
-  (let ((bounds (bounds-of-thing-at-point thing)))
-    (funcall action (car bounds) (cdr bounds))))
+;; Sexp finger 1 (Right middle)
+(global-set-key (kbd "M-\"") #'sp-backward-barf-sexp)
+(global-set-key (kbd "M-E") #'sp-backward-slurp-sexp)
+(global-set-key (kbd "M-U") #'sp-forward-slurp-sexp)
+(global-set-key (kbd "M-:") #'sp-forward-barf-sexp)
+(global-set-key (kbd "M->") #'sp-splice-sexp)
+
+;; Sexp finger 2 (Right ring)
+(global-set-key (kbd "M-O") #'etc-backward-transpose-sexp)
+(global-set-key (kbd "M-P") #'sp-transpose-sexp)
+(global-set-key (kbd "M-<") #'sp-split-sexp)
+
+;; Sexp finger 3 (Right pinky)
+(global-set-key (kbd "M-\\") #'sp-unwrap-sexp)
+(global-set-key (kbd "M-I") #'sp-rewrap-sexp)
+(global-set-key (kbd "M-?") #'sp-wrap-round)
+
+
+;; (defun etc-indent-shift-left ()
+;;   (interactive)
+;;   (let ((beg (if (region-active-p) (region-beginning) (line-beginning-position)))
+;;         (end (if (region-active-p) (region-end) (line-end-position))))
+;;     (apply #'python-indent-shift-left
+;;            (adjust-bounds-to-line (region-beginning) (region-end)))))
+
+;; (defun etc-indent-shift-right ()
+;;   (interactive)
+;;   (apply #'python-indent-shift-right
+;;          (adjust-bounds-to-line (region-beginning) (region-end))))
+
+;; (defun adjust-bounds-to-line (beg end)
+;;   "Adjust BEG and END to the beginning and end of their respective lines.
+
+;; If BEG is not at the beginning of a line, move it to the beginning.
+;; If END is not at the end of a line, move it to the end.
+;; Returns a cons cell (NEW-BEG . NEW-END)."
+;;   (let (new-beg new-end)
+;;     ;; Adjust beg
+;;     (save-excursion
+;;       (goto-char beg)
+;;       (setq new-beg (if (bolp)
+;;                         beg
+;;                       (line-beginning-position))))
+;;     ;; Adjust end
+;;     (save-excursion
+;;       (goto-char end)
+;;       (setq new-end (if (eolp)
+;;                         end
+;;                       (line-end-position))))
+;;     ;; Return the new bounds
+;;     (list new-beg new-end)))
+
+
+;; (defun grow-region-to-lines ()
+;;   "Expand the active region to encompass entire lines.
+;; If a region is active, adjust the start to the beginning of the first line
+;; and the end to the end of the last line in the region.
+;; If no region is active, select the entire current line."
+;;   (interactive)
+;;   (if (use-region-p)
+;;       ;; Case 1: Active region exists
+;;       (let (start end)
+;;         ;; Determine the start position: beginning of the first line in the region
+;;         (save-excursion
+;;           (goto-char (region-beginning))
+;;           (setq start (line-beginning-position)))
+
+;;         ;; Determine the end position: end of the last line in the region
+;;         (save-excursion
+;;           (goto-char (region-end))
+;;           ;; If the region ends exactly at the beginning of a line (i.e., between lines),
+;;           ;; adjust to include the previous line's end.
+;;           (when (= (point) (line-beginning-position))
+;;             (forward-line -1))
+;;           (setq end (line-end-position)))
+
+;;         ;; Update the region to the new boundaries
+;;         (set-mark start)
+;;         (goto-char end)
+;;         (activate-mark))
+;;     ;; Case 2: No active region; select the current line
+;;     (let (start end)
+;;       (save-excursion
+;;         (setq start (line-beginning-position))
+;;         (setq end (line-end-position)))
+;;       (set-mark start)
+;;       (goto-char end)
+;;       (activate-mark))))
+
+;; (defun etc-setup-folding ()
+;;   (hs-minor-mode)
+;;   (hs-hide-all))
+
+;; (add-hook 'prog-mode-hook #'etc-setup-folding)
+

@@ -135,29 +135,6 @@
 (define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
 (define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
 
-;; not having the the shift functions do this is very annoying because
-;; if you have partially selected a line it doesn't get dragged
-(defun expand-region-to-whole-lines ()
-  "Expand the current region to cover whole lines."
-  (interactive)
-  (if (use-region-p)
-      (let ((start (save-excursion
-                     (goto-char (region-beginning))
-                     (line-beginning-position)))
-            (end (save-excursion
-                   (goto-char (region-end))
-                   (line-end-position))))
-        (push-mark start nil t)  ; Set the mark without deactivating
-        (goto-char end)
-        (activate-mark))          ; Ensure the region is active
-    ;; If no region is active, select the current line
-    (let ((start (line-beginning-position))
-          (end (line-end-position)))
-      (push-mark start nil t)
-      (goto-char end)
-      (activate-mark))))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
