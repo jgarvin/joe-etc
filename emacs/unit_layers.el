@@ -56,7 +56,9 @@
 
 (defun etc-apply-to-unit (action thing)
   (let ((bounds (etc-bounds-of-thing-at-point thing)))
-    (funcall action (car bounds) (cdr bounds))))
+    (if (equal bounds (cons nil nil))
+        (user-error "No %s at point" thing)
+      (funcall action (car bounds) (cdr bounds)))))
 
 (defmacro etc-gen-commands (unit)
   `(progn
