@@ -23,10 +23,10 @@
   (etc-forward-symbol -1))
 
 ;; NAVIGATION layer
-(global-set-key (kbd "C-<left>") #'etc-backward-word)
-(global-set-key (kbd "C-M-<left>") #'etc-backward-symbol)
-(global-set-key (kbd "C-<right>") #'etc-forward-word)
-(global-set-key (kbd "C-M-<right>") #'etc-forward-symbol)
+(global-set-key (kbd "C-<left>") #'backward-word)
+(global-set-key (kbd "C-M-<left>") #'backward-symbol)
+(global-set-key (kbd "C-<right>") #'forward-word)
+(global-set-key (kbd "C-M-<right>") #'forward-symbol)
 (global-set-key (kbd "C-<next>") #'md-get-next-instance-of-symbol)
 (global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
 (global-set-key (kbd "M-<left>") #'previous-buffer)
@@ -113,12 +113,14 @@
 (global-set-key (kbd "M-T") #'etc-copy-line)
 (global-set-key (kbd "M-C") #'etc-select-line)
 (global-set-key (kbd "M-G") #'etc-comment-line)
+(global-set-key (kbd "M-W") #'etc-cut-symbol)
 
 ;; Line finger 1 (Left middle)
 (global-set-key (kbd "M-*") #'etc-indent-left-line) ;; shift override so use *
 (global-set-key (kbd "M-H") #'drag-stuff-up)
 (global-set-key (kbd "M-R") #'drag-stuff-down)
 (global-set-key (kbd "M-M") #'etc-indent-rIght-line)
+(global-set-key (kbd "M-X") #'etc-cut-word)
 
 ;; Block finger (Left ring)
 (global-set-key (kbd "M-Q") #'etc-cut-paragraph) ;; no letter bound here so use Q
@@ -154,5 +156,3 @@
 (global-set-key (kbd "M-+") #'sp-unwrap-sexp)
 (global-set-key (kbd "M-I") #'sp-rewrap-sexp)
 (global-set-key (kbd "M-?") #'sp-wrap-round)
-
-
