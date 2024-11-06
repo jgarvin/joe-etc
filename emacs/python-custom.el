@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t -*-
 
+;; the default behavior for triple quotes of putting the closing
+;; quotes on their own line is annoying, this disables it
+(setq python-fill-docstring-style nil)
+
 ;; sp-select-next-thing isn't the right function, if there's a nested
 ;; instance nearby we'll try aligning that instead which is wrong. We
 ;; want "select containing sexp"
