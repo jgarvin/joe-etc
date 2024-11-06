@@ -1,3 +1,7 @@
+(defun backward-symbol (&optional arg)
+  (interactive "p")
+  (forward-symbol (* -1 (or arg 1))))
+
 ;; NAVIGATION layer
 (global-set-key (kbd "C-<left>") #'backward-word)
 (global-set-key (kbd "C-M-<left>") #'backward-symbol)
