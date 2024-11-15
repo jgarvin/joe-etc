@@ -46,7 +46,10 @@
        ,(format "Copy the current %s to kill ring." (symbol-name (cadr unit)))
        (interactive)
        (etc-apply-to-unit #'kill-ring-save ',(cadr unit))
-       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
+       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit))))
+       ;; (when (and (eobp) (equal ',(cadr unit) 'line) (not (looking-at-p "^\\s-*$")))
+       ;;   (insert "\n"))
+       )
 
      (defun ,(intern (concat "etc-cut-" (symbol-name (cadr unit)))) ()
        ,(format "Kill the current %s." (symbol-name (cadr unit)))
@@ -56,18 +59,24 @@
      (defun ,(intern (concat "etc-comment-" (symbol-name (cadr unit)))) ()
        ,(format "Comment the current %s." (symbol-name (cadr unit)))
        (interactive)
-       (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit))
-       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
+       (if (use-region-p)
+           (comment-or-uncomment-region (region-beginning) (region-end))
+         (etc-apply-to-unit #'comment-or-uncomment-region ',(cadr unit))
+         (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit))))))
 
      (defun ,(intern (concat "etc-indent-left-" (symbol-name (cadr unit)))) ()
        ,(format "Comment the current %s." (symbol-name (cadr unit)))
        (interactive)
-       (etc-apply-to-unit #'python-indent-shift-left ',(cadr unit)))
+       (if (use-region-p)
+           (python-indent-shift-left (region-beginning) (region-beginning))
+         (etc-apply-to-unit #'python-indent-shift-left ',(cadr unit))))
 
      (defun ,(intern (concat "etc-indent-right-" (symbol-name (cadr unit)))) ()
        ,(format "Comment the current %s." (symbol-name (cadr unit)))
        (interactive)
-       (etc-apply-to-unit #'python-indent-shift-right ',(cadr unit)))
+       (if (use-region-p)
+           (python-indent-shift-right (region-beginning) (region-beginning))
+         (etc-apply-to-unit #'python-indent-shift-right ',(cadr unit))))
 
      (defun ,(intern (concat "etc-select-" (symbol-name (cadr unit)))) ()
        ,(format "Mark the current %s." (symbol-name (cadr unit)))
@@ -101,10 +110,10 @@
 (global-set-key (kbd "M-W") #'etc-cut-symbol)
 
 ;; Line finger 1 (Left middle)
-(global-set-key (kbd "M-*") #'etc-indent-left-line) ;; shift override so use *
+(global-set-key (kbd "M-*") #'python-indent-shift-left) ;; shift override so use *
 (global-set-key (kbd "M-H") #'drag-stuff-up)
 (global-set-key (kbd "M-R") #'drag-stuff-down)
-(global-set-key (kbd "M-M") #'etc-indent-rIght-line)
+(global-set-key (kbd "M-M") #'python-indent-shift-right)
 (global-set-key (kbd "M-X") #'etc-cut-word)
 
 ;; Block finger (Left ring)

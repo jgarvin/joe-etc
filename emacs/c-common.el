@@ -94,15 +94,16 @@ doesn't provide a sane default we fix that here."
             (if (file-exists-p (concat path name "INLINES." value))
                 (setq result (concat path name "INLINES." value))
               (if (file-exists-p (concat path (replace-in-string name "INLINES" "") "." value))
-                  (setq result (concat path (replace-in-string name "INLINES" "") "." value))))))))))
+                  (setq result (concat path (replace-in-string name "INLINES" "") "." value))
+                (user-error "Could not find complement to %s.%s" fname fext)))))))))
 
 ;; Toggle function that uses the current buffer name to open/find the
 ;; other file
 (defun toggle-header-buffer()
   (interactive)
-  (let ((ext (file-name-extension buffer-file-name))
-        (fname (file-name-sans-extension buffer-file-name)))
-    (find-file (find-other-file fname ext))))
+  (let* ((ext (file-name-extension buffer-file-name))
+         (fname (file-name-sans-extension buffer-file-name)))
+    (find-other-file fname ext)))
 
 (defun etc-compilation-finished (buffer finished-status)
   (message "Result: [%S] [%S]" buffer finished-status))

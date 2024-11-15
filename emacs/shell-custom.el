@@ -71,6 +71,7 @@
 exist, make one. If we're already in a shell, switch to the next shell in the
 same folder. If given prefix argument always make a new shell."
   (interactive "P")
+  (etc-save-if-necessary) ;; for some reason normal save hooks don't cover this
   (let* ((dir (file-truename default-directory))
          (existing (sort (-filter (lambda (x)
                                     (with-current-buffer x
