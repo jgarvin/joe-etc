@@ -5273,7 +5273,7 @@
       "KC_TRNS",
       "KC_TRNS",
       "TD(21)",
-      "KC_NO",
+      "M18",
       "LCA(KC_I)",
       "LCA(KC_UP)",
       "KC_NO",
@@ -5321,10 +5321,10 @@
       "KC_PGUP",
       "KC_NO",
       "KC_END",
-      "KC_NO",
+      "M20",
       "KC_RIGHT",
       "KC_NO",
-      "KC_NO",
+      "M21",
       "KC_NO"
     ],
     [
@@ -5429,7 +5429,7 @@
       "M6",
       "LCG(KC_LEFT)",
       "LGUI(KC_LEFT)",
-      "KC_TRNS",
+      "LGUI(KC_F)",
       "SGUI(KC_LEFT)",
       "KC_NO",
       "M7",
@@ -6562,7 +6562,20 @@
     },
     {
       "mid": 18,
-      "actions": []
+      "actions": [
+        [
+          "tap",
+          "LCTL(KC_C)"
+        ],
+        [
+          "tap",
+          "KC_P"
+        ],
+        [
+          "tap",
+          "KC_F"
+        ]
+      ]
     },
     {
       "mid": 19,
@@ -6570,11 +6583,45 @@
     },
     {
       "mid": 20,
-      "actions": []
+      "actions": [
+        [
+          "tap",
+          "LCTL(KC_C)"
+        ],
+        [
+          "tap",
+          "KC_P"
+        ],
+        [
+          "tap",
+          "KC_S"
+        ],
+        [
+          "tap",
+          "KC_G"
+        ]
+      ]
     },
     {
       "mid": 21,
-      "actions": []
+      "actions": [
+        [
+          "tap",
+          "LCTL(KC_C)"
+        ],
+        [
+          "tap",
+          "KC_P"
+        ],
+        [
+          "tap",
+          "KC_S"
+        ],
+        [
+          "tap",
+          "KC_D"
+        ]
+      ]
     },
     {
       "mid": 22,
