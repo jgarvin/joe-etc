@@ -200,6 +200,8 @@
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 ;;(global-set-key (kbd "C-c p p") #'projectile-switch-project)
 
+(load-file "~/etc/emacs/projectile-bookmarks.el")
+
 (use-package
   erc-hl-nicks
   :ensure t
@@ -240,7 +242,6 @@
   :ensure t
   )
 
-;; example: /ssh:slurm-training|docker:root@docker-scale-out_login_1:/home/fred/ssh:slurm-training|docker:fred@docker-scale-out_login_1:/home/fred
 ;;(use-package
 ;;  docker-tramp
 ;;  :ensure t
