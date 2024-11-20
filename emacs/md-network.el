@@ -12,6 +12,12 @@
 (defvar md-server-port 23233)
 (defvar-local md-server-log-count 10000)
 
+;; TODO: apparently emacs 29.1 added with-undo-amalgamate which makes
+;; everything inside a block count as one undo action, which would be
+;; an improvement. Really we want it around the multiple actions
+;; triggered by an utterance though which may be a mix of elisp and
+;; key shorcuts, so not perfect.
+
 ;; Yes this is a mutex,
 ;; necessary because if executing any actions
 ;; causes more IO the server filter may run again,
@@ -42,7 +48,7 @@
               ;; racing between keyboard events from X11 and commands
               ;; from the mandimus socket.
               ;; Makes everything hang and timeout terribly.
-;;              (input-pending-p) 
+;;              (input-pending-p)
               )
     (let ((md-executing-actions-p t))
       (unwind-protect
