@@ -153,7 +153,10 @@
   :ensure t
   )
 
-
+(use-package
+  free-keys
+  :ensure t
+  )
 
 ;; builtin python mode doesn't support python 3.10 match/case
 ;; (use-package
@@ -325,7 +328,7 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(lsp-ivy orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+   '(free-keys filladapt lsp-ivy orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
