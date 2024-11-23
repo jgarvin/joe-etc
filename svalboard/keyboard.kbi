@@ -5209,7 +5209,7 @@
       "MO(1)",
       "KC_ENTER",
       "MO(7)",
-      "KC_NO",
+      "KC_ESCAPE",
       "LSFT_T(KC_C)",
       "KC_G",
       "KC_T",
@@ -5226,9 +5226,9 @@
       "KC_V",
       "KC_S",
       "KC_NO",
-      "KC_ESCAPE",
       "KC_NO",
-      "KC_Q",
+      "KC_NO",
+      "LGUI_T(KC_Q)",
       "KC_Z",
       "KC_A",
       "KC_NO",
@@ -5258,7 +5258,7 @@
       "KC_DOT",
       "KC_K",
       "KC_NO",
-      "KC_SLASH",
+      "LGUI_T(KC_SLASH)",
       "KC_GRAVE",
       "KC_I",
       "KC_NO",
@@ -5276,17 +5276,17 @@
       "M18",
       "LCA(KC_I)",
       "LCA(KC_UP)",
-      "KC_NO",
+      "M22",
       "KC_NO",
       "LCA(KC_RIGHT)",
-      "LCA(KC_B)",
-      "LCA(KC_O)",
+      "LCA(KC_D)",
+      "LCA(KC_E)",
       "LCTL(KC_DOT)",
       "KC_NO",
       "KC_NO",
       "LCA(KC_LEFT)",
-      "LCA(KC_D)",
-      "LCA(KC_E)",
+      "LCA(KC_B)",
+      "LCA(KC_O)",
       "LCTL(KC_COMMA)",
       "KC_NO",
       "KC_NO",
@@ -6625,7 +6625,20 @@
     },
     {
       "mid": 22,
-      "actions": []
+      "actions": [
+        [
+          "tap",
+          "LCTL(KC_C)"
+        ],
+        [
+          "tap",
+          "KC_P"
+        ],
+        [
+          "tap",
+          "KC_B"
+        ]
+      ]
     },
     {
       "mid": 23,
@@ -7205,7 +7218,7 @@
     "20": 5,
     "21": 128
   },
-  "via_proto": 9,
+  "via_proto": 1300,
   "vial_proto": 6,
   "kbid": "5199957870438586395",
   "payload": {

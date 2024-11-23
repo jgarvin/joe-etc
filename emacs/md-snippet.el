@@ -477,6 +477,11 @@ go to the highest slot (most recent)."
  :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
 
 (md-replace-snippet
+ :name "debug message"
+ :contents "(message \"$e1=%s\" $1)"
+ :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
+
+(md-replace-snippet
  :name "and"
  :contents "(and $1 $2)"
  :context '(derived-mode-p 'emacs-lisp-mode 'eshell-mode))
@@ -558,3 +563,26 @@ go to the highest slot (most recent)."
 (load-file "~/etc/emacs/md-sql-snippet.el")
 (load-file "~/etc/emacs/md-verilog-snippet.el")
 (load-file "~/etc/emacs/md-zig-snippet.el")
+
+(defun md-pick-snippet ()
+  "Prompt with Ivy to select a snippet name and call `foo` with the selection."
+  (interactive)
+  (ivy-read "Select snippet: "
+            (md-get-snippet-names)
+            :require-match t
+            :caller #'md-pick-snippet
+            :action #'md-insert-snippet))
+
+(defun md-debug-print ()
+  (interactive)
+  (md-insert-snippet
+   (cond
+    ((derived-mode-p 'c-mode) "print F")
+    ((derived-mode-p 'c++-mode) "see air")
+    ((derived-mode-p 'python-mode) "F print")
+    ((derived-mode-p 'rust-mode) "debug")
+    ((derived-mode-p 'emacs-lisp-mode) "debug message")
+    (t (user-error "md-debug-print has no case for %s!" major-mode)))))
+
+(global-set-key (kbd "C-'") #'md-debug-print)
+(global-set-key (kbd "C-M-'") #'md-pick-snippet)

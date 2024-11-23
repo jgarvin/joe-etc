@@ -105,6 +105,7 @@
    ("not equals" "$1 != $2")
    ("assert" "assert $1")
    ("todo" "# TODO: $1")
+   ("F print" "print(f\"{$1=}\", file=sys.stderr)")
    ("main" "if __name__ == \"__main__\":\n    $1")
    ("class" "class $1($2):\n    $3")
    ("data class" "@dataclass\nclass $1($2):\n    $3")
