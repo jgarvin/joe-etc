@@ -577,7 +577,7 @@ go to the highest slot (most recent)."
   (interactive)
   (md-insert-snippet
    (cond
-    ((derived-mode-p 'c-mode) "print F")
+    ((derived-mode-p 'c-mode) "debug print F")
     ((derived-mode-p 'c++-mode) "see air")
     ((derived-mode-p 'python-mode) "F print")
     ((derived-mode-p 'rust-mode) "debug")

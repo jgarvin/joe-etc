@@ -174,6 +174,7 @@
    ("block" "{\n    $1;\n}")
    ("placement new" "new($1) $2($3)")
    ("print F" "printf(\"$1\");")
+   ("debug print F" "fprintf(stderr, \"$1=%$2\", $1);")
    ("ref" "std::ref($1)")
    ("pack" "$1&&... $2")
    ("atomic" "std::atomic<$1>")
