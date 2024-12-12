@@ -232,6 +232,13 @@
   )
 
 (require 'expand-region)
+
+(defun etc-set-mark-or-expand-region (&optional arg)
+  (interactive "P")
+  (cond
+   ((not mark-active) (set-mark-command arg))
+   (t (er/expand-region (prefix-numeric-value arg)))))
+
 (global-set-key (kbd "C-SPC") #'etc-set-mark-or-expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "M-=") 'er/contract-region)
@@ -1043,12 +1050,6 @@
   (copy-thing 'backward-word 'forward-word arg)
   ;;(paste-to-mark arg)
   )
-
-(defun etc-set-mark-or-expand-region (&optional arg)
-  (interactive "P")
-  (cond
-   ((not mark-active) (set-mark-command arg))
-   (t (er/expand-region (prefix-numeric-value arg)))))
 
 ;; (require 'change-inner)
 ;; (global-set-key (kbd "M-i") 'change-inner)

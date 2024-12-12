@@ -283,7 +283,10 @@
   (unwind-protect
       (with-current-buffer buf
         (unless (or (not md-enable-symbol-refresh)
-                    md-inhibit-refresh-symbol-hooks)
+                    md-inhibit-refresh-symbol-hooks
+                    ;; we were getting weird backtraces when runnning
+                    ;; on minibuffer contents
+                    (active-minibuffer-window))
           (let ((old (symbol-value v))
                 (md-inhibit-refresh-symbol-hooks t))
             (set v (md-safe-get-unit-impl (point-min) (point-max) unit))

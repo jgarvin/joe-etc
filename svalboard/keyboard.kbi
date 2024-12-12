@@ -5390,7 +5390,7 @@
       "KC_NO"
     ],
     [
-      "LGUI(KC_R)",
+      "OSM(MOD_LSFT)",
       "M17",
       "KC_TRNS",
       "LCTL(KC_RBRACKET)",
@@ -5411,7 +5411,7 @@
       "TD(7)",
       "TD(6)",
       "TD(3)",
-      "KC_TRNS",
+      "LGUI(KC_R)",
       "KC_TRNS",
       "KC_NO",
       "LGUI(KC_Q)",
@@ -5430,25 +5430,25 @@
       "LCG(KC_LEFT)",
       "LGUI(KC_LEFT)",
       "LGUI(KC_F)",
-      "SGUI(KC_LEFT)",
+      "KC_NO",
       "KC_NO",
       "M7",
       "LCG(KC_DOWN)",
       "LGUI(KC_DOWN)",
       "M10",
-      "SGUI(KC_DOWN)",
+      "KC_NO",
       "KC_NO",
       "M8",
       "LCG(KC_UP)",
       "LGUI(KC_UP)",
       "M12",
-      "SGUI(KC_UP)",
+      "KC_NO",
       "KC_NO",
       "M9",
       "LCG(KC_RIGHT)",
       "LGUI(KC_RIGHT)",
       "KC_TRNS",
-      "SGUI(KC_RIGHT)",
+      "KC_NO",
       "KC_NO"
     ],
     [
@@ -5671,13 +5671,13 @@
       "KC_TRNS",
       "KC_TRNS",
       "KC_TRNS",
-      "USER05",
+      "KC_NO",
       "KC_TRNS",
       "KC_TRNS",
       "LSA(KC_L)",
       "LSA(KC_J)",
       "LSA(KC_N)",
-      "LSA(KC_NO)",
+      "LSA(KC_F)",
       "LSA(KC_Y)",
       "KC_NO",
       "LSA(KC_U)",
@@ -6881,14 +6881,14 @@
     ],
     [
       "KC_ENTER",
-      "KC_SLASH",
+      "LGUI_T(KC_SLASH)",
       "KC_NO",
       "KC_NO",
       "M16"
     ],
     [
       "LSFT_T(KC_C)",
-      "KC_SLASH",
+      "LGUI_T(KC_SLASH)",
       "KC_NO",
       "KC_NO",
       "LSFT(KC_SLASH)"
@@ -6922,11 +6922,39 @@
       "USER04"
     ],
     [
+      "KC_C",
+      "KC_SLASH",
+      "KC_NO",
+      "KC_NO",
+      "LSFT(KC_SLASH)"
+    ],
+    [
       "KC_NO",
       "KC_NO",
       "KC_NO",
       "KC_NO",
       "KC_NO"
+    ],
+    [
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO"
+    ],
+    [
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO"
+    ],
+    [
+      "KC_ENTER",
+      "KC_SLASH",
+      "KC_NO",
+      "KC_NO",
+      "M16"
     ],
     [
       "KC_NO",
@@ -6957,11 +6985,11 @@
       "KC_NO"
     ],
     [
+      "KC_DOWN",
+      "LCTL(KC_LEFT)",
       "KC_NO",
       "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
+      "LALT(KC_N)"
     ],
     [
       "KC_NO",
@@ -6992,39 +7020,11 @@
       "KC_NO"
     ],
     [
+      "KC_UP",
+      "LCTL(KC_RIGHT)",
       "KC_NO",
       "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
-    ],
-    [
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
-    ],
-    [
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
-    ],
-    [
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
-    ],
-    [
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO",
-      "KC_NO"
+      "LALT(KC_P)"
     ],
     [
       "KC_NO",
@@ -7218,7 +7218,7 @@
     "20": 5,
     "21": 128
   },
-  "via_proto": 1300,
+  "via_proto": 9,
   "vial_proto": 6,
   "kbid": "5199957870438586395",
   "payload": {
@@ -7882,7 +7882,7 @@
     {
       "tdid": 7,
       "tap": "LGUI(KC_6)",
-      "hold": "KC_NO",
+      "hold": "KC_LALT",
       "doubletap": "SGUI(KC_6)",
       "taphold": "KC_NO",
       "tapms": 400
@@ -8231,6 +8231,7 @@
       "2": "Num",
       "3": "Window Management",
       "6": "Function",
+      "7": "Emacs",
       "8": "Sym"
     }
   }

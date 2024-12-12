@@ -46,7 +46,8 @@
        ,(format "Copy the current %s to kill ring." (symbol-name (cadr unit)))
        (interactive)
        (etc-apply-to-unit #'kill-ring-save ',(cadr unit))
-       (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit))))
+       (unless (eq ',(cadr unit) 'buffer)
+         (goto-char (cdr (etc-bounds-of-thing-at-point ',(cadr unit)))))
        ;; (when (and (eobp) (equal ',(cadr unit) 'line) (not (looking-at-p "^\\s-*$")))
        ;;   (insert "\n"))
        )
@@ -102,6 +103,9 @@
       (sp-transpose-sexp)
       (sp-previous-sexp))))
 
+;; need some kind of smart paste that does select and paste in one
+;; step, that's much more common for me
+
 ;; Line finger 0 (Left index)
 (global-set-key (kbd "M-B") #'etc-cut-line)
 (global-set-key (kbd "M-T") #'etc-copy-line)
@@ -125,14 +129,14 @@
 ;; Buffer finger (Left pinky)
 (global-set-key (kbd "M-#") #'etc-cut-buffer) ;; no letter bound here so use #
 (global-set-key (kbd "M-A") #'etc-copy-buffer)
-(global-set-key (kbd "M-Q") #'etc-select-buffer)
-(global-set-key (kbd "M-Z") #'etc-comment-buffer)
+(global-set-key (kbd "M-Z") #'etc-select-buffer)
 
 ;; Sexp finger 0 (Right index)
 (global-set-key (kbd "M-Y") #'etc-cut-sexp)
 (global-set-key (kbd "M-N") #'etc-copy-sexp)
 (global-set-key (kbd "M-L") #'etc-select-sexp)
 (global-set-key (kbd "M-J") #'etc-comment-sexp)
+(global-set-key (kbd "M-F") #'etc-copy-symbol)
 
 ;; Sexp finger 1 (Right middle)
 (global-set-key (kbd "M-\"") #'sp-backward-barf-sexp)
