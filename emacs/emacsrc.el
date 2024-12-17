@@ -1288,11 +1288,6 @@
 
 (global-set-key (kbd "C-c .") #'completion-at-point)
 
-
-;; w/o this remote X emacs is VERY slow while mark is active, every
-;; keystroke sends all the text into the clipboard!
-(setq select-active-regions nil)
-
 (defun etc-full-profile ()
   (interactive)
   (profiler-stop)
@@ -1388,12 +1383,17 @@ If the buffer runs `dired', the buffer is reverted."
 
 ;;(setq tramp-verbose 3)
 
-;;;;;;;; wayland stuff ;;;;;;;;;;;;;;;;;;
+;;;;;;;; wayland vs x stuff ;;;;;;;;;;;;;;;;;;
 
 (when
     (and (getenv "DISPLAY")
          (not (getenv "WAYLAND_DISPLAY")))
-  (run-with-timer 0 60 #'etc-set-repeat-rate))
+  (run-with-timer 0 60 #'etc-set-repeat-rate)
+  ;; w/o this remote X emacs is VERY slow while mark is active, every
+  ;; keystroke sends all the text into the clipboard! unfortunately
+  ;; disables middle click
+  (setq select-active-regions nil))
+
 
 ;; (when (getenv "WAYLAND_DISPLAY")
 ;;  ;; without this middle click doesn't work
