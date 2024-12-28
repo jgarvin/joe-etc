@@ -39,6 +39,7 @@
                           (bookmark-set x))))
               :caller 'counsel-projectile-bookmark)))
 
+(require 'ivy)
 (ivy-set-actions
  'counsel-projectile-bookmark
  '(("d" bookmark-delete "delete")

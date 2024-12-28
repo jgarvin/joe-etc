@@ -135,6 +135,7 @@
 (define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
 (define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
 
+(load-file "~/etc/emacs/ivy-custom.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -446,10 +447,6 @@
 (when nil
   (load-file "~/etc/emacs/helm-custom.el")
   (load-file "~/etc/emacs/helm-ag-custom.el"))
-
-;; Could never get relative line numbers to work with ivy
-(when t
-   (load-file "~/etc/emacs/ivy-custom.el"))
 
 ;; vertico indexed mode works great, but eager directory deletion is missing
 ;;(load-file "~/etc/emacs/etc-vertico.el")
