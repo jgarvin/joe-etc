@@ -100,6 +100,8 @@ inputplug
 arandr
 kitty
 sway*
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
 dmenu
 libgtk-layer-shell-dev
 python3-pip
