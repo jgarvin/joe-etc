@@ -135,6 +135,17 @@
 (define-key drag-stuff-mode-map (kbd "M-<up>") #'drag-stuff-up)
 (define-key drag-stuff-mode-map (kbd "M-<down>") #'drag-stuff-down)
 
+(use-package
+  projectile
+  :ensure t
+  )
+
+;; binding mysteriously disappeared after some upgrade
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+(load-file "~/etc/emacs/memoize.el")
+(load-file "~/etc/emacs/projectile-custom.el") ;; must come before ivy
+
 (load-file "~/etc/emacs/ivy-custom.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -195,13 +206,6 @@
 ;;   )
 ;; (require 'magit-gerrit)
 
-(use-package
-  projectile
-  :ensure t
-  )
-
-;; binding mysteriously disappeared after some upgrade
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 ;;(global-set-key (kbd "C-c p p") #'projectile-switch-project)
 
 (load-file "~/etc/emacs/projectile-bookmarks.el")
@@ -462,8 +466,7 @@
 (load-file "~/etc/emacs/term-custom.el")
 (load-file "~/etc/emacs/comint-custom.el")
 (load-file "~/etc/emacs/shell-custom.el")
-(load-file "~/etc/emacs/memoize.el")
-(load-file "~/etc/emacs/projectile-custom.el")
+
 (load-file "~/etc/emacs/proced-custom.el")
 ;;(load-file "~/etc/emacs/email-custom.el")
 (load-file "~/etc/emacs/w3m-custom.el")
@@ -1280,8 +1283,10 @@
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
 
- ;; Handy key definition
-(define-key global-map "\M-Q" 'unfill-paragraph)
+;; utbHandy key definition.. don't remember why I ever wanted this? use
+;; this binding in unit_layers now
+;;
+;;(define-key global-map "\M-Q" 'unfill-paragraph)
 
 (global-set-key (kbd "C-c .") #'completion-at-point)
 
