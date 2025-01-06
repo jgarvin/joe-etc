@@ -159,8 +159,8 @@ class Result:
     preprocess_time: float = None
     precompile_time: float = None
     compile_time: float = None
-    compile_time_with_precompiled_headers: float = None
-    compile_time_precompiled_ratio: float = None
+    # compile_time_with_precompiled_headers: float = None
+    # compile_time_precompiled_ratio: float = None
     marginal_preprocess_time: float = None
     marginal_precompile_time: float = None
     marginal_compile_time: float = None
@@ -169,56 +169,6 @@ class Result:
     gch_header_ratio: float = None
 
 test_results = {}
-# with (
-#     tempfile.NamedTemporaryFile(suffix=".hpp") as all_include_file,
-#     tempfile.NamedTemporaryFile(suffix=".cpp") as all_compile_precompiled_headers_file,
-#     tempfile.NamedTemporaryFile(suffix=".cpp") as all_compile_file
-# ):
-#     for header in headers:
-#         all_include_file.write(("#include " + header + "\n").encode())
-#         all_compile_file.write(("#include " + header + "\n").encode())
-
-#     all_include_file.flush()
-
-#     all_compile_file.write("\nint main () { return 0; }".encode())
-#     all_compile_file.flush()
-
-#     all_compile_precompiled_heaeders_file.write(("#include <" + all_include_file.name + ">\n").encode())
-#     all_compile_precompiled_headers_file.write("\nint main () { return 0; }".encode())
-#     all_compile_precompiled_headers_file.flush()
-
-#     preprocess_all_command = [
-#         *sys.argv[1:],
-#         "-E",
-#         "-o",
-#         str(Path(all_include_file.name).with_suffix('.ii')),
-#         all_include_file.name
-#     ]
-
-#     precompile_all_command = [
-#         *sys.argv[1:],
-#         all_include_file.name
-#     ]
-
-#     compile_all_precompiled_command = [
-#         *sys.argv[1:],
-#         all_compile_precompiled_headers_file.name
-#     ]
-
-#     compile_all_command = [
-#         *sys.argv[1:],
-#         all_compile_file.name
-#     ]
-
-#     print("all preprocessing")
-#     all_preprocess_time = min_time_command(preprocess_all_command)
-#     print("all precompiling")
-#     all_precompile_time = min_time_command(precompile_all_command)
-#     print("all compiling")
-#     all_compile_time = min_time_command(compile_all_command)
-#     print("all compiling with precompiled headers")
-#     all_compile_time_with_precompiled_headers = min_time_command(compile_all_command)
-
 header_subsets = [headers, *[[h] for h in headers]]
 
 all_results = None
@@ -379,7 +329,5 @@ def report_times(times_dict):
 
         plt.savefig(f"{field.name}_bar_chart.png")
         plt.close()
-
-    print(f"Ratio of gch to hpp: {totals['gch_bytes']/totals['header_bytes']:,.2f}")
 
 report_times(test_results)
