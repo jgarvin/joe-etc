@@ -9,8 +9,11 @@ from collections import defaultdict
 from pathlib import Path
 import matplotlib.pyplot as plt
 import glob
+import copy
 
-LIMIT = 5
+# LIMIT = -1
+# REPETITIONS = 10
+LIMIT = 3
 REPETITIONS = 1
 
 @dataclass
@@ -158,12 +161,12 @@ class Result:
     title: str = None
     preprocess_time: float = None
     precompile_time: float = None
-    compile_time: float = None
-    # compile_time_with_precompiled_headers: float = None
-    # compile_time_precompiled_ratio: float = None
+    compile_time_with_precompiled_headers: float = None
+    compile_time_without_precompiled_headers: float = None
     marginal_preprocess_time: float = None
     marginal_precompile_time: float = None
-    marginal_compile_time: float = None
+    marginal_compile_time_with_precompiled_headers: float = None
+    marginal_compile_time_without_precompiled_headers: float = None
     gch_kb: float = None
     header_kb: float = None
     gch_header_ratio: float = None
@@ -174,10 +177,10 @@ header_subsets = [headers, *[[h] for h in headers]]
 all_results = None
 for header_subset in header_subsets[:1+LIMIT]:
     with (
-        tempfile.NamedTemporaryFile(suffix=".hpp") as single_include_file,
-        tempfile.NamedTemporaryFile(suffix=".hpp") as single_exclude_file,
-        tempfile.NamedTemporaryFile(suffix=".cpp") as single_include_compile_file,
-        tempfile.NamedTemporaryFile(suffix=".cpp") as single_exclude_compile_file
+        tempfile.NamedTemporaryFile(suffix=".hpp", delete=False) as single_include_file,
+        tempfile.NamedTemporaryFile(suffix=".hpp", delete=False) as single_exclude_file,
+        tempfile.NamedTemporaryFile(suffix=".cpp", delete=False) as single_include_compile_file,
+        tempfile.NamedTemporaryFile(suffix=".cpp", delete=False) as single_exclude_compile_file
     ):
         for header in header_subset:
             single_include_file.write(("#include " + header + "\n").encode())
@@ -249,37 +252,78 @@ for header_subset in header_subsets[:1+LIMIT]:
         print(f"{x.title} precompiling")
         x.precompile_time = min_time_command(precompile_include_command)
         print(f"{x.title} compiling")
-        x.compile_time = min_time_command(compile_include_command) # needs to be after precompile to pick up gch
+        x.compile_time_with_precompiled_headers = min_time_command(compile_include_command) # needs to be after precompile to pick up gch
 
         if all_results is not None:
             print(f"{x.title} excluding preprocessing")
             x.marginal_preprocess_time = all_results.preprocess_time - min_time_command(preprocess_exclude_command)
-            print(f"{x.title} excluding precompliing")
+            print(f"{x.title} excluding precompiling")
             x.marginal_precompile_time = all_results.precompile_time - min_time_command(precompile_exclude_command)
             print(f"{x.title} excluding compiling")
-            x.marginal_compile_time = all_results.compile_time - min_time_command(compile_exclude_command)
+            x.marginal_compile_time_with_precompiled_headers = all_results.compile_time_with_precompiled_headers - min_time_command(compile_exclude_command)
         else:
-            x.marginal_preprocess_time = x.preprocess_time
-            x.marginal_precompile_time = x.precompile_time
-            x.marginal_compile_time = x.compile_time
+            print(f"Setting 0 for {x.title} pieces")
+            x.marginal_preprocess_time = 0
+            x.marginal_precompile_time = 0
+            x.marginal_compile_time_with_precompiled_headers = 0
 
         x.header_kb = os.stat(Path(single_include_file.name).with_suffix('.ii')).st_size / 1000
         x.gch_kb = os.stat(Path(single_include_file.name).with_suffix('.hpp.gch')).st_size / 1000
         x.gch_header_ratio = x.gch_kb / x.header_kb
 
+        os.remove(Path(single_include_file.name).with_suffix('.hpp.gch'))
+        x.compile_time_without_precompiled_headers = min_time_command(compile_include_command)
+
+        if all_results is not None:
+            os.remove(Path(single_exclude_file.name).with_suffix('.hpp.gch'))
+            x.marginal_compile_time_without_precompiled_headers = all_results.compile_time_without_precompiled_headers - min_time_command(compile_exclude_command)
+        else:
+            print(f"Setting 0 for {x.title} pieces 2")
+            x.marginal_compile_time_without_precompiled_headers = 0
+
         if all_results is None:
             # assumption is that the 'all' subset is evaluated first
             all_results = x
 
-        test_results[header] = x
+        test_results[x.title] = x
+        del x
 
         for garbage in glob.glob(str(Path(single_include_file.name).with_suffix('')) + "*"):
             os.remove(garbage)
         for garbage in glob.glob(str(Path(single_exclude_file.name).with_suffix('')) + "*"):
             os.remove(garbage)
 
+assert all_results.marginal_compile_time_with_precompiled_headers == 0
+assert all_results.marginal_compile_time_without_precompiled_headers == 0
+assert all_results.marginal_precompile_time == 0
+assert all_results.marginal_preprocess_time == 0
+
+def gen_chart(field_name, headers, values):
+    plt.figure(figsize=(6, len(values)))
+    bars = plt.barh(headers, values, color='skyblue')
+    plt.ylabel('Headers')
+    plt.xlabel(field_name.replace('_', ' ').capitalize())
+    plt.title(f'{field_name.replace("_", " ").capitalize()}')
+    plt.tight_layout()
+
+    for bar in bars:
+        width = bar.get_width()
+        plt.annotate(
+            f'{width:,.3f}',
+            xy=(width, bar.get_y() + bar.get_height() / 2),
+            xytext=(3, 0),
+            textcoords="offset points",
+            ha='left', va='center', fontsize=8
+        )
+
+    plt.savefig(f"{field_name}_bar_chart.png")
+    plt.close()
+
 def report_times(times_dict):
-    s = list(times_dict.items())
+    t = copy.copy(times_dict)
+    all_result = t["All"]
+    del t["All"]
+    s = list(t.items())
 
     totals = defaultdict(lambda: 0)
     medians = defaultdict(lambda: 0)
@@ -296,7 +340,6 @@ def report_times(times_dict):
 
         for header, result in s:
             val = getattr(result, field.name)
-            # print(f"{header=} {time=}")
             print(f"{header}: {val:,.6f}")
 
         print(f"{field.name} average: {totals[field.name]/len(s):,.2f}")
@@ -310,24 +353,27 @@ def report_times(times_dict):
             values.append(val if val is not None else 0)
             print(f"{header}: {val:,.6f}" if val is not None else f"{header}: N/A")
 
-        plt.figure(figsize=(6, 20))
-        bars = plt.barh(headers, values, color='skyblue')
-        plt.ylabel('Headers')
-        plt.xlabel(field.name.replace('_', ' ').capitalize())
-        plt.title(f'{field.name.replace("_", " ").capitalize()} by Header')
-        plt.tight_layout()
+        from pprint import pprint
+        pprint(headers)
+        pprint(values)
+        gen_chart(field.name, headers, values)
 
-        for bar in bars:
-            width = bar.get_width()
-            plt.annotate(
-                f'{width:,.3f}',
-                xy=(width, bar.get_y() + bar.get_height() / 2),
-                xytext=(3, 0),
-                textcoords="offset points",
-                ha='left', va='center', fontsize=8
-            )
+    headers = []
+    values = []
+    for field in fields(all_result):
+        if field.name in ["title", "header_kb", "gch_kb", "gch_header_ratio"]:
+            continue
+        val = getattr(all_result, field.name)
+        if val == 0:
+            continue
+        headers.append(field.name.replace('_', ' ').capitalize())
+        values.append(val if val is not None else 0)
 
-        plt.savefig(f"{field.name}_bar_chart.png")
-        plt.close()
+    print("******************** all")
+    from pprint import pprint
+    pprint(headers)
+    pprint(values)
+
+    gen_chart("All Headers Combined", headers, values)
 
 report_times(test_results)
