@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 import glob
 import copy
 
-# LIMIT = -1
-# REPETITIONS = 10
-LIMIT = 3
-REPETITIONS = 1
+LIMIT = 999999
+REPETITIONS = 3
+# LIMIT = 3
+# REPETITIONS = 1
 
 @dataclass
 class ProcessTime:
@@ -155,7 +155,7 @@ stdheaders = """
 headers = stdheaders.splitlines()
 headers = [h for h in headers if h]
 
-# TODO: with and without precompiled headers
+# TODO: binary size, want to know if there is anything that doesn't get stripped when unused
 @dataclass
 class Result:
     title: str = None
@@ -170,6 +170,7 @@ class Result:
     gch_kb: float = None
     header_kb: float = None
     gch_header_ratio: float = None
+    binary_size: float = None
 
 test_results = {}
 header_subsets = [headers, *[[h] for h in headers]]
@@ -217,6 +218,8 @@ for header_subset in header_subsets[:1+LIMIT]:
 
         compile_include_command = [
             *sys.argv[1:],
+            "-o",
+            str(Path(single_include_compile_file.name).with_suffix(".out")),
             single_include_compile_file.name
         ]
 
@@ -269,6 +272,7 @@ for header_subset in header_subsets[:1+LIMIT]:
 
         x.header_kb = os.stat(Path(single_include_file.name).with_suffix('.ii')).st_size / 1000
         x.gch_kb = os.stat(Path(single_include_file.name).with_suffix('.hpp.gch')).st_size / 1000
+        x.binary_size = os.stat(Path(single_include_compile_file.name).with_suffix('.out')).st_size / 1000
         x.gch_header_ratio = x.gch_kb / x.header_kb
 
         os.remove(Path(single_include_file.name).with_suffix('.hpp.gch'))
@@ -361,7 +365,7 @@ def report_times(times_dict):
     headers = []
     values = []
     for field in fields(all_result):
-        if field.name in ["title", "header_kb", "gch_kb", "gch_header_ratio"]:
+        if field.name in ["title", "header_kb", "gch_kb", "gch_header_ratio", "binary_size"]:
             continue
         val = getattr(all_result, field.name)
         if val == 0:
