@@ -503,6 +503,7 @@
 (load-file "~/etc/emacs/vhdl-custom.el")
 (load-file "~/etc/emacs/ein-custom.el")
 (load-file "~/etc/emacs/zig-custom.el")
+(load-file "~/etc/emacs/ld-mode.el")
 
 (load-file "~/etc/emacs/gui.el")
 
