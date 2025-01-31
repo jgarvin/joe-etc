@@ -14,7 +14,7 @@ import copy
 LIMIT = 999999
 REPETITIONS = 3
 # LIMIT = 3
-# REPETITIONS = 1
+# REPETITIONS = 10
 
 @dataclass
 class ProcessTime:
@@ -42,7 +42,8 @@ def time_command(cmd: list[str]) -> float:
     system_time = rusage.ru_stime
     total_time = user_time + system_time
 
-    return total_time
+    #return total_time
+    return user_time
 
 def min_time_command(cmd):
     return min([time_command(cmd) for i in range(REPETITIONS)])
@@ -303,7 +304,7 @@ assert all_results.marginal_precompile_time == 0
 assert all_results.marginal_preprocess_time == 0
 
 def gen_chart(field_name, headers, values):
-    plt.figure(figsize=(6, len(values)))
+    plt.figure(figsize=(8, len(values)))
     bars = plt.barh(headers, values, color='skyblue')
     plt.ylabel('Headers')
     plt.xlabel(field_name.replace('_', ' ').capitalize())
@@ -342,16 +343,12 @@ def report_times(times_dict):
         for result in ((x[1] for x in s)):
             totals[field.name] += getattr(result, field.name)
 
-        for header, result in s:
-            val = getattr(result, field.name)
-            print(f"{header}: {val:,.6f}")
-
         print(f"{field.name} average: {totals[field.name]/len(s):,.2f}")
         print(f"{field.name} median: {medians[field.name]:,.2f}")
 
         headers = []
         values = []
-        for header, result in s:
+        for header, result in s[-20:]:
             val = getattr(result, field.name)
             headers.append(header)
             values.append(val if val is not None else 0)
@@ -360,7 +357,7 @@ def report_times(times_dict):
         from pprint import pprint
         pprint(headers)
         pprint(values)
-        gen_chart(field.name, headers, values)
+        gen_chart(f"Top {len(values)} " + field.name, headers, values)
 
     headers = []
     values = []
