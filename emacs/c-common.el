@@ -140,6 +140,7 @@ doesn't provide a sane default we fix that here."
   ;; Prefer 4-space tabs
 
   (c-set-offset 'innamespace 0) ;; don't indent top level namespace
+  (c-set-offset 'inextern-lang 0) ;; don't indent extern
    ;; don't indent top level namespace
   (c-set-offset 'case-label '+) ;; 'case' indented once after 'switch'
 
