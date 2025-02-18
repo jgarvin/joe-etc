@@ -5343,8 +5343,8 @@
       "KC_TRNS",
       "KC_NO",
       "KC_TRNS",
-      "KC_NO",
-      "KC_NO",
+      "KC_X",
+      "LSFT(KC_MINUS)",
       "KC_NO",
       "KC_TRNS",
       "KC_NO",
@@ -5367,7 +5367,7 @@
       "LSFT_T(KC_3)",
       "LSFT(KC_5)",
       "KC_1",
-      "KC_X",
+      "KC_NO",
       "KC_7",
       "KC_NO",
       "LCTL_T(KC_4)",
@@ -5377,7 +5377,7 @@
       "KC_8",
       "KC_NO",
       "LALT_T(KC_6)",
-      "KC_NO",
+      "KC_KP_MINUS",
       "KC_5",
       "KC_TRNS",
       "KC_9",
@@ -5726,7 +5726,7 @@
       "KC_NO",
       "KC_NO",
       "KC_NO",
-      "LSFT(KC_4)",
+      "KC_NO",
       "KC_NO",
       "KC_NO",
       "KC_NO",
@@ -5740,13 +5740,13 @@
       "LSFT(KC_MINUS)",
       "KC_KP_EQUAL",
       "KC_NO",
-      "LSFT(KC_GRAVE)",
+      "LSFT(KC_7)",
       "KC_NO",
       "TD(12)",
       "KC_SCOLON",
       "KC_KP_PLUS",
       "KC_NO",
-      "LSFT(KC_7)",
+      "LSFT(KC_8)",
       "KC_NO",
       "TD(1)",
       "KC_MINUS",
@@ -5754,7 +5754,7 @@
       "KC_NO",
       "LSFT(KC_5)",
       "KC_NO",
-      "KC_NO",
+      "LSFT(KC_SLASH)",
       "KC_GRAVE",
       "KC_NO",
       "KC_NO",
@@ -6518,19 +6518,15 @@
       "actions": [
         [
           "tap",
-          "KC_HOME"
+          "KC_UP"
         ],
         [
           "tap",
-          "KC_HOME"
+          "KC_END"
         ],
         [
           "tap",
           "KC_ENTER"
-        ],
-        [
-          "tap",
-          "KC_UP"
         ]
       ]
     },
@@ -7520,6 +7516,7 @@
   "cols": 6,
   "tapdance_count": 50,
   "macros_size": 795,
+  "sval_proto": 0,
   "key_overrides": [
     {
       "koid": 0,
@@ -7633,13 +7630,13 @@
     },
     {
       "koid": 11,
-      "trigger": "KC_NO",
-      "replacement": "KC_NO",
+      "trigger": "KC_GRAVE",
+      "replacement": "KC_GRAVE",
       "layers": 65535,
-      "trigger_mods": 0,
+      "trigger_mods": 2,
       "negative_mod_mask": 0,
-      "suppressed_mods": 0,
-      "options": 7
+      "suppressed_mods": 2,
+      "options": 23
     },
     {
       "koid": 12,
@@ -7833,7 +7830,7 @@
     },
     {
       "tdid": 1,
-      "tap": "LSFT(KC_8)",
+      "tap": "LSFT(KC_6)",
       "hold": "KC_LALT",
       "doubletap": "KC_NO",
       "taphold": "KC_NO",
@@ -7921,7 +7918,7 @@
     },
     {
       "tdid": 12,
-      "tap": "LSFT(KC_6)",
+      "tap": "LSFT(KC_4)",
       "hold": "KC_LCTRL",
       "doubletap": "KC_NO",
       "taphold": "KC_NO",
