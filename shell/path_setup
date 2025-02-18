@@ -5,4 +5,4 @@ if [ -d $HOME/work-scripts ]; then
     export PATH=$HOME/work-scripts:$PATH
 fi
 export PATH="$HOME/.cargo/bin:$PATH"
-export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH=$HOME/opt/lib:$LD_LIBRARY_PATH
