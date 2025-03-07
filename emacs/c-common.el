@@ -156,6 +156,20 @@ doesn't provide a sane default we fix that here."
   ;;         int arg3)
   (c-set-offset 'arglist-intro '+)
 
+  ;; when we split arguments across lines, make the closer indent the
+  ;; same as the opener. In other words if I write:
+  ;;
+  ;;     return std::lexicographical_compare_three_way(
+  ;;         span.begin(),
+  ;;         rspan.end(),
+  ;;         other.begin(),
+  ;;         other.end()
+  ;;     );
+  ;;
+  ;; Then the closing parenthesis aligns with the return, not 'other'
+  ;; which is the default behavior.
+  (c-set-offset 'arglist-close 0)
+
   ;; none of these help the enum problem
   ;; (c-set-offset 'statement-cont 0)
   ;; (c-set-offset 'brace-list-open 0)
