@@ -43,7 +43,8 @@
   ;; to open the file at that location
   ;;(compilation-shell-minor-mode 1)
   (shell-dirtrack-mode 0)
-  (setq dirtrack-list '("^[-_A-Za-z0-9]+?@[-_A-Za-z0-9]+?:\\([-_/~A-Za-z0-9]+\\)\\$" 1))
+  (setq dirtrack-list '("^[-_A-Za-z0-9]+@[-_A-Za-z0-9]+:\\([-_./~A-Za-z0-9]+\\)\\$" 1))
+  ;; (setq dirtrack-list '("^[-_A-Za-z0-9]+?@[-_A-Za-z0-9]+?:\\([-_/~A-Za-z0-9]+\\)\\$" 1))
   (dirtrack-mode 1)
   ;;(setq dirtrack-list '("^[^@:\n]+@[^:\n]+:\\([^]]+\\)][$#]" 1))
 ;;  (setq dirtrack-list '("^\\[[^<\n]*<\\([^>\n]+\\)>][$#]" 1))
