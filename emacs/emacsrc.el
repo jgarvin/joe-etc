@@ -148,6 +148,20 @@
 
 (load-file "~/etc/emacs/ivy-custom.el")
 
+;; Define the OSC 52 clipboard function
+(defun send-text-to-terminal-clipboard (text)
+  (let ((b64-text (base64-encode-string (encode-coding-string text 'utf-8) t)))
+    (send-string-to-terminal (concat "\e]52;c;" b64-text "\007"))))
+
+(unless (display-graphic-p)
+  ;; Use OSC 52 for terminal clipboard operations. Terminal will
+  ;; generally need configuration to accept this, e.g. kitty needs
+  ;; `clipboard_control read-clipboard read-primary write-clipboard
+  ;; write-primary`
+  ;;
+  ;; alternatively consider "clippety": https://github.com/spudlyo/clipetty
+  (setq interprogram-cut-function #'send-text-to-terminal-clipboard))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package
