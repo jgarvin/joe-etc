@@ -245,6 +245,7 @@
    (t (er/expand-region (prefix-numeric-value arg)))))
 
 (global-set-key (kbd "C-SPC") #'etc-set-mark-or-expand-region)
+(global-set-key (kbd "C-@") #'etc-set-mark-or-expand-region) ;; for terminal mode
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "M-=") 'er/contract-region)
 
