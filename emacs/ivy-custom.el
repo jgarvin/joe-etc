@@ -72,6 +72,10 @@
 (define-key swiper-isearch-map (kbd "<down>") #'swiper-isearch-next-line)
 (define-key swiper-isearch-map (kbd "<up>") #'swiper-isearch-previous-line)
 
+;; don't take over my usual completion key
+(define-key ivy-minibuffer-map (kbd "S-SPC") nil)
+(define-key ivy-minibuffer-map (kbd "C-S-SPC") #'ivy-restrict-to-matches)
+
 (global-set-key (kbd "C-r") 'swiper-isearch-backward)
 (global-set-key (kbd "C-s") 'swiper-isearch)
 (global-set-key (kbd "C-S-y") 'counsel-yank-pop)
@@ -134,5 +138,3 @@
 
 ;; provides lsp-ivy-workspace-symbol and lsp-ivy-global-workspace-symbol
 (use-package lsp-ivy :ensure t)
-
-
