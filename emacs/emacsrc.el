@@ -1224,7 +1224,7 @@
 
 (defun etc-reopen-with-sudo ()
   (interactive)
-  (find-alternate-file (concat "/sudo::|" buffer-file-name)))
+  (find-alternate-file (concat "/sudo::" buffer-file-name)))
 
 (defun etc-reopen-with-sudo ()
   (interactive)
