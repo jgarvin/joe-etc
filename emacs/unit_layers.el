@@ -13,6 +13,7 @@
 (global-set-key (kbd "M-<right>") #'next-buffer)
 (define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
+(define-key smartparens-mode-map (kbd "C-M-_") #'sp-end-of-sexp) ;; needed for terminal mode
 (define-key smartparens-mode-map (kbd "C-M-n") #'sp-previous-sexp)
 (define-key smartparens-mode-map (kbd "C-M-i") #'sp-next-sexp)
 (define-key smartparens-mode-map (kbd "C-M-e") #'sp-down-sexp)

@@ -559,10 +559,10 @@
 (global-undo-tree-mode)
 ;;(define-key undo-tree-map (kbd "C-_"))
 (global-unset-key (kbd "C-_"))
-(define-key undo-tree-map (kbd "C-_") nil)
-(define-key undo-tree-map (kbd "C-_") nil)
 (define-key undo-tree-map (kbd "C-/") #'undo-tree-undo)
+(define-key undo-tree-map (kbd "C-_") #'undo-tree-undo) ;; needed for terminal mode
 (define-key undo-tree-map (kbd "M-/") #'undo-tree-redo)
+(define-key undo-tree-map (kbd "M-_") #'undo-tree-redo) ;; needed for terminal mode
 (setq-default undo-limit 1000000)
 (setq-default undo-strong-limit 1000000)
 
@@ -1461,7 +1461,9 @@ If the buffer runs `dired', the buffer is reverted."
 ;; unless you set these.
 ;;
 ;; https://www.reddit.com/r/emacs/comments/osscfd/pgtk_emacswaylandgnome_no_shiftspace/
+
 (setq pgtk-use-im-context-on-new-connection nil)
-(pgtk-use-im-context nil)
+(when (fboundp #'pgtk-use-im-context)
+  (pgtk-use-im-context nil))
 
 (add-to-list 'auto-mode-alist '("\\.log\\." . fundamental-mode))
