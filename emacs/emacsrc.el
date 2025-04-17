@@ -1150,6 +1150,7 @@
 
 ;; let ctrl-backspace/delete skip over punctuation
 (global-set-key (kbd "C-<backspace>") #'md-backward-kill-word)
+(global-set-key (kbd "C-h") #'md-backward-kill-word) ;; needed for terminal, use F1 instead
 (global-set-key (kbd "C-<delete>") #'md-forward-kill-word)
 
 ;; with speech recognition we don't want to have to
