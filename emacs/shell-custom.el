@@ -77,7 +77,10 @@ same folder. If given prefix argument always make a new shell."
          (existing (sort (-filter (lambda (x)
                                     (with-current-buffer x
                                       (let ((process (get-buffer-process (current-buffer))))
-                                        (and (equal dir (file-truename default-directory))
+                                        ;; we first check that the tramp part of the path (if any) matches, because calling `file-truename`
+                                        ;; on a tramp path that contains sudo will reprompt for the password!
+                                        (and (equal (file-remote-p dir) (file-remote-p default-directory))
+                                             (equal dir (file-truename default-directory))
                                              (derived-mode-p 'shell-mode)
                                              process
                                              (string-match-p ".*?\\(zsh\\|bash\\)\\'" (car (process-command process)))

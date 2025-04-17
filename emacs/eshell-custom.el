@@ -94,7 +94,8 @@ same folder. If given prefix argument always make a new shell."
                                     (and (not (minibufferp x))
                                          (not (buffer-live-p x))
                                          (with-current-buffer x
-                                           (and (equal dir (file-truename default-directory))
+                                           (and (equal (file-remote-p dir) (file-remote-p default-directory))
+                                                (equal dir (file-truename default-directory))
                                                 (derived-mode-p 'eshell-mode)))))
                                   (buffer-list))
                          (lambda (x y)
