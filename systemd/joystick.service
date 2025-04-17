@@ -2,7 +2,7 @@
 Description=joystick
 
 [Service]
-ExecStart=/bin/bash -c "~/mandimus/joystick.py"
+ExecStart=/usr/bin/env bash -c "~/mandimus/joystick.py"
 Restart=always
 RuntimeMaxSec=60
 

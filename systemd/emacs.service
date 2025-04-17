@@ -2,7 +2,7 @@
 Description=emacs
 
 [Service]
-ExecStart=/bin/bash -c "killall -USR2 emacsclient; ~/etc/bin/launch-emacs"
+ExecStart=/usr/bin/env bash -c "killall -USR2 emacsclient; ~/etc/bin/launch-emacs"
 ExecStartPost=/bin/systemctl --user try-restart mandimus.service
 Restart=always
 RestartSec=1

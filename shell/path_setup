@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export PATH=$HOME/opt/bin:$HOME/etc/bin:$PATH
 if [ -d $HOME/work-scripts ]; then

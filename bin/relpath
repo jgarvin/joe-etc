@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Originally written by 'pini' on stackoverflow, now has edits
 # URL: http://stackoverflow.com/a/5027832/50385

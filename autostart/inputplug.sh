@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo >2 "Setting preferred microphone..."
 $HOME/etc/autostart/preferred-microphone.sh

@@ -2,7 +2,7 @@
 Description=inputplug
 
 [Service]
-ExecStart=/bin/bash -c "inputplug -d -c ~/etc/autostart/inputplug.sh"
+ExecStart=/usr/bin/env bash -c "inputplug -d -c ~/etc/autostart/inputplug.sh"
 Restart=always
 RestartSec=1
 

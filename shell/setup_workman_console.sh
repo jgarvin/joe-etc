@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -f /etc/vconsole.conf ]; then
     echo "/etc/vconsole.conf already exists!" >2

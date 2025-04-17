@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cp $(dirname "${BASH_SOURCE[0]}")/workman-p /usr/share/X11/xkb/symbols
 

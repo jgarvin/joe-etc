@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #source $HOME/etc/shell/path_setup
 source $HOME/.bash_profile

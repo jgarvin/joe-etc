@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -x
 set -e
@@ -26,7 +26,7 @@ docker run --rm -u $(id -u):$(id -g) -v  $EMACS_INSTALL_DIRECTORY:/emacs-install
 # create a script for running with appropriate paths set...
 # leading backslash prevents variable expansion
 cat << \EOF > ${SCRIPT_INSTALL_DIRECTORY}/emacs
-#!/bin/bash
+#!/usr/bin/env bash
 export PATH=$HOME/emacs-install/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/emacs-install/lib:$HOME/emacs-install/system-lib:$LD_LIBRARY_PATH
 emacs "$@"
@@ -34,7 +34,7 @@ EOF
 chmod +x ${SCRIPT_INSTALL_DIRECTORY}/emacs
 
 cat << \EOF > ${SCRIPT_INSTALL_DIRECTORY}/emacsclient
-#!/bin/bash
+#!/usr/bin/env bash
 export PATH=$HOME/emacs-install/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/emacs-install/lib:$HOME/emacs-install/system-lib:$LD_LIBRARY_PATH
 emacsclient "$@"
