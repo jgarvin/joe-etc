@@ -88,7 +88,7 @@
                 (user-error "Couldn't find file relative to current buffer and no most recent project to search."))
               )))))))
 
-(global-set-key (kbd "C-<return>") #'etc-smart-find-file-at-point)
+(global-set-key (kbd "M-RET") #'etc-smart-find-file-at-point)
 
 (global-set-key (kbd "M-;") #'comment-or-uncomment-region)
 
@@ -1019,7 +1019,7 @@
   "Emacs quick move minor mode"
   t)
 ;; you can select the key you prefer to
-(define-key global-map (kbd "M-RET") 'ace-jump-mode)
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 (define-key shell-mode-map (kbd "M-RET") nil)
 (define-key message-mode-map (kbd "M-RET") nil)
 (define-key global-map (kbd "S-<return>") 'ace-jump-line-mode)
