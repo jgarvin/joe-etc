@@ -18,8 +18,8 @@
 (global-set-key (kbd "<home>") 'beginning-or-indentation)
 (global-set-key (kbd "<end>") 'end-or-trailing)
 
-(global-set-key (kbd "S-SPC") 'dabbrev-expand)
 (global-set-key (kbd "M-SPC") 'dabbrev-expand)
+
 (setq dabbrev-case-fold-search nil)
 (global-unset-key (kbd "M-/"))
 
