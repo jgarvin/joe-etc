@@ -1021,8 +1021,8 @@
 ;; you can select the key you prefer to
 (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 (define-key shell-mode-map (kbd "M-RET") nil)
-(define-key message-mode-map (kbd "M-RET") nil)
-(define-key global-map (kbd "S-<return>") 'ace-jump-line-mode)
+(define-key message-mode-map (kbd "M-RET") )
+(define-key global-map (kbd "C-c RET") 'ace-jump-line-mode)
 ;;(global-set-key (kbd "M-RET") 'ace-jump-mode)
 
 ;;
