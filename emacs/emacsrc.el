@@ -34,9 +34,6 @@
       "M-x "
       (all-completions "" obarray 'commandp))))))
 
-;; Most useful binding ever
-(global-set-key (kbd "M-/") 'comment-or-uncomment-region) ;; C-S-_ does undo already
-
 (global-set-key "\M-j" 'previous-buffer)
 (global-set-key "\M-k" 'next-buffer)
 
@@ -161,6 +158,24 @@
   ;;
   ;; alternatively consider "clippety": https://github.com/spudlyo/clipetty
   (setq interprogram-cut-function #'send-text-to-terminal-clipboard))
+
+(defun etc-translate-hack ()
+  ;; doing this on a timer seems to be the only way to get
+  ;; it to work on startup...  after-init-hook doesn't work,
+  ;; neither does just putting top level in emacsrc
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t))
+(run-with-timer 0 2 #'etc-translate-hack)
+
+(when (getenv "DISPLAY")
+  ;; Make emacs use the normal clipboard
+  ;;(setq x-select-enable-clipboard t)
+  ;;(setq interprogram-paste-function 'gui-get-primary-selection)
+  ;;(setq x-selection-timeout 300)
+  ;; When remotely logging in, need to remap alt for emacs keybindings to work
+  (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
+    (setq x-alt-keysym 'meta))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -338,74 +353,66 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(TeX-view-program-selection
-   '(((output-dvi style-pstricks)
-      "Evince")
-     (output-dvi "Evince")
-     (output-pdf "Evince")
-     (output-html "Evince")))
+   '(((output-dvi style-pstricks) "Evince") (output-dvi "Evince")
+     (output-pdf "Evince") (output-html "Evince")))
  '(c-noise-macro-names '("constexpr"))
  '(custom-safe-themes
-   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default))
+   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e"
+     "f0b0710b7e1260ead8f7808b3ee13c3bb38d45564e369cbe15fc6d312f0cd7a0"
+     "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa"
+     default))
  '(ediff-split-window-function 'split-window-horizontally)
  '(haskell-mode-hook '(turn-on-haskell-indent))
  '(ignored-local-variable-values
    '((eval font-lock-add-keywords nil
-           `((,(concat "("
-                       (regexp-opt
-                        '("sp-do-move-op" "sp-do-move-cl" "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op" "sp-do-del-cl")
-                        t)
-                       "\\_>")
-              1 'font-lock-variable-name-face)))
+           `
+           ((,(concat "("
+                      (regexp-opt
+                       '("sp-do-move-op" "sp-do-move-cl"
+                         "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op"
+                         "sp-do-del-cl")
+                       t)
+                      "\\_>")
+             1 'font-lock-variable-name-face)))
      (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
- '(package-selected-packages
-   '(nix-mode free-keys filladapt lsp-ivy orderless vertico xclip xterm-color lsp-mode zig-mode minimap dockerfile-mode async smartparens lsp-ui visible-mark counsel docker-tramp ein counsel-projectile counsel-tramp counsel-gtags ivy-hydra ivy flycheck-rust toml-mode lsp-flycheck rust-mode smart-hungry-delete sqlup-mode helm-ag julia-shell julia-repl julia-mode helm-bbdb gmail2bbdb jabber jabber-mode bbdb magit use-package undo-tree string-inflection realgud racket-mode perl6-mode haskell-mode goto-chg f expand-region erc-hl-nicks))
+ '(package-selected-packages nil)
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
-                      (buffer-file-name)
-                      (getenv "HOME"))))
+              (format
+               "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem"
+               (buffer-file-name) (getenv "HOME"))))
            nil t)
      (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
-              (format "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
-                      (getenv "HOME"))))
+              (format
+               "touch %s/dragonshare/NatLink/NatLink/MacroSystem/_dfly_client.py"
+               (getenv "HOME"))))
            nil t)
      (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-                      (buffer-file-name)
-                      (getenv "HOME")
-                      (buffer-name))))
+              (format
+               "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+               (buffer-file-name) (getenv "HOME") (buffer-name))))
            nil t)
      (eval add-hook 'after-save-hook
            (lambda nil
              (shell-command
-              (format "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
-                      (buffer-file-name)
-                      (getenv "HOME")
-                      (buffer-name)))))))
+              (format
+               "rsync -av %s %s/dragonshare/NatLink/NatLink/MacroSystem/_%s"
+               (buffer-file-name) (getenv "HOME") (buffer-name)))))))
  '(send-mail-function 'smtpmail-send-it)
  '(tramp-default-proxies-alist
-   '(("^192\\.168\\.68\\.65$"
-      #("^root$" 1 5
-        (tramp-default t))
-      #("/sudo:root@192.168.68.65:" 0 6
-        (tramp-ad-hoc t)
-        6 10
-        (tramp-ad-hoc t tramp-default t)
-        10 25
-        (tramp-ad-hoc t)))
-     ("^192\\.168\\.68\\.65$"
-      #("^root$" 1 5
-        (tramp-default t))
-      #("/ssh:teamslice@192.168.68.65:" 0 29
-        (tramp-ad-hoc t)))))
+   '(("^192\\.168\\.68\\.65$" #("^root$" 1 5 (tramp-default t))
+      #("/sudo:root@192.168.68.65:" 0 6 (tramp-ad-hoc t) 6 10
+        (tramp-ad-hoc t tramp-default t) 10 25 (tramp-ad-hoc t)))
+     ("^192\\.168\\.68\\.65$" #("^root$" 1 5 (tramp-default t))
+      #("/ssh:teamslice@192.168.68.65:" 0 29 (tramp-ad-hoc t)))))
  '(tramp-save-ad-hoc-proxies t)
  '(tramp-syntax 'default nil (tramp))
  '(warning-suppress-log-types '((comp)))
@@ -539,24 +546,6 @@
   ;; instead we just run it once a minute, blame laziness :p
   (let ((default-directory "/")) ;; guaranteed to exist so I don't get an error, xset doesn't touch current directory anyway
     (call-process "xset" nil nil nil "r" "rate" "200" "60")))
-
-(defun etc-translate-hack ()
-  ;; doing this on a timer seems to be the only way to get
-  ;; it to work on startup...  after-init-hook doesn't work,
-  ;; neither does just putting top level in emacsrc
-  (keyboard-translate ?\C-t ?\C-x)
-  (keyboard-translate ?\C-x ?\C-t))
-(run-with-timer 0 2 #'etc-translate-hack)
-
-(when (getenv "DISPLAY")
-  ;; Make emacs use the normal clipboard
-  ;;(setq x-select-enable-clipboard t)
-  ;;(setq interprogram-paste-function 'gui-get-primary-selection)
-  ;;(setq x-selection-timeout 300)
-  ;; When remotely logging in, need to remap alt for emacs keybindings to work
-  (when (not (string= (nth 0 (split-string (nth 1 (split-string (getenv "DISPLAY") ":")) "\\.")) "0"))
-    (setq x-alt-keysym 'meta))
-  )
 
 (setq make-backup-files nil)
 
@@ -1225,20 +1214,21 @@
 
 (defun etc-reopen-with-sudo ()
   (interactive)
+  (message "debug buffer-file-name: %s" buffer-file-name)
   (find-alternate-file (concat "/sudo::" buffer-file-name)))
 
-(defun etc-reopen-with-sudo ()
-  (interactive)
-  (let* ((vec (tramp-dissect-file-name (buffer-file-name (current-buffer))))
-       (method (tramp-file-name-method vec))
-       (user (tramp-file-name-user vec))
-       (host (tramp-file-name-host vec))
-       (localname (tramp-file-name-localname vec)))
-    (message "localname=%s" localname)
-    (find-alternate-file
-     (if (tramp-tramp-file-p (buffer-file-name (current-buffer)))
-         (concat (format "/%s:%s@%s|sudo::%s" method user host localname))
-       (concat "/sudo:root@localhost:" buffer-file-name)))))
+;; (defun etc-reopen-with-sudo ()
+;;   (interactive)
+;;   (let* ((vec (tramp-dissect-file-name (buffer-file-name (current-buffer))))
+;;        (method (tramp-file-name-method vec))
+;;        (user (tramp-file-name-user vec))
+;;        (host (tramp-file-name-host vec))
+;;        (localname (tramp-file-name-localname vec)))
+;;     (message "localname=%s" localname)
+;;     (find-alternate-file
+;;      (if (tramp-tramp-file-p (buffer-file-name (current-buffer)))
+;;          (concat (format "/%s:%s@%s|sudo::%s" method user host localname))
+;;        (concat "/sudo:root@localhost:" buffer-file-name)))))
 
 (global-set-key (kbd "C-c o s") #'etc-reopen-with-sudo)
 
