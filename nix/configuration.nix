@@ -12,6 +12,7 @@
       #./i3.nix
       ./fonts.nix
       ./thunar.nix
+      ./btrfs.nix
       ./steam.nix
     ];
 
