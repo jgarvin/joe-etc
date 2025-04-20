@@ -94,6 +94,8 @@
     xorg.xeyes
     xterm
     killall
+    google-chrome
+    obsidian
   ];
 
   # Enable the gnome-keyring secrets vault.
