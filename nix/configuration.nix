@@ -14,6 +14,7 @@
       ./thunar.nix
       ./btrfs.nix
       ./steam.nix
+      ./tailscale.nix
     ];
 
   # this is the latest version that still works with the nvidia drivers

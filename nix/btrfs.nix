@@ -11,6 +11,8 @@
     "/nix".options = [ "compress=zstd" "noatime" ];
   };
 
+  # All of the btrbk setup comes from: https://nixos.wiki/wiki/Btrbk
+
   # Have btrbk regularly take snapshots of /home. These are local disk
   # only, just meant as protection against `rm -rf ~` and the like.
   services.btrbk.instances = {
