@@ -12,6 +12,7 @@
        ./sway.nix
       #./i3.nix
       ./fonts.nix
+      ./thunar.nix
     ];
 
   # this is the latest version that still works with the nvidia drivers
@@ -97,6 +98,8 @@
     google-chrome
     obsidian
   ];
+
+  programs.steam.enable = true;
 
   # Enable the gnome-keyring secrets vault.
   # Will be exposed through DBus to programs willing to store secrets.
