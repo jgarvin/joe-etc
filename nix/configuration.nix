@@ -36,9 +36,6 @@
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
   hardware.bluetooth.enable = true;
 
-  # programs.nm-applet.enable = true;
-  # services.blueman.enable = true;
-
   # Set your time zone.
   time.timeZone = "America/Chicago";
 
