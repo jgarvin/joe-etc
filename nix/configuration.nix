@@ -17,6 +17,8 @@
       ./tailscale.nix
     ];
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # this is the latest version that still works with the nvidia drivers
   # boot.kernelPackages = pkgs.linuxPackages_6_12;
 
