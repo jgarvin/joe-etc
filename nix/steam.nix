@@ -1,8 +1,5 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, unstablePkgs, ... }:
 
-# let
-  # unstable = import <nixos-unstable> { };
-# in
 {
   # # Someone here says that this branch combined with
   # #    SDL_VIDEODRIVER=x11 gamescope --backend sdl
@@ -29,8 +26,8 @@
   programs.steam.enable = true;
 
   environment.systemPackages = with pkgs; [
-    #unstable.gamescope # flickers like crazy
-    gamescope
+    unstablePkgs.gamescope # flickers like crazy, TODO: switch back
+    # gamescope
     mangohud
   ];
 
