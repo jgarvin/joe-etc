@@ -8,8 +8,9 @@
       ./nvidia.nix
       # ./disable_nvidia.nix
       ./amd_radeon.nix
-       # ./sway.nix
+       ./sway.nix
       #./i3.nix
+      #./gnome.nix
       ./fonts.nix
       ./thunar.nix
       ./btrfs.nix
@@ -17,11 +18,6 @@
       ./tailscale.nix
       ./power.nix
     ];
-
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.displayManager.gdm.wayland = true;
-  services.xserver.desktopManager.gnome.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -107,6 +103,7 @@
     gnumake
     cmake
     libtool
+    pciutils # lspci
   ];
 
   # Enable the gnome-keyring secrets vault.

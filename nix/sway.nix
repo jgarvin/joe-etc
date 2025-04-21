@@ -15,6 +15,7 @@
     blueman # bluetooth applet
     networkmanagerapplet # internet connectivity applet
     udiskie # for auto mounting
+    pciutils # for lspci
   ];
 
   # enable Sway window manager
@@ -24,8 +25,14 @@
   };
 
   services.greetd = let
+    # set WLR_DRM_DEVICES to specifically be the amd card so sway
+    # doesn't try to use nvidia. we use the path with an explicit
+    # pci-e address rather than /dev/dri/cardN because that numbering
+    # can change across boots.
+    #
+    # To figure out the pci address for the card use `lspci | grep -i radeon`
     sway-nvidia-wrapper = pkgs.writeShellScriptBin "sway-nvidia" ''
-    exec ${pkgs.sway}/bin/sway --unsupported-gpu "$@"
+    WLR_DRM_DEVICES=$(realpath /dev/dri/by-path/pci-0000:c5:00.0-card) exec ${pkgs.sway}/bin/sway --unsupported-gpu "$@"
   '';
   in {
     enable = true;
