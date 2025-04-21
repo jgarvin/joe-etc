@@ -35,5 +35,11 @@
 (defadvice other-frame (before other-frame-now activate)
   (etc-save-if-necessary))
 
+(defadvice next-buffer (before next-buffer-save-now activate)
+  (etc-save-if-necessary))
+
+(defadvice previous-buffer (before previous-buffer-save-now activate)
+  (etc-save-if-necessary))
+
 ;; so I can't be tempted to do by hand
 (global-unset-key "\C-x\C-s")
