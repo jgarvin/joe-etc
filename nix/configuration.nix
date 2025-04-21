@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 
-{
+let my_kernel = pkgs.linuxPackages_6_14;
+in {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
@@ -21,11 +22,8 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # this is the latest version that still works with the nvidia drivers
-  # boot.kernelPackages = pkgs.linuxPackages_6_12;
-
   # this is the latest though
-  boot.kernelPackages = pkgs.linuxPackages_6_14;
+  boot.kernelPackages = my_kernel;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -104,6 +102,9 @@
     cmake
     libtool
     pciutils # lspci
+    gdb
+    valgrind
+    my_kernel.perf
   ];
 
   # Enable the gnome-keyring secrets vault.
