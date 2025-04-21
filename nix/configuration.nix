@@ -98,11 +98,15 @@
     acpi # needed for waybar battery status?
     jq
     mesa-demos # glxgears
+    vulkan-tools # vkcube
     xorg.xeyes
     xterm
     killall
     google-chrome
     obsidian
+    gnumake
+    cmake
+    libtool
   ];
 
   # Enable the gnome-keyring secrets vault.
