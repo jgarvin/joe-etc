@@ -15,6 +15,7 @@
       ./btrfs.nix
       ./steam.nix
       ./tailscale.nix
+      ./power.nix
     ];
 
   services.xserver.enable = true;
@@ -90,7 +91,6 @@
     git
     lshw
     silver-searcher
-    tlp
     zsh
     gcc14
     emacs-pgtk
