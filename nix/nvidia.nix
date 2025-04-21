@@ -4,6 +4,7 @@
   # Enable OpenGL
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
   };
 
   # Load nvidia driver for Xorg and Wayland
@@ -59,8 +60,8 @@
         enableOffloadCmd = true;
       };
       # Make sure to use the correct Bus ID values for your system!
-      nvidiaBusId = "PCI:196:0:0";
       amdgpuBusId = "PCI:197:0:0"; # For AMD GPU
+      nvidiaBusId = "PCI:196:0:0";
     };
   };
 }

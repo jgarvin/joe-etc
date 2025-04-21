@@ -5,10 +5,10 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./asus.nix
-      # ./nvidia.nix
-      ./disable_nvidia.nix
+      ./nvidia.nix
+      # ./disable_nvidia.nix
       ./amd_radeon.nix
-       ./sway.nix
+       # ./sway.nix
       #./i3.nix
       ./fonts.nix
       ./thunar.nix
@@ -16,6 +16,11 @@
       ./steam.nix
       ./tailscale.nix
     ];
+
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.wayland = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
