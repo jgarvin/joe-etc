@@ -6,6 +6,7 @@
   environment.systemPackages = with pkgs; [
     # sway stuff
     grim # screenshot functionality
+    sway-contrib.grimshot # screenshot functionality
     slurp # screenshot functionality
     wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
     mako # notification system developed by swaywm maintainer
