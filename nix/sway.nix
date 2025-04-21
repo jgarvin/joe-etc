@@ -17,6 +17,7 @@
     networkmanagerapplet # internet connectivity applet
     udiskie # for auto mounting
     pciutils # for lspci
+    pavucontrol # for clicking on sound icon in waybar
   ];
 
   # enable Sway window manager
