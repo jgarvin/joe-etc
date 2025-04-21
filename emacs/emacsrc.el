@@ -1090,11 +1090,13 @@
   (with-current-buffer "*el-macroexpansion*" (emacs-lisp-mode)))
 
 (defun unkillable-scratch-buffer ()
-	(if (equal (buffer-name (current-buffer)) "*scratch*")
-	    (progn
-	      (delete-region (point-min) (point-max))
-	      nil)
-	  t))
+  (if (and (equal (buffer-name (current-buffer)) "*scratch*"))
+      (condition-case nil
+          (progn
+            (delete-region (point-min) (point-max))
+            nil)
+        (error t))  ;; Return t if any error occurs during deletion
+    t))
 (add-hook 'kill-buffer-query-functions 'unkillable-scratch-buffer)
 
 ;; cancel minibuffer prompts when I switch focus
