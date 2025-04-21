@@ -21,7 +21,14 @@ shopt -s histappend
 # No, this was too dangerous, kept executing old commands from other terminals!
 #export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
 
-export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a;"
+if [[ ! "$PROMPT_COMMAND" =~ "history -a;" ]]; then
+    export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a;"
+fi
+
+# not sure why use of this gets injected, only seems to happen in gnome
+if [ "$INSIDE_EMACS" ] && [[ "$PROMPT_COMMAND" =~ "__vte_prompt_command" ]]; then
+    __vte_prompt_command() { true; }
+fi
 
 alias ag='ag --hidden'
 
