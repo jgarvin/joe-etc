@@ -138,3 +138,8 @@ if [ -f "$HOME/.cargo/env" ]; then
    source "$HOME/.cargo/env"
 fi
 
+if [ -f $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then
+   source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
+elif [ -f /etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh ]; then
+    source /etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh
+fi

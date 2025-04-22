@@ -85,17 +85,11 @@ in {
     silver-searcher
     zsh
     gcc14
-    emacs-pgtk
+    emacs
     dmidecode
-    acpi # needed for waybar battery status?
+    acpi
     jq
-    mesa-demos # glxgears
-    vulkan-tools # vkcube
-    xorg.xeyes
-    xterm
     killall
-    google-chrome
-    obsidian
     gnumake
     cmake
     libtool
@@ -103,6 +97,7 @@ in {
     gdb
     valgrind
     my_kernel.perf
+    google-chrome
   ];
 
   # Enable the gnome-keyring secrets vault.
