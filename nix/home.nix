@@ -10,12 +10,6 @@
   home.username = "prophet";
   home.homeDirectory = "/home/prophet";
 
-  # set cursor size and dpi for 4k monitor
-  # xresources.properties = {
-    # "Xcursor.size" = 16;
-    # "Xft.dpi" = 172;
-  # };
-
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.

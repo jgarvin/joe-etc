@@ -3,18 +3,47 @@
 ;; (require 'color-theme)
 ;; (setq color-theme-is-global t)
 ;; (color-theme-initialize)
-(if (string= (system-name) "eruv")
-    (progn
-      (load-file "~/etc/emacs/cyberpunk-theme.el")
-      (set-face-attribute 'mode-line nil
-                          :foreground "white"
-                          :background "grey20"))
-  (load-theme 'manoj-dark)
-  (set-face-attribute 'mode-line nil
-                    :foreground (face-attribute 'mode-line-inactive :foreground)
-                    :background (face-attribute 'mode-line-inactive :background))
-  )
+;; (if (string= (system-name) "eruv")
+;;     (progn
+;;       (load-file "~/etc/emacs/cyberpunk-theme.el")
+;;       (set-face-attribute 'mode-line nil
+;;                           :foreground "white"
+;;                           :background "grey20"))
+;;   (load-theme 'manoj-dark)
+;;   (set-face-attribute 'mode-line nil
+;;                     :foreground (face-attribute 'mode-line-inactive :foreground)
+;;                     :background (face-attribute 'mode-line-inactive :background))
+;;   )
 
+(if (string= (system-name) "eruv2")
+    (use-package material-theme
+      :config
+      ;; Use dark variant to match your Materia theme
+      (load-theme 'material t)
+
+      ;; Set cursor color to match Materia blue accent
+      (set-cursor-color "#2196F3")
+
+      ;; Customize specific faces to match Materia better
+      (custom-set-faces
+       ;; Mode line (status bar) to match Materia
+       '(mode-line ((t (:background "#323232" :foreground "#FFFFFF" :box (:line-width 1 :color "#2196F3")))))
+       '(mode-line-inactive ((t (:background "#262626" :foreground "#888888" :box (:line-width 1 :color "#555555")))))
+
+       ;; Selection color to match Materia blue
+       '(region ((t (:background "#2196F3" :foreground "#FFFFFF"))))
+
+       ;; Fix any dark blue on dark background issues
+       '(font-lock-comment-face ((t (:foreground "#8BC34A"))))
+       '(font-lock-function-name-face ((t (:foreground "#82AAFF"))))
+       '(font-lock-keyword-face ((t (:foreground "#C792EA"))))
+       '(font-lock-string-face ((t (:foreground "#FFCB6B"))))
+       '(font-lock-constant-face ((t (:foreground "#89DDFF"))))
+       '(font-lock-variable-name-face ((t (:foreground "#EEFFFF"))))
+
+       ;; Highlight current line
+       '(hl-line ((t (:background "#37474F")))))
+      :ensure t))
 
 ;; (load-theme)
 
@@ -122,3 +151,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (global-set-key (kbd "C-x C--") 'acg/zoom-frame-out)
 (global-set-key (kbd "<C-down-mouse-4>") 'acg/zoom-frame)
 (global-set-key (kbd "<C-down-mouse-5>") 'acg/zoom-frame-out)
+
+(dolist (frame (frame-list))
+  (etc-customize-frame frame))
