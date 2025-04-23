@@ -27,7 +27,7 @@
   };
 
   services.greetd = let
-    # set WLR_DRM_DEVICES to specifically be the amd card so sway
+    # Set WLR_DRM_DEVICES to specifically be the amd card so sway
     # doesn't try to use nvidia. we use the path with an explicit
     # pci-e address rather than /dev/dri/cardN because that numbering
     # can change across boots.

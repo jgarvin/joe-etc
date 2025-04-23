@@ -124,6 +124,11 @@ in {
     "d /backups 0700 prophet users - -"
   ];
 
+  security.sudo.extraConfig = ''
+  # Set sudo timeout to 30 minutes
+  Defaults        timestamp_timeout=30
+'';
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
