@@ -35,6 +35,7 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               users.prophet = import ./home.nix;
+              extraSpecialArgs = { inherit inputs; inherit unstablePkgs; };
             };
           }
         ];

@@ -5,6 +5,7 @@
     [
       ./theme.nix
       ./user_backup.nix
+      ./indexing.nix
     ];
 
   # TODO please change the username & home directory to your own
