@@ -226,29 +226,47 @@ Unless, cons cell (KEY . VALUE) is added."
   (unless comp-command
     (user-error "No compile command set."))
   (let ((rust-format-on-save t))
-       (etc-save-if-necessary))
-  (let* (;; make the compilaton buffer depend on the command name and the project,
+    (etc-save-if-necessary))
+
+  ;; Capture the current environment before any buffer switching occurs
+  (let* (;; capture the environment before we switch active buffers.
+         ;; this is necessary for direnv-mode to work as expected,
+         ;; because we copy the compile script to tmp and run it out
+         ;; of there, so it's not considered to be in the project
+         ;; directory, which would clear the direnv environment.
+         (current-env process-environment)
+         ;; Properly merge with existing compilation-environment,
+         ;; since intention of customizing the
+         ;; `compilation-environment` variable normally is to inject
+         ;; extra env vars specific for compiles.
+         (compilation-environment (append compilation-environment current-env))
+         ;; make the compilation buffer depend on the command name and the project,
          ;; this makes sure we can have multiple compiles going
          (default-directory (etc-get-project-root))
          (buf-name (etc-build-buffer-name 'build comp-command))
          (compilation-buffer-name-function (lambda (mode) buf-name))
-        ;; Pass info on for how to run things from the buffer we invoke in, which
+         ;; Pass info on for how to run things from the buffer we invoke in, which
          ;; in turn could be getting from project or elsewhere.
          (runc run-command)
          (comc comp-command)
          (proj (etc-get-project))
          (invoking (current-buffer))
-         (compilation-mode-hook (cons (lambda (&rest unused)
-                                        (etc-push-recent-buffer 'build (current-buffer))
-                                        (font-lock-mode 0)
-                                        (setq etc-compilation-comp-command comc)
-                                        (setq etc-compilation-project proj)
-                                        (setq etc-compilation-run-command runc)
-                                        (setq etc-compilation-invoking-buffer invoking)) compilation-mode-hook))
+         (compilation-mode-hook
+          (cons (lambda (&rest unused)
+                  (etc-push-recent-buffer 'build (current-buffer))
+                  (font-lock-mode 0)
+                  (setq etc-compilation-comp-command comc)
+                  (setq etc-compilation-project proj)
+                  (setq etc-compilation-run-command runc)
+                  (setq etc-compilation-invoking-buffer invoking))
+                compilation-mode-hook))
          (temp-file (make-temp-file "bld.")))
     (message "directory: %S" default-directory)
     (copy-file comp-command temp-file t nil nil t)
-    (compile temp-file arg)))
+    (message "=============================================")
+    (message "Environment: %s" process-environment)
+    (compile temp-file arg)
+    (message "=============================================")))
 
 (defun etc-make-build-scripts-executable ()
   ;; code taken from executable-make-buffer-file-executable-if-script-p
@@ -302,7 +320,7 @@ Unless, cons cell (KEY . VALUE) is added."
       (comint-interrupt-subjob)
       (setq etc-interrupted-once t)) ;; not strong enough sometimes
     ;; TODO: resort to killing on a timer
-    ;; 
+    ;;
     ))
 
 (global-set-key (kbd "C-c b") #'etc-compile)

@@ -37,7 +37,20 @@
     valgrind
     linuxPackages_latest.perf # we can't easily inspect the one we're booting due to purity :(
     google-chrome
+    direnv
+    nix-direnv
   ];
+
+  # Enable direnv with nix-direnv integration
+  programs.direnv = {
+    enable = true;
+    nix-direnv = {
+      enable = true;
+    };
+    # Don't enable bash integration since home-manager isn't managing
+    # bashrc (yet)
+    enableBashIntegration = false;
+  };
 
   systemd.user = {
     # Start new services automatically on switch

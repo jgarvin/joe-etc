@@ -143,3 +143,5 @@ if [ -f $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then
 elif [ -f /etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh ]; then
     source /etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh
 fi
+
+eval "$(direnv hook bash)"
