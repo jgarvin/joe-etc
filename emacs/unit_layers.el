@@ -9,8 +9,12 @@
 (global-set-key (kbd "C-M-<right>") #'forward-symbol)
 (global-set-key (kbd "C-<next>") #'md-get-next-instance-of-symbol)
 (global-set-key (kbd "C-<prior>") #'md-get-previous-instance-of-symbol)
+
 (global-set-key (kbd "M-<left>") #'previous-buffer)
 (global-set-key (kbd "M-<right>") #'next-buffer)
+(define-key Buffer-menu-mode-map (kbd "M-<right>") nil)
+(define-key Buffer-menu-mode-map (kbd "M-<left>") nil)
+
 (define-key smartparens-mode-map (kbd "C-M-l") #'sp-beginning-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-/") #'sp-end-of-sexp)
 (define-key smartparens-mode-map (kbd "C-M-_") #'sp-end-of-sexp) ;; needed for terminal mode
