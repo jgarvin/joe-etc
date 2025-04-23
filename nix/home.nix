@@ -39,6 +39,7 @@
     google-chrome
     direnv
     nix-direnv
+    ccls
   ];
 
   # Enable direnv with nix-direnv integration
