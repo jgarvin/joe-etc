@@ -4,6 +4,7 @@
   imports =
     [
       ./theme.nix
+      ./user_backup.nix
     ];
 
   # TODO please change the username & home directory to your own
@@ -36,6 +37,11 @@
     linuxPackages_latest.perf # we can't easily inspect the one we're booting due to purity :(
     google-chrome
   ];
+
+  systemd.user = {
+    # Start new services automatically on switch
+    startServices = "sd-switch";
+  };
 
   # still managing these manually for now
   programs.bash.enable = false;

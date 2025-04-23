@@ -98,6 +98,8 @@ in {
     valgrind
     my_kernel.perf
     google-chrome
+    tarsnap
+    tarsnapper
   ];
 
   # Enable the gnome-keyring secrets vault.
@@ -114,6 +116,13 @@ in {
   services.upower.enable = true;
 
   services.dbus.enable = true;
+
+  # Create a directory for some backups that is outside /home so that
+  # if I accidentally blow away home with a bad find/xargs that I can
+  # recover easily.
+  systemd.tmpfiles.rules = [
+    "d /backups 0700 prophet users - -"
+  ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
