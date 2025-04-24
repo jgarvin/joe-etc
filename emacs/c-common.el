@@ -2,7 +2,7 @@
 
 (lsp-register-client
  (make-lsp-client
-  :new-connection (lsp-stdio-connection `(,(format "%s/opt/bin/ccls" (getenv "HOME"))))
+  :new-connection (lsp-stdio-connection "ccls")
   :major-modes '(c-mode c++-mode)
   :server-id 'ccls))
 
