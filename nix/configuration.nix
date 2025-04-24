@@ -18,6 +18,7 @@ in {
       ./steam.nix
       ./tailscale.nix
       ./power.nix
+      ./core_dumps.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -95,6 +96,7 @@ in {
     libtool
     pciutils # lspci
     gdb
+    lldb
     valgrind
     my_kernel.perf
     google-chrome
