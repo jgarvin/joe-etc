@@ -8,6 +8,8 @@
 
 (defvar-local etc-projectile-project-name-cached nil)
 (defvar-local etc-projectile-project-root-cached nil)
+(defvar-local etc-projectile-cached-default-directory nil
+  "Stores the default-directory value when the cache was last updated.")
 
 (defun etc-projectile-project-p ()
   (cond
@@ -16,13 +18,15 @@
    ;; without this experience for freezing navigating directories with
    ;; tramp
    ((and (buffer-file-name (current-buffer)) (file-remote-p (buffer-file-name (current-buffer)))) nil)
-   (etc-projectile-project-name-cached t)
-   (etc-projectile-project-root-cached t)
+   ;; Check if default-directory has changed
+   ((and etc-projectile-project-name-cached etc-projectile-cached-default-directory
+         (string= default-directory etc-projectile-cached-default-directory)) t)
    (t (condition-case nil
           (let ((project-name (projectile-project-name))
                 (project-root (projectile-project-root)))
             (setq etc-projectile-project-name-cached (if project-name project-name 'none))
             (setq etc-projectile-project-root-cached (if project-root project-root 'none))
+            (setq etc-projectile-cached-default-directory default-directory)
             (or etc-projectile-project-name-cached etc-projectile-project-root-cached))
         (error nil))))
   )
