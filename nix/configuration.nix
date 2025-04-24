@@ -101,7 +101,12 @@ in {
     tarsnap
     tarsnapper
     pstree
+    man-pages
+    man-pages-posix
   ];
+
+  # install man pages for everything we install
+  documentation.man.enable = true;
 
   # Enable the gnome-keyring secrets vault.
   # Will be exposed through DBus to programs willing to store secrets.

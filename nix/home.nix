@@ -41,7 +41,14 @@
     nix-direnv
     ccls
     bottom
+    man-pages
+    man-pages-posix
   ];
+
+  # Enable man pages for Home Manager packages
+  manual.manpages.enable = true;
+  # Add the appropriate man directories to your MANPATH
+  programs.man.enable = true;
 
   programs.kitty = {
     enable = true;
