@@ -13,8 +13,8 @@ setup_symlink $HOME/etc/shell/bash_profile $HOME/.bash_profile
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 
-mkdir -p $HOME/.config/kitty/
-setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
+# mkdir -p $HOME/.config/kitty/
+# setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
 
 mkdir -p $HOME/.config/sway
 setup_symlink $HOME/etc/sway.conf $HOME/.config/sway/config

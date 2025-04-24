@@ -100,6 +100,7 @@ in {
     google-chrome
     tarsnap
     tarsnapper
+    pstree
   ];
 
   # Enable the gnome-keyring secrets vault.

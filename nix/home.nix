@@ -40,7 +40,28 @@
     direnv
     nix-direnv
     ccls
+    bottom
   ];
+
+  programs.kitty = {
+    enable = true;
+    font = {
+      name = "Iosevka";
+      size = 11;
+    };
+    settings = {
+      # Your existing settings
+      cursor_shape = "block";
+      shell_integration = "disabled";
+      cursor_blink_interval = "0";
+      disable_ligatures = "always";
+      enable_audio_bell = "no";
+
+      # Window styling to match your Materia theme
+      window_padding_width = "10";
+    };
+  };
+
 
   # Enable direnv with nix-direnv integration
   programs.direnv = {
