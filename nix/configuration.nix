@@ -88,7 +88,6 @@ in {
     gcc14
     emacs
     dmidecode
-    acpi
     jq
     killall
     gnumake
@@ -108,6 +107,7 @@ in {
   ];
 
   # install man pages for everything we install
+  documentation.enable = true;
   documentation.man.enable = true;
 
   # Enable the gnome-keyring secrets vault.
