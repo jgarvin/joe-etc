@@ -123,6 +123,7 @@
 (load-file "~/etc/emacs/etc-debug-overlay.el")
 (load-file "~/etc/emacs/lsp-custom.el")
 (load-file "~/etc/emacs/etc-windmove.el")
+(load-file "~/etc/emacs/nix-custom.el")
 
 (use-package
   drag-stuff
