@@ -263,10 +263,11 @@ Unless, cons cell (KEY . VALUE) is added."
          (temp-file (make-temp-file "bld.")))
     (message "directory: %S" default-directory)
     (copy-file comp-command temp-file t nil nil t)
-    (message "=============================================")
-    (message "Environment: %s" process-environment)
+    ;; (message "=============================================")
+    ;; (message "Environment: %s" process-environment)
     (compile temp-file arg)
-    (message "=============================================")))
+    ;; (message "=============================================")
+    ))
 
 (defun etc-make-build-scripts-executable ()
   ;; code taken from executable-make-buffer-file-executable-if-script-p
