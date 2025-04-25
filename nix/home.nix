@@ -43,6 +43,7 @@
     bottom
     man-pages
     man-pages-posix
+    krita
   ];
 
   # Enable man pages for Home Manager packages

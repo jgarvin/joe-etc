@@ -19,6 +19,7 @@ in {
       ./tailscale.nix
       ./power.nix
       ./core_dumps.nix
+      ./stylus.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -63,13 +64,15 @@ in {
     ];
   };
 
-  # Provides desktop integrations like file chooser dialogs, power management requests, etc.
+  # Provides desktop integrations like file chooser dialogs, power
+  # management requests, etc.
   xdg.portal = {
     enable = true;
     wlr.enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-wlr # for sway/wl-roots compositors
       xdg-desktop-portal-gtk
+      xdg-desktop-portal-kde
     ];
   };
 

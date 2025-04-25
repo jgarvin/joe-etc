@@ -72,9 +72,39 @@
     "Kvantum/kvantum.kvconfig".text = ''
       [General]
       theme=Materia
+      fixed=Iosevka,11,-1,5,50,0,0,0,0,0
+      general=Iosevka,11,-1,5,50,0,0,0,0,0
     '';
     # Add the actual theme files
     "Kvantum/Materia".source = "${pkgs.materia-kde-theme}/share/Kvantum/Materia";
+
+    # Qt5 configuration
+    "qt5ct/qt5ct.conf".text = ''
+    [Appearance]
+    color_scheme_path=
+    custom_palette=false
+    icon_theme=Papirus-Dark
+    standard_dialogs=default
+    style=kvantum
+
+    [Fonts]
+    fixed="Iosevka,11,-1,5,50,0,0,0,0,0"
+    general="Iosevka,11,-1,5,50,0,0,0,0,0"
+  '';
+
+    # Qt6 configuration
+    "qt6ct/qt6ct.conf".text = ''
+    [Appearance]
+    color_scheme_path=
+    custom_palette=false
+    icon_theme=Papirus-Dark
+    standard_dialogs=default
+    style=kvantum
+
+    [Fonts]
+    fixed="Iosevka,11,-1,5,50,0,0,0,0,0"
+    general="Iosevka,11,-1,5,50,0,0,0,0,0"
+  '';
 
     # Add fontconfig for more consistent font rendering
     "fontconfig/fonts.conf".text = ''
