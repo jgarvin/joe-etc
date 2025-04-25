@@ -21,9 +21,13 @@
       # Enable USB autosuspend
       USB_AUTOSUSPEND = 1;
 
-      # CPU power management settings
+      # Maximum performance on AC
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+      
+      # Power saving on battery (you can adjust based on your preference)
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
 
       # PCI Runtime Power Management
       RUNTIME_PM_ON_AC = "auto";
