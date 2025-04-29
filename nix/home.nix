@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, unstablePkgs, ... }:
 
 {
   imports =
@@ -44,6 +44,7 @@
     man-pages
     man-pages-posix
     krita
+    hyperfine
   ];
 
   # Enable man pages for Home Manager packages
