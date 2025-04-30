@@ -109,6 +109,8 @@ in {
     man-pages-posix
   ];
 
+  # This sets up the udev rules that are needed by vial/keybard
+  hardware.keyboard.qmk.enable = true;
   # install man pages for everything we install
   documentation.enable = true;
   documentation.man.enable = true;
