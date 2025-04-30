@@ -20,6 +20,7 @@ in {
       ./power.nix
       ./core_dumps.nix
       ./stylus.nix
+      ./printing.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -38,9 +39,6 @@ in {
 
   # Set your time zone.
   time.timeZone = "America/Chicago";
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound.
   services.pipewire = {

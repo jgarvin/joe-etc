@@ -47,6 +47,7 @@
     hyperfine
     fuzzel
     obsidian
+    zathura
   ];
 
   # Enable man pages for Home Manager packages
