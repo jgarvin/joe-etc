@@ -45,6 +45,8 @@
     man-pages-posix
     krita
     hyperfine
+    fuzzel
+    obsidian
   ];
 
   # Enable man pages for Home Manager packages
