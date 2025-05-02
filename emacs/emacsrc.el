@@ -126,6 +126,13 @@
 (load-file "~/etc/emacs/nix-custom.el")
 
 (use-package
+  direnv
+  :ensure t
+  )
+
+(direnv-mode)
+
+(use-package
   drag-stuff
   :ensure t
   )
@@ -380,12 +387,12 @@
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
    '(ace-jump-mode async counsel-gtags counsel-projectile counsel-tramp
-                   dockerfile-mode drag-stuff ein erc-hl-nicks
-                   expand-region free-keys goto-chg haskell-mode
-                   ivy-hydra julia-repl julia-shell lsp-ivy magit
-                   material-theme nix-mode realgud rust-mode
-                   smartparens sqlup-mode string-inflection toml-mode
-                   undo-tree vterm xterm-color zig-mode))
+                   direnv-mode dockerfile-mode drag-stuff ein
+                   erc-hl-nicks expand-region free-keys goto-chg
+                   haskell-mode ivy-hydra julia-repl julia-shell
+                   lsp-ivy magit material-theme nix-mode realgud
+                   rust-mode smartparens sqlup-mode string-inflection
+                   toml-mode undo-tree vterm xterm-color zig-mode))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -431,7 +438,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((((class color) (min-colors 89)) (:foreground "#d3d3d3" :background "#000000")))))
+ '(default ((((class color) (min-colors 89)) (:foreground "#d3d3d3" :background "#000000"))))
+ '(font-lock-comment-face ((t (:foreground "#8BC34A"))))
+ '(font-lock-constant-face ((t (:foreground "#89DDFF"))))
+ '(font-lock-function-name-face ((t (:foreground "#82AAFF"))))
+ '(font-lock-keyword-face ((t (:foreground "#C792EA"))))
+ '(font-lock-string-face ((t (:foreground "#FFCB6B"))))
+ '(font-lock-variable-name-face ((t (:foreground "#EEFFFF"))))
+ '(hl-line ((t (:background "#37474F"))))
+ '(mode-line ((t (:background "#323232" :foreground "#FFFFFF" :box (:line-width 1 :color "#2196F3")))))
+ '(mode-line-inactive ((t (:background "#262626" :foreground "#888888" :box (:line-width 1 :color "#555555")))))
+ '(region ((t (:background "#2196F3" :foreground "#FFFFFF")))))
 
 (if (< emacs-major-version 24)
     (load-file "~/etc/emacs/cl-lib-0.3.el")
