@@ -49,6 +49,7 @@
     obsidian
     zathura
     signal-desktop
+    graphviz
   ];
 
   # Enable man pages for Home Manager packages
