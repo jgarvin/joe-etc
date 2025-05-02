@@ -48,6 +48,7 @@
     fuzzel
     obsidian
     zathura
+    signal-desktop
   ];
 
   # Enable man pages for Home Manager packages
