@@ -50,6 +50,7 @@
     zathura
     signal-desktop
     graphviz
+    python314
   ];
 
   # Enable man pages for Home Manager packages

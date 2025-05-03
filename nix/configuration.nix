@@ -26,6 +26,10 @@ in {
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # enable the bcc snooping and systemtap tools, useful for debugging
+  programs.bcc.enable = true;
+  programs.systemtap.enable = true;
+
   # this is the latest though
   boot.kernelPackages = my_kernel;
 
