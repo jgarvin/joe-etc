@@ -53,6 +53,9 @@
     python314
     dash
     rc
+    zsh
+    parallel
+    tokei
   ];
 
   # Enable man pages for Home Manager packages
