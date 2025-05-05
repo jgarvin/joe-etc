@@ -128,8 +128,11 @@
 ;; Block finger (Left ring)
 (global-set-key (kbd "C-M-g") #'etc-cut-paragraph)
 (global-set-key (kbd "C-M-q") #'etc-copy-paragraph)
+(define-key sh-mode-map (kbd "C-M-q") nil)
+(define-key c++-mode-map (kbd "C-M-q") nil)
 (global-set-key (kbd "C-M-x") #'etc-select-paragraph)
 (global-set-key (kbd "C-M-y") #'etc-comment-paragraph)
+(define-key c++-mode-map (kbd "C-M-y") nil)
 
 ;; Buffer finger (Left pinky)
 (global-set-key (kbd "C-M-z") #'etc-cut-buffer)
