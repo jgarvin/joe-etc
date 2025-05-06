@@ -125,6 +125,9 @@
 (global-set-key (kbd "M-8") #'python-indent-shift-right)
 (global-set-key (kbd "M-9") #'etc-cut-word)
 
+;; to define sh mode
+(require 'sh-script)
+
 ;; Block finger (Left ring)
 (global-set-key (kbd "C-M-g") #'etc-cut-paragraph)
 (global-set-key (kbd "C-M-q") #'etc-copy-paragraph)
