@@ -8,9 +8,13 @@
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    gdb-src = {
+      url = "git+https://sourceware.org/git/binutils-gdb.git";
+      flake = false; # Not a flake itself
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, unstable, home-manager, ... }:
+  outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
     let
       system = "x86_64-linux";
       pkgs   = import nixpkgs {
@@ -21,12 +25,43 @@
         inherit system;
         config = { allowUnfree = true; };
       };
+      # Added this because gdb fails to access TLS vars on versions
+      # before ~April 2025.
+      #
+      # https://sourceware.org/bugzilla/show_bug.cgi?id=24548
+      gdb-git = pkgs.gdb.overrideAttrs (oldAttrs: {
+        pname = "gdb-git";
+        version = "git";
+        src = gdb-src;
+
+        # Fix preConfigure to handle the different directory structure
+        # in git
+        # Completely replace preConfigure with a simplified version
+        preConfigure = ''
+          # Skip file removal entirely - those files don't exist in git
+
+          # GDB has to be built out of tree.
+          mkdir -p _build
+          cd _build
+        '';
+
+        # Not sure why this was needed? I'd have expected the existing
+        # package to bring these in. Maybe they build from a tarball
+        # that already has everything generated?
+        nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [
+          pkgs.bison
+          pkgs.flex
+          pkgs.texinfo
+          pkgs.perl
+        ];
+      });
     in {
       nixosConfigurations.eruv2 = nixpkgs.lib.nixosSystem {
         inherit system pkgs;
         specialArgs = {
           inherit inputs;
           inherit unstablePkgs;
+          inherit gdb-git;
         };
         modules = [
           ./configuration.nix

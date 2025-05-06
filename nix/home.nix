@@ -33,7 +33,7 @@
     gnumake
     cmake
     libtool
-    gdb
+    # gdb
     valgrind
     linuxPackages_latest.perf # we can't easily inspect the one we're booting due to purity :(
     google-chrome

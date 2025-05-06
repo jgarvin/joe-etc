@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "gdb-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746546944,
+        "narHash": "sha256-RRhc3SI0e1ZwKxZn7eAb+3S/kqGYwYgx1w5bdx/PPMw=",
+        "ref": "refs/heads/master",
+        "rev": "998165ba99a3bcc80ba0b196223f4d49623e87b4",
+        "revCount": 122148,
+        "type": "git",
+        "url": "https://sourceware.org/git/binutils-gdb.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://sourceware.org/git/binutils-gdb.git"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -39,6 +55,7 @@
     },
     "root": {
       "inputs": {
+        "gdb-src": "gdb-src",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "unstable": "unstable"
