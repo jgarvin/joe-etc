@@ -56,6 +56,14 @@
     zsh
     parallel
     tokei
+
+    # webcam stuff
+    mpv
+    v4l-utils
+    cheese
+    gst_all_1.gstreamer
+    guvcview
+    zoom-us
   ];
 
   # Enable man pages for Home Manager packages

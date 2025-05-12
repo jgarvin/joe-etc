@@ -22,6 +22,7 @@ in {
       ./printing.nix
       ./hugepages.nix
       ./debugging.nix
+      ./bluetooth.nix
     ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -36,7 +37,6 @@ in {
   networking.hostName = "eruv2";
 
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
-  hardware.bluetooth.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Chicago";
@@ -57,6 +57,8 @@ in {
       "input" # allow reading /dev/input, waybar needs for keyboard-state
       "networkmanager" # allow changing wifi
       "wheel"  # Enable ‘sudo’ for the user.
+      "bluetooth" # allow using bluetooth
+      "lp" # also for bluetooth for historical reasons
     ];
     packages = with pkgs; [
       tree
