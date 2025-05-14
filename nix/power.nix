@@ -3,6 +3,8 @@
 {
   services.thermald.enable = true;
 
+  powerManagement.enable = true;
+
   ## Steps to determine settings:
   ##
   ## - Run `sudo powertop`
@@ -24,7 +26,7 @@
       # Maximum performance on AC
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      
+
       # Power saving on battery (you can adjust based on your preference)
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
@@ -46,6 +48,7 @@
   environment.systemPackages = with pkgs; [
     acpi
     powertop
+    wirelesstools
   ];
 
   services.power-profiles-daemon.enable = false; # we prefer tlp over gnome's manager
