@@ -64,6 +64,8 @@
     gst_all_1.gstreamer
     guvcview
     zoom-us
+
+    audacity
   ];
 
   # Enable man pages for Home Manager packages
