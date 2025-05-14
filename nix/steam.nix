@@ -29,8 +29,24 @@
     unstablePkgs.gamescope # flickers like crazy, TODO: switch back
     # gamescope
     mangohud
+
+    # steam streaming
+    sunshine
+    moonlight-qt
   ];
 
   programs.steam.gamescopeSession.enable = true;
   programs.gamemode.enable = true;
+
+  # for streaming
+  # https://www.reddit.com/r/NixOS/comments/1bq2bx4/beginners_guide_to_sunshine_gamedesktop_streaming/
+  services.avahi.publish.enable = true;
+  services.avahi.publish.userServices = true;
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 47984 47989 47990 48010 ];
+    allowedUDPPortRanges = [
+      { from = 47998; to = 48000; }
+    ];
+  };
 }
