@@ -3,19 +3,30 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     gdb-src = {
       url = "git+https://sourceware.org/git/binutils-gdb.git";
       flake = false; # Not a flake itself
     };
+
+    # nix package search
+    nps.url = "github:OleMussmann/nps";
+    nps.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
     let
+      third-party-packages = final: prev: {
+        nps = inputs.nps.packages.${prev.system}.default;
+        # other third party flakes could go here
+      };
       system = "x86_64-linux";
       pkgs   = import nixpkgs {
         system = "x86_64-linux";
@@ -65,7 +76,7 @@
         };
         modules = [
           ./configuration.nix
-          home-manager.nixosModules.home-manager {
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ third-party-packages ]; })          home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;

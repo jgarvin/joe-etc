@@ -3,7 +3,10 @@
 {
   services.thermald.enable = true;
 
-  powerManagement.enable = true;
+  #powerManagement.enable = true;
+
+  # without this wifi cuts out constantly
+  #networking.networkmanager.wifi.powersave = false;
 
   ## Steps to determine settings:
   ##
