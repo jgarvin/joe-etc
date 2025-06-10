@@ -49,4 +49,15 @@
       ${tailscale}/bin/tailscale up -authkey $(cat /etc/nixos/secrets/tailscale-authkey)
     '';
   };
+
+  # restart tailscale after resume from sleep
+  systemd.services.tailscale-resume = {
+    description = "Restart Tailscale after waking up";
+    after = [ "suspend.target" ];
+    wantedBy = [ "suspend.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.systemd}/bin/systemctl restart tailscaled.service";
+    };
+  };
 }

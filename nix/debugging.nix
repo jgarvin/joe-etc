@@ -47,6 +47,7 @@ in
     gdb-git
     lldb
     valgrind
+    bloaty
   ];
 
   programs.bcc.enable = true;

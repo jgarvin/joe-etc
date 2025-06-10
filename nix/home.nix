@@ -48,7 +48,7 @@
     fuzzel
     obsidian
     zathura
-    signal-desktop
+    unstablePkgs.signal-desktop
     graphviz
     python314
     dash
@@ -66,6 +66,8 @@
     zoom-us
 
     audacity
+
+    unzip
   ];
 
   # Enable man pages for Home Manager packages
