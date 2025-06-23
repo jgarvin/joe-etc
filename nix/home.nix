@@ -68,6 +68,19 @@
     audacity
 
     unzip
+
+    mermaid-cli     # diagrams
+    texliveFull
+    mupdf
+    ghostscript
+    librsvg
+
+    wine
+
+    ghidra
+    radare2
+    rizin
+    cutter
   ];
 
   # Enable man pages for Home Manager packages

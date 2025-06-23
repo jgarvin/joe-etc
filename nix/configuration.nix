@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, unstablePkgs, ... }:
 
 let my_kernel = pkgs.linuxPackages_6_14;
 in {
@@ -23,7 +23,14 @@ in {
       ./hugepages.nix
       ./debugging.nix
       ./bluetooth.nix
+      ./virtualization.nix
     ];
+
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";  # or "rocm" for AMD, or remove for CPU only
+    package = unstablePkgs.ollama;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

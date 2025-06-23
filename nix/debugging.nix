@@ -48,6 +48,9 @@ in
     lldb
     valgrind
     bloaty
+    
+    # valgrind needs this in order to find the nixseparatedebuginfod stuff
+    (lib.getBin (pkgs.elfutils.override { enableDebuginfod = true; }))
   ];
 
   programs.bcc.enable = true;
@@ -59,4 +62,7 @@ in
   # allow ptrace of non-child pids
   boot.kernel.sysctl."kernel.yama.ptrace_scope" = 0;
 
+  # enable nixseparatedebuginfod service that grabs the debug info for
+  # any package automagically when you run gdb
+  services.nixseparatedebuginfod.enable = true;
 }
