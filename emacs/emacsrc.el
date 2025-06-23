@@ -187,6 +187,21 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LESS ESSENTIAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(load-file "~/.private.el")
+
+(use-package chatgpt-shell
+  :ensure t
+  :custom
+  ((chatgpt-shell-openai-key etc-openai-key)
+   (chatgpt-shell-anthropic-key etc-anthropic-key)
+   (chatgpt-shell-anthropic-thinking-budget-tokens 10000)))
+
+(global-set-key (kbd "C-c g p t") #'chatgpt-shell)
+
+(use-package
+  graphviz-dot-mode
+  :ensure t)
+
 (use-package
   dash
   :ensure t
@@ -386,13 +401,14 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(ace-jump-mode async counsel-gtags counsel-projectile counsel-tramp
-                   direnv-mode dockerfile-mode drag-stuff ein
-                   erc-hl-nicks expand-region free-keys goto-chg
-                   haskell-mode ivy-hydra julia-repl julia-shell
-                   lsp-ivy magit material-theme nix-mode realgud
-                   rust-mode smartparens sqlup-mode string-inflection
-                   toml-mode undo-tree vterm xterm-color zig-mode))
+   '(ace-jump-mode async chatgpt-shell counsel-gtags counsel-projectile
+                   counsel-tramp direnv-mode dockerfile-mode
+                   drag-stuff ein erc-hl-nicks expand-region free-keys
+                   goto-chg graphviz-dot-mode haskell-mode ivy-hydra
+                   julia-repl julia-shell lsp-ivy magit material-theme
+                   nix-mode realgud rust-mode smartparens sqlup-mode
+                   string-inflection toml-mode undo-tree vterm
+                   xterm-color zig-mode))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1500,3 +1516,18 @@ If the buffer runs `dired', the buffer is reverted."
   (pgtk-use-im-context nil))
 
 (add-to-list 'auto-mode-alist '("\\.log\\." . fundamental-mode))
+
+;; enable emojis
+(set-fontset-font
+ t
+ 'symbol
+ (cond
+  ((eq system-type 'windows-nt)
+   (cond
+    ((member "Segoe UI Symbol" (font-family-list)) "Segoe UI Symbol")))
+  ((eq system-type 'darwin)
+   (cond
+    ((member "Apple Symbols" (font-family-list)) "Apple Symbols")))
+  ((eq system-type 'gnu/linux)
+   (cond
+    ((member "Symbola" (font-family-list)) "Symbola")))))
