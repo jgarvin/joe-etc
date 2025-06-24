@@ -1,0 +1,25 @@
+### To come up with this, run wdisplays,
+## arrange the displays the way that you want, then
+## put the positions in here.
+# multimonitor setup
+output DP-10 transform "270"
+output DP-10 position 0 0
+output DP-9 position 960 0
+output eDP-1 position 1208 986
+# repeat of setup because input names change
+output DP-12 transform "270"
+output DP-12 position 0 0
+output DP-11 position 960 0
+
+# I don't know why it defaults to 2...
+output eDP-1 scale 2.5
+output DP-9 scale 1.5
+output DP-10 scale 1.5
+output DP-11 scale 1.5
+output DP-12 scale 1.5
+
+# for when I lose my glasses
+# output DP-6 scale 2
+# output DP-5 scale 2
+# output DP-4 scale 2
+# output DP-3 scale 2
