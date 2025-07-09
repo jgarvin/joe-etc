@@ -81,6 +81,10 @@
     radare2
     rizin
     cutter
+
+    unstablePkgs.yt-dlp
+
+    ffmpeg-full
   ];
 
   # Enable man pages for Home Manager packages

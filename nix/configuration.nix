@@ -24,13 +24,14 @@ in {
       ./debugging.nix
       ./bluetooth.nix
       ./virtualization.nix
+      ./perf.nix
     ];
 
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";  # or "rocm" for AMD, or remove for CPU only
-    package = unstablePkgs.ollama;
-  };
+  # services.ollama = {
+  #   enable = true;
+  #   acceleration = "cuda";  # or "rocm" for AMD, or remove for CPU only
+  #   package = unstablePkgs.ollama;
+  # };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -97,6 +98,8 @@ in {
     silver-searcher
     zsh
     gcc14
+    llvmPackages_19.clang
+    llvmPackages_19.llvm # w/o this clang lto doesn't work
     emacs
     dmidecode
     jq
