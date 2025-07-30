@@ -31,7 +31,7 @@
     # supported GPUs is at:
     # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
     # Only available from driver 515.43.04+
-    open = true;
+    open = false; # true didn't work with "570.172.08" 
 
     # Enable the Nvidia settings menu,
     # accessible via `nvidia-settings`.
@@ -41,15 +41,15 @@
     # package = config.boot.kernelPackages.nvidiaPackages.latest;
 
     package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "570.133.07";
+      version = "570.172.08";
       # this is the third one it will complain is wrong
-      sha256_64bit = "sha256-LUPmTFgb5e9VTemIixqpADfvbUX1QoTT2dztwI3E3CY=";
+      sha256_64bit = "sha256-AlaGfggsr5PXsl+nyOabMWBiqcbHLG4ij617I4xvoX0=";
       # unused
       sha256_aarch64 = "sha256-2l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
       # this is the second one it will complain is wrong
-      openSha256 = "sha256-9l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
+      openSha256 = "sha256-N/1Ra8Teq93U3T898ImAT2DceHjDHZL1DuriJeTYEa4=";
       # this is the first one it will complain is wrong
-      settingsSha256 = "sha256-XMk+FvTlGpMquM8aE8kgYK2PIEszUZD2+Zmj2OpYrzU=";
+      settingsSha256 = "sha256-N/1Ra8Teq93U3T898ImAT2DceHjDHZL1DuriJeTYEa4=";
       # unused
       persistencedSha256 = "sha256-4l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
     };

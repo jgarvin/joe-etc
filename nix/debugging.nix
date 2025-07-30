@@ -48,7 +48,7 @@ in
     lldb
     valgrind
     bloaty
-    
+
     # valgrind needs this in order to find the nixseparatedebuginfod stuff
     (lib.getBin (pkgs.elfutils.override { enableDebuginfod = true; }))
   ];
@@ -65,4 +65,9 @@ in
   # enable nixseparatedebuginfod service that grabs the debug info for
   # any package automagically when you run gdb
   services.nixseparatedebuginfod.enable = true;
+
+  # let me use dmesg as a regular user
+  boot.kernel.sysctl = {
+    "kernel.dmesg_restrict" = 0;
+  };
 }

@@ -1,6 +1,6 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
-let my_kernel = pkgs.linuxPackages_6_14;
+let my_kernel = pkgs.linuxPackages_6_15;
 in {
   imports =
     [ # Include the results of the hardware scan.
@@ -81,7 +81,7 @@ in {
     extraPortals = with pkgs; [
       xdg-desktop-portal-wlr # for sway/wl-roots compositors
       xdg-desktop-portal-gtk
-      xdg-desktop-portal-kde
+      kdePackages.xdg-desktop-portal-kde
     ];
   };
 
