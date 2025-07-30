@@ -133,6 +133,14 @@
 (direnv-mode)
 
 (use-package
+  undo-fu-session
+  :ensure t
+  )
+
+(require 'undo-fu-session)
+(undo-fu-session-global-mode)
+
+(use-package
   drag-stuff
   :ensure t
   )
@@ -400,15 +408,7 @@
      (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
- '(package-selected-packages
-   '(ace-jump-mode async chatgpt-shell counsel-gtags counsel-projectile
-                   counsel-tramp direnv-mode dockerfile-mode
-                   drag-stuff ein erc-hl-nicks expand-region free-keys
-                   goto-chg graphviz-dot-mode haskell-mode ivy-hydra
-                   julia-repl julia-shell lsp-ivy magit material-theme
-                   nix-mode realgud rust-mode smartparens sqlup-mode
-                   string-inflection toml-mode undo-tree vterm
-                   xterm-color zig-mode))
+ '(package-selected-packages nil)
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil
@@ -1531,3 +1531,6 @@ If the buffer runs `dired', the buffer is reverted."
   ((eq system-type 'gnu/linux)
    (cond
     ((member "Symbola" (font-family-list)) "Symbola")))))
+
+;; tend to accidentally press this on sval, never mean to
+(global-unset-key (kbd "<f2> <f2>"))
