@@ -135,8 +135,8 @@ doesn't provide a sane default we fix that here."
   (local-set-key (kbd "C-d") 'c-hungry-delete-forward)
   (local-set-key (kbd "<delete>") 'c-hungry-delete-forward)
   (local-set-key (kbd "<backspace>") 'c-hungry-delete-backwards)
-  (local-set-key (kbd "C-M-y") #'sp-slurp-hybrid-sexp)
-  (local-set-key (kbd "C-M-k") #'sp-kill-hybrid-sexp)
+  ;;(local-set-key (kbd "C-M-y") #'sp-slurp-hybrid-sexp)
+  ;;(local-set-key (kbd "C-M-k") #'sp-kill-hybrid-sexp)
   ;; Prefer 4-space tabs
 
   (c-set-offset 'innamespace 0) ;; don't indent top level namespace
