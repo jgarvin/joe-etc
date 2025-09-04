@@ -18,6 +18,7 @@
     udiskie # for auto mounting
     pciutils # for lspci
     pavucontrol # for clicking on sound icon in waybar
+    wdisplays # to configure monitor layout
   ];
 
   # enable Sway window manager

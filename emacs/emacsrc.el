@@ -255,6 +255,11 @@
   )
 
 (use-package
+  fuel ;; factor-mode
+  :ensure t
+  )
+
+(use-package
   magit
   :ensure t
   )
@@ -408,7 +413,15 @@
      (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(ace-jump-mode async chatgpt-shell counsel-gtags counsel-projectile
+                   counsel-tramp direnv dockerfile-mode drag-stuff ein
+                   erc-hl-nicks expand-region free-keys fuel goto-chg
+                   graphviz-dot-mode haskell-mode ivy-hydra julia-repl
+                   julia-shell lsp-ivy magit material-theme nix-mode
+                   realgud rust-mode smartparens sqlup-mode
+                   string-inflection toml-mode undo-fu-session
+                   undo-tree xterm-color zig-mode))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil

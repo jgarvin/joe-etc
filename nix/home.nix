@@ -85,6 +85,8 @@
     unstablePkgs.yt-dlp
 
     ffmpeg-full
+
+    sqlite
   ];
 
   # Enable man pages for Home Manager packages

@@ -49,10 +49,15 @@ define print_environ
     end
 end
 
+define nl
+  next
+  list .
+end
+
 ##################################################################
 # Code to dump where crash occurs and register values whenever
 # execution stops taken from https://aengelke.net/.gdbinit
-set output-radix 16
+# set output-radix 16
 
 python
 
