@@ -40,6 +40,7 @@
 
 
 (etc-enable-line-numbers)
-;; without this magit-status for some unknown reason won't display why numbers...
+
+;; without this magit-status for some unknown reason won't display line numbers...
 ;; you have to toggle the mode after the buffer is created for them to show up
 (add-hook 'buffer-list-update-hook #'etc-enable-line-numbers)
