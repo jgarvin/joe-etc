@@ -1,4 +1,4 @@
-{ config, pkgs, unstablePkgs, ... }:
+{ config, pkgs, inputs, unstablePkgs, ... }:
 
 {
   imports =
@@ -87,6 +87,8 @@
     ffmpeg-full
 
     sqlite
+
+    inputs.centered-master.packages.${pkgs.system}.default
   ];
 
   # Enable man pages for Home Manager packages

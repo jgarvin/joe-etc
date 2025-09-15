@@ -17,7 +17,7 @@ setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 # setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
 
 mkdir -p $HOME/.config/sway
-setup_symlink $HOME/etc/sway.conf $HOME/.config/sway/config
+setup_symlink $HOME/etc/sway/sway.conf $HOME/.config/sway/config
 
 mkdir -p $HOME/.config/waybar
 setup_symlink $HOME/etc/waybar.conf $HOME/.config/waybar/config

@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "centered-master": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "../sway/centered_master",
+        "type": "path"
+      },
+      "original": {
+        "path": "../sway/centered_master",
+        "type": "path"
+      },
+      "parent": []
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1696426674,
@@ -138,6 +154,7 @@
     },
     "root": {
       "inputs": {
+        "centered-master": "centered-master",
         "gdb-src": "gdb-src",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",

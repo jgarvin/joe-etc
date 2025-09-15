@@ -19,6 +19,9 @@
     # nix package search
     nps.url = "github:OleMussmann/nps";
     nps.inputs.nixpkgs.follows = "nixpkgs";
+
+    centered-master.url = "path:../sway/centered_master";
+    centered-master.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
@@ -76,7 +79,8 @@
         };
         modules = [
           ./configuration.nix
-          ({ config, pkgs, ... }: { nixpkgs.overlays = [ third-party-packages ]; })          home-manager.nixosModules.home-manager {
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ third-party-packages ]; })
+          home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
