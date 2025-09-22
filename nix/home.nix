@@ -88,7 +88,8 @@
 
     sqlite
 
-    inputs.centered-master.packages.${pkgs.system}.default
+    # inputs.centered-master.packages.${pkgs.system}.default
+    libreoffice-qt
   ];
 
   # Enable man pages for Home Manager packages
