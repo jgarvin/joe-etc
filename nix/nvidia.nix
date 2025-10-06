@@ -31,7 +31,7 @@
     # supported GPUs is at:
     # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
     # Only available from driver 515.43.04+
-    open = false; # true didn't work with "570.172.08" 
+    open = false; # true didn't work with "570.172.08"
 
     # Enable the Nvidia settings menu,
     # accessible via `nvidia-settings`.
@@ -41,9 +41,9 @@
     # package = config.boot.kernelPackages.nvidiaPackages.latest;
 
     package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "570.172.08";
+      version = "580.95.05";
       # this is the third one it will complain is wrong
-      sha256_64bit = "sha256-AlaGfggsr5PXsl+nyOabMWBiqcbHLG4ij617I4xvoX0=";
+      sha256_64bit = "sha256-hJ7w746EK5gGss3p8RwTA9VPGpp2lGfk5dlhsv4Rgqc=";
       # unused
       sha256_aarch64 = "sha256-2l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
       # this is the second one it will complain is wrong

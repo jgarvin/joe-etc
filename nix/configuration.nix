@@ -1,6 +1,6 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
-let my_kernel = pkgs.linuxPackages_6_15;
+let my_kernel = pkgs.linuxPackages_6_17;
 in {
   imports =
     [ # Include the results of the hardware scan.
