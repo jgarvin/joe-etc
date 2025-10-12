@@ -33,6 +33,12 @@ in {
   #   package = unstablePkgs.ollama;
   # };
 
+  # my syslog was totally spammed with this, so lets kill the
+  # messenger and naively hope for the best
+  boot.kernelParams = [
+    "split_lock_detect=off"
+  ];
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # this is the latest though
@@ -52,6 +58,7 @@ in {
   # Enable sound.
   services.pipewire = {
     enable = true;
+    alsa.enable = true;
     pulse.enable = true;
   };
 
