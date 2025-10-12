@@ -27,6 +27,8 @@
     wrapperFeatures.gtk = true;
   };
 
+
+
   services.greetd = let
     # Set WLR_DRM_DEVICES to specifically be the amd card so sway
     # doesn't try to use nvidia. we use the path with an explicit
@@ -35,8 +37,11 @@
     #
     # To figure out the pci address for the card use `lspci | grep -i radeon`
     sway-nvidia-wrapper = pkgs.writeShellScriptBin "sway-nvidia" ''
-    WLR_DRM_DEVICES=$(realpath /dev/dri/by-path/pci-0000:c5:00.0-card) exec ${pkgs.sway}/bin/sway --unsupported-gpu "$@"
-  '';
+      XDG_STATE_HOME="''${XDG_STATE_HOME:-$HOME/.local/state}"
+      mkdir -p "$XDG_STATE_HOME/sway"
+      export WLR_DRM_DEVICES="$(realpath /dev/dri/by-path/pci-0000:c5:00.0-card)"
+      exec ${pkgs.sway}/bin/sway -d --unsupported-gpu "$@" 2>"$XDG_STATE_HOME/sway/sway.log"
+    '';
   in {
     enable = true;
     settings = {
