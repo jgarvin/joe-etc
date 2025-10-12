@@ -6,3 +6,9 @@ output DP-3 position 0 0
 output DP-3 mode 5120x1440@120Hz
 output DP-3 scale 1.25
 output eDP-1 position 1238 1152
+
+# originally added this for sunshine, but the resolution/position
+# setting causes sway to crash a few second after startup
+#
+## exec_always swaymsg -q create_output HEADLESS-1
+## output HEADLESS-1 resolution 1200x800 position 10000 10000
