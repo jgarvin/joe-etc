@@ -1,5 +1,6 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, unstablePkgs, ... }:
 
+let preferred_sway = unstablePkgs.sway; in
 {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -23,11 +24,10 @@
 
   # enable Sway window manager
   programs.sway = {
+    package = preferred_sway;
     enable = true;
     wrapperFeatures.gtk = true;
   };
-
-
 
   services.greetd = let
     # Set WLR_DRM_DEVICES to specifically be the amd card so sway
@@ -40,7 +40,8 @@
       XDG_STATE_HOME="''${XDG_STATE_HOME:-$HOME/.local/state}"
       mkdir -p "$XDG_STATE_HOME/sway"
       export WLR_DRM_DEVICES="$(realpath /dev/dri/by-path/pci-0000:c5:00.0-card)"
-      exec ${pkgs.sway}/bin/sway -d --unsupported-gpu "$@" 2>"$XDG_STATE_HOME/sway/sway.log"
+      echo "Sway restart -- $(date)" >> "$XDG_STATE_HOME/sway/sway.log"
+      exec ${preferred_sway}/bin/sway -d --unsupported-gpu "$@" 2>>"$XDG_STATE_HOME/sway/sway.log"
     '';
   in {
     enable = true;
