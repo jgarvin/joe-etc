@@ -7,7 +7,18 @@
 ;; make sure to also save the kill ring and the search ring
 (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
 (savehist-mode t)
+(setq savehist-autosave-interval 300
+      history-length 1000)
 ;; (savehist-uninstall)
+
+(recentf-mode 1)
+(setq recentf-max-saved-items 500
+      recentf-auto-cleanup 'never)
+(run-at-time nil 300 #'recentf-save-list)
+
+(desktop-save-mode 1)
+(setq desktop-auto-save-timeout 300
+      desktop-load-locked-desktop t)
 
 (require 'desktop)
 (setq desktop-restore-eager t)
@@ -24,4 +35,3 @@
 
 (advice-add 'desktop-save-buffer-p :around #'etc-filter-saved-buffers)
 
-(desktop-save-mode 1)
