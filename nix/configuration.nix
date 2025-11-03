@@ -27,6 +27,13 @@ in {
       ./perf.nix
     ];
 
+  # don't let things accumulate forever
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 45d";
+  };
+
   # services.ollama = {
   #   enable = true;
   #   acceleration = "cuda";  # or "rocm" for AMD, or remove for CPU only
@@ -46,6 +53,7 @@ in {
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 25;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "eruv2";

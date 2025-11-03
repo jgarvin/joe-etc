@@ -20,6 +20,7 @@ let preferred_sway = unstablePkgs.sway; in
     pciutils # for lspci
     pavucontrol # for clicking on sound icon in waybar
     wdisplays # to configure monitor layout
+    imv # image viewer
   ];
 
   # enable Sway window manager

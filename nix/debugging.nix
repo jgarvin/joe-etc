@@ -48,6 +48,11 @@ in
     lldb
     valgrind
     bloaty
+    lm_sensors
+    iotop
+    radeontop
+    bpftrace
+    sysstat
 
     # valgrind needs this in order to find the nixseparatedebuginfod stuff
     (lib.getBin (pkgs.elfutils.override { enableDebuginfod = true; }))
