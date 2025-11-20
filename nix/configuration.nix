@@ -34,6 +34,13 @@ in {
     options = "--delete-older-than 45d";
   };
 
+  # don't lock my system with too many parallel builds, use one less
+  # than total number of real non-smt cores
+  nix.settings = {
+    max-jobs = 11;
+    cores = 11;
+  };
+
   # services.ollama = {
   #   enable = true;
   #   acceleration = "cuda";  # or "rocm" for AMD, or remove for CPU only
