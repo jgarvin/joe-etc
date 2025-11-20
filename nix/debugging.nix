@@ -53,6 +53,7 @@ in
     radeontop
     bpftrace
     sysstat
+    file # can't believe this isn't default
 
     # valgrind needs this in order to find the nixseparatedebuginfod stuff
     (lib.getBin (pkgs.elfutils.override { enableDebuginfod = true; }))
