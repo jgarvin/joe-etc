@@ -16,3 +16,6 @@
 [submodule "popup-keys"]
 	path = popup-keys
 	url = git@github.com:QBobWatson/popup-keys.git
+[submodule "emacs/combobulate"]
+	path = emacs/combobulate
+	url = https://github.com/mickeynp/combobulate.git

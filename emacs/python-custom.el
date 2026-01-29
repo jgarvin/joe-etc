@@ -1,5 +1,9 @@
 ;;; -*- lexical-binding: t -*-
 
+(setq etc-preferred-python-mode 'python-ts-mode)
+(setq etc-preferred-python-mode-map python-ts-mode-map)
+(setq etc-preferred-python-mode-hook 'python-ts-mode-hook)
+
 ;; the default behavior for triple quotes of putting the closing
 ;; quotes on their own line is annoying, this disables it
 (setq python-fill-docstring-style nil)
@@ -107,7 +111,7 @@
 (defun python-advice (old new)
   (advice-add old :before-until
               (lambda ()
-                (if (derived-mode-p 'python-mode)
+                (if (derived-mode-p etc-preferred-python-mode)
                     (or (funcall new) t)
                   nil))))
 
@@ -124,24 +128,25 @@
     ;; requires an inferior python process, which I don't want to setup
     (company-mode 0)))
 
-(add-hook 'python-mode-hook 'etc-python-setup)
+(add-hook etc-preferred-python-mode-hook 'etc-python-setup)
 
 ;; enable for typeshed files
 (setq auto-mode-alist
       (append
        ;; File name (within directory) starts with a dot.
-       '(("\\.pyi\\'" . python-mode)
-         ("\\.py\\'" . python-mode))
+       '(("\\.pyi\\'" . etc-preferred-python-mode)
+         ("\\.py\\'" . etc-preferred-python-mode))
        auto-mode-alist))
 
 ;; prefer backwards kill word behavior... but A-<backspace> does this
 ;; already so maybe I should reevaluate. Apparently both kill words by
 ;; default!
-(define-key python-mode-map (kbd "C-<backspace>") nil)
+(define-key etc-preferred-python-mode-map (kbd "C-<backspace>") nil)
+
 
 ;; we setup alt left and right to do this instead, simpler and useful in many modes
-(define-key python-mode-map (kbd "C-c <") nil)
-(define-key python-mode-map (kbd "C-c >") nil)
+(define-key etc-preferred-python-mode-map (kbd "C-c <") nil)
+(define-key etc-preferred-python-mode-map (kbd "C-c >") nil)
 
 (setq py-underscore-word-syntax-p nil)
 

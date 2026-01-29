@@ -1,9 +1,19 @@
 ;; -*- lexical-binding: t -*-
 
+(require 'c-ts-mode)
+(require 'c++-ts-mode)
+
+(setq etc-preferred-c-mode 'c-ts-mode)
+(setq etc-preferred-c-mode-map c-ts-mode-map)
+(setq etc-preferred-c-mode-hook 'c-ts-mode-hook)
+(setq etc-preferred-c++-mode 'c++-ts-mode)
+(setq etc-preferred-c++-mode-map c++-ts-mode-map)
+(setq etc-preferred-c++-mode-hook 'c++-ts-mode-hook)
+
 (lsp-register-client
  (make-lsp-client
   :new-connection (lsp-stdio-connection "ccls")
-  :major-modes '(c-mode c++-mode)
+  :major-modes '(c-mode c-ts-mode c++-mode c++-ts-mode)
   :server-id 'ccls))
 
 (defun run-with-symbol-at-point (command)
@@ -35,10 +45,10 @@ doesn't provide a sane default we fix that here."
 ;; Bind the new command to a key, e.g., C-c f
 (global-set-key (kbd "C-c f") 'find-file-with-symbol)
 
-(define-key c-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
-(define-key c-mode-map (kbd "M-,") 'lsp-find-references)
-(define-key c++-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
-(define-key c++-mode-map (kbd "M-,") 'lsp-find-references)
+(define-key etc-preferred-c-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
+(define-key etc-preferred-c-mode-map (kbd "M-,") 'lsp-find-references)
+(define-key etc-preferred-c++-mode-map (kbd "M-.") 'lsp-find-definition-with-symbol)
+(define-key etc-preferred-c++-mode-map (kbd "M-,") 'lsp-find-references)
 
 (defvar-local run-command nil)
 
@@ -232,7 +242,7 @@ doesn't provide a sane default we fix that here."
 ;; (defadvice c-lineup-arglist (around my activate)
 ;;   "Improve indentation of continued C++11 lambda function opened as argument."
 ;;   (setq ad-return-value
-;;         (if (and (equal major-mode 'c++-mode)
+;;         (if (and (equal major-mode 'etc-preferred-c++-mode)
 ;;                  (ignore-errors
 ;;                    (save-excursion
 ;;                      (goto-char (c-langelem-pos langelem))
@@ -286,5 +296,5 @@ doesn't provide a sane default we fix that here."
 (custom-set-variables '(c-noise-macro-names '("constexpr")))
 
 (add-hook 'c-mode-common-hook 'etc-setup-c-common)
-;;(add-hook 'c++-mode-hook 'fix-enum-class)
-;; (add-hook 'c++-mode-hook #'etc-c++-mode-hook)
+;;(add-hook 'etc-preferred-c++-mode-hook 'fix-enum-class)
+;; (add-hook 'etc-preferred-c++-mode-hook #'etc-etc-preferred-c++-mode-hook)
