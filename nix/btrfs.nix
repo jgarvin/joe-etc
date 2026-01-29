@@ -11,13 +11,25 @@
     "/nix".options = [ "compress=zstd" "noatime" ];
   };
 
+  # Enable periodic deduplication to save space. lots of periodic
+  # rebuilds of big projects like llvm can create the same files over
+  # and over.
+  services.beesd.filesystems = {
+    root = {
+      spec = "/";
+      hashTableSizeMB = 256;  # or 512, depending on how much RAM you can spare
+      verbosity = "crit";
+      extraOptions = [ "--loadavg-target" "1.0" ];
+    };
+  };
+
   # All of the btrbk setup comes from: https://nixos.wiki/wiki/Btrbk
 
   # Have btrbk regularly take snapshots of /home. These are local disk
   # only, just meant as protection against `rm -rf ~` and the like.
   services.btrbk.instances = {
     "home" = {
-      onCalendar = "hourly";
+      onCalendar = "*-*-* */2:00:00";  # every 2 hours
       settings = {
         timestamp_format = "long";
         snapshot_preserve_min = "1w";
@@ -68,4 +80,9 @@
   # For a complete restore:
   # sudo mv /home /home.broken # if it still exists partially
   # sudo btrfs subvolume snapshot /snapshots/home.YYYYMMDD-HHMMSS /home
+  #
+  # To delete snapshots taking up too much space:
+  # cd /snapshots
+  # ls
+  # sudo btrfs subvolume delete home.202511*
 }
