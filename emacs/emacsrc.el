@@ -201,6 +201,7 @@
 
 (load-file "~/.private.el")
 
+
 (use-package chatgpt-shell
   :ensure t
   :custom
@@ -418,9 +419,10 @@
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
  '(package-selected-packages
-   '(ace-jump-mode async chatgpt-shell counsel-gtags counsel-projectile
-                   counsel-tramp direnv dockerfile-mode drag-stuff ein
-                   erc-hl-nicks expand-region free-keys fuel goto-chg
+   '(ace-jump-mode async chatgpt-shell combobulate counsel-gtags
+                   counsel-projectile counsel-tramp direnv
+                   dockerfile-mode drag-stuff ein erc-hl-nicks
+                   expand-region free-keys fuel goto-chg
                    graphviz-dot-mode haskell-mode ivy-hydra julia-repl
                    julia-shell lsp-ivy magit material-theme nix-mode
                    realgud rust-mode smartparens sqlup-mode
@@ -536,6 +538,8 @@
 (when nil
   (load-file "~/etc/emacs/helm-custom.el")
   (load-file "~/etc/emacs/helm-ag-custom.el"))
+
+(load-file "~/etc/emacs/combobulate-custom.el")
 
 ;; vertico indexed mode works great, but eager directory deletion is missing
 ;;(load-file "~/etc/emacs/etc-vertico.el")
@@ -1456,8 +1460,8 @@ If the buffer runs `dired', the buffer is reverted."
     (revert-buffer))))
 
 ;;(setq tramp-verbose 3)
-
-;;;;;;;; wayland vs x stuff ;;;;;;;;;;;;;;;;;;
+;
+;;;;;;; wayland vs x stuff ;;;;;;;;;;;;;;;;;;
 
 (when
     (and (getenv "DISPLAY")
@@ -1551,3 +1555,5 @@ If the buffer runs `dired', the buffer is reverted."
 
 ;; tend to accidentally press this on sval, never mean to
 (global-unset-key (kbd "<f2> <f2>"))
+
+(setq compilation-max-output-line-length nil)
