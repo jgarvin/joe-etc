@@ -90,6 +90,9 @@
 
     # inputs.centered-master.packages.${pkgs.system}.default
     libreoffice-qt
+
+    # programming
+    racket
   ];
 
   # Enable man pages for Home Manager packages

@@ -54,6 +54,7 @@ in
     bpftrace
     sysstat
     file # can't believe this isn't default
+    lsof # same
 
     # valgrind needs this in order to find the nixseparatedebuginfod stuff
     (lib.getBin (pkgs.elfutils.override { enableDebuginfod = true; }))
