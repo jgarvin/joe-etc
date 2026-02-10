@@ -41,9 +41,9 @@
     # package = config.boot.kernelPackages.nvidiaPackages.latest;
 
     package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "580.95.05";
+      version = "580.126.09";
       # this is the third one it will complain is wrong
-      sha256_64bit = "sha256-hJ7w746EK5gGss3p8RwTA9VPGpp2lGfk5dlhsv4Rgqc=";
+      sha256_64bit = "sha256-TKxT5I+K3/Zh1HyHiO0kBZokjJ/YCYzq/QiKSYmG7CY=";
       # unused
       sha256_aarch64 = "sha256-2l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
       # this is the second one it will complain is wrong

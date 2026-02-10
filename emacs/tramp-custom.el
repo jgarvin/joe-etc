@@ -36,6 +36,12 @@
 ;; (string-match-p "\\[.*?@.*?:<.*?>\\]" "jgarvin@ghost12:/$")
 
 (customize-set-variable 'tramp-save-ad-hoc-proxies t)
-(setq vc-handled-backends nil)
+
+;; don't enable vc for tramp files, it's too slow
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
 (eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-find-file-hook))
 (eval-after-load "vc" '(remove-hook 'find-file-hook 'vc-refresh-state))

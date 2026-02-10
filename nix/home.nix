@@ -121,6 +121,37 @@
     };
   };
 
+  # install vscode but let it do its own extension management instead
+  # of managing with nixos
+  programs.vscode = {
+    enable = true;
+    package = let
+      vscode-fhs = pkgs.vscode.fhsWithPackages (ps: with ps; [
+        rustup
+        zlib
+        openssl.dev
+        pkg-config
+        libsecret
+        gnome-keyring
+      ]);
+    in pkgs.symlinkJoin {
+      # This is all shenanigans to work around that the only way to
+      # let vscode find the OS keyring when running under alternative
+      # WMs like sway is to explicitly pass an argument telling it
+      # what to use, doesn't seem to respect argv.json.
+      name = "vscode-wrapped";
+      paths = [ vscode-fhs ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+      rm $out/bin/code
+      makeWrapper ${vscode-fhs}/bin/code $out/bin/code \
+        --add-flags "--password-store=gnome-libsecret"
+    '';
+    } // {
+      pname = vscode-fhs.pname or "vscode";
+      version = vscode-fhs.version or "unknown";
+    };
+  };
 
   # Enable direnv with nix-direnv integration
   programs.direnv = {
