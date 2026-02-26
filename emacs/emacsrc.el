@@ -418,7 +418,7 @@
      (vc-prepare-patches-separately)
      (diff-add-log-use-relative-names . t)
      (vc-git-annotate-switches . "-w")))
- '(package-selected-packages '(lean4-mode))
+ '(package-selected-packages '(lean4-mode nael))
  '(package-vc-selected-packages
    '((lean4-mode :url
                  "https://github.com/leanprover-community/lean4-mode.git")))
@@ -1552,22 +1552,12 @@ If the buffer runs `dired', the buffer is reverted."
 
 (setq compilation-max-output-line-length nil)
 
-(package-activate 'lsp-mode)
-(featurep 'lsp-mode)
-(use-package lean4-mode
-  :commands lean4-mode
-  :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
-            :rev :last-release
-            ;; Or, if you prefer the bleeding edge version of Lean4-Mode:
-            ;; :rev :newest
-            ))
 
-;;(package-vc-install '(lean4-mode :url "https://github.com/leanprover-community/lean4-mode.git") :last-release)
+;; mode for lean4
+(use-package
+  nael
+  :ensure t)
+(add-hook 'nael-mode-hook #'abbrev-mode)
+(add-hook 'nael-mode-hook #'eglot)
 
-;; package-user-dir
-
-;; (package-desc-dir (cadr (assq 'lsp-mode package-alist)))
-
-;; (version-list-<= '(8 0 0) (package-desc-version (cadr (assq 'lsp-mode package-alist))))
-
-;; (package-desc-reqs (cadr (assq 'lean4-mode package-alist)))
+(define-key global-map (kbd "C-c C-h") 'eldoc-doc-buffer)

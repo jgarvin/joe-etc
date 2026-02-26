@@ -22,9 +22,13 @@
 
     centered-master.url = "path:../sway/centered_master";
     centered-master.inputs.nixpkgs.follows = "nixpkgs";
+
+    claude-code.url = "github:sadjow/claude-code-nix";
+
+    codex-cli-nix.url = "github:sadjow/codex-cli-nix";
   };
 
-  outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
+  outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, claude-code, codex-cli-nix, ... }:
     let
       third-party-packages = final: prev: {
         nps = inputs.nps.packages.${prev.system}.default;
@@ -79,7 +83,10 @@
         };
         modules = [
           ./configuration.nix
-          ({ config, pkgs, ... }: { nixpkgs.overlays = [ third-party-packages ]; })
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [
+                                      third-party-packages
+                                      claude-code.overlays.default
+                                    ]; })
           home-manager.nixosModules.home-manager {
             home-manager = {
               useGlobalPkgs = true;

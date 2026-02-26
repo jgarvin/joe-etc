@@ -6,6 +6,7 @@
       ./theme.nix
       ./user_backup.nix
       ./indexing.nix
+      ./lean.nix
     ];
 
   # TODO please change the username & home directory to your own
@@ -93,6 +94,9 @@
 
     # programming
     racket
+
+    claude-code
+    inputs.codex-cli-nix.packages.${pkgs.system}.default
   ];
 
   # Enable man pages for Home Manager packages
