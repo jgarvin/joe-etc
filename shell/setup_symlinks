@@ -20,6 +20,9 @@ setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
 mkdir -p $HOME/.config/sway
 setup_symlink $HOME/etc/sway/sway.conf $HOME/.config/sway/config
 
+mkdir -p $HOME/.config/mako
+setup_symlink $HOME/etc/mako/config $HOME/.config/mako/config
+
 mkdir -p $HOME/.config/waybar
 setup_symlink $HOME/etc/waybar.conf $HOME/.config/waybar/config
 setup_symlink $HOME/etc/waybar.css $HOME/.config/waybar/style.css
