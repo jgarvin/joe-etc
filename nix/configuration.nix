@@ -141,6 +141,7 @@ in {
     man-pages
     man-pages-posix
     nps # this is injected into pkgs by an overlay
+    tmux
   ];
 
   # This sets up the udev rules that are needed by vial/keybard
