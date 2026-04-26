@@ -13,7 +13,7 @@ let preferred_sway = unstablePkgs.sway; in
     mako # notification system developed by swaywm maintainer
     waybar
     wlr-randr
-    kitty # terminal
+    ghostty # terminal
     blueman # bluetooth applet
     networkmanagerapplet # internet connectivity applet
     udiskie # for auto mounting

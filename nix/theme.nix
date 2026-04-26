@@ -60,12 +60,7 @@
     # Theme packages
     materia-theme
     papirus-icon-theme
-    kitty-themes
   ];
-
-  programs.kitty = {
-    themeFile = "ayu";
-  };
 
   # Set up kvantum theme to match your GTK theme
   xdg.configFile = {

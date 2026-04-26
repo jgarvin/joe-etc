@@ -99,9 +99,9 @@ same folder. If given prefix argument always make a new shell."
       (shell (generate-new-buffer-name "*shell*")))))
 
 ;; switched to eshell
-(global-set-key (kbd "C-z") #'etc-open-shell)
+(global-set-key (kbd "C-c z") #'etc-open-shell)
 
-(define-key shell-mode-map (kbd "C-c C-z") #'self-insert-command)
+;;(define-key shell-mode-map (kbd "C-c C-z") #'self-insert-command)
 (define-key shell-mode-map (kbd "C-<up>") nil)
 (define-key shell-mode-map (kbd "C-<down>") nil)
 (define-key shell-mode-map (kbd "C-c SPC") nil)

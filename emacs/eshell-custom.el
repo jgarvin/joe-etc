@@ -28,7 +28,7 @@ execute after every command."
 ;;  (require 'helm-eshell)
   (eshell-cmpl-initialize)
 ;;  (define-key eshell-mode-map [remap pcomplete] 'helm-esh-pcomplete)
-;;  (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history) 
+;;  (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history)
   ;; for me
   (define-key eshell-mode-map (kbd "<home>") #'eshell-bol)
   (define-key eshell-mode-map (kbd "<up>") #'previous-line)
@@ -109,7 +109,7 @@ same folder. If given prefix argument always make a new shell."
             (switch-to-buffer (car existing))))
       (eshell (generate-new-buffer-name "*eshell*")))))
 
-(global-set-key (kbd "C-c z") #'etc-open-eshell)
+;;(global-set-key (kbd "C-c z") #'etc-open-eshell)
 
 ;; Thanks to 'Ben'
 ;; http://stackoverflow.com/a/28160819/50385

@@ -106,22 +106,60 @@
 
   programs.nushell.enable = true;
 
-  programs.kitty = {
+  programs.ghostty = {
     enable = true;
-    font = {
-      name = "Iosevka";
-      size = 11;
-    };
-    settings = {
-      # Your existing settings
-      cursor_shape = "block";
-      shell_integration = "disabled";
-      cursor_blink_interval = "0";
-      disable_ligatures = "always";
-      enable_audio_bell = "no";
 
-      # Window styling to match your Materia theme
-      window_padding_width = "10";
+    # Custom theme: Ayu's palette/foreground/cursor with a pure black
+    # background. We override via a custom theme rather than a plain
+    # `background` setting because home-manager's keyValue formatter
+    # writes keys alphabetically, so `theme = "Ayu"` would come after
+    # `background = ...` and clobber it.
+    themes.AyuBlack = {
+      palette = [
+        "0=#11151c"
+        "1=#ea6c73"
+        "2=#7fd962"
+        "3=#f9af4f"
+        "4=#53bdfa"
+        "5=#cda1fa"
+        "6=#90e1c6"
+        "7=#c7c7c7"
+        "8=#686868"
+        "9=#f07178"
+        "10=#aad94c"
+        "11=#ffb454"
+        "12=#59c2ff"
+        "13=#d2a6ff"
+        "14=#95e6cb"
+        "15=#ffffff"
+      ];
+      background = "000000";
+      foreground = "bfbdb6";
+      cursor-color = "e6b450";
+      cursor-text = "000000";
+      selection-background = "409fff";
+      selection-foreground = "000000";
+    };
+
+    settings = {
+      font-family = "Iosevka";
+      font-size = 11;
+      theme = "AyuBlack";
+
+      # Force the classic block terminal cursor at the prompt.
+      # Without shell-integration=none, the shell switches the cursor
+      # to a beam when at the prompt.
+      cursor-style = "block";
+      cursor-style-blink = false;
+      shell-integration = "none";
+
+      confirm-close-surface = false;
+
+      # Disable Iosevka ligatures (calt drives them; liga/dlig for safety).
+      font-feature = [ "-calt" "-liga" "-dlig" ];
+
+      window-padding-x = 10;
+      window-padding-y = 10;
     };
   };
 

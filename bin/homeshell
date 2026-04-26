@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for term in kitty xfce4-terminal gnome-terminal xterm; do
+for term in ghostty kitty xfce4-terminal gnome-terminal xterm; do
     if which $term &> /dev/null; then
         exec $term
     fi
