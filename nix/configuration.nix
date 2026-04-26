@@ -142,6 +142,7 @@ in {
     man-pages-posix
     nps # this is injected into pkgs by an overlay
     tmux
+    ripgrep # agents usually want
   ];
 
   # This sets up the udev rules that are needed by vial/keybard
