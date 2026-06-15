@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, unstablePkgs, ... }:
+{ config, lib, pkgs, inputs, unstablePkgs, ... }:
 
 {
   imports =
@@ -95,9 +95,42 @@
     # programming
     racket
 
-    claude-code
-    inputs.codex-cli-nix.packages.${pkgs.system}.default
+    inputs.llm-agents.packages.${pkgs.system}.claude-code
+    inputs.llm-agents.packages.${pkgs.system}.codex
+    inputs.llm-agents.packages.${pkgs.system}.gemini-cli
+    inputs.llm-agents.packages.${pkgs.system}.opencode
+    inputs.llm-agents.packages.${pkgs.system}.pi
+
+    (unstablePkgs.rustPlatform.buildRustPackage rec {
+      pname = "claude-history";
+      version = "0.1.46";
+      src = unstablePkgs.fetchFromGitHub {
+        owner = "raine";
+        repo = "claude-history";
+        rev = "v${version}";
+        hash = "sha256-WzP1tMlzv872baoi00D0GFdflOusMb3qZMP5yxyGXbY=";
+      };
+      cargoHash = "sha256-wdb0NzREoLtz83V5ZiKJRXgfHaloYvuUelWqm1J6FZ0=";
+      doCheck = false; # test failure about line length?
+    })
   ];
+
+  # Pi agent settings. Keep the extension package declaration here so Pi can
+  # install/load FFF on startup using its supported package mechanism.
+  home.file.".pi/agent/settings.json" = {
+    force = true;
+    text = builtins.toJSON {
+      lastChangelogVersion = "0.79.3";
+      defaultProvider = "openai-codex";
+      defaultModel = "gpt-5.5";
+      defaultThinkingLevel = "high";
+      npmCommand = [ "${pkgs.nodejs}/bin/npm" ];
+      packages = [
+        "npm:@ff-labs/pi-fff"
+        "npm:@nehlis/pi-effort"
+      ];
+    };
+  };
 
   # Enable man pages for Home Manager packages
   manual.manpages.enable = true;
@@ -108,6 +141,12 @@
 
   programs.ghostty = {
     enable = true;
+    # scroll-to-bottom was added in Ghostty 1.3.0. Prefer the stable
+    # package once it is new enough, otherwise use unstable.
+    package =
+      if lib.versionAtLeast pkgs.ghostty.version "1.3.0"
+      then pkgs.ghostty
+      else unstablePkgs.ghostty;
 
     # Custom theme: Ayu's palette/foreground/cursor with a pure black
     # background. We override via a custom theme rather than a plain
@@ -142,9 +181,18 @@
     };
 
     settings = {
+      # it prints annoying messages about copying to the clipboard
+      # that block the prompt
+      app-notifications = false;
+
       font-family = "Iosevka";
       font-size = 11;
       theme = "AyuBlack";
+
+      # Scrollback is configured in bytes and is per terminal surface.
+      # 256 MiB gives a much longer history than the 10 MB default.
+      scrollback-limit = 268435456;
+      scroll-to-bottom = "no-keystroke";
 
       # Force the classic block terminal cursor at the prompt.
       # Without shell-integration=none, the shell switches the cursor

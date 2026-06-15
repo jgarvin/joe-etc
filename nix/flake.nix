@@ -20,15 +20,16 @@
     nps.url = "github:OleMussmann/nps";
     nps.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+
     centered-master.url = "path:../sway/centered_master";
     centered-master.inputs.nixpkgs.follows = "nixpkgs";
 
-    claude-code.url = "github:sadjow/claude-code-nix";
-
-    codex-cli-nix.url = "github:sadjow/codex-cli-nix";
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, claude-code, codex-cli-nix, ... }:
+  outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
     let
       third-party-packages = final: prev: {
         nps = inputs.nps.packages.${prev.system}.default;
@@ -38,6 +39,16 @@
       pkgs   = import nixpkgs {
         system = "x86_64-linux";
         config = { allowUnfree = true; };
+        overlays = [
+          (final: prev: {
+            # bees 0.11 added --throttle-factor, which keeps it from
+            # saturating Btrfs deferred-work queues. Use unstable until the
+            # stable package has that feature, then automatically use stable.
+            bees = if prev.lib.versionAtLeast prev.bees.version "0.11"
+                   then prev.bees
+                   else unstablePkgs.bees;
+          })
+        ];
       };
       unstablePkgs = import unstable {
         inherit system;
@@ -83,9 +94,9 @@
         };
         modules = [
           ./configuration.nix
+          inputs.nix-index-database.nixosModules.default
           ({ config, pkgs, ... }: { nixpkgs.overlays = [
                                       third-party-packages
-                                      claude-code.overlays.default
                                     ]; })
           home-manager.nixosModules.home-manager {
             home-manager = {
