@@ -13,6 +13,7 @@ setup_symlink $HOME/etc/shell/bashrc $HOME/.bashrc
 setup_symlink $HOME/etc/shell/bash_profile $HOME/.bash_profile
 setup_symlink $HOME/etc/screenrc $HOME/.screenrc
 setup_symlink $HOME/etc/shell/xprofile $HOME/.xprofile
+setup_symlink $HOME/etc/opencode/tui.json $HOME/.config/opencode/tui.json
 
 # mkdir -p $HOME/.config/kitty/
 # setup_symlink $HOME/etc/kitty.conf $HOME/.config/kitty/kitty.conf
