@@ -167,6 +167,13 @@ in {
 
   services.dbus.enable = true;
 
+  # reboot the system if systemd doesn't ping watchdog
+  # for this long, so we don't stay hung
+  systemd.watchdog.runtimeTime = "10min";
+  # when there is a reboot request, force reboot if graceful
+  # shutdown is taking longer than this
+  systemd.watchdog.rebootTime = "15min";
+
   # Create a directory for some backups that is outside /home so that
   # if I accidentally blow away home with a bad find/xargs that I can
   # recover easily.
