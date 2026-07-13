@@ -11,7 +11,7 @@
     "/nix".options = [ "compress=zstd" "noatime" ];
   };
 
-  # Enable periodic deduplication to save space. lots of periodic
+  # Enable continuous deduplication to save space. lots of periodic
   # rebuilds of big projects like llvm can create the same files over
   # and over.
   services.beesd.filesystems = {
@@ -19,7 +19,10 @@
       spec = "/";
       hashTableSizeMB = 256;  # or 512, depending on how much RAM you can spare
       verbosity = "crit";
-      extraOptions = [ "--loadavg-target" "1.0" ];
+      extraOptions = [
+        "--loadavg-target" "1.0"
+        "--throttle-factor" "1.0"
+      ];
     };
   };
 
@@ -29,7 +32,7 @@
   # only, just meant as protection against `rm -rf ~` and the like.
   services.btrbk.instances = {
     "home" = {
-      onCalendar = "*-*-* */2:00:00";  # every 2 hours
+      onCalendar = "*-*-* 00/2:00:00";  # every 2 hours
       settings = {
         timestamp_format = "long";
         snapshot_preserve_min = "1w";

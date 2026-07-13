@@ -5,7 +5,9 @@
 output DP-3 position 0 0
 output DP-3 mode 5120x1440@120Hz
 output DP-3 scale 1.25
+
 output eDP-1 position 1238 1152
+exec_always ~/etc/sway/sway_update_internal_output.sh
 
 # originally added this for sunshine, but the resolution/position
 # setting causes sway to crash a few second after startup
