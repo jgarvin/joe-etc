@@ -67,6 +67,7 @@
     zoom-us
 
     audacity
+    sox
 
     unzip
 
@@ -98,6 +99,7 @@
     inputs.llm-agents.packages.${pkgs.system}.claude-code
     inputs.llm-agents.packages.${pkgs.system}.codex
     inputs.llm-agents.packages.${pkgs.system}.gemini-cli
+    inputs.llm-agents.packages.${pkgs.system}.antigravity-cli
     inputs.llm-agents.packages.${pkgs.system}.opencode
     inputs.llm-agents.packages.${pkgs.system}.pi
 
