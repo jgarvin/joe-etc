@@ -10,6 +10,7 @@ let preferred_sway = unstablePkgs.sway; in
     sway-contrib.grimshot # screenshot functionality
     slurp # screenshot functionality
     wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
+    wl-clip-persist # keep clipboard contents after the source application exits
     mako # notification system developed by swaywm maintainer
     waybar
     wlr-randr
