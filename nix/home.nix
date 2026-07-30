@@ -187,6 +187,10 @@
       # that block the prompt
       app-notifications = false;
 
+      # Keep independently launched windows in separate processes so a
+      # Ghostty crash only takes down the windows owned by that instance.
+      gtk-single-instance = false;
+
       font-family = "Iosevka";
       font-size = 11;
       theme = "AyuBlack";
@@ -259,6 +263,22 @@
   systemd.user = {
     # Start new services automatically on switch
     startServices = "sd-switch";
+
+    # All interactive coding agents and their local process trees share these
+    # limits. Per-command scopes are placed below this slice by agent_run.sh,
+    # so concurrent agents cannot each claim an independent 8 GiB allowance.
+    slices.agents = {
+      Unit.Description = "Aggregate limits for interactive coding agents";
+      Slice = {
+        MemoryHigh = "8G";
+        MemoryMax = "8G";
+        MemorySwapMax = 0;
+        CPUQuota = "400%";
+        CPUWeight = 10;
+        IOWeight = 1;
+        TasksMax = 128;
+      };
+    };
   };
 
   # still managing these manually for now

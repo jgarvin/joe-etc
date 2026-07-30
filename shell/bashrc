@@ -145,3 +145,12 @@ elif [ -f /etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh ]; then
 fi
 
 eval "$(direnv hook bash)"
+
+# Keep coding agents and all of their local child processes inside the shared
+# aggregate resource limits configured by Home Manager's agents.slice.
+alias claude='$HOME/etc/shell/agent_run.sh claude'
+alias codex='$HOME/etc/shell/agent_run.sh codex'
+alias gemini='$HOME/etc/shell/agent_run.sh gemini'
+alias antigravity='$HOME/etc/shell/agent_run.sh antigravity'
+alias opencode='$HOME/etc/shell/agent_run.sh opencode'
+alias pi='$HOME/etc/shell/agent_run.sh pi'

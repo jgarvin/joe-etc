@@ -181,6 +181,14 @@ in {
     "d /backups 0700 prophet users - -"
   ];
 
+  services.cron.systemCronJobs = [
+    # Delete old non-directories, then directories once they become
+    # empty. The default cadence for this is too slow, and customizing
+    # it requires recapitulating a bunch of options that could change
+    # in the future so this is the next best hack.
+    "@daily root ${pkgs.findutils}/bin/find /tmp -xdev -depth -mindepth 1 -mmin +4320 \\( ! -type d -o -empty \\) -delete"
+  ];
+
   security.sudo.extraConfig = ''
   # Set sudo timeout to 30 minutes
   Defaults        timestamp_timeout=30

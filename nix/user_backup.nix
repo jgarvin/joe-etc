@@ -84,9 +84,18 @@
 
     services.ssc-remote-backup = let
       ssc-remote-backup-script = pkgs.writeShellScript "ssc-remote-backup-script" ''
-    #! ${pkgs.bash}/bin/bash
-    tar czf - -C ~ ssc | ssh teamslice@sliceserv "cat > /home/teamslice/backups/ssc_$(date +%d_%m_%y_%s).tar.gz"
-'';
+        set -euo pipefail
+
+        backup_name="ssc_$(${pkgs.coreutils}/bin/date +%d_%m_%y_%s).tar.gz"
+        ${pkgs.gnutar}/bin/tar \
+          --create \
+          --gzip \
+          --file=- \
+          --directory=/home/prophet \
+          ssc |
+          ${pkgs.openssh}/bin/ssh teamslice@sliceserv \
+            "cat > /home/teamslice/backups/$backup_name"
+      '';
     in {
       Unit = {
         Description = "Remote backup of ssc directory";
@@ -94,7 +103,6 @@
       Service = {
         Type = "oneshot";
         ExecStart = ssc-remote-backup-script;
-        Environment = "PATH=${lib.makeBinPath [ pkgs.coreutils pkgs.bash ]}";
       };
     };
     timers.ssc-remote-backup = {
