@@ -90,6 +90,9 @@
 
 (global-set-key (kbd "M-RET") #'etc-smart-find-file-at-point)
 
+(with-eval-after-load 'markdown
+  (define-key markdown-mode-map (kbd "M-RET") nil))
+
 (with-eval-after-load 'shell
   (define-key shell-mode-map (kbd "M-RET") nil))
 
