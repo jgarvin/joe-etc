@@ -10,6 +10,14 @@
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
 
+  # Prebuilt cudaSupport=true packages (cudaSupport itself is set where pkgs is created, in flake.nix).
+  # cache.nixos.org does not build unfree/CUDA variants. This cache moved from cuda-maintainers.cachix.org
+  # to cache.nixos-cuda.org in Nov 2025.
+  nix.settings = {
+    substituters = [ "https://cache.nixos-cuda.org" ];
+    trusted-public-keys = [ "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" ];
+  };
+
   hardware.nvidia = {
 
     # Modesetting is required.

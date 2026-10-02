@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e
 set +x
 
 DELTAS="1d 7d 31d"

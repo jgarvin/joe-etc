@@ -1,6 +1,14 @@
 { config, lib, pkgs, unstablePkgs, ... }:
 
-let my_kernel = pkgs.linuxPackages_6_18;
+let
+  my_kernel = pkgs.linuxPackages_6_18;
+  # tmux 3.5a corrupts newlines in bracketed pastes when extended keys are
+  # enabled. Version 3.6 fixes paste handling by forwarding the input without
+  # interpreting each byte as a key.
+  preferred_tmux =
+    if lib.versionAtLeast pkgs.tmux.version "3.6"
+    then pkgs.tmux
+    else unstablePkgs.tmux;
 in {
   imports =
     [ # Include the results of the hardware scan.
@@ -141,7 +149,7 @@ in {
     man-pages
     man-pages-posix
     nps # this is injected into pkgs by an overlay
-    tmux
+    preferred_tmux
     ripgrep # agents usually want
   ];
 
@@ -182,11 +190,12 @@ in {
   ];
 
   services.cron.systemCronJobs = [
-    # Delete old non-directories, then directories once they become
-    # empty. The default cadence for this is too slow, and customizing
-    # it requires recapitulating a bunch of options that could change
-    # in the future so this is the next best hack.
-    "@daily root ${pkgs.findutils}/bin/find /tmp -xdev -depth -mindepth 1 -mmin +4320 \\( ! -type d -o -empty \\) -delete"
+    # Delete old non-directories, then directories once they become empty.
+    # Preserve sockets and FIFOs because their mtimes do not indicate whether
+    # a process is still using them. The default cadence for this is too slow,
+    # and customizing it requires recapitulating a bunch of options that could
+    # change in the future so this is the next best hack.
+    "@daily root ${pkgs.findutils}/bin/find /tmp -xdev -depth -mindepth 1 -mmin +4320 ! \\( -type s -o -type p \\) \\( ! -type d -o -empty \\) -delete"
   ];
 
   security.sudo.extraConfig = ''

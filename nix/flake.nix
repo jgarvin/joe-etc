@@ -27,6 +27,8 @@
     centered-master.inputs.nixpkgs.follows = "nixpkgs";
 
     llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents-claude.url = "github:numtide/llm-agents.nix";
+    llm-agents-opencode.url = "github:numtide/llm-agents.nix";
   };
 
   outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
@@ -38,7 +40,9 @@
       system = "x86_64-linux";
       pkgs   = import nixpkgs {
         system = "x86_64-linux";
-        config = { allowUnfree = true; };
+        # cudaSupport must be set here, not in nvidia.nix: nixosSystem receives this pre-built pkgs, so
+        # module-level nixpkgs.config would not reach it. Binary cache for CUDA builds is in nvidia.nix.
+        config = { allowUnfree = true; cudaSupport = true; };
         overlays = [
           (final: prev: {
             # bees 0.11 added --throttle-factor, which keeps it from
@@ -47,12 +51,16 @@
             bees = if prev.lib.versionAtLeast prev.bees.version "0.11"
                    then prev.bees
                    else unstablePkgs.bees;
+            # Firefox links onnxruntime for its local ML features. The global
+            # cudaSupport flag makes that a CUDA build, which fails to compile
+            # and also forces Firefox itself to be rebuilt from source.
+            onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
           })
         ];
       };
       unstablePkgs = import unstable {
         inherit system;
-        config = { allowUnfree = true; };
+        config = { allowUnfree = true; cudaSupport = true; };
       };
       # Added this because gdb fails to access TLS vars on versions
       # before ~April 2025.

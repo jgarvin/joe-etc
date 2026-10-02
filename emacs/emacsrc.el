@@ -90,7 +90,7 @@
 
 (global-set-key (kbd "M-RET") #'etc-smart-find-file-at-point)
 
-(with-eval-after-load 'markdown
+(with-eval-after-load 'markdown-mode
   (define-key markdown-mode-map (kbd "M-RET") nil))
 
 (with-eval-after-load 'shell
@@ -897,10 +897,6 @@
                                  (string-equal ext "tmp")
                                  (string-equal ext "log")))
                         (< (buffer-size) uncomfortable-buffer-size))
-               ;; make text automatically wrap when the line gets too long
-               ;; -- disabled because it's not intelligent enough to understand when text is an emacs interface element
-               ;; (refill-mode 1)
-               (auto-fill-mode 1)
                ;; render long lines of text by wrapping them
                (visual-line-mode 1))))))
 

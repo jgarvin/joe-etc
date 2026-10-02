@@ -7,6 +7,7 @@
       ./user_backup.nix
       ./indexing.nix
       ./lean.nix
+      ./opencode.nix
     ];
 
   # TODO please change the username & home directory to your own
@@ -88,6 +89,11 @@
 
     ffmpeg-full
 
+    # GPU inference; CUDA builds come from the global cudaSupport flag in flake.nix.
+    # Stable's whisper-cpp 1.7.5 builds the ggml CPU/CUDA backend modules but never
+    # installs them; unstable sets GGML_BACKEND_DIR so they land in $out/lib.
+    unstablePkgs.whisper-cpp
+
     sqlite
 
     # inputs.centered-master.packages.${pkgs.system}.default
@@ -96,41 +102,48 @@
     # programming
     racket
 
-    inputs.llm-agents.packages.${pkgs.system}.claude-code
+    inputs.llm-agents-claude.packages.${pkgs.system}.claude-code
     inputs.llm-agents.packages.${pkgs.system}.codex
     inputs.llm-agents.packages.${pkgs.system}.gemini-cli
     inputs.llm-agents.packages.${pkgs.system}.antigravity-cli
-    inputs.llm-agents.packages.${pkgs.system}.opencode
+    inputs.llm-agents-opencode.packages.${pkgs.system}.opencode
     inputs.llm-agents.packages.${pkgs.system}.pi
-
-    (unstablePkgs.rustPlatform.buildRustPackage rec {
-      pname = "claude-history";
-      version = "0.1.46";
-      src = unstablePkgs.fetchFromGitHub {
-        owner = "raine";
-        repo = "claude-history";
-        rev = "v${version}";
-        hash = "sha256-WzP1tMlzv872baoi00D0GFdflOusMb3qZMP5yxyGXbY=";
-      };
-      cargoHash = "sha256-wdb0NzREoLtz83V5ZiKJRXgfHaloYvuUelWqm1J6FZ0=";
-      doCheck = false; # test failure about line length?
-    })
   ];
 
-  # Pi agent settings. Keep the extension package declaration here so Pi can
-  # install/load FFF on startup using its supported package mechanism.
+  # Pi agent settings. Keep extension package declarations here so Pi can
+  # install and load them on startup using its supported package mechanism.
   home.file.".pi/agent/settings.json" = {
     force = true;
     text = builtins.toJSON {
-      lastChangelogVersion = "0.79.3";
+      collapseChangelog = true;
+      lastChangelogVersion = inputs.llm-agents.packages.${pkgs.system}.pi.version;
       defaultProvider = "openai-codex";
       defaultModel = "gpt-5.5";
       defaultThinkingLevel = "high";
       npmCommand = [ "${pkgs.nodejs}/bin/npm" ];
       packages = [
+        "npm:@davidroman/pi-loop"
         "npm:@ff-labs/pi-fff"
         "npm:@nehlis/pi-effort"
+        "npm:pi-goal@0.1.7"
+        "npm:pi-input-history@1.1.0"
+        "npm:pi-jev-auto-mode"
+        "${config.home.homeDirectory}/pi-sanhedrin"
+        "${config.home.homeDirectory}/pi-draft-recovery"
+        "${config.home.homeDirectory}/pi-model-restore"
       ];
+    };
+  };
+
+  home.file.".pi/agent/keybindings.json" = {
+    force = true;
+    text = builtins.toJSON {
+      # Keep Ctrl+R for pi-input-history's reverse search.
+      "app.session.rename" = "ctrl+shift+r";
+      # Use Pi's native deletion actions, retaining their default shortcuts.
+      # Ghostty reports these modifiers through the Kitty keyboard protocol.
+      "tui.editor.deleteWordBackward" = [ "ctrl+w" "alt+backspace" "ctrl+backspace" ];
+      "tui.editor.deleteToLineStart" = [ "ctrl+u" "ctrl+shift+backspace" ];
     };
   };
 
@@ -210,7 +223,11 @@
       confirm-close-surface = false;
 
       # Disable Iosevka ligatures (calt drives them; liga/dlig for safety).
-      font-feature = [ "-calt" "-liga" "-dlig" ];
+      font-feature = [
+        "-calt"
+        #"-liga"
+        #"-dlig"
+      ];
 
       window-padding-x = 10;
       window-padding-y = 10;
@@ -276,7 +293,7 @@
         CPUQuota = "400%";
         CPUWeight = 10;
         IOWeight = 1;
-        TasksMax = 128;
+        TasksMax = 8192;
       };
     };
   };
