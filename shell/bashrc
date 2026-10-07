@@ -4,7 +4,11 @@ case $- in
       *) return;;
 esac
 
-# enable ctrl+backspace deleting words
+# enable ctrl+backspace deleting words: outside tmux, Ghostty sends
+# ctrl+backspace as ^H (0x08), and readline binds the terminal's werase
+# character to unix-word-rubout. Inside tmux the key arrives as the CSI-u
+# sequence \e[127;5u instead, which ~/.inputrc (programs.readline in
+# nix/home.nix) handles.
 stty werase \^H
 
 source $HOME/etc/shell/path_setup
@@ -154,3 +158,30 @@ alias gemini='$HOME/etc/shell/agent_run.sh gemini'
 alias antigravity='$HOME/etc/shell/agent_run.sh antigravity'
 alias opencode='$HOME/etc/shell/agent_run.sh opencode'
 alias pi='$HOME/etc/shell/agent_run.sh pi'
+
+# start a tmux session if there isn't one, otherwise
+# create a new session that is grouped with it, also
+# cleanup sessions as terminals are closed, except that
+# we want the last session to stay alive so we get the
+# usual tmux behavior of keeping all our work running.
+#
+# Opening a terminal locally is usually for new work, so it gets a fresh
+# window. Logging in over ssh (e.g. from the phone) is usually to check on
+# existing work, so it goes to the window last looked at, which hooks in
+# tmux.conf record. sshd sets SSH_CONNECTION, which is how we tell them apart.
+t() {
+    if [[ -n ${SSH_CONNECTION-} ]]; then
+        # run-shell -C because select-window doesn't expand formats in -t
+        tmux new-session -t work \; set-option destroy-unattached keep-last \; run-shell -C "select-window -t '#{@last_window}'"
+    else
+        # a brand new group already comes with a fresh window
+        tmux new-session -t work \; set-option destroy-unattached keep-last \; if-shell -F '#{>:#{session_group_size},1}' new-window
+    fi
+}
+
+# $- contains 'i' for interactive shells; -t 0 and -t 1 check that stdin
+# and stdout are terminals. TMUX must be empty to prevent shells started
+# inside tmux from recursively launching another tmux session.
+if [[ $- == *i* && -t 0 && -t 1 && -z ${TMUX-} ]]; then
+    t
+fi

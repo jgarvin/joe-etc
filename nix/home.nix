@@ -234,6 +234,15 @@
     };
   };
 
+  # Inside tmux (extended-keys always), Ctrl+Backspace reaches bash as the
+  # CSI-u sequence \e[127;5u rather than ^H, so the `stty werase ^H` in
+  # shell/bashrc doesn't cover it. Without this binding readline would
+  # insert "7;5u" into the line.
+  programs.readline = {
+    enable = true;
+    bindings."\\e[127;5u" = "backward-kill-word";
+  };
+
   # install vscode but let it do its own extension management instead
   # of managing with nixos
   programs.vscode = {

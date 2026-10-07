@@ -16,6 +16,25 @@
       flake = false; # Not a flake itself
     };
 
+    # Branch of unmerged tmux PR 5615, which adds kitty keyboard protocol
+    # support: https://github.com/tmux/tmux/pull/5615
+    #
+    # This is what makes Ctrl+Backspace work in Claude Code inside tmux.
+    # Released tmux only asks Ghostty for xterm's modifyOtherKeys mode, and
+    # in that mode Ghostty sends Ctrl+Backspace as 0x08, the same byte as
+    # Ctrl+H. tmux then forwards it as C-h, which Claude Code treats as plain
+    # Backspace. With this branch tmux turns on the kitty protocol in
+    # Ghostty, which sends Ctrl+Backspace as \e[127;5u, and tmux passes it
+    # on as Ctrl+Backspace. Programs that never ask for extended keys, like
+    # bash, also get \e[127;5u (because of extended-keys always in
+    # tmux.conf); programs.readline in home.nix makes bash understand it.
+    #
+    # Switch back to nixpkgs' tmux once a release includes kitty support.
+    tmux-kitty-src = {
+      url = "github:tmux/tmux/kitty-keys-autodetect";
+      flake = false;
+    };
+
     # nix package search
     nps.url = "github:OleMussmann/nps";
     nps.inputs.nixpkgs.follows = "nixpkgs";
@@ -92,6 +111,17 @@
           pkgs.perl
         ];
       });
+      # The unstable recipe already builds from the GitHub tree with
+      # autoreconf, so only the source needs replacing. The version must be
+      # the one the tree reports (e.g. next-3.9) because the recipe's install
+      # check requires `tmux -V` to print it.
+      tmux-kitty = unstablePkgs.tmux.overrideAttrs (_: {
+        pname = "tmux-kitty";
+        version = builtins.head (builtins.match
+          ".*AC_INIT[(][[]tmux[]], *([^)]+)[)].*"
+          (builtins.readFile "${inputs.tmux-kitty-src}/configure.ac"));
+        src = inputs.tmux-kitty-src;
+      });
     in {
       nixosConfigurations.eruv2 = nixpkgs.lib.nixosSystem {
         inherit system pkgs;
@@ -99,6 +129,7 @@
           inherit inputs;
           inherit unstablePkgs;
           inherit gdb-git;
+          inherit tmux-kitty;
         };
         modules = [
           ./configuration.nix

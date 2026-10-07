@@ -1,14 +1,7 @@
-{ config, lib, pkgs, unstablePkgs, ... }:
+{ config, pkgs, unstablePkgs, tmux-kitty, ... }:
 
 let
   my_kernel = pkgs.linuxPackages_6_18;
-  # tmux 3.5a corrupts newlines in bracketed pastes when extended keys are
-  # enabled. Version 3.6 fixes paste handling by forwarding the input without
-  # interpreting each byte as a key.
-  preferred_tmux =
-    if lib.versionAtLeast pkgs.tmux.version "3.6"
-    then pkgs.tmux
-    else unstablePkgs.tmux;
 in {
   imports =
     [ # Include the results of the hardware scan.
@@ -149,7 +142,7 @@ in {
     man-pages
     man-pages-posix
     nps # this is injected into pkgs by an overlay
-    preferred_tmux
+    tmux-kitty # built from PR branch, see flake.nix
     ripgrep # agents usually want
   ];
 

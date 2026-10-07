@@ -491,6 +491,7 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_4",
         "nps": "nps",
+        "tmux-kitty-src": "tmux-kitty-src",
         "unstable": "unstable"
       }
     },
@@ -568,6 +569,23 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tmux-kitty-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790700506,
+        "narHash": "sha256-rieogjAru+abQgrtuKOIWFv4knK2o86hJHzNZKH5vrs=",
+        "owner": "tmux",
+        "repo": "tmux",
+        "rev": "ff391aa052301422b5816c78ec652230faef97fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tmux",
+        "ref": "kitty-keys-autodetect",
+        "repo": "tmux",
         "type": "github"
       }
     },
