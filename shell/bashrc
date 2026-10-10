@@ -152,12 +152,49 @@ eval "$(direnv hook bash)"
 
 # Keep coding agents and all of their local child processes inside the shared
 # aggregate resource limits configured by Home Manager's agents.slice.
-alias claude='$HOME/etc/shell/agent_run.sh claude'
-alias codex='$HOME/etc/shell/agent_run.sh codex'
-alias gemini='$HOME/etc/shell/agent_run.sh gemini'
 alias antigravity='$HOME/etc/shell/agent_run.sh antigravity'
-alias opencode='$HOME/etc/shell/agent_run.sh opencode'
-alias pi='$HOME/etc/shell/agent_run.sh pi'
+
+# The TUI agents also get the terminal restored when they exit unsuccessfully.
+# A crash or a SIGKILL from agents.slice's OOM policy can skip their own
+# cleanup and leave raw mode, mouse reporting, the alternate screen, etc.
+# enabled. Under tmux, reset turns those modes off but stays on the alternate
+# screen, so rmcup leaves it afterwards; for an agent that drew on the normal
+# screen, reset clears it (tmux's scroll-on-clear moves it into history), so
+# say why. Restoring the termios settings saved before launch keeps
+# customizations like werase above, which stty sane would revert.
+_agent_tui() {
+    # Runs with stdin or stdout redirected (e.g. claude -p ... | jq) aren't TUI
+    # sessions, so don't clear away their error output.
+    if [[ ! -t 0 || ! -t 1 ]]; then
+        "$HOME/etc/shell/agent_run.sh" "$@"
+        return
+    fi
+    local tty_settings status signal
+    tty_settings=$(stty -g)
+    "$HOME/etc/shell/agent_run.sh" "$@"
+    status=$?
+    # Any non-zero status, not just 128+N signal deaths: even status 1 can be
+    # a real crash, because JS runtimes such as Node exit with 1 on an
+    # uncaught exception (and Rust exits with 101 on a panic).
+    if (( status != 0 )); then
+        reset
+        tput rmcup
+        stty "$tty_settings"
+        local reason="status $status"
+        # kill -l maps a 128+N status to signal N's name, and fails for
+        # statuses past the last signal number, which can't be signal deaths.
+        if (( status > 128 )) && signal=$(kill -l "$status" 2>/dev/null); then
+            reason+=" (SIG$signal)"
+        fi
+        printf '%s exited with %s; terminal reset\n' "$1" "$reason" >&2
+    fi
+    return "$status"
+}
+claude() { _agent_tui claude "$@"; }
+codex() { _agent_tui codex "$@"; }
+gemini() { _agent_tui gemini "$@"; }
+opencode() { _agent_tui opencode "$@"; }
+pi() { _agent_tui pi "$@"; }
 
 # start a tmux session if there isn't one, otherwise
 # create a new session that is grouped with it, also
