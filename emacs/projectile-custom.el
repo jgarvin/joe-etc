@@ -2,7 +2,13 @@
   projectile
   :ensure t)
 
-(projectile-global-mode 1)
+(projectile-mode 1)
+
+;; This and C-S-<f1> are sent by macro keys on the keyboard's
+;; navigation layer, which also gets used outside emacs. As C-c p ...
+;; sequences, hitting one by accident sent Ctrl+C, which clears the
+;; prompt in terminal programs.
+(global-set-key (kbd "C-S-<f2>") #'projectile-find-file)
 
 ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 

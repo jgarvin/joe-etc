@@ -6496,20 +6496,20 @@
           "KC_LCTRL"
         ],
         [
+          "down",
+          "KC_LSHIFT"
+        ],
+        [
           "tap",
-          "KC_C"
+          "KC_F1"
+        ],
+        [
+          "up",
+          "KC_LSHIFT"
         ],
         [
           "up",
           "KC_LCTRL"
-        ],
-        [
-          "tap",
-          "KC_P"
-        ],
-        [
-          "tap",
-          "KC_B"
         ]
       ]
     },
@@ -6560,16 +6560,24 @@
       "mid": 18,
       "actions": [
         [
-          "tap",
-          "LCTL(KC_C)"
+          "down",
+          "KC_LCTRL"
+        ],
+        [
+          "down",
+          "KC_LSHIFT"
         ],
         [
           "tap",
-          "KC_P"
+          "KC_F2"
         ],
         [
-          "tap",
-          "KC_F"
+          "up",
+          "KC_LSHIFT"
+        ],
+        [
+          "up",
+          "KC_LCTRL"
         ]
       ]
     },
@@ -6623,16 +6631,24 @@
       "mid": 22,
       "actions": [
         [
-          "tap",
-          "LCTL(KC_C)"
+          "down",
+          "KC_LCTRL"
+        ],
+        [
+          "down",
+          "KC_LSHIFT"
         ],
         [
           "tap",
-          "KC_P"
+          "KC_F1"
         ],
         [
-          "tap",
-          "KC_B"
+          "up",
+          "KC_LSHIFT"
+        ],
+        [
+          "up",
+          "KC_LCTRL"
         ]
       ]
     },

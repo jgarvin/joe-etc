@@ -33,3 +33,4 @@ out
 systemd/*.target.wants/
 bin/async_tail
 .codex
+.claude

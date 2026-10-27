@@ -46,6 +46,8 @@
    ("e" bookmark-rename "edit")))
 
 (define-key projectile-mode-map (kbd "C-c p b") #'counsel-projectile-bookmark)
+;; keyboard macro key, see projectile-custom.el for why it isn't C-c p b
+(global-set-key (kbd "C-S-<f1>") #'counsel-projectile-bookmark)
 
 (defun projectile-bookmarks ()
   (let ((bmarks (bookmark-all-names)))
