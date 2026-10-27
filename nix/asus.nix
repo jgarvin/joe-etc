@@ -1,10 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-  services.asusd = {
-    enable = true;
-    enableUserService = true;
-  };
+  services.asusd.enable = true;
 
   systemd.services.asusd = {
     wantedBy = [ "multi-user.target" ];

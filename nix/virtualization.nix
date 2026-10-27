@@ -55,7 +55,7 @@
       SWAY_IS_VM = "1";
     };
 
-    services.greetd.settings.default_session.command = lib.mkForce "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.sway}/bin/sway";
+    services.greetd.settings.default_session.command = lib.mkForce "${pkgs.tuigreet}/bin/tuigreet --time --cmd ${pkgs.sway}/bin/sway";
 
     # stuff to get copy/paste working? still doesn't
     services.spice-vdagentd.enable = true;

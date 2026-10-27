@@ -2,12 +2,12 @@
   description = "flake for my-host";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -53,7 +53,7 @@
   outputs = inputs@{ self, nixpkgs, unstable, gdb-src, home-manager, ... }:
     let
       third-party-packages = final: prev: {
-        nps = inputs.nps.packages.${prev.system}.default;
+        nps = inputs.nps.packages.${prev.stdenv.hostPlatform.system}.default;
         # other third party flakes could go here
       };
       system = "x86_64-linux";

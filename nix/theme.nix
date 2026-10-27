@@ -37,6 +37,8 @@
       name = "Iosevka";
       size = 11;
     };
+    # home-manager 26.05 no longer applies gtk.theme to GTK4 by default.
+    gtk4.theme = config.gtk.theme;
   };
 
   # Qt configuration

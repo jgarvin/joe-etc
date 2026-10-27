@@ -45,22 +45,9 @@
     # accessible via `nvidia-settings`.
     nvidiaSettings = true;
 
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    # package = config.boot.kernelPackages.nvidiaPackages.latest;
-
-    package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "580.126.09";
-      # this is the third one it will complain is wrong
-      sha256_64bit = "sha256-TKxT5I+K3/Zh1HyHiO0kBZokjJ/YCYzq/QiKSYmG7CY=";
-      # unused
-      sha256_aarch64 = "sha256-2l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
-      # this is the second one it will complain is wrong
-      openSha256 = "sha256-N/1Ra8Teq93U3T898ImAT2DceHjDHZL1DuriJeTYEa4=";
-      # this is the first one it will complain is wrong
-      settingsSha256 = "sha256-N/1Ra8Teq93U3T898ImAT2DceHjDHZL1DuriJeTYEa4=";
-      # unused
-      persistencedSha256 = "sha256-4l8N83Spj0MccA8+8R1uqiXBS0Ag4JrLPjrU3TaXHnM=";
-    };
+    # The release's packaged driver. To pin a specific version instead, use
+    # config.boot.kernelPackages.nvidiaPackages.mkDriver { version = ...; ... }.
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
 
     prime = {
       offload = {

@@ -14,6 +14,14 @@
   home.username = "prophet";
   home.homeDirectory = "/home/prophet";
 
+  # Expire old Home Manager generations and collect unreferenced store paths.
+  services.home-manager.autoExpire = {
+    enable = true;
+    frequency = "weekly";
+    timestamp = "-45 days";
+    store.cleanup = true;
+  };
+
   # Packages that should be installed to the user profile.
   home.packages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -29,7 +37,7 @@
     jq
     mesa-demos # glxgears
     vulkan-tools # vkcube
-    xorg.xeyes
+    xeyes
     xterm
     killall
     gnumake
@@ -37,7 +45,7 @@
     libtool
     # gdb
     valgrind
-    linuxPackages_latest.perf # we can't easily inspect the one we're booting due to purity :(
+    perf
     google-chrome
     direnv
     nix-direnv
@@ -96,18 +104,18 @@
 
     sqlite
 
-    # inputs.centered-master.packages.${pkgs.system}.default
+    # inputs.centered-master.packages.${pkgs.stdenv.hostPlatform.system}.default
     libreoffice-qt
 
     # programming
     racket
 
-    inputs.llm-agents-claude.packages.${pkgs.system}.claude-code
-    inputs.llm-agents.packages.${pkgs.system}.codex
-    inputs.llm-agents.packages.${pkgs.system}.gemini-cli
-    inputs.llm-agents.packages.${pkgs.system}.antigravity-cli
-    inputs.llm-agents-opencode.packages.${pkgs.system}.opencode
-    inputs.llm-agents.packages.${pkgs.system}.pi
+    inputs.llm-agents-claude.packages.${pkgs.stdenv.hostPlatform.system}.claude-code
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.gemini-cli
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.antigravity-cli
+    inputs.llm-agents-opencode.packages.${pkgs.stdenv.hostPlatform.system}.opencode
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi
   ];
 
   # Pi agent settings. Keep extension package declarations here so Pi can
@@ -116,7 +124,7 @@
     force = true;
     text = builtins.toJSON {
       collapseChangelog = true;
-      lastChangelogVersion = inputs.llm-agents.packages.${pkgs.system}.pi.version;
+      lastChangelogVersion = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi.version;
       defaultProvider = "openai-codex";
       defaultModel = "gpt-5.5";
       defaultThinkingLevel = "high";
@@ -128,6 +136,7 @@
         "npm:pi-goal@0.1.7"
         "npm:pi-input-history@1.1.0"
         "npm:pi-jev-auto-mode"
+        "npm:pi-side-chat"
         "${config.home.homeDirectory}/pi-sanhedrin"
         "${config.home.homeDirectory}/pi-draft-recovery"
         "${config.home.homeDirectory}/pi-model-restore"

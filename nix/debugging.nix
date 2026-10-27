@@ -11,18 +11,18 @@ in
   systemd.coredump.enable = true;
 
   # Configure coredump behavior
-  systemd.coredump.extraConfig = ''
+  systemd.coredump.settings.Coredump = {
     # Store coredumps persistently in the filesystem
-    Storage=external
+    Storage = "external";
     # Compress core dumps to save space
-    Compress=yes
+    Compress = "yes";
     # Maximum total storage space for core dumps (5x our max single dump size)
-    MaxUse=${toString (maxCoreSizeGB * 5)}G
+    MaxUse = "${toString (maxCoreSizeGB * 5)}G";
     # Keep this much space free on the filesystem
-    KeepFree=1G
+    KeepFree = "1G";
     # Maximum size of a single core dump
-    ProcessSizeMax=${toString maxCoreSizeGB}G
-  '';
+    ProcessSizeMax = "${toString maxCoreSizeGB}G";
+  };
 
   # Set appropriate resource limits for core dumps
   security.pam.loginLimits = [
@@ -32,7 +32,7 @@ in
   ];
 
   # Set systemd default limits for core dumps
-  systemd.extraConfig = "DefaultLimitCORE=${toString maxCoreSizeGB}G";
+  systemd.settings.Manager.DefaultLimitCORE = "${toString maxCoreSizeGB}G";
 
   # Set appropriate kernel parameters
   boot.kernel.sysctl = {
@@ -71,7 +71,7 @@ in
 
   # enable nixseparatedebuginfod service that grabs the debug info for
   # any package automagically when you run gdb
-  services.nixseparatedebuginfod.enable = true;
+  services.nixseparatedebuginfod2.enable = true;
 
   # let me use dmesg as a regular user
   boot.kernel.sysctl = {

@@ -7,7 +7,7 @@
   # running the xfce desktop
   programs.xfconf.enable = true;
 
-  programs.thunar.plugins = with pkgs.xfce; [
+  programs.thunar.plugins = with pkgs; [
     thunar-archive-plugin # handle zip etc
     thunar-volman # handle removable media
   ];

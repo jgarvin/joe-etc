@@ -50,7 +50,7 @@ let preferred_sway = unstablePkgs.sway; in
     settings = {
       default_session = {
         # sway needs the `--unsupported-gpu` whenever you use nvidia proprietary drivers
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${sway-nvidia-wrapper}/bin/sway-nvidia";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd ${sway-nvidia-wrapper}/bin/sway-nvidia";
         user = "greeter";
       };
     };

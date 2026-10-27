@@ -116,6 +116,7 @@ in {
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     htop
+    ncdu
     git
     lshw
     silver-searcher
@@ -134,7 +135,7 @@ in {
     gdb
     lldb
     valgrind
-    my_kernel.perf
+    perf
     google-chrome
     tarsnap
     tarsnapper
@@ -170,10 +171,10 @@ in {
 
   # reboot the system if systemd doesn't ping watchdog
   # for this long, so we don't stay hung
-  systemd.watchdog.runtimeTime = "10min";
+  systemd.settings.Manager.RuntimeWatchdogSec = "10min";
   # when there is a reboot request, force reboot if graceful
   # shutdown is taking longer than this
-  systemd.watchdog.rebootTime = "15min";
+  systemd.settings.Manager.RebootWatchdogSec = "15min";
 
   # Create a directory for some backups that is outside /home so that
   # if I accidentally blow away home with a bad find/xargs that I can
@@ -183,12 +184,17 @@ in {
   ];
 
   services.cron.systemCronJobs = [
-    # Delete old non-directories, then directories once they become empty.
-    # Preserve sockets and FIFOs because their mtimes do not indicate whether
-    # a process is still using them. The default cadence for this is too slow,
-    # and customizing it requires recapitulating a bunch of options that could
-    # change in the future so this is the next best hack.
-    "@daily root ${pkgs.findutils}/bin/find /tmp -xdev -depth -mindepth 1 -mmin +4320 ! \\( -type s -o -type p \\) \\( ! -type d -o -empty \\) -delete"
+    # Delete each entry directly in /tmp once nothing in it was modified for 3
+    # days, as a whole; one recent change anywhere inside keeps all of it,
+    # since the old parts of a tree in use (git packfiles, build caches) are
+    # often still needed. /tmp/claude-<uid> is Claude Code's TMPDIR and holds
+    # loose tool output plus one directory per project, each holding one
+    # directory per session, so the entries at those levels are judged
+    # separately instead. See clean-tmp.py for what counts as in use. The
+    # default cadence for this is too slow, and customizing it requires
+    # recapitulating a bunch of options that could change in the future so
+    # this is the next best hack.
+    "@daily root ${pkgs.python3}/bin/python3 ${./clean-tmp.py} --root /tmp --max-age-minutes 4320 --container 'claude-[0-9]*/-*'"
   ];
 
   security.sudo.extraConfig = ''
